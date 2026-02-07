@@ -61,8 +61,6 @@ export default function B2CRegistrationForm() {
     const [phoneVerified, setPhoneVerified] = useState(false)
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
-    const [generatedEmailCode, setGeneratedEmailCode] = useState('') // In real app, don't store on client
-    const [generatedPhoneCode, setGeneratedPhoneCode] = useState('')
 
     // Auto-generate username when names change
     const generateUsername = () => {
@@ -95,9 +93,6 @@ export default function B2CRegistrationForm() {
             setLoading(false)
             if (data.success) {
                 setEmailCodeSent(true)
-                if (data.debug_code) {
-                    setGeneratedEmailCode(data.debug_code)
-                }
             } else {
                 setError(data.error)
                 resetRecaptcha()
@@ -112,26 +107,23 @@ export default function B2CRegistrationForm() {
     const handleVerifyEmail = async () => {
         setLoading(true)
         setError('')
-        // In a real app, you'd call an API to verify the code against the server session/DB
-        // For now, we still support the debug_code check or a placeholder success
-        if (generatedEmailCode) {
-            if (formData.emailCode === generatedEmailCode) {
+        try {
+            const res = await fetch('/api/validate/email/verify', {
+                method: 'POST',
+                body: JSON.stringify({ email: formData.email, code: formData.emailCode })
+            })
+            const data = await res.json()
+            if (data.success) {
                 setEmailVerified(true)
                 setStep(2)
             } else {
-                setError('Invalid code')
+                setError(data.error || 'Invalid code')
             }
-        } else {
-            // Production: Mock verification success for now if code is entered
-            // OR better: Implement /api/validate/email/verify
-            if (formData.emailCode.length === 6) {
-                setEmailVerified(true)
-                setStep(2)
-            } else {
-                setError('Please enter the 6-digit code sent to your email')
-            }
+        } catch (err) {
+            setError('Verification failed. Please try again.')
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     // STEP 2: Phone Handlers
@@ -145,29 +137,30 @@ export default function B2CRegistrationForm() {
         setLoading(false)
         if (data.success) {
             setPhoneCodeSent(true)
-            if (data.debug_code) {
-                setGeneratedPhoneCode(data.debug_code)
-            }
         } else {
             setError(data.error)
         }
     }
 
-    const handleVerifyPhone = () => {
-        if (generatedPhoneCode) {
-            if (formData.phoneCode === generatedPhoneCode) {
+    const handleVerifyPhone = async () => {
+        setLoading(true)
+        setError('')
+        try {
+            const res = await fetch('/api/validate/phone/verify', {
+                method: 'POST',
+                body: JSON.stringify({ phone: formData.phone, code: formData.phoneCode })
+            })
+            const data = await res.json()
+            if (data.success) {
                 setPhoneVerified(true)
                 setStep(3)
             } else {
-                setError('Invalid code')
+                setError(data.error || 'Invalid code')
             }
-        } else {
-            if (formData.phoneCode.length === 6) {
-                setPhoneVerified(true)
-                setStep(3)
-            } else {
-                setError('Please enter the 6-digit code sent to your phone')
-            }
+        } catch (err) {
+            setError('Verification failed. Please try again.')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -296,12 +289,7 @@ export default function B2CRegistrationForm() {
 
                     {emailCodeSent && !emailVerified && (
                         <div className="bg-green-50 p-4 rounded-lg border border-green-100 animate-in fade-in slide-in-from-top-2">
-                            {generatedEmailCode && (
-                                <p className="text-xs text-green-600 mb-2 font-semibold">TEST MODE CODE: <span className="font-mono text-lg ml-2">{generatedEmailCode}</span></p>
-                            )}
-                            {!generatedEmailCode && (
-                                <p className="text-xs text-green-600 mb-2 font-semibold italic text-center">Check your inbox for the 6-digit code</p>
-                            )}
+                            <p className="text-xs text-green-600 mb-2 font-semibold italic text-center">Check your inbox for the 6-digit code</p>
                             <div className="flex gap-2 items-center">
                                 <input
                                     id="reg-email-code"
@@ -347,12 +335,7 @@ export default function B2CRegistrationForm() {
                     </div>
                     {phoneCodeSent && !phoneVerified && (
                         <div className="bg-green-50 p-4 rounded-lg border border-green-100 animate-in fade-in slide-in-from-top-2">
-                            {generatedPhoneCode && (
-                                <p className="text-xs text-green-600 mb-2 font-semibold">TEST MODE SMS: <span className="font-mono text-lg ml-2">{generatedPhoneCode}</span></p>
-                            )}
-                            {!generatedPhoneCode && (
-                                <p className="text-xs text-green-600 mb-2 font-semibold italic text-center">Check your phone for the 6-digit code</p>
-                            )}
+                            <p className="text-xs text-green-600 mb-2 font-semibold italic text-center">Check your phone for the 6-digit code</p>
                             <div className="flex gap-2 items-center">
                                 <input
                                     id="reg-phone-code"

@@ -81,8 +81,6 @@ export default function B2BRegistrationForm() {
     const [phoneVerified, setPhoneVerified] = useState(false)
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
-    const [generatedEmailCode, setGeneratedEmailCode] = useState('')
-    const [generatedPhoneCode, setGeneratedPhoneCode] = useState('')
 
     // --- HANDLERS ---
 
@@ -128,7 +126,6 @@ export default function B2BRegistrationForm() {
             setLoading(false)
             if (data.success) {
                 setEmailCodeSent(true)
-                if (data.debug_code) setGeneratedEmailCode(data.debug_code)
             } else {
                 setError(data.error)
                 resetRecaptcha()
@@ -140,13 +137,20 @@ export default function B2BRegistrationForm() {
         }
     }
 
-    const handleVerifyEmail = () => {
-        if (generatedEmailCode) {
-            if (formData.emailCode === generatedEmailCode) setEmailVerified(true)
-            else setError('Invalid code')
-        } else {
-            if (formData.emailCode.length === 6) setEmailVerified(true)
-            else setError('Please enter the 6-digit code sent to your email')
+    const handleVerifyEmail = async () => {
+        setLoading(true); setError('')
+        try {
+            const res = await fetch('/api/validate/email/verify', {
+                method: 'POST',
+                body: JSON.stringify({ email: formData.email, code: formData.emailCode })
+            })
+            const data = await res.json()
+            if (data.success) setEmailVerified(true)
+            else setError(data.error || 'Invalid code')
+        } catch (err) {
+            setError('Verification failed')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -157,17 +161,23 @@ export default function B2BRegistrationForm() {
         setLoading(false)
         if (data.success) {
             setPhoneCodeSent(true)
-            if (data.debug_code) setGeneratedPhoneCode(data.debug_code)
         } else setError(data.error)
     }
 
-    const handleVerifyPhone = () => {
-        if (generatedPhoneCode) {
-            if (formData.phoneCode === generatedPhoneCode) setPhoneVerified(true)
-            else setError('Invalid code')
-        } else {
-            if (formData.phoneCode.length === 6) setPhoneVerified(true)
-            else setError('Please enter the 6-digit code sent to your phone')
+    const handleVerifyPhone = async () => {
+        setLoading(true); setError('')
+        try {
+            const res = await fetch('/api/validate/phone/verify', {
+                method: 'POST',
+                body: JSON.stringify({ phone: formData.phone, code: formData.phoneCode })
+            })
+            const data = await res.json()
+            if (data.success) setPhoneVerified(true)
+            else setError(data.error || 'Invalid code')
+        } catch (err) {
+            setError('Verification failed')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -395,8 +405,7 @@ export default function B2BRegistrationForm() {
                     </div>
                     {emailCodeSent && !emailVerified && (
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
-                            {generatedEmailCode && <span className="text-xs font-mono text-blue-800 block">TEST MODE CODE: {generatedEmailCode}</span>}
-                            {!generatedEmailCode && <span className="text-xs font-medium text-blue-800 block italic">Check your email for the verification code</span>}
+                            <span className="text-xs font-medium text-blue-800 block italic">Check your email for the verification code</span>
                             <div className="flex gap-2 items-center">
                                 <label htmlFor="email-verify-code" className="sr-only">Code</label>
                                 <input id="email-verify-code" name="emailCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.emailCode} onChange={e => setFormData(prev => ({ ...prev, emailCode: e.target.value }))} />
@@ -415,8 +424,7 @@ export default function B2BRegistrationForm() {
                     </div>
                     {phoneCodeSent && !phoneVerified && (
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
-                            {generatedPhoneCode && <span className="text-xs font-mono text-blue-800 block">TEST MODE SMS: {generatedPhoneCode}</span>}
-                            {!generatedPhoneCode && <span className="text-xs font-medium text-blue-800 block italic">Check your phone for the 6-digit code</span>}
+                            <span className="text-xs font-medium text-blue-800 block italic">Check your phone for the 6-digit code</span>
                             <div className="flex gap-2 items-center">
                                 <label htmlFor="phone-verify-code" className="sr-only">Code</label>
                                 <input id="phone-verify-code" name="phoneCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.phoneCode} onChange={e => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))} />
