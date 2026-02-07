@@ -245,5 +245,128 @@
     "legalAgreement": "Pravni sporazum: Stranka je elektronsko sprejela Splošne pogoje dne: {date}.",
     "thankYou": "Hvala, ker ste izbrali Tigo Energy. Trajnost je naša misija.",
     "officialShopInvoice": "Uradni račun spletne trgovine"
+  },
+  "email": {
+    "hello": "Pozdravljeni,",
+    "bestRegards": "Lep pozdrav,",
+    "team": "Ekipa Tigo Energy SHOP",
+    "verificationCode": {
+      "title": "Potrdite svoj e-poštni naslov",
+      "text": "Hvala, ker ste se pridružili Tigo Energy SHOP. Za dokončanje registracije in zavarovanje računa uporabite naslednjo potrditveno kodo:",
+      "expire": "Ta koda poteče čez 10 minut. Če tega niste zahtevali, prezrite to e-pošto."
+    },
+    "verificationLink": {
+      "title": "Potrdite svoj e-poštni naslov",
+      "helloWithName": "Pozdravljeni {{name}},",
+      "text": "Dobrodošli v Tigo Energy SHOP! Kliknite spodnji gumb, da potrdite svoj e-poštni naslov in aktivirate svoj račun.",
+      "button": "Potrdi e-poštni naslov",
+      "linkHelp": "Če zgornji gumb ne deluje, lahko kopirate in prilepite naslednjo povezavo v svoj brskalnik:",
+      "ignore": "Če računa niste ustvarili vi, dodatno ukrepanje ni potrebno."
+    },
+    "welcome": {
+      "title": "Dobrodošli v družini!",
+      "text": "Veseli smo, da ste se nam pridružili v Tigo Energy SHOP. Zdaj ste povezani s specializiranim evropskim distributerjem za Tigo Energy sončne rešitve.",
+      "feature1": "Strokovna podpora",
+      "feature1Desc": "Neposreden dostop do tehničnih strokovnjakov, ki Tigo izdelke poznajo do potankosti.",
+      "feature2": "Neposredna distribucija",
+      "feature2Desc": "Originalni izdelki po najboljših možnih cenah, poslani neposredno po vsej Evropi.",
+      "feature3": "Pametna solarna orodja",
+      "feature3Desc": "Upravljajte svoja naročila, sledenje in B2B ugodnosti na enem mestu.",
+      "button": "Začni raziskovati",
+      "footerNote": "Če imate kakršna koli vprašanja, je naša ekipa za podporo oddaljena le eno sporočilo."
+    },
+    "messageSent": {
+      "status": "Sporočilo uspešno poslano",
+      "title": "Prejeli smo vaše povpraševanje",
+      "text": "Hvala, ker ste stopili v stik z nami. Vaše sporočilo je bilo uspešno dostavljeno naši ekipi za podporo. Spodaj smo priložili kopijo vašega sporočila za vašo evidenco.",
+      "footerNote": "Član naše ekipe bo pregledal vaše povpraševanje in vam odgovoril v najkrajšem možnem času. Običajno odgovorimo v enem delovnem dnevu."
+    },
+    "newMessage": {
+      "title": "Imate novo sporočilo",
+      "text": "Član ekipe je odgovoril na vaše povpraševanje. Sporočilo si lahko ogledate in nadaljujete pogovor v svojem profilu trgovine.",
+      "dateLabel": "Prejeto dne:",
+      "button": "Poglej sporočilo",
+      "footerNote": "Če imate težave s prijavo, se obrnite na našo ekipo za podporo."
+    },
+    "orderConfirmation": {
+      "title": "Hvala za vaše naročilo!",
+      "text": "Prejeli smo vaše naročilo in ga že pripravljamo. Ko bo vaše naročilo odposlano, boste prejeli še eno e-pošto.",
+      "orderNumber": "Številka naročila:",
+      "date": "Datum:",
+      "paymentMethod": "Način plačila:",
+      "product": "Izdelek",
+      "qty": "Kol.",
+      "price": "Cena",
+      "subtotal": "Vmesna vsota",
+      "shipping": "Dostava",
+      "vat": "DDV",
+      "total": "Skupaj plačano",
+      "footerNote": "Statusu naročila lahko sledite v svojem profilu računa."
+    },
+    "orderPartial": {
+      "title": "Naročilo prejeto",
+      "bannerTitle": "Izračun dostave v teku",
+      "bannerText": "Vaše naročilo je bilo uspešno prejeto in delno plačano. Zaradi narave ali velikosti vašega naročila trenutno računamo najbolj natančen strošek dostave za vašo lokacijo.",
+      "text": "O določenem strošku dostave vas bomo obvestili po e-pošti. Ko bo strošek potrjen, boste lahko v svojem profilu opravili končno plačilo in s tem zaključili naročilo.",
+      "amountPaid": "Plačani znesek (izdelki):",
+      "shippingStatus": "Status dostave:",
+      "pending": "Čaka na izračun",
+      "footerNote": "Hvala za vaše potrpljenje in ker ste izbrali Tigo Energy SHOP."
+    },
+    "cartAbandonment": {
+      "title": "Ste kaj pozabili?",
+      "text": "Opazili smo, da ste v košarici pustili nekaj izdelkov. Shranili smo jih za vas, da lahko nadaljujete točno tam, kjer ste končali.",
+      "itemsTitle": "Izdelki v vaši košarici:",
+      "button": "Zaključi nakup",
+      "footerNote": "Potrebujete pomoč pri naročilu? Odgovorite na to e-pošto in naša ekipa vam bo z veseljem pomagala."
+    },
+    "priceChange": {
+      "title": "Navdušujoča posodobitev cen!",
+      "text": "Mislili smo, da vas bo zanimalo, da ima izdelek, ki ste ga predhodno kupili ali zanj pokazali zanimanje, novo ceno.",
+      "footerNote": "To je odličen čas za razširitev vaše sončne elektrarne ali zalogo komponent.",
+      "button": "Poglej izdelek"
+    },
+    "delivered": {
+      "title": "Dostavljeno!",
+      "text": "Odlična novica! Vaše naročilo #{{order_number}} je bilo uspešno dostavljeno. Upamo, da ste zadovoljni s svojimi novimi Tigo Energy izdelki.",
+      "attachmentNote": "Za vašo evidenco smo tej e-pošti priložili naslednje dokumente:",
+      "doc1": "Potrdilo o dostavi",
+      "doc2": "Uradni račun",
+      "footerNote": "Hvala, ker ste izbrali Initra Energija kot svojega partnerja Tigo Energy. Če imate kakršna koli vprašanja glede namestitve ali nastavitve izdelka, vam je naša tehnična ekipa na voljo."
+    },
+    "b2bVerified": {
+      "status": "VIES potrjen",
+      "title": "Vaš B2B račun je aktiven",
+      "helloWithCompany": "Pozdravljena ekipa {{company_name}},",
+      "text": "Z veseljem vas obveščamo, da je bila vaša ID številka za DDV (VIES) uspešno potrjena. Vaš B2B račun je zdaj popolnoma aktiven in lahko koristite vse ugodnosti našega profesionalnega programa za partnerje.",
+      "benefit1": "0% DDV (pridobitev znotraj Skupnosti)",
+      "benefit2": "Profesionalne B2B cene",
+      "benefit3": "Prednostne možnosti dostave",
+      "benefit4": "Neposredna tehnična podpora",
+      "button": "Prijava v vaš B2B portal",
+      "footerNote": "Dobrodošli! Veselimo se sodelovanja pri vaših solarnih projektih."
+    },
+    "b2bApplication": {
+      "title": "B2B prijava prejeta",
+      "bannerTitle": "Preverjanje v teku",
+      "bannerText": "Naša ekipa trenutno pregleduje vašo dokumentacijo in podatke o podjetju. Ta postopek običajno traja do 48 ur.",
+      "text": "Ko bodo vaši podatki preverjeni, vas bomo obvestili po e-pošti in vaš račun bo popolnoma operativen z dostopom do B2B cen in profesionalnih orodij.",
+      "footerNote": "Če imate vmes kakršna koli nujna vprašanja, lahko odgovorite na to e-pošto."
+    },
+    "passwordReset": {
+      "title": "Ponastavitev gesla",
+      "text": "Prejeli smo zahtevo za ponastavitev gesla za vaš račun Tigo Energy SHOP. Kliknite spodnji gumb, da izberete novo geslo.",
+      "button": "Ponastavi geslo",
+      "linkHelp": "Če zgornji gumb ne deluje, lahko kopirate in prilepite naslednjo povezavo v svoj brskalnik:",
+      "expire": "Ta povezava poteče čez 1 uro. Če niste zahtevali ponastavitve gesla, prezrite to e-pošto."
+    },
+    "shippingUpdate": {
+      "title": "Vaše naročilo je na poti!",
+      "text": "Vaše naročilo #{{order_number}} je bilo odposlano in je že na poti k vam.",
+      "carrier": "Prevoznik",
+      "tracking": "Številka za sledenje",
+      "button": "Sledi pošiljki",
+      "footerNote": "Upoštevajte, da lahko traja do 24 ur, da se podatki o sledenju posodobijo na spletni strani prevoznika."
+    }
   }
 }

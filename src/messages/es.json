@@ -245,5 +245,128 @@
     "legalAgreement": "Acuerdo legal: El cliente acepto electronicamente los Terminos y Condiciones el: {date}.",
     "thankYou": "Gracias por elegir Tigo Energy. La sostenibilidad es nuestra mision.",
     "officialShopInvoice": "Factura oficial de la tienda"
+  },
+  "email": {
+    "hello": "Hello,",
+    "bestRegards": "Best regards,",
+    "team": "The Tigo Energy SHOP Team",
+    "verificationCode": {
+      "title": "Verify your email address",
+      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
+      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+    },
+    "verificationLink": {
+      "title": "Verify your email address",
+      "helloWithName": "Hello {{name}},",
+      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
+      "button": "Verify Email Address",
+      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
+      "ignore": "If you did not create an account, no further action is required."
+    },
+    "welcome": {
+      "title": "Welcome to the family!",
+      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
+      "feature1": "Expert Support",
+      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
+      "feature2": "Direct Distribution",
+      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
+      "feature3": "Smart Solar Tools",
+      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
+      "button": "Start Exploring",
+      "footerNote": "If you have any questions, our support team is just one message away."
+    },
+    "messageSent": {
+      "status": "Message Successfully Sent",
+      "title": "We've received your inquiry",
+      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
+      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+    },
+    "newMessage": {
+      "title": "You have a new message",
+      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
+      "dateLabel": "Received on:",
+      "button": "View Message",
+      "footerNote": "If you have any trouble logging in, please contact our support team."
+    },
+    "orderConfirmation": {
+      "title": "Thanks for your order!",
+      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
+      "orderNumber": "Order Number:",
+      "date": "Date:",
+      "paymentMethod": "Payment Method:",
+      "product": "Product",
+      "qty": "Qty",
+      "price": "Price",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "vat": "VAT",
+      "total": "Total Paid",
+      "footerNote": "You can track your order status in your Account Profile."
+    },
+    "orderPartial": {
+      "title": "Order Received",
+      "bannerTitle": "Shipping Calculation in Progress",
+      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
+      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
+      "amountPaid": "Amount Paid (Products):",
+      "shippingStatus": "Shipping Status:",
+      "pending": "Pending Calculation",
+      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+    },
+    "cartAbandonment": {
+      "title": "Did you forget something?",
+      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
+      "itemsTitle": "Items in your cart:",
+      "button": "Complete My Purchase",
+      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+    },
+    "priceChange": {
+      "title": "Exciting price update!",
+      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
+      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
+      "button": "View Product"
+    },
+    "delivered": {
+      "title": "Delivered!",
+      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
+      "attachmentNote": "For your records, we have attached the following documents to this email:",
+      "doc1": "Delivery Confirmation",
+      "doc2": "Official Invoice",
+      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+    },
+    "b2bVerified": {
+      "status": "VIES Verified",
+      "title": "Your B2B Account is Active",
+      "helloWithCompany": "Hello {{company_name}} team,",
+      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
+      "benefit1": "0% VAT (Intra-Community Acquisition)",
+      "benefit2": "Professional B2B Pricing",
+      "benefit3": "Priority Shipping Options",
+      "benefit4": "Direct Technical Support",
+      "button": "Log In to Your B2B Portal",
+      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+    },
+    "b2bApplication": {
+      "title": "B2B Application Received",
+      "bannerTitle": "Verification in Progress",
+      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
+      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
+      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+    },
+    "passwordReset": {
+      "title": "Reset your password",
+      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
+      "button": "Reset Password",
+      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
+      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+    },
+    "shippingUpdate": {
+      "title": "Your order is on the way!",
+      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
+      "carrier": "Carrier",
+      "tracking": "Tracking Number",
+      "button": "Track Package",
+      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+    }
   }
 }

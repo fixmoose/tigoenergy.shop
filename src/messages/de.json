@@ -245,5 +245,128 @@
     "legalAgreement": "Rechtsvereinbarung: Kunde hat den AGB elektronisch zugestimmt am: {date}.",
     "thankYou": "Vielen Dank, dass Sie sich fuer Tigo Energy entschieden haben. Nachhaltigkeit ist unsere Mission.",
     "officialShopInvoice": "Offizielle Shop-Rechnung"
+  },
+  "email": {
+    "hello": "Hallo,",
+    "bestRegards": "Mit freundlichen Grüßen,",
+    "team": "Das Tigo Energy SHOP Team",
+    "verificationCode": {
+      "title": "E-Mail-Adresse bestätigen",
+      "text": "Vielen Dank für Ihre Anmeldung bei Tigo Energy SHOP. Um Ihre Registrierung abzuschließen und Ihr Konto zu sichern, verwenden Sie bitte den folgenden Bestätigungscode:",
+      "expire": "Dieser Code läuft in 10 Minuten ab. Wenn Sie dies nicht angefordert haben, ignorieren Sie bitte diese E-Mail."
+    },
+    "verificationLink": {
+      "title": "E-Mail-Adresse bestätigen",
+      "helloWithName": "Hallo {{name}},",
+      "text": "Willkommen bei Tigo Energy SHOP! Bitte klicken Sie auf die Schaltfläche unten, um Ihre E-Mail-Adresse zu bestätigen und Ihr Konto zu aktivieren.",
+      "button": "E-Mail-Adresse bestätigen",
+      "linkHelp": "Wenn die Schaltfläche oben nicht funktioniert, können Sie den folgenden Link auch kopieren und in Ihren Browser einfügen:",
+      "ignore": "Wenn Sie kein Konto erstellt haben, ist keine weitere Aktion erforderlich."
+    },
+    "welcome": {
+      "title": "Willkommen in der Familie!",
+      "text": "Wir freuen uns, Sie bei Tigo Energy SHOP begrüßen zu dürfen. Sie sind nun mit Europas spezialisiertem Distributor für Tigo Energy Solarlösungen verbunden.",
+      "feature1": "Experten-Support",
+      "feature1Desc": "Direkter Zugang zu technischen Experten, die Tigo-Produkte in- und auswendig kennen.",
+      "feature2": "Direktvertrieb",
+      "feature2Desc": "Originalprodukte zu den bestmöglichen Preisen, direkt in ganz Europa versandt.",
+      "feature3": "Intelligente Solar-Tools",
+      "feature3Desc": "Verwalten Sie Ihre Bestellungen, Sendungsverfolgung und B2B-Vorteile von einem einzigen Profil aus.",
+      "button": "Jetzt entdecken",
+      "footerNote": "Wenn Sie Fragen haben, ist unser Support-Team nur eine Nachricht entfernt."
+    },
+    "messageSent": {
+      "status": "Nachricht erfolgreich gesendet",
+      "title": "Wir haben Ihre Anfrage erhalten",
+      "text": "Vielen Dank, dass Sie sich an uns gewandt haben. Ihre Nachricht wurde erfolgreich an unser Support-Team übermittelt. Wir haben unten eine Kopie Ihrer Nachricht für Ihre Unterlagen beigefügt.",
+      "footerNote": "Ein Mitglied unseres Teams wird Ihre Anfrage prüfen und sich so schnell wie möglich bei Ihnen melden. Wir antworten in der Regel innerhalb eines Arbeitstages."
+    },
+    "newMessage": {
+      "title": "Sie haben eine neue Nachricht",
+      "text": "Ein Teammitglied hat auf Ihre Anfrage geantwortet. Sie können die Nachricht einsehen und das Gespräch in Ihrem Shop-Profil fortsetzen.",
+      "dateLabel": "Empfangen am:",
+      "button": "Nachricht anzeigen",
+      "footerNote": "Wenn Sie Probleme beim Einloggen haben, wenden Sie sich bitte an unser Support-Team."
+    },
+    "orderConfirmation": {
+      "title": "Vielen Dank für Ihre Bestellung!",
+      "text": "Wir haben Ihre Bestellung erhalten und bereiten sie vor. Sie erhalten eine weitere E-Mail, sobald Ihre Bestellung versandt wurde.",
+      "orderNumber": "Bestellnummer:",
+      "date": "Datum:",
+      "paymentMethod": "Zahlungsart:",
+      "product": "Produkt",
+      "qty": "Menge",
+      "price": "Preis",
+      "subtotal": "Zwischensumme",
+      "shipping": "Versand",
+      "vat": "MwSt.",
+      "total": "Gesamtbetrag",
+      "footerNote": "Sie können Ihren Bestellstatus in Ihrem Konto-Profil verfolgen."
+    },
+    "orderPartial": {
+      "title": "Bestellung erhalten",
+      "bannerTitle": "Versandkostenberechnung läuft",
+      "bannerText": "Ihre Bestellung wurde erfolgreich empfangen und teilweise bezahlt. Aufgrund der Art oder Größe Ihrer Bestellung berechnen wir derzeit die genauesten Versandkosten für Ihren Standort.",
+      "text": "Wir benachrichtigen Sie per E-Mail, sobald der Versandpreis feststeht. Nach der Bestätigung können Sie die Restzahlung in Ihrem Shop-Profil vornehmen, um die Bestellung abzuschließen.",
+      "amountPaid": "Bezahlter Betrag (Produkte):",
+      "shippingStatus": "Versandstatus:",
+      "pending": "Berechnung ausstehend",
+      "footerNote": "Vielen Dank für Ihre Geduld und dass Sie sich für Tigo Energy SHOP entschieden haben."
+    },
+    "cartAbandonment": {
+      "title": "Haben Sie etwas vergessen?",
+      "text": "Wir haben bemerkt, dass Sie noch Artikel in Ihrem Warenkorb haben. Wir haben sie für Sie gespeichert, damit Sie genau dort weitermachen können, wo Sie aufgehört haben.",
+      "itemsTitle": "Artikel in Ihrem Warenkorb:",
+      "button": "Kauf abschließen",
+      "footerNote": "Benötigen Sie Hilfe bei Ihrer Bestellung? Antworten Sie einfach auf diese E-Mail und unser Team hilft Ihnen gerne weiter."
+    },
+    "priceChange": {
+      "title": "Spannendes Preis-Update!",
+      "text": "Wir dachten, Sie würden gerne wissen, dass ein Produkt, das Sie zuvor gekauft oder an dem Sie Interesse gezeigt haben, jetzt einen neuen Preis hat.",
+      "footerNote": "Dies ist ein großartiger Zeitpunkt, um Ihre Solaranlage zu erweitern oder Komponenten aufzustocken.",
+      "button": "Produkt anzeigen"
+    },
+    "delivered": {
+      "title": "Zugestellt!",
+      "text": "Gute Nachrichten! Ihre Bestellung #{{order_number}} wurde erfolgreich zugestellt. Wir hoffen, dass Sie mit Ihren neuen Tigo Energy Produkten zufrieden sind.",
+      "attachmentNote": "Zu Ihrer Information haben wir die folgenden Dokumente an diese E-Mail angehängt:",
+      "doc1": "Lieferbestätigung",
+      "doc2": "Offizielle Rechnung",
+      "footerNote": "Vielen Dank, dass Sie sich für Initra Energija als Ihren Tigo Energy Partner entschieden haben. Wenn Sie Fragen zur Installation oder zum Produktaufbau haben, hilft Ihnen unser technisches Team gerne weiter."
+    },
+    "b2bVerified": {
+      "status": "VIES verifiziert",
+      "title": "Ihr B2B-Konto ist aktiv",
+      "helloWithCompany": "Hallo {{company_name}} Team,",
+      "text": "Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Umsatzsteuer-Identifikationsnummer (VIES) erfolgreich verifiziert wurde. Ihr B2B-Konto ist nun vollständig aktiv und Sie können alle Vorteile unseres professionellen Partnerprogramms nutzen.",
+      "benefit1": "0% MwSt. (Innergemeinschaftlicher Erwerb)",
+      "benefit2": "Professionelle B2B-Preise",
+      "benefit3": "Bevorzugte Versandoptionen",
+      "benefit4": "Direkter technischer Support",
+      "button": "Anmeldung in Ihrem B2B-Portal",
+      "footerNote": "Willkommen an Bord! Wir freuen uns darauf, Ihre Solarprojekte zu unterstützen."
+    },
+    "b2bApplication": {
+      "title": "B2B-Anmeldung erhalten",
+      "bannerTitle": "Verifizierung läuft",
+      "bannerText": "Unser Team prüft derzeit Ihre Unterlagen und Unternehmensinformationen. Dieser Prozess dauert in der Regel bis zu 48 Stunden.",
+      "text": "Sobald Ihre Informationen verifiziert sind, werden wir Sie per E-Mail benachrichtigen und Ihr Konto wird mit Zugang zu B2B-Preisen und professionellen Tools voll einsatzbereit sein.",
+      "footerNote": "In der Zwischenzeit können Sie bei dringenden Fragen einfach auf diese E-Mail antworten."
+    },
+    "passwordReset": {
+      "title": "Passwort zurücksetzen",
+      "text": "Wir haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Bitte klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu wählen.",
+      "button": "Passwort zurücksetzen",
+      "linkHelp": "Wenn die oben genannte Schaltfläche nicht funktioniert, können Sie den folgenden Link kopieren und in Ihren Browser einfügen:",
+      "expire": "Dieser Link läuft in 1 Stunde ab. Wenn Sie kein neues Passwort angefordert haben, ignorieren Sie diese E-Mail bitte."
+    },
+    "shippingUpdate": {
+      "title": "Ihre Bestellung ist unterwegs!",
+      "text": "Ihre Bestellung #{{order_number}} wurde versandt und ist nun auf dem Weg zu Ihnen.",
+      "carrier": "Versanddienstleister",
+      "tracking": "Sendungsnummer",
+      "button": "Sendung verfolgen",
+      "footerNote": "Bitte beachten Sie, dass es bis zu 24 Stunden dauern kann, bis die Tracking-Informationen auf der Website des Versanddienstleisters aktualisiert werden."
+    }
   }
 }

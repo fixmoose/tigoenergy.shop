@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order Has Shipped</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: #1a1a1a;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 20px;
+        }
+
+        .tracking-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .tracking-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .tracking-number {
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111;
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            background-color: #3ba140;
+            color: #ffffff !important;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        .footer {
+            background: #f3f4f6;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer p {
+            margin: 4px 0;
+        }
+
+        .footer a {
+            color: #3ba140;
+            text-decoration: none;
+        }
+
+        .divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 24px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" class="logo">
+        </div>
+        <div class="content">
+            <h1 class="title">{{t_email_shippingUpdate_title}}</h1>
+            <p>Hello {{name}},</p>
+            <p>Your order <strong>#{{order_number}}</strong> has been shipped and is now on its way to you.</p>
+
+            <div class="tracking-card">
+                <span class="tracking-label">{{t_email_shippingUpdate_carrier}}</span>
+                <strong>{{carrier_name}}</strong>
+                <div style="height: 16px;"></div>
+                <span class="tracking-label">{{t_email_shippingUpdate_tracking}}</span>
+                <span class="tracking-number">{{tracking_number}}</span>
+            </div>
+
+            <div class="button-container">
+                <a href="{{tracking_url}}" class="button">{{t_email_shippingUpdate_button}}</a>
+            </div>
+
+            <p>Please note that it may take up to 24 hours for the tracking information to update on the carrier's
+                website.</p>
+
+            <div class="divider"></div>
+
+            <p>{{t_email_bestRegards}}<br>{{t_email_team}}</p>
+        </div>
+        <div class="footer">
+            <p><strong>Initra Energija d.o.o.</strong></p>
+            <p>{{t_footer_operatedBy}}</p>
+            
+            <p><a href="mailto:support@tigoenergy.shop">support@tigoenergy.shop</a> | <a
+                    href="https://tigoenergy.shop">tigoenergy.shop</a></p>
+            <p>&copy; 2026 {{t_footer_allRightsReserved}}</p>
+        </div>
+    </div>
+</body>
+
+</html>
