@@ -41,7 +41,7 @@ export async function getAllReviews() {
 export async function createReview(formData: FormData) {
     // Verify reCAPTCHA
     const recaptchaToken = formData.get('recaptcha_token') as string
-    const recaptcha = await verifyRecaptcha(recaptchaToken)
+    const recaptcha = await verifyRecaptcha(recaptchaToken, 'review')
     if (!recaptcha.success) {
         throw new Error('reCAPTCHA verification failed. Please try again.')
     }

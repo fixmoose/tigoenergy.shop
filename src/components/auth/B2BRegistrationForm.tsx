@@ -118,7 +118,7 @@ export default function B2BRegistrationForm() {
     const handleSendEmailCode = async () => {
         setLoading(true); setError('')
         try {
-            const token = await executeRecaptcha()
+            const token = await executeRecaptcha('registration')
             const res = await fetch('/api/validate/email', {
                 method: 'POST', body: JSON.stringify({ email: formData.email, recaptchaToken: token })
             })

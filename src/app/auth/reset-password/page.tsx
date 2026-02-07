@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      const token = await executeRecaptcha()
+      const token = await executeRecaptcha('reset_password')
       const { error: err } = await supabase.auth.updateUser({ password })
       if (err) {
         setError(err.message)

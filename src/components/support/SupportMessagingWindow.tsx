@@ -27,7 +27,7 @@ export default function SupportMessagingWindow({ type = 'general', orderId, pref
         setLoading(true)
         setError('')
         try {
-            const token = await executeRecaptcha()
+            const token = await executeRecaptcha('support')
             setSavedToken(token) // Save for step 2 (submission)
             await sendSupportOTP(email, token)
             setStep('otp')

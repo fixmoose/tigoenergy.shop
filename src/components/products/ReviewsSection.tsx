@@ -39,7 +39,7 @@ export default function ReviewsSection({ productId, reviews }: { productId: stri
         setLoading(true)
         setError(null)
         try {
-            const token = await executeRecaptcha()
+            const token = await executeRecaptcha('review')
             const formData = new FormData(e.currentTarget)
             formData.append('product_id', productId)
             formData.append('rating', rating.toString())

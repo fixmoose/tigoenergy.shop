@@ -7,7 +7,7 @@ const supabase = createClient()
 
 export async function sendSupportOTP(email: string, recaptchaToken: string) {
     // 1. Verify reCAPTCHA
-    const recaptcha = await verifyRecaptcha(recaptchaToken)
+    const recaptcha = await verifyRecaptcha(recaptchaToken, 'support')
     if (!recaptcha.success) {
         throw new Error('reCAPTCHA verification failed: ' + recaptcha.error)
     }
@@ -69,7 +69,7 @@ export async function submitSupportRequestV2(formData: {
     recaptchaToken: string
 }) {
     // 1. Verify reCAPTCHA
-    const recaptcha = await verifyRecaptcha(formData.recaptchaToken)
+    const recaptcha = await verifyRecaptcha(formData.recaptchaToken, 'support')
     if (!recaptcha.success) {
         throw new Error('reCAPTCHA verification failed')
     }
@@ -126,7 +126,7 @@ export async function addMessageToSupportRequest(requestId: string, message: str
     // reCAPTCHA is optional for subsequent messages if already verified in session, 
     // but recommended if exposed publicly.
     if (recaptchaToken) {
-        const recaptcha = await verifyRecaptcha(recaptchaToken)
+        const recaptcha = await verifyRecaptcha(recaptchaToken, 'support')
         if (!recaptcha.success) throw new Error('reCAPTCHA failed')
     }
 

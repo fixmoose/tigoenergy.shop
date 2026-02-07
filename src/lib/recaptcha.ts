@@ -1,19 +1,18 @@
-export async function verifyRecaptcha(token: string | null) {
+export async function verifyRecaptcha(token: string | null, action: string = 'any') {
     if (!token) {
         return { success: false, error: 'reCAPTCHA token is missing' }
     }
 
-    const projectId = process.env.RECAPTCHA_PROJECT_ID
+    // NEW: Use the Project ID provided by the user
+    const projectId = process.env.RECAPTCHA_PROJECT_ID || 'strong-return-396706'
     const apiKey = process.env.RECAPTCHA_API_KEY
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LdKhWMsAAAAAJYZR9_phXUq7XGZhtipLKb_f5Z3'
 
-    // Fallback to legacy verification if Enterprise config is missing
-    if (!projectId || !apiKey) {
-        const secretKey = process.env.RECAPTCHA_SECRET_KEY
-        if (!secretKey) {
-            console.error('Neither reCAPTCHA Enterprise nor Legacy Secret Key is defined')
-            return { success: false, error: 'reCAPTCHA configuration error' }
-        }
+    // If no API Key is provided for Google Cloud, we cannot use the Enterprise Assessment API.
+    // In that case, we fallback to the legacy verification (which still works for Enterprise keys).
+    if (!apiKey) {
+        console.warn('RECAPTCHA_API_KEY is missing. Falling back to legacy siteverify (recommended for easier Vercel setup).')
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LdKhWMsAAAAACAe9oKxIks-4WjZyIsGKu7gMs5_'
 
         try {
             const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
@@ -22,6 +21,11 @@ export async function verifyRecaptcha(token: string | null) {
                 body: `secret=${secretKey}&response=${token}`,
             })
             const data = await response.json()
+
+            if (!data.success) {
+                console.error('reCAPTCHA siteverify failed:', data['error-codes'])
+            }
+
             return {
                 success: data.success,
                 error: data['error-codes'] ? data['error-codes'][0] : null
@@ -32,7 +36,7 @@ export async function verifyRecaptcha(token: string | null) {
         }
     }
 
-    // reCAPTCHA Enterprise Verification
+    // reCAPTCHA Enterprise Assessment API (The "New" Way)
     try {
         const response = await fetch(
             `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments?key=${apiKey}`,
@@ -43,7 +47,7 @@ export async function verifyRecaptcha(token: string | null) {
                     event: {
                         token: token,
                         siteKey: siteKey,
-                        expectedAction: 'any' // Optional: tune this per-action if needed
+                        expectedAction: action
                     }
                 })
             }
@@ -53,18 +57,24 @@ export async function verifyRecaptcha(token: string | null) {
 
         if (data.error) {
             console.error('reCAPTCHA Enterprise API Error:', data.error)
+            // If the Enterprise API fails (e.g. key disabled), return false but log it.
             return { success: false, error: data.error.message }
         }
 
-        // Enterprise success criteria: token must be valid and score high enough (if v3/score-based)
-        // For v2 Invisible conversion, we check if the token is valid.
+        // Check token validity
         const isValid = data.tokenProperties?.valid === true
+        const reason = data.tokenProperties?.invalidReason
+
+        if (!isValid) {
+            console.error(`reCAPTCHA Token Invalid: ${reason}`)
+        }
 
         return {
             success: isValid,
             score: data.riskAnalysis?.score,
             reasons: data.riskAnalysis?.reasons,
-            error: isValid ? null : 'invalid-token'
+            action: data.tokenProperties?.action,
+            error: isValid ? null : (reason || 'invalid-token')
         }
     } catch (error) {
         console.error('reCAPTCHA Enterprise verification error:', error)
