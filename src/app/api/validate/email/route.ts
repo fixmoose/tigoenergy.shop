@@ -29,8 +29,8 @@ export async function POST(request: Request) {
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 mins
 
         // 4. STORE IN DATABASE
-        const { createClient } = await import('@/lib/supabase/server')
-        const supabase = await createClient()
+        const { createAdminClient } = await import('@/lib/supabase/server')
+        const supabase = await createAdminClient()
 
         // Remove existing codes for this email and insert new one
         await supabase.from('guest_verifications').delete().eq('email', email)
