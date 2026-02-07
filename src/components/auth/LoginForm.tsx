@@ -61,8 +61,11 @@ export default function LoginForm() {
                 )}
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                     <input
+                        id="login-email"
+                        name="email"
+                        autoComplete="email"
                         type="email"
                         required
                         value={email}
@@ -74,10 +77,13 @@ export default function LoginForm() {
 
                 <div>
                     <div className="flex items-center justify-between mb-1">
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <label htmlFor="login-pwd" className="block text-sm font-medium text-gray-700">Password</label>
                         <Link href="/auth/reset-password" className="text-xs text-green-600 hover:text-green-700 font-medium">Forgot Password?</Link>
                     </div>
                     <input
+                        id="login-pwd"
+                        name="password"
+                        autoComplete="current-password"
                         type="password"
                         required
                         value={password}

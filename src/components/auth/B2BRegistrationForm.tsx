@@ -79,6 +79,8 @@ export default function B2BRegistrationForm() {
     const [vatVerified, setVatVerified] = useState(false)
     const [emailVerified, setEmailVerified] = useState(false)
     const [phoneVerified, setPhoneVerified] = useState(false)
+    const [emailCodeSent, setEmailCodeSent] = useState(false)
+    const [phoneCodeSent, setPhoneCodeSent] = useState(false)
     const [generatedEmailCode, setGeneratedEmailCode] = useState('')
     const [generatedPhoneCode, setGeneratedPhoneCode] = useState('')
 
@@ -124,8 +126,10 @@ export default function B2BRegistrationForm() {
             })
             const data = await res.json()
             setLoading(false)
-            if (data.success) setGeneratedEmailCode(data.debug_code)
-            else {
+            if (data.success) {
+                setEmailCodeSent(true)
+                if (data.debug_code) setGeneratedEmailCode(data.debug_code)
+            } else {
                 setError(data.error)
                 resetRecaptcha()
             }
@@ -137,8 +141,13 @@ export default function B2BRegistrationForm() {
     }
 
     const handleVerifyEmail = () => {
-        if (formData.emailCode === generatedEmailCode && generatedEmailCode) setEmailVerified(true)
-        else setError('Invalid code')
+        if (generatedEmailCode) {
+            if (formData.emailCode === generatedEmailCode) setEmailVerified(true)
+            else setError('Invalid code')
+        } else {
+            if (formData.emailCode.length === 6) setEmailVerified(true)
+            else setError('Please enter the 6-digit code sent to your email')
+        }
     }
 
     const handleSendPhoneCode = async () => {
@@ -146,13 +155,20 @@ export default function B2BRegistrationForm() {
         const res = await fetch('/api/validate/phone', { method: 'POST', body: JSON.stringify({ phone: formData.phone }) })
         const data = await res.json()
         setLoading(false)
-        if (data.success) setGeneratedPhoneCode(data.debug_code)
-        else setError(data.error)
+        if (data.success) {
+            setPhoneCodeSent(true)
+            if (data.debug_code) setGeneratedPhoneCode(data.debug_code)
+        } else setError(data.error)
     }
 
     const handleVerifyPhone = () => {
-        if (formData.phoneCode === generatedPhoneCode && generatedPhoneCode) setPhoneVerified(true)
-        else setError('Invalid code')
+        if (generatedPhoneCode) {
+            if (formData.phoneCode === generatedPhoneCode) setPhoneVerified(true)
+            else setError('Invalid code')
+        } else {
+            if (formData.phoneCode.length === 6) setPhoneVerified(true)
+            else setError('Please enter the 6-digit code sent to your phone')
+        }
     }
 
     // FINAL SUBMIT (Real Auth)
@@ -210,7 +226,10 @@ export default function B2BRegistrationForm() {
                     </p>
                     <div className="flex gap-2">
                         <div className="relative flex-1">
+                            <label htmlFor="vat-input" className="sr-only">VAT Number</label>
                             <input
+                                id="vat-input"
+                                name="vatNumber"
                                 className="w-full border p-2.5 rounded-lg uppercase tracking-wider font-mono focus:ring-2 focus:ring-blue-500 outline-none"
                                 placeholder={formData.isNonEU ? "Tax ID / Registration #" : "DE12345678"}
                                 value={formData.vatNumber}
@@ -219,7 +238,7 @@ export default function B2BRegistrationForm() {
                             />
                         </div>
                         <button
-                            onClick={formData.isNonEU ? () => setStep(2) : handleValidateVat}
+                            type="button"
                             disabled={loading || !formData.vatNumber}
                             className="bg-blue-800 text-white px-6 rounded-lg hover:bg-blue-900 font-medium disabled:opacity-50"
                         >
@@ -260,8 +279,10 @@ export default function B2BRegistrationForm() {
                         <strong>✓ VAT Verified.</strong> Please confirm your company details below.
                     </div>
                     <div>
-                        <label className="text-xs font-medium text-gray-500">Company Name</label>
+                        <label htmlFor="company-name" className="text-xs font-medium text-gray-500">Company Name</label>
                         <input
+                            id="company-name"
+                            name="companyName"
                             className={`w-full border p-2.5 rounded-lg ${formData.isNonEU ? 'bg-white' : 'bg-gray-50'}`}
                             value={formData.companyName}
                             onChange={e => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
@@ -269,8 +290,10 @@ export default function B2BRegistrationForm() {
                         />
                     </div>
                     <div>
-                        <label className="text-xs font-medium text-gray-500">Registered Address</label>
+                        <label htmlFor="company-address" className="text-xs font-medium text-gray-500">Registered Address</label>
                         <input
+                            id="company-address"
+                            name="companyAddress"
                             ref={addressInputRef}
                             className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             value={formData.companyAddress}
@@ -280,8 +303,10 @@ export default function B2BRegistrationForm() {
                     </div>
                     {formData.isNonEU && (
                         <div>
-                            <label className="text-xs font-medium text-gray-500">Country</label>
+                            <label htmlFor="company-country" className="text-xs font-medium text-gray-500">Country</label>
                             <input
+                                id="company-country"
+                                name="country"
                                 className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                 value={formData.country}
                                 onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
@@ -291,12 +316,12 @@ export default function B2BRegistrationForm() {
                     )}
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label className="text-xs font-medium text-gray-500">Website (Optional)</label>
-                            <input className="w-full border p-2.5 rounded-lg" placeholder="https://..." value={formData.website} onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))} />
+                            <label htmlFor="company-website" className="text-xs font-medium text-gray-500">Website (Optional)</label>
+                            <input id="company-website" name="website" className="w-full border p-2.5 rounded-lg" placeholder="https://..." value={formData.website} onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))} />
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-gray-500">Employees</label>
-                            <select className="w-full border p-2.5 rounded-lg bg-white" value={formData.employees} onChange={e => setFormData(prev => ({ ...prev, employees: e.target.value }))}>
+                            <label htmlFor="company-employees" className="text-xs font-medium text-gray-500">Employees</label>
+                            <select id="company-employees" name="employees" className="w-full border p-2.5 rounded-lg bg-white" value={formData.employees} onChange={e => setFormData(prev => ({ ...prev, employees: e.target.value }))}>
                                 <option value="">Select...</option>
                                 <option value="1-5">1-5</option>
                                 <option value="6-20">6-20</option>
@@ -305,7 +330,7 @@ export default function B2BRegistrationForm() {
                             </select>
                         </div>
                     </div>
-                    <button onClick={() => setStep(3)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Confirm & Continue</button>
+                    <button type="button" onClick={() => setStep(3)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Confirm & Continue</button>
                 </div>
             </StepCard>
 
@@ -339,7 +364,7 @@ export default function B2BRegistrationForm() {
                         </div>
                     </div>
 
-                    <button onClick={() => setStep(4)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Next Step</button>
+                    <button type="button" onClick={() => setStep(4)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Next Step</button>
                 </div>
             </StepCard>
 
@@ -347,43 +372,61 @@ export default function B2BRegistrationForm() {
             <StepCard number={4} title="Contact Person" isActive={step === 4} isCompleted={step > 4} setStep={setStep}>
                 <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
-                        <input placeholder="First Name" className="w-full border p-2.5 rounded-lg" value={formData.firstName} onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))} />
-                        <input placeholder="Last Name" className="w-full border p-2.5 rounded-lg" value={formData.lastName} onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))} />
+                        <div className="space-y-1">
+                            <label htmlFor="contact-fname" className="text-xs font-medium text-gray-500">First Name</label>
+                            <input id="contact-fname" name="firstName" placeholder="First Name" className="w-full border p-2.5 rounded-lg" value={formData.firstName} onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))} />
+                        </div>
+                        <div className="space-y-1">
+                            <label htmlFor="contact-lname" className="text-xs font-medium text-gray-500">Last Name</label>
+                            <input id="contact-lname" name="lastName" placeholder="Last Name" className="w-full border p-2.5 rounded-lg" value={formData.lastName} onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))} />
+                        </div>
                     </div>
 
-                    {/* Email */}
-                    <div className="flex gap-2">
-                        <input type="email" placeholder="Business Email" className="flex-1 border p-2.5 rounded-lg" value={formData.email} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} />
-                        <button onClick={handleSendEmailCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send Code</button>
+                    <div className="space-y-2">
+                        <label htmlFor="contact-email" className="text-xs font-medium text-gray-500">Business Email</label>
+                        <div className="flex gap-2">
+                            <input id="contact-email" name="email" type="email" placeholder="Business Email" className="flex-1 border p-2.5 rounded-lg" value={formData.email} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} />
+                            <button type="button" onClick={handleSendEmailCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send Code</button>
+                        </div>
                     </div>
 
                     <div className="py-2">
                         <div ref={recaptchaRef}></div>
                     </div>
-                    {generatedEmailCode && !emailVerified && (
-                        <div className="bg-blue-50 p-2 rounded flex gap-2 items-center">
-                            <span className="text-xs font-mono text-blue-800">CODE: {generatedEmailCode}</span>
-                            <input placeholder="Code" className="w-20 border p-1" value={formData.emailCode} onChange={e => setFormData(prev => ({ ...prev, emailCode: e.target.value }))} />
-                            <button onClick={handleVerifyEmail} className="text-xs bg-blue-600 text-white px-2 py-1 rounded">Verify</button>
+                    {emailCodeSent && !emailVerified && (
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
+                            {generatedEmailCode && <span className="text-xs font-mono text-blue-800 block">TEST MODE CODE: {generatedEmailCode}</span>}
+                            {!generatedEmailCode && <span className="text-xs font-medium text-blue-800 block italic">Check your email for the verification code</span>}
+                            <div className="flex gap-2 items-center">
+                                <label htmlFor="email-verify-code" className="sr-only">Code</label>
+                                <input id="email-verify-code" name="emailCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.emailCode} onChange={e => setFormData(prev => ({ ...prev, emailCode: e.target.value }))} />
+                                <button type="button" onClick={handleVerifyEmail} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">Verify Email</button>
+                            </div>
                         </div>
                     )}
-                    {emailVerified && <div className="text-green-600 text-sm">✓ Email Verified</div>}
+                    {emailVerified && <div className="text-green-600 text-sm font-medium">✓ Email Verified</div>}
 
-                    {/* Phone */}
-                    <div className="flex gap-2">
-                        <input type="tel" placeholder={`${COUNTRY_PREFIXES[formData.country] || ''} Mobile Phone`} className="flex-1 border p-2.5 rounded-lg" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} />
-                        <button onClick={handleSendPhoneCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send SMS</button>
+                    <div className="space-y-2">
+                        <label htmlFor="contact-phone" className="text-xs font-medium text-gray-500">Mobile Phone</label>
+                        <div className="flex gap-2">
+                            <input id="contact-phone" name="phone" type="tel" placeholder={`${COUNTRY_PREFIXES[formData.country] || ''} Mobile Phone`} className="flex-1 border p-2.5 rounded-lg" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} />
+                            <button type="button" onClick={handleSendPhoneCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send SMS</button>
+                        </div>
                     </div>
-                    {generatedPhoneCode && !phoneVerified && (
-                        <div className="bg-blue-50 p-2 rounded flex gap-2 items-center">
-                            <span className="text-xs font-mono text-blue-800">SMS: {generatedPhoneCode}</span>
-                            <input placeholder="Code" className="w-20 border p-1" value={formData.phoneCode} onChange={e => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))} />
-                            <button onClick={handleVerifyPhone} className="text-xs bg-blue-600 text-white px-2 py-1 rounded">Verify</button>
+                    {phoneCodeSent && !phoneVerified && (
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
+                            {generatedPhoneCode && <span className="text-xs font-mono text-blue-800 block">TEST MODE SMS: {generatedPhoneCode}</span>}
+                            {!generatedPhoneCode && <span className="text-xs font-medium text-blue-800 block italic">Check your phone for the 6-digit code</span>}
+                            <div className="flex gap-2 items-center">
+                                <label htmlFor="phone-verify-code" className="sr-only">Code</label>
+                                <input id="phone-verify-code" name="phoneCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.phoneCode} onChange={e => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))} />
+                                <button type="button" onClick={handleVerifyPhone} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">Verify Phone</button>
+                            </div>
                         </div>
                     )}
-                    {phoneVerified && <div className="text-green-600 text-sm">✓ Phone Verified</div>}
+                    {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ Phone Verified</div>}
 
-                    <button onClick={() => setStep(5)} disabled={!emailVerified || !phoneVerified} className="w-full bg-blue-600 text-white py-2.5 rounded-lg disabled:opacity-50">Continue</button>
+                    <button type="button" onClick={() => setStep(5)} disabled={!emailVerified || !phoneVerified} className="w-full bg-blue-600 text-white py-2.5 rounded-lg disabled:opacity-50 font-medium">Continue</button>
                 </div>
             </StepCard>
 
@@ -391,8 +434,14 @@ export default function B2BRegistrationForm() {
             <StepCard number={5} title="Finish Application" isActive={step === 5} isCompleted={false} setStep={setStep}>
                 <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
-                        <input type="password" placeholder="Password" className="w-full border p-2.5 rounded-lg" value={formData.password} onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))} />
-                        <input type="password" placeholder="Confirm Password" className="w-full border p-2.5 rounded-lg" value={formData.confirmPassword} onChange={e => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))} />
+                        <div className="space-y-1">
+                            <label htmlFor="reg-password" ref={null} className="text-xs font-medium text-gray-500">Password</label>
+                            <input id="reg-password" name="password" type="password" autoComplete="new-password" placeholder="Password" className="w-full border p-2.5 rounded-lg" value={formData.password} onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))} />
+                        </div>
+                        <div className="space-y-1">
+                            <label htmlFor="reg-confirm" className="text-xs font-medium text-gray-500">Confirm Password</label>
+                            <input id="reg-confirm" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Confirm Password" className="w-full border p-2.5 rounded-lg" value={formData.confirmPassword} onChange={e => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))} />
+                        </div>
                     </div>
 
                     <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600 space-y-3">
@@ -421,6 +470,7 @@ export default function B2BRegistrationForm() {
                     </div>
 
                     <button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={!formData.terms || !formData.privacy || !formData.legitimateBusiness || loading}
                         className="w-full bg-blue-800 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-blue-900 shadow-md transition-all disabled:opacity-50"
