@@ -45,11 +45,12 @@ export function useRecaptcha() {
             }
         }
 
-        if (!window.grecaptcha) {
+        if (!window.grecaptcha?.enterprise) {
             if (!document.getElementById('recaptcha-script')) {
                 const script = document.createElement('script')
                 script.id = 'recaptcha-script'
-                script.src = 'https://www.google.com/recaptcha/enterprise.js?render=explicit'
+                // Include siteKey in URL as per Enterprise recommendation
+                script.src = `https://www.google.com/recaptcha/enterprise.js?render=${siteKey}&onload=onRecaptchaLoad`
                 script.async = true
                 script.defer = true
                 document.head.appendChild(script)
