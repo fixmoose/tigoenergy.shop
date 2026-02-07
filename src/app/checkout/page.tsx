@@ -26,6 +26,21 @@ const COUNTRIES = [
     { code: 'HR', name: 'Croatia' }
 ]
 
+const COUNTRY_PREFIXES: Record<string, string> = {
+    'SI': '+386',
+    'DE': '+49',
+    'AT': '+43',
+    'FR': '+33',
+    'IT': '+39',
+    'ES': '+34',
+    'NL': '+31',
+    'BE': '+32',
+    'PL': '+48',
+    'CZ': '+420',
+    'CH': '+41',
+    'HR': '+385'
+}
+
 interface SavedAddress {
     id: string
     street: string
@@ -183,6 +198,15 @@ export default function CheckoutPage() {
 
     const totalWeight = items.reduce((sum, item) => sum + ((item.weight_kg || 0) * (item.quantity || 0)), 0)
 
+    // Pallet Mode Detection
+    const junctionQty = items
+        .filter(i => (i.metadata as any)?.subcategory === 'GO Junction' || i.name.includes('GO Junction'))
+        .reduce((s, i) => s + i.quantity, 0)
+    const evChargerQty = items
+        .filter(i => (i.metadata as any)?.subcategory === 'GO EV Charger' || i.name.includes('GO EV Charger'))
+        .reduce((s, i) => s + i.quantity, 0)
+    const isPalletMode = junctionQty >= 50 || evChargerQty >= 25 || totalWeight > 100
+
     useEffect(() => {
         const fetchRates = async () => {
             if (!formData.shipping_country) return
@@ -203,19 +227,28 @@ export default function CheckoutPage() {
                 let filtered = data || []
                 const isSI = formData.shipping_country === 'SI'
 
-                if (totalWeight > 20) {
-                    // Only InterEuropa allowed for heavy shipments
+                if (isPalletMode) {
+                    // Only InterEuropa allowed for pallet shipments
                     // EXCEPT for SI where we also allow Personal Pick-up
                     filtered = filtered.filter(r =>
                         r.carrier === 'InterEuropa' ||
                         (isSI && r.carrier === 'Personal Pick-up')
                     )
-                }
-
-                // If SI, InterEuropa is hidden as requested (use GLS or Pick-up)
-                if (isSI) {
+                } else {
+                    // Normal mode: Hide InterEuropa, allow GLS/DPD
                     filtered = filtered.filter(r => r.carrier !== 'InterEuropa')
                 }
+
+                // Deduplication: Keep only one rate per carrier (the cheapest one)
+                // This prevents "InterEuropa appearing 5 times" issues
+                const uniqueRates = new Map<string, any>();
+                filtered.forEach(rate => {
+                    const existing = uniqueRates.get(rate.carrier);
+                    if (!existing || rate.rate_eur < existing.rate_eur) {
+                        uniqueRates.set(rate.carrier, rate);
+                    }
+                });
+                filtered = Array.from(uniqueRates.values());
 
                 setShippingRates(filtered)
 
@@ -421,7 +454,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('phoneNumber')} <span className="text-red-500">*</span></label>
-                                    <input type="tel" name="shipping_phone" required value={formData.shipping_phone} onChange={handleChange} className={getInputClass('shipping_phone')} placeholder="+49 ..." />
+                                    <input type="tel" name="shipping_phone" required value={formData.shipping_phone} onChange={handleChange} className={getInputClass('shipping_phone')} placeholder={`${COUNTRY_PREFIXES[formData.shipping_country] || '+49'} ...`} />
                                 </div>
                             </div>
                             {!user && (

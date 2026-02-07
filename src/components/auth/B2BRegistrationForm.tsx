@@ -8,6 +8,21 @@ import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 
+const COUNTRY_PREFIXES: Record<string, string> = {
+    'SI': '+386',
+    'DE': '+49',
+    'AT': '+43',
+    'FR': '+33',
+    'IT': '+39',
+    'ES': '+34',
+    'NL': '+31',
+    'BE': '+32',
+    'PL': '+48',
+    'CZ': '+420',
+    'CH': '+41',
+    'HR': '+385'
+}
+
 export default function B2BRegistrationForm() {
     const supabase = createClient()
     const router = useRouter()
@@ -186,10 +201,9 @@ export default function B2BRegistrationForm() {
                     <p className="text-sm text-gray-600">Enter your valid EU VAT number to verify your business status via VIES.</p>
                     <div className="flex gap-2">
                         <div className="relative flex-1">
-                            <span className="absolute left-3 top-2.5 text-gray-400 font-bold">EU</span>
                             <input
-                                className="w-full border p-2.5 pl-10 rounded-lg uppercase tracking-wider font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                                placeholder="SI12345678"
+                                className="w-full border p-2.5 rounded-lg uppercase tracking-wider font-mono focus:ring-2 focus:ring-blue-500 outline-none"
+                                placeholder="DE12345678"
                                 value={formData.vatNumber}
                                 onChange={e => setFormData(prev => ({ ...prev, vatNumber: e.target.value }))}
                                 autoFocus
@@ -202,6 +216,9 @@ export default function B2BRegistrationForm() {
                         >
                             {loading ? 'Verifying...' : 'Verify VAT'}
                         </button>
+                    </div>
+                    <div className="text-xs text-blue-600 font-medium bg-blue-50 p-2 rounded">
+                        Format: CC12345678 (e.g., DE12345678). Country code is mandatory.
                     </div>
                     <div className="text-xs text-gray-400">
                         * Verification happens in real-time. If VIES is offline, we will fallback to manual verification.
@@ -294,7 +311,7 @@ export default function B2BRegistrationForm() {
                     {/* Email */}
                     <div className="flex gap-2">
                         <input type="email" placeholder="Business Email" className="flex-1 border p-2.5 rounded-lg" value={formData.email} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} />
-                        <button onClick={handleSendEmailCode} disabled={loading || !recaptchaToken} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send Code</button>
+                        <button onClick={handleSendEmailCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send Code</button>
                     </div>
 
                     <div className="py-2">
@@ -311,7 +328,7 @@ export default function B2BRegistrationForm() {
 
                     {/* Phone */}
                     <div className="flex gap-2">
-                        <input type="tel" placeholder="Mobile Phone" className="flex-1 border p-2.5 rounded-lg" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} />
+                        <input type="tel" placeholder={`${COUNTRY_PREFIXES[formData.country] || ''} Mobile Phone`} className="flex-1 border p-2.5 rounded-lg" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} />
                         <button onClick={handleSendPhoneCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send SMS</button>
                     </div>
                     {generatedPhoneCode && !phoneVerified && (

@@ -95,7 +95,7 @@ export default function LoginForm() {
 
                 <button
                     type="submit"
-                    disabled={loading || !recaptchaToken}
+                    disabled={loading}
                     className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
                 >
                     {loading ? (

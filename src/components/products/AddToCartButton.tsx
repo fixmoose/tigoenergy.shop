@@ -44,7 +44,11 @@ export default function AddToCartButton({ product, userId, pricing }: { product:
             name: productName,
             quantity,
             unit_price: unitPrice,
-            image_url: product.images?.[0]
+            image_url: product.images?.[0],
+            metadata: {
+              category: product.category,
+              subcategory: product.subcategory
+            }
           }
         }),
       })
