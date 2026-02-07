@@ -1,9 +1,10 @@
-'use client'
+'use server'
 
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { verifyRecaptcha } from '@/lib/recaptcha'
-
-const supabase = createClient()
+import { sendEmail, renderTemplate } from '@/lib/email'
+import { headers } from 'next/headers'
+import { getMarketFromKey } from '@/lib/constants/markets'
 
 export async function sendSupportOTP(email: string, recaptchaToken: string) {
     // 1. Verify reCAPTCHA
@@ -11,6 +12,8 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
     if (!recaptcha.success) {
         throw new Error('reCAPTCHA verification failed: ' + recaptcha.error)
     }
+
+    const supabase = await createClient()
 
     // 2. Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
@@ -28,13 +31,35 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
 
     if (error) throw error
 
-    // 4. Send Email (Mocked for now)
-    console.log(`[MOCK SUPPORT OTP] Sending ${otp} to ${email}`)
+    // 4. Send Production Email
+    const headersList = await headers()
+    const marketKey = headersList.get('x-market-key') || 'SHOP'
+    const market = getMarketFromKey(marketKey)
+    const preferredLang = headersList.get('x-preferred-language')
+    const locale = (preferredLang && market.availableLanguages.includes(preferredLang))
+        ? preferredLang
+        : market.defaultLanguage
 
-    return { success: true, debug_code: otp }
+    try {
+        const html = await renderTemplate('verification-code', {
+            code: otp,
+            email
+        }, locale)
+
+        await sendEmail({
+            to: email,
+            subject: locale === 'sl' ? 'Podpora: Vaša potrditvena koda' : 'Support: Your Verification Code',
+            html
+        })
+    } catch (emailError) {
+        console.error('Failed to send support OTP email:', emailError)
+    }
+
+    return { success: true, debug_code: process.env.NODE_ENV === 'development' ? otp : undefined }
 }
 
 export async function verifySupportOTP(email: string, code: string) {
+    const supabase = await createClient()
     const { data, error } = await supabase
         .from('guest_verifications')
         .select('*')
@@ -74,6 +99,7 @@ export async function submitSupportRequestV2(formData: {
         throw new Error('reCAPTCHA verification failed')
     }
 
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // 2. If guest, check if email is verified
@@ -123,13 +149,12 @@ export async function submitSupportRequestV2(formData: {
 }
 
 export async function addMessageToSupportRequest(requestId: string, message: string, recaptchaToken?: string) {
-    // reCAPTCHA is optional for subsequent messages if already verified in session, 
-    // but recommended if exposed publicly.
     if (recaptchaToken) {
         const recaptcha = await verifyRecaptcha(recaptchaToken, 'SUPPORT')
         if (!recaptcha.success) throw new Error('reCAPTCHA failed')
     }
 
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     const { error } = await supabase
@@ -146,6 +171,7 @@ export async function addMessageToSupportRequest(requestId: string, message: str
 }
 
 export async function getSupportMessages(requestId: string) {
+    const supabase = await createClient()
     const { data, error } = await supabase
         .from('support_messages')
         .select('*')

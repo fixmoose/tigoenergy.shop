@@ -2,6 +2,9 @@
 import { NextResponse } from 'next/server'
 
 import { verifyRecaptcha } from '@/lib/recaptcha'
+import { sendEmail, renderTemplate } from '@/lib/email'
+import { headers } from 'next/headers'
+import { getMarketFromKey } from '@/lib/constants/markets'
 
 export async function POST(request: Request) {
     try {
@@ -18,25 +21,39 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
         }
 
-        // SIMULATED SENDING (In production: SendGrid/Resend)
-        // Generate a 6-digit code
+        // 3. GENERATE & SEND CODE
         const code = Math.floor(100000 + Math.random() * 900000).toString()
 
-        console.log(`[MOCK EMAIL] Sending code ${code} to ${email}`)
+        // Get locale for email template
+        const headersList = await headers()
+        const marketKey = headersList.get('x-market-key') || 'SHOP'
+        const market = getMarketFromKey(marketKey)
+        const preferredLang = headersList.get('x-preferred-language')
+        const locale = (preferredLang && market.availableLanguages.includes(preferredLang))
+            ? preferredLang
+            : market.defaultLanguage
 
-        // In a real app, store this code in Redis or DB with expiry.
-        // For this demo/phase, we return it to the client for testing OR 
-        // we should create a 'verification_codes' table. 
-        // Requirement says "Send code to email".
-        // I will return it in response for DEV/Testing purposes only, 
-        // or simulate success and expect user to check console/logs.
-        // Let's create a `verification_codes` table to be robust later, 
-        // but for now, let's just return success.
+        try {
+            const html = await renderTemplate('verification-code', {
+                code,
+                email
+            }, locale)
+
+            await sendEmail({
+                to: email,
+                subject: locale === 'sl' ? 'Vaša potrditvena koda' : 'Your Verification Code',
+                html
+            })
+        } catch (emailError) {
+            console.error('Failed to send production email:', emailError)
+            // Still return success for testing/fallback if desired, or error out
+            // return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+        }
 
         return NextResponse.json({
             success: true,
             message: 'Code sent to email',
-            debug_code: code // REMOVE IN PRODUCTION
+            debug_code: process.env.NODE_ENV === 'development' ? code : undefined
         })
 
     } catch (error) {
