@@ -273,6 +273,7 @@ export default function Header() {
               <div className="flex flex-col leading-tight">
                 <span className="text-green-100 text-xs font-medium tracking-wider">TIGO AUTHORIZED</span>
                 <span className="text-green-100 text-xs font-medium tracking-wider">DIRECT ONLINE SHOP</span>
+                <span className="bg-orange-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm mt-1 w-fit uppercase tracking-tighter shadow-sm">BETA eStore</span>
               </div>
             </Link>
 
@@ -355,7 +356,7 @@ export default function Header() {
 
               {/* Account / Sign In */}
               {/* Account Dropdown */}
-              <div className="hidden sm:flex flex-col items-center group relative cursor-pointer">
+              <div className="flex flex-col items-center group relative cursor-pointer">
                 {/* prominent BETA Badge */}
                 <div className="absolute -top-3 -right-6 pointer-events-none z-10">
                   <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border-2 border-green-600 transform rotate-12 scale-125 inline-block">
@@ -618,8 +619,11 @@ export default function Header() {
 
             {/* Drawer */}
             <div className="fixed inset-y-0 left-0 w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
-              <div className="p-5 bg-green-600 text-white flex justify-between items-center shadow-md">
-                <span className="font-bold text-xl">{t('menu')}</span>
+              <div className="p-5 bg-green-600 text-white flex justify-between items-center shadow-md border-b border-green-700">
+                <div className="flex flex-col">
+                  <span className="font-bold text-xl">{t('menu')}</span>
+                  <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded mt-1 w-fit uppercase">BETA eStore</span>
+                </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-1 hover:bg-green-700 rounded-full transition">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
