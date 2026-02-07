@@ -1,4 +1,3 @@
-
 'use client'
 
 import React, { useState } from 'react'
@@ -72,7 +71,8 @@ export default function B2BRegistrationForm() {
         // Agreements
         terms: false,
         privacy: false,
-        legitimateBusiness: false
+        legitimateBusiness: false,
+        isNonEU: false
     })
 
     // Verification States
@@ -198,31 +198,53 @@ export default function B2BRegistrationForm() {
             {/* STEP 1: VAT */}
             <StepCard number={1} title="VAT Verification" isActive={step === 1} isCompleted={step > 1} setStep={setStep}>
                 <div className="space-y-4">
-                    <p className="text-sm text-gray-600">Enter your valid EU VAT number to verify your business status via VIES.</p>
+                    <p className="text-sm text-gray-600">
+                        {formData.isNonEU
+                            ? "Enter your company's Tax ID or VAT registration number for manual verification."
+                            : "Enter your valid EU VAT number to verify your business status via VIES."}
+                    </p>
                     <div className="flex gap-2">
                         <div className="relative flex-1">
                             <input
                                 className="w-full border p-2.5 rounded-lg uppercase tracking-wider font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                                placeholder="DE12345678"
+                                placeholder={formData.isNonEU ? "Tax ID / Registration #" : "DE12345678"}
                                 value={formData.vatNumber}
                                 onChange={e => setFormData(prev => ({ ...prev, vatNumber: e.target.value }))}
                                 autoFocus
                             />
                         </div>
                         <button
-                            onClick={handleValidateVat}
+                            onClick={formData.isNonEU ? () => setStep(2) : handleValidateVat}
                             disabled={loading || !formData.vatNumber}
                             className="bg-blue-800 text-white px-6 rounded-lg hover:bg-blue-900 font-medium disabled:opacity-50"
                         >
-                            {loading ? 'Verifying...' : 'Verify VAT'}
+                            {loading ? 'Verifying...' : formData.isNonEU ? 'Continue' : 'Verify VAT'}
                         </button>
                     </div>
-                    <div className="text-xs text-blue-600 font-medium bg-blue-50 p-2 rounded">
-                        Format: CC12345678 (e.g., DE12345678). Country code is mandatory.
+
+                    <div className="flex items-center gap-2 py-1">
+                        <input
+                            type="checkbox"
+                            id="nonEuCheckbox"
+                            className="w-4 h-4 text-blue-600 rounded"
+                            checked={formData.isNonEU}
+                            onChange={e => setFormData(prev => ({ ...prev, isNonEU: e.target.checked }))}
+                        />
+                        <label htmlFor="nonEuCheckbox" className="text-sm font-medium text-gray-700 cursor-pointer">
+                            Located outside of European Union?
+                        </label>
                     </div>
-                    <div className="text-xs text-gray-400">
-                        * Verification happens in real-time. If VIES is offline, we will fallback to manual verification.
-                    </div>
+
+                    {!formData.isNonEU && (
+                        <>
+                            <div className="text-xs text-blue-600 font-medium bg-blue-50 p-2 rounded">
+                                Format: CC12345678 (e.g., DE12345678). Country code is mandatory.
+                            </div>
+                            <div className="text-xs text-gray-400">
+                                * Verification happens in real-time. If VIES is offline, we will fallback to manual verification.
+                            </div>
+                        </>
+                    )}
                 </div>
             </StepCard>
 
@@ -234,7 +256,12 @@ export default function B2BRegistrationForm() {
                     </div>
                     <div>
                         <label className="text-xs font-medium text-gray-500">Company Name</label>
-                        <input className="w-full border p-2.5 rounded-lg bg-gray-50" value={formData.companyName} readOnly />
+                        <input
+                            className={`w-full border p-2.5 rounded-lg ${formData.isNonEU ? 'bg-white' : 'bg-gray-50'}`}
+                            value={formData.companyName}
+                            onChange={e => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+                            readOnly={!formData.isNonEU}
+                        />
                     </div>
                     <div>
                         <label className="text-xs font-medium text-gray-500">Registered Address</label>
@@ -246,6 +273,17 @@ export default function B2BRegistrationForm() {
                             placeholder="Type company address..."
                         />
                     </div>
+                    {formData.isNonEU && (
+                        <div>
+                            <label className="text-xs font-medium text-gray-500">Country</label>
+                            <input
+                                className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                value={formData.country}
+                                onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                                placeholder="e.g. United States, United Kingdom..."
+                            />
+                        </div>
+                    )}
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <label className="text-xs font-medium text-gray-500">Website (Optional)</label>
