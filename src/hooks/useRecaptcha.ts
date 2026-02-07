@@ -20,6 +20,10 @@ export function useRecaptcha() {
 
         const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
+        if (!siteKey) {
+            console.error('reCAPTCHA site key is missing! Check your environment variables (NEXT_PUBLIC_RECAPTCHA_SITE_KEY).')
+        }
+
         const renderRecaptcha = () => {
             if (window.grecaptcha && recaptchaRef.current && widgetId.current === null) {
                 widgetId.current = window.grecaptcha.render(recaptchaRef.current, {

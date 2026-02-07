@@ -13,18 +13,15 @@ export default function LoginForm() {
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
     const supabase = createClient()
-    const { recaptchaRef, token: recaptchaToken } = useRecaptcha()
+    const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!recaptchaToken) {
-            setError('Please complete the reCAPTCHA')
-            return
-        }
         setLoading(true)
         setError(null)
 
         try {
+            const token = await executeRecaptcha()
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
@@ -42,6 +39,7 @@ export default function LoginForm() {
             router.refresh()
         } catch (error: any) {
             setError(error.message)
+            resetRecaptcha()
         } finally {
             setLoading(false)
         }
