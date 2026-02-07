@@ -19,7 +19,7 @@ export function useRecaptcha() {
     useEffect(() => {
         if (typeof window === 'undefined') return
 
-        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LdKhWMsAAAAAJYZR9_phXUq7XGZhtipLKb_f5Z3'
+        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LedhWMsAAAAAKBY-ybP74GCk5TVxrgVzMX0CPrD'
 
         if (!siteKey) {
             console.error('reCAPTCHA site key is missing! Check your environment variables (NEXT_PUBLIC_RECAPTCHA_SITE_KEY).')

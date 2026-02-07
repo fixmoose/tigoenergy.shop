@@ -6,7 +6,7 @@ export async function verifyRecaptcha(token: string | null, action: string = 'an
     // NEW: Use the Project ID provided by the user
     const projectId = process.env.RECAPTCHA_PROJECT_ID || 'strong-return-396706'
     const apiKey = process.env.RECAPTCHA_API_KEY
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LdKhWMsAAAAAJYZR9_phXUq7XGZhtipLKb_f5Z3'
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LedhWMsAAAAAKBY-ybP74GCk5TVxrgVzMX0CPrD'
 
     // If no API Key is provided for Google Cloud, we cannot use the Enterprise Assessment API.
     // In that case, we fallback to the legacy verification (which still works for Enterprise keys).
