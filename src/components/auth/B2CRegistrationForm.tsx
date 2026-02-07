@@ -21,7 +21,7 @@ export default function B2CRegistrationForm() {
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const { recaptchaRef, token: recaptchaToken, resetRecaptcha } = useRecaptcha()
+    const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
     const { inputRef: addressInputRef } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
@@ -81,22 +81,25 @@ export default function B2CRegistrationForm() {
 
     // STEP 1: Email Handlers
     const handleSendEmailCode = async () => {
-        if (!recaptchaToken) {
-            setError('Please complete the reCAPTCHA')
-            return
-        }
         setLoading(true)
         setError('')
-        const res = await fetch('/api/validate/email', {
-            method: 'POST', body: JSON.stringify({ email: formData.email, recaptchaToken })
-        })
-        const data = await res.json()
-        setLoading(false)
-        if (data.success) {
-            setGeneratedEmailCode(data.debug_code)
-            // Removed alert, showing inline
-        } else {
-            setError(data.error)
+
+        try {
+            const token = await executeRecaptcha()
+            const res = await fetch('/api/validate/email', {
+                method: 'POST', body: JSON.stringify({ email: formData.email, recaptchaToken: token })
+            })
+            const data = await res.json()
+            setLoading(false)
+            if (data.success) {
+                setGeneratedEmailCode(data.debug_code)
+            } else {
+                setError(data.error)
+                resetRecaptcha()
+            }
+        } catch (err: any) {
+            setLoading(false)
+            setError('reCAPTCHA verification failed. Please try again.')
             resetRecaptcha()
         }
     }

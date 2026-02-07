@@ -12,6 +12,8 @@ declare global {
 export function useRecaptcha() {
     const [token, setToken] = useState<string | null>(null)
     const recaptchaRef = useRef<HTMLDivElement>(null)
+    const widgetId = useRef<number | null>(null)
+    const resolver = useRef<((token: string) => void) | null>(null)
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -19,17 +21,25 @@ export function useRecaptcha() {
         const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
         const renderRecaptcha = () => {
-            if (window.grecaptcha && recaptchaRef.current && !recaptchaRef.current.innerHTML) {
-                window.grecaptcha.render(recaptchaRef.current, {
+            if (window.grecaptcha && recaptchaRef.current && widgetId.current === null) {
+                widgetId.current = window.grecaptcha.render(recaptchaRef.current, {
                     sitekey: siteKey,
-                    callback: (token: string) => setToken(token),
-                    'expired-callback': () => setToken(null),
+                    size: 'invisible', // Explicitly support invisible
+                    callback: (token: string) => {
+                        setToken(token)
+                        if (resolver.current) {
+                            resolver.current(token)
+                            resolver.current = null
+                        }
+                    },
+                    'expired-callback': () => {
+                        setToken(null)
+                    },
                 })
             }
         }
 
         if (!window.grecaptcha) {
-            // Check if script already exists
             if (!document.getElementById('recaptcha-script')) {
                 const script = document.createElement('script')
                 script.id = 'recaptcha-script'
@@ -40,7 +50,6 @@ export function useRecaptcha() {
 
                 window.onRecaptchaLoad = renderRecaptcha
             } else {
-                // Script is there but grecaptcha not ready, wait for it
                 const check = setInterval(() => {
                     if (window.grecaptcha) {
                         renderRecaptcha()
@@ -54,11 +63,22 @@ export function useRecaptcha() {
     }, [])
 
     const resetRecaptcha = () => {
-        if (typeof window !== 'undefined' && window.grecaptcha) {
-            window.grecaptcha.reset()
+        if (typeof window !== 'undefined' && window.grecaptcha && widgetId.current !== null) {
+            window.grecaptcha.reset(widgetId.current)
             setToken(null)
         }
     }
 
-    return { recaptchaRef, token, resetRecaptcha }
+    const execute = (): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            if (typeof window !== 'undefined' && window.grecaptcha && widgetId.current !== null) {
+                resolver.current = resolve
+                window.grecaptcha.execute(widgetId.current)
+            } else {
+                reject(new Error('reCAPTCHA not ready'))
+            }
+        })
+    }
+
+    return { recaptchaRef, token, resetRecaptcha, execute }
 }
