@@ -363,7 +363,7 @@ export default function CheckoutPage() {
         setSubmitting(true)
 
         try {
-            const token = await executeRecaptcha('checkout')
+            const token = await executeRecaptcha('CHECKOUT')
             const data = new FormData(e.currentTarget)
             data.append('cart_items', JSON.stringify(items))
             data.append('language', currentLanguage.code)

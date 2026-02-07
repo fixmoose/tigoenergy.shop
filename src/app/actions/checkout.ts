@@ -21,7 +21,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
     // 0. Verify reCAPTCHA
     const recaptchaToken = formData.get('recaptcha_token') as string
-    const recaptcha = await verifyRecaptcha(recaptchaToken, 'checkout')
+    const recaptcha = await verifyRecaptcha(recaptchaToken, 'CHECKOUT')
     if (!recaptcha.success) {
         return { error: 'reCAPTCHA verification failed. Please try again.' }
     }

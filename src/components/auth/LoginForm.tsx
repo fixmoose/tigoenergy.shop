@@ -21,7 +21,7 @@ export default function LoginForm() {
         setError(null)
 
         try {
-            const token = await executeRecaptcha('login')
+            const token = await executeRecaptcha('LOGIN')
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,

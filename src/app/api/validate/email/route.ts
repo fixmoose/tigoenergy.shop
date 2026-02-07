@@ -8,7 +8,7 @@ export async function POST(request: Request) {
         const { email, recaptchaToken } = await request.json()
 
         // 1. Verify reCAPTCHA
-        const recaptcha = await verifyRecaptcha(recaptchaToken, 'registration')
+        const recaptcha = await verifyRecaptcha(recaptchaToken, 'REGISTRATION')
         if (!recaptcha.success) {
             return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 })
         }

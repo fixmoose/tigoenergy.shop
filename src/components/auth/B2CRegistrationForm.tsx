@@ -85,7 +85,7 @@ export default function B2CRegistrationForm() {
         setError('')
 
         try {
-            const token = await executeRecaptcha('registration')
+            const token = await executeRecaptcha('REGISTRATION')
             const res = await fetch('/api/validate/email', {
                 method: 'POST', body: JSON.stringify({ email: formData.email, recaptchaToken: token })
             })
