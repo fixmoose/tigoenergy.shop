@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      has-supabase: ${{ steps.check.outputs.has-supabase }}
+      has-playwright: ${{ steps.check.outputs.has-playwright }}
+    steps:
+      - id: check
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ] && [ -n "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "has-supabase=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-supabase=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if [ "${{ secrets.PLAYWRIGHT_RUN }}" == "true" ]; then
+            echo "has-playwright=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-playwright=false" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test --if-present
+      - name: Clean and build
+        run: rm -rf .next && npm run build --if-present
+
+  create-bucket:
+    needs: [build, check-secrets]
+    runs-on: ubuntu-latest
+    if: ${{ needs.check-secrets.outputs.has-supabase == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Create product-images bucket (Supabase)
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: npm run supabase:setup-bucket
+
+  e2e:
+    needs: [build, check-secrets]
+    runs-on: ubuntu-latest
+    if: ${{ needs.check-secrets.outputs.has-playwright == 'true' }}
+    services:
+      web:
+        image: node:20
+        ports: ['3000:3000']
+        options: >-
+          --entrypoint sh -c "npm ci && npm run build && npm run start"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright e2e
+        env:
+          BASE_URL: http://localhost:3000
+        run: npx playwright test --config=playwright.config.ts --reporter=list
