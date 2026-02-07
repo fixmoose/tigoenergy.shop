@@ -4,7 +4,7 @@ export async function verifyRecaptcha(token: string | null, action: string = 'an
     }
 
     // NEW: Use the Project ID provided by the user
-    const projectId = process.env.RECAPTCHA_PROJECT_ID || 'strong-return-396706'
+    const projectId = process.env.RECAPTCHA_PROJECT_ID || 'tigoenergy-shop'
     const apiKey = process.env.RECAPTCHA_API_KEY
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LedhWMsAAAAAKBY-ybP74GCk5TVxrgVzMX0CPrD'
 
