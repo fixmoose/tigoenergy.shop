@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 
 import { verifyRecaptcha } from '@/lib/recaptcha'
-import { sendEmail, renderTemplate } from '@/lib/email'
+import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
 
@@ -34,6 +34,9 @@ export async function POST(request: Request) {
             : market.defaultLanguage
 
         try {
+            const translations = await getEmailTranslations(locale)
+            const subject = translations.email?.verificationCode?.title || 'Your Verification Code'
+
             const html = await renderTemplate('verification-code', {
                 code,
                 email
@@ -41,7 +44,7 @@ export async function POST(request: Request) {
 
             await sendEmail({
                 to: email,
-                subject: locale === 'sl' ? 'Vaša potrditvena koda' : 'Your Verification Code',
+                subject: subject,
                 html
             })
         } catch (emailError) {

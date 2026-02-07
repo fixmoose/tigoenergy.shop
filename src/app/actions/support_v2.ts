@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { verifyRecaptcha } from '@/lib/recaptcha'
-import { sendEmail, renderTemplate } from '@/lib/email'
+import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
 
@@ -41,6 +41,9 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
         : market.defaultLanguage
 
     try {
+        const translations = await getEmailTranslations(locale)
+        const subject = translations.email?.verificationCode?.title || (locale === 'sl' ? 'Podpora: Vaša potrditvena koda' : 'Support: Your Verification Code')
+
         const html = await renderTemplate('verification-code', {
             code: otp,
             email
@@ -48,7 +51,7 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
 
         await sendEmail({
             to: email,
-            subject: locale === 'sl' ? 'Podpora: Vaša potrditvena koda' : 'Support: Your Verification Code',
+            subject: subject,
             html
         })
     } catch (emailError) {

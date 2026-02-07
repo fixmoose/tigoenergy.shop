@@ -136,3 +136,19 @@ export async function renderTemplate(templateName: string, data: Record<string, 
         throw new Error(`Email template rendering failed for ${templateName}`)
     }
 }
+
+/**
+ * Loads translations for a specific locale.
+ */
+export async function getEmailTranslations(locale: string = 'en') {
+    const messagesPath = path.join(process.cwd(), 'src/messages', `${locale}.json`)
+    const enMessagesPath = path.join(process.cwd(), 'src/messages', 'en.json')
+
+    try {
+        const raw = await fs.readFile(messagesPath, 'utf8')
+        return JSON.parse(raw)
+    } catch {
+        const raw = await fs.readFile(enMessagesPath, 'utf8')
+        return JSON.parse(raw)
+    }
+}
