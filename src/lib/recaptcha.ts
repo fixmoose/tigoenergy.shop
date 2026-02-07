@@ -3,81 +3,38 @@ export async function verifyRecaptcha(token: string | null, action: string = 'an
         return { success: false, error: 'reCAPTCHA token is missing' }
     }
 
-    // NEW: Use the Project ID provided by the user
-    const projectId = process.env.RECAPTCHA_PROJECT_ID || 'tigoenergy-shop'
-    const apiKey = process.env.RECAPTCHA_API_KEY
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LedhWMsAAAAAKBY-ybP74GCk5TVxrgVzMX0CPrD'
-
-    // If no API Key is provided for Google Cloud, we cannot use the Enterprise Assessment API.
-    // In that case, we fallback to the legacy verification (which still works for Enterprise keys).
-    if (!apiKey) {
-        console.warn('RECAPTCHA_API_KEY is missing. Falling back to legacy siteverify (recommended for easier Vercel setup).')
-        const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LdKhWMsAAAAACAe9oKxIks-4WjZyIsGKu7gMs5_'
-
-        try {
-            const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `secret=${secretKey}&response=${token}`,
-            })
-            const data = await response.json()
-
-            if (!data.success) {
-                console.error('reCAPTCHA siteverify failed:', data['error-codes'])
-            }
-
-            return {
-                success: data.success,
-                error: data['error-codes'] ? data['error-codes'][0] : null
-            }
-        } catch (error) {
-            console.error('Legacy reCAPTCHA verification error:', error)
-            return { success: false, error: 'Failed to verify reCAPTCHA' }
-        }
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY
+    if (!secretKey) {
+        console.error('RECAPTCHA_SECRET_KEY is not set in environment variables.')
+        return { success: false, error: 'reCAPTCHA server configuration error' }
     }
 
-    // reCAPTCHA Enterprise Assessment API (The "New" Way)
     try {
-        const response = await fetch(
-            `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    event: {
-                        token: token,
-                        siteKey: siteKey,
-                        expectedAction: action
-                    }
-                })
-            }
-        )
-
+        const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${secretKey}&response=${token}`,
+        })
         const data = await response.json()
 
-        if (data.error) {
-            console.error('reCAPTCHA Enterprise API Error:', data.error)
-            // If the Enterprise API fails (e.g. key disabled), return false but log it.
-            return { success: false, error: data.error.message }
+        if (!data.success) {
+            console.error('reCAPTCHA verification failed:', data['error-codes'])
         }
 
-        // Check token validity
-        const isValid = data.tokenProperties?.valid === true
-        const reason = data.tokenProperties?.invalidReason
-
-        if (!isValid) {
-            console.error(`reCAPTCHA Token Invalid: ${reason}`)
+        // Verify action matches if one was specified (prevents token reuse across forms)
+        if (data.success && action !== 'any' && data.action && data.action !== action) {
+            console.error(`reCAPTCHA action mismatch: expected "${action}", got "${data.action}"`)
+            return { success: false, error: 'reCAPTCHA action mismatch' }
         }
 
         return {
-            success: isValid,
-            score: data.riskAnalysis?.score,
-            reasons: data.riskAnalysis?.reasons,
-            action: data.tokenProperties?.action,
-            error: isValid ? null : (reason || 'invalid-token')
+            success: data.success,
+            score: data.score,
+            action: data.action,
+            error: data['error-codes'] ? data['error-codes'][0] : null
         }
     } catch (error) {
-        console.error('reCAPTCHA Enterprise verification error:', error)
+        console.error('reCAPTCHA verification error:', error)
         return { success: false, error: 'Failed to verify reCAPTCHA' }
     }
 }

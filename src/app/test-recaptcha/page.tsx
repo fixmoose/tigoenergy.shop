@@ -30,13 +30,13 @@ export default function TestRecaptchaPage() {
 
     return (
         <div className="p-8 max-w-2xl mx-auto mt-10 bg-white rounded-3xl shadow-2xl border border-gray-100">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">🛡️ reCAPTCHA Enterprise Tester</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">🛡️ reCAPTCHA v3 Tester</h1>
 
             <div className="space-y-6">
                 <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
                     <p className="text-sm text-blue-800">
-                        This page allows you to trigger a real reCAPTCHA Enterprise event.
-                        Clicking the button will generate a token and send it to your backend for assessment.
+                        This page allows you to trigger a real reCAPTCHA v3 event.
+                        Clicking the button will generate a token and send it to your backend for verification.
                     </p>
                 </div>
 
@@ -75,7 +75,7 @@ export default function TestRecaptchaPage() {
                         </pre>
                         {result.success && (
                             <p className="text-sm text-green-700 mt-3 italic">
-                                Check your Google Cloud "Overview" tab in a few minutes. This event should appear there.
+                                reCAPTCHA verification passed successfully.
                             </p>
                         )}
                     </div>
