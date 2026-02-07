@@ -13,7 +13,10 @@ export async function POST(request: Request) {
         // 1. Verify reCAPTCHA
         const recaptcha = await verifyRecaptcha(recaptchaToken, 'REGISTRATION')
         if (!recaptcha.success) {
-            return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 })
+            console.error('Registration B2C reCAPTCHA failed:', recaptcha.error)
+            return NextResponse.json({
+                error: `reCAPTCHA verification failed: ${recaptcha.error || 'Unknown error'}`
+            }, { status: 400 })
         }
 
         // 2. VALIDATION LOGIC
