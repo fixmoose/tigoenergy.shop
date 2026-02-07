@@ -2,18 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { sendSupportOTP, verifySupportOTP, submitSupportRequestV2, addMessageToSupportRequest, getSupportMessages } from '@/app/actions/support_v2'
+import { useRecaptcha } from '@/hooks/useRecaptcha'
 
 interface Props {
     type?: 'shipping' | 'return' | 'general'
     orderId?: string
     prefillMessage?: string
-}
-
-declare global {
-    interface Window {
-        grecaptcha: any;
-        onRecaptchaLoad: () => void;
-    }
 }
 
 export default function SupportMessagingWindow({ type = 'general', orderId, prefillMessage }: Props) {
@@ -26,46 +20,20 @@ export default function SupportMessagingWindow({ type = 'general', orderId, pref
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [requestId, setRequestId] = useState<string | null>(null)
-    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
-    const recaptchaRef = useRef<HTMLDivElement>(null)
-
-    // Load reCAPTCHA script
-    useEffect(() => {
-        if (typeof window !== 'undefined' && !window.grecaptcha) {
-            const script = document.createElement('script')
-            script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
-            script.async = true
-            script.defer = true
-            document.head.appendChild(script)
-            window.onRecaptchaLoad = () => {
-                if (recaptchaRef.current) {
-                    window.grecaptcha.render(recaptchaRef.current, {
-                        sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-                        callback: (token: string) => setRecaptchaToken(token)
-                    })
-                }
-            }
-        } else if (window.grecaptcha && recaptchaRef.current) {
-            window.grecaptcha.render(recaptchaRef.current, {
-                sitekey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-                callback: (token: string) => setRecaptchaToken(token)
-            })
-        }
-    }, [])
+    const [savedToken, setSavedToken] = useState<string | null>(null)
+    const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const handleSendOTP = async () => {
-        if (!recaptchaToken) {
-            setError('Please complete the reCAPTCHA')
-            return
-        }
         setLoading(true)
         setError('')
         try {
-            const res = await sendSupportOTP(email, recaptchaToken)
+            const token = await executeRecaptcha()
+            setSavedToken(token) // Save for step 2 (submission)
+            await sendSupportOTP(email, token)
             setStep('otp')
-            // Reset reCAPTCHA for next use if needed, but usually one is enough for flow
         } catch (err: any) {
             setError(err.message)
+            resetRecaptcha()
         } finally {
             setLoading(false)
         }
@@ -83,7 +51,7 @@ export default function SupportMessagingWindow({ type = 'general', orderId, pref
                 message,
                 email,
                 name,
-                recaptchaToken: recaptchaToken as string
+                recaptchaToken: savedToken as string
             })
             setRequestId(res.requestId)
             setStep('chat')
@@ -152,7 +120,7 @@ export default function SupportMessagingWindow({ type = 'general', orderId, pref
                         />
                         <div ref={recaptchaRef}></div>
                         <button
-                            onClick={handleSendOTP} disabled={loading || !recaptchaToken}
+                            onClick={handleSendOTP} disabled={loading}
                             className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition shadow-lg shadow-blue-100"
                         >
                             {loading ? 'Sending Code...' : 'Start Conversation'}
@@ -186,8 +154,8 @@ export default function SupportMessagingWindow({ type = 'general', orderId, pref
                         {messages.map((m, idx) => (
                             <div key={idx} className={`flex ${m.sender_type === 'admin' ? 'justify-start' : 'justify-end'}`}>
                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${m.sender_type === 'admin'
-                                        ? 'bg-white text-gray-800 rounded-tl-none'
-                                        : 'bg-blue-600 text-white rounded-tr-none'
+                                    ? 'bg-white text-gray-800 rounded-tl-none'
+                                    : 'bg-blue-600 text-white rounded-tr-none'
                                     }`}>
                                     {m.message}
                                     <div className={`text-[10px] mt-1 opacity-60 ${m.sender_type === 'admin' ? 'text-gray-400' : 'text-blue-100'}`}>

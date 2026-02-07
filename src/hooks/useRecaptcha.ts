@@ -4,7 +4,9 @@ import { useEffect, useState, useRef } from 'react'
 
 declare global {
     interface Window {
-        grecaptcha: any;
+        grecaptcha: {
+            enterprise: any;
+        };
         onRecaptchaLoad: () => void;
     }
 }
@@ -25,8 +27,8 @@ export function useRecaptcha() {
         }
 
         const renderRecaptcha = () => {
-            if (window.grecaptcha && recaptchaRef.current && widgetId.current === null) {
-                widgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+            if (window.grecaptcha?.enterprise && recaptchaRef.current && widgetId.current === null) {
+                widgetId.current = window.grecaptcha.enterprise.render(recaptchaRef.current, {
                     sitekey: siteKey,
                     size: 'invisible', // Explicitly support invisible
                     callback: (token: string) => {
@@ -47,7 +49,7 @@ export function useRecaptcha() {
             if (!document.getElementById('recaptcha-script')) {
                 const script = document.createElement('script')
                 script.id = 'recaptcha-script'
-                script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+                script.src = 'https://www.google.com/recaptcha/enterprise.js?render=explicit'
                 script.async = true
                 script.defer = true
                 document.head.appendChild(script)
@@ -55,29 +57,29 @@ export function useRecaptcha() {
                 window.onRecaptchaLoad = renderRecaptcha
             } else {
                 const check = setInterval(() => {
-                    if (window.grecaptcha) {
+                    if (window.grecaptcha?.enterprise) {
                         renderRecaptcha()
                         clearInterval(check)
                     }
                 }, 100)
             }
-        } else {
+        } else if (window.grecaptcha?.enterprise) {
             renderRecaptcha()
         }
     }, [])
 
     const resetRecaptcha = () => {
-        if (typeof window !== 'undefined' && window.grecaptcha && widgetId.current !== null) {
-            window.grecaptcha.reset(widgetId.current)
+        if (typeof window !== 'undefined' && window.grecaptcha?.enterprise && widgetId.current !== null) {
+            window.grecaptcha.enterprise.reset(widgetId.current)
             setToken(null)
         }
     }
 
     const execute = (): Promise<string> => {
         return new Promise((resolve, reject) => {
-            if (typeof window !== 'undefined' && window.grecaptcha && widgetId.current !== null) {
+            if (typeof window !== 'undefined' && window.grecaptcha?.enterprise && widgetId.current !== null) {
                 resolver.current = resolve
-                window.grecaptcha.execute(widgetId.current)
+                window.grecaptcha.enterprise.execute(widgetId.current)
             } else {
                 reject(new Error('reCAPTCHA not ready'))
             }

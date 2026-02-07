@@ -11,7 +11,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('')
   const router = useRouter()
   const supabase = createClient()
-  const { recaptchaRef, token: recaptchaToken } = useRecaptcha()
+  const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
   useEffect(() => {
     // Check if we have a session (from the reset link)
@@ -26,10 +26,6 @@ export default function ResetPasswordPage() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA')
-      return
-    }
     setError('')
     setMessage('')
 
@@ -40,6 +36,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
+      const token = await executeRecaptcha()
       const { error: err } = await supabase.auth.updateUser({ password })
       if (err) {
         setError(err.message)
@@ -49,8 +46,9 @@ export default function ResetPasswordPage() {
           router.push('/admin/sign-in')
         }, 2000)
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.')
+    } catch (err: any) {
+      setError(err.message || 'An error occurred. Please try again.')
+      resetRecaptcha()
       console.error(err)
     } finally {
       setLoading(false)
@@ -77,7 +75,7 @@ export default function ResetPasswordPage() {
         <div className="py-2">
           <div ref={recaptchaRef}></div>
         </div>
-        <button type="submit" disabled={loading || !recaptchaToken} className="w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 disabled:opacity-50">
+        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 disabled:opacity-50">
           {loading ? 'Resetting...' : 'Reset Password'}
         </button>
       </form>

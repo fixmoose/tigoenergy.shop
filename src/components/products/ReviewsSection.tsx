@@ -32,27 +32,24 @@ export default function ReviewsSection({ productId, reviews }: { productId: stri
     const [rating, setRating] = useState(5)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const { recaptchaRef, token: recaptchaToken } = useRecaptcha()
+    const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!recaptchaToken) {
-            setError('Please complete the reCAPTCHA')
-            return
-        }
         setLoading(true)
         setError(null)
         try {
+            const token = await executeRecaptcha()
             const formData = new FormData(e.currentTarget)
             formData.append('product_id', productId)
             formData.append('rating', rating.toString())
-            formData.append('recaptcha_token', recaptchaToken)
+            formData.append('recaptcha_token', token)
 
             await createReview(formData)
             setIsFormOpen(false)
-            // Reset form? browser handles it mostly, but component unmounts
-        } catch (error) {
-            alert('Error submitting review: ' + (error as Error).message)
+        } catch (error: any) {
+            setError(error.message)
+            resetRecaptcha()
         } finally {
             setLoading(false)
         }
@@ -97,7 +94,7 @@ export default function ReviewsSection({ productId, reviews }: { productId: stri
 
                     <button
                         type="submit"
-                        disabled={loading || !recaptchaToken}
+                        disabled={loading}
                         className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
                     >
                         {loading ? 'Posting...' : 'Post Review'}

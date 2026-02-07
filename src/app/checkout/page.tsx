@@ -88,7 +88,7 @@ export default function CheckoutPage() {
     const [validatingVat, setValidatingVat] = useState(false)
     const [vatResult, setVatResult] = useState<any>(null)
     const [localIsB2B, setLocalIsB2B] = useState<boolean | null>(null)
-    const { recaptchaRef, token: recaptchaToken } = useRecaptcha()
+    const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const { inputRef: shippingRef } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
@@ -352,10 +352,6 @@ export default function CheckoutPage() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!recaptchaToken) {
-            setError('Please complete the reCAPTCHA')
-            return
-        }
         setError(null)
         setInvalidFields([])
         if (!validateForm()) return
@@ -365,22 +361,26 @@ export default function CheckoutPage() {
             return
         }
         setSubmitting(true)
-        const data = new FormData(e.currentTarget)
-        data.append('cart_items', JSON.stringify(items))
-        data.append('language', currentLanguage.code)
-        data.append('recaptcha_token', recaptchaToken)
-        if (selectedShippingId) data.append('shipping_id', selectedShippingId)
 
         try {
+            const token = await executeRecaptcha()
+            const data = new FormData(e.currentTarget)
+            data.append('cart_items', JSON.stringify(items))
+            data.append('language', currentLanguage.code)
+            data.append('recaptcha_token', token)
+            if (selectedShippingId) data.append('shipping_id', selectedShippingId)
+
             const res = await placeOrder({}, data)
             if (res.error) {
                 setError(res.error)
+                resetRecaptcha()
             } else if (res.success && res.orderId) {
                 clearCart()
                 window.location.href = `/checkout/success/${res.orderId}`
             }
         } catch (err: any) {
             setError(err.message || 'Something went wrong')
+            resetRecaptcha()
         } finally {
             setSubmitting(false)
         }
@@ -724,7 +724,7 @@ export default function CheckoutPage() {
                                 <div ref={recaptchaRef}></div>
                             </div>
 
-                            <button type="submit" disabled={submitting || !recaptchaToken} className="w-full mt-6 bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={submitting} className="w-full mt-6 bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
                                 {submitting ? t('processing') : t('placeOrder')}
                             </button>
                         </div>
