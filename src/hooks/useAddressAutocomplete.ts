@@ -32,19 +32,15 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
             const scriptId = 'google-maps-places-script'
             if (document.getElementById(scriptId)) {
-                // Script might be loading, wait for it
-                const interval = setInterval(() => {
-                    if (window.google?.maps?.places) {
-                        setIsLoaded(true)
-                        clearInterval(interval)
-                    }
-                }, 100)
+                if (window.google?.maps?.places) {
+                    setIsLoaded(true)
+                }
                 return
             }
 
             const script = document.createElement('script')
             script.id = scriptId
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`
             script.async = true
             script.defer = true
             script.onload = () => setIsLoaded(true)
