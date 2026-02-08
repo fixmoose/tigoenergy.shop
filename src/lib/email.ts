@@ -141,6 +141,28 @@ export async function renderTemplate(templateName: string, data: Record<string, 
 }
 
 /**
+ * Renders a template from the database (document_templates table)
+ */
+export async function renderDatabaseTemplate(type: string, data: Record<string, string>, locale: string = 'en') {
+    const { getPinnedTemplate, replacePlaceholders } = await import('./document-service')
+
+    try {
+        const template = await getPinnedTemplate(type, locale)
+        if (!template) {
+            console.warn(`Template of type ${type} for locale ${locale} not found in DB.`)
+            return null
+        }
+
+        // Mapping common placeholders to DocumentData fields if needed
+        // replacePlaceholders handles simple {key} replacement
+        return replacePlaceholders(template.content_html, data as any)
+    } catch (error) {
+        console.error(`Error rendering database template ${type}:`, error)
+        return null
+    }
+}
+
+/**
  * Loads translations for a specific locale.
  */
 export async function getEmailTranslations(locale: string = 'en') {

@@ -108,18 +108,28 @@ export default function EnvironmentalPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Environmental Reporting</h1>
-          <p className="text-slate-500 mt-1">eTROD (WEEE & Packaging) reporting for FURS</p>
+          <p className="text-slate-500 mt-1">Standalone reporting for WEEE (eTROD) and Packaging Waste (OE)</p>
         </div>
-        <button
-          onClick={downloadCSV}
-          disabled={
-            (activeTab === 'etrod' && (!etrodReport || etrodReport.rows.length === 0)) ||
-            (activeTab === 'packaging' && (!packagingReport || packagingReport.rows.length === 0))
-          }
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Download CSV
-        </button>
+        <div className="flex gap-3 items-center">
+          <a
+            href="https://ecarina.fu.gov.si/wps/portal/e-carina/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2"
+          >
+            Submit to e-Carina ↗
+          </a>
+          <button
+            onClick={downloadCSV}
+            disabled={
+              (activeTab === 'etrod' && (!etrodReport || etrodReport.rows.length === 0)) ||
+              (activeTab === 'packaging' && (!packagingReport || packagingReport.rows.length === 0))
+            }
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Download CSV
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -333,13 +343,15 @@ export default function EnvironmentalPage() {
 
           {/* eTROD Categories Reference */}
           <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4">
-            <h4 className="font-semibold text-green-800 mb-2">eTROD Categories (Slovenian WEEE & Packaging)</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm text-green-700">
-              <div>1 = Large Household Appliances</div>
-              <div>2 = Small Household Appliances</div>
-              <div>...</div>
-              <div>7 = Photovoltaic Panels (Solar/PV)</div>
-              <div className="font-bold border-t mt-1 pt-1">Includes Packaging (OE) reporting</div>
+            <h4 className="font-semibold text-green-800 mb-2">eTROD WEEE Categories</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+              <div className="flex gap-2"><strong>1</strong> <span>Oprema za toplotno izmenjavo</span></div>
+              <div className="flex gap-2"><strong>2</strong> <span>Zasloni, monitorji in oprema z zasloni (&gt;100 cm²)</span></div>
+              <div className="flex gap-2"><strong>3</strong> <span>Sijalke (Lamps)</span></div>
+              <div className="flex gap-2"><strong>4</strong> <span>Velika oprema (&gt;50 cm)</span></div>
+              <div className="flex gap-2"><strong>5</strong> <span>Majhna oprema (≤50 cm)</span></div>
+              <div className="flex gap-2"><strong>6</strong> <span>Majhna oprema za IT in telekomunikacije</span></div>
+              <div className="flex gap-2 font-bold bg-green-100/50 px-2 py-1 rounded"><strong>7-PBA</strong> <span>Prenosne baterije in akumulatorji</span></div>
             </div>
           </div>
         </>

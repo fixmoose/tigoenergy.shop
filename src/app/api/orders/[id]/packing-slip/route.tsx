@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { renderToStream } from '@react-pdf/renderer'
-import { PackingSlipDocument } from '@/components/orders/PackingSlipDocument'
-import React from 'react'
+import { createClient } from '../../../../../lib/supabase/server'
+import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
+import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
 
 export async function GET(
     req: NextRequest,
@@ -11,10 +10,10 @@ export async function GET(
     const { id } = await params
     const supabase = await createClient()
 
-    // 1. Fetch Order
+    // 1. Fetch Order with Items
     const { data: order, error: orderError } = await supabase
         .from('orders')
-        .select('*')
+        .select('*, order_items(*)')
         .eq('id', id)
         .single()
 
@@ -28,7 +27,6 @@ export async function GET(
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Basic ownership check (if not admin, email must match)
     if (order.customer_email !== user.email) {
         const isAdmin = user.email?.endsWith('@tigoenergy.com') || user.user_metadata?.role === 'admin'
         if (!isAdmin) {
@@ -36,31 +34,49 @@ export async function GET(
         }
     }
 
-    // 3. Fetch Items
-    const { data: items, error: itemsError } = await supabase
-        .from('order_items')
-        .select('*')
-        .eq('order_id', id)
-
-    if (itemsError || !items) {
-        return NextResponse.json({ error: 'Order items not found' }, { status: 404 })
-    }
-
     try {
-        // 4. Render PDF to stream
-        const stream = (await renderToStream(
-            <PackingSlipDocument
-                order={order as any}
-                items={items as any}
-                language={order.language || 'en'}
-            />
-        )) as any
+        // 3. Get Pinned Template
+        const template = await getPinnedTemplate('packing_slip', order.language || 'en')
+        if (!template) {
+            return NextResponse.json({ error: 'Packing slip template not found' }, { status: 404 })
+        }
 
-        // 5. Return stream as response
-        return new NextResponse(stream as any, {
+        // 4. Prepare Data for Placeholders
+        const formatAddress = (addr: any) => {
+            if (!addr) return 'N/A'
+            return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
+        }
+
+        const documentData: DocumentData = {
+            order_number: order.order_number,
+            order_date: new Date(order.created_at).toLocaleDateString(),
+            customer_name: `${order.billing_address?.first_name || ''} ${order.billing_address?.last_name || ''}`.trim() || order.customer_email,
+            customer_email: order.customer_email,
+            customer_company: order.company_name,
+            billing_address: formatAddress(order.billing_address),
+            shipping_address: formatAddress(order.shipping_address),
+            subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
+            vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
+            shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
+            total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
+            payment_method: order.payment_method || 'N/A',
+            items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
+            tracking_number: order.tracking_number || 'N/A',
+            carrier_name: order.shipping_carrier || 'Standard'
+        }
+
+        // 5. Replace Placeholders
+        const htmlContent = replacePlaceholders(template.content_html, documentData)
+
+        // 6. Generate PDF
+        const pdfBuffer = await generatePdfFromHtml(htmlContent)
+
+        // 7. Return PDF response
+        return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': `attachment; filename=PackingSlip_${order.order_number}.pdf`,
+                'Cache-Control': 'no-cache'
             },
         })
     } catch (err) {

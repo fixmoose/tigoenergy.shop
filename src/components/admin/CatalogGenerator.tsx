@@ -9,13 +9,13 @@ type Category = any // Temporary fallback to unblock build
 // --- PDF STYLES ---
 const styles = StyleSheet.create({
     page: { flexDirection: 'column', backgroundColor: '#FFFFFF', padding: 30, fontSize: 10, fontFamily: 'Helvetica' },
-    header: { marginBottom: 20, borderBottomWidth: 1, borderBottomStyle: 'solid', paddingBottom: 10, borderColor: '#EEE' },
+    header: { marginBottom: 20, borderBottomWidth: 1, borderBottomStyle: 'solid', paddingBottom: 10, borderBottomColor: '#EEE' },
     title: { fontSize: 24, fontWeight: 'bold', color: '#111' },
     subtitle: { fontSize: 12, color: '#666', marginTop: 4 },
 
     // Pricelist Table
     table: { display: 'flex', flexDirection: 'column', width: 'auto', borderStyle: 'solid', borderWidth: 1, borderColor: '#EEE' },
-    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEE', minHeight: 24, alignItems: 'center' },
+    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomStyle: 'solid', borderBottomColor: '#EEE', minHeight: 24, alignItems: 'center' },
     tableHeader: { backgroundColor: '#F9FAFB', fontWeight: 'bold' },
     colSku: { width: '15%', padding: 4 },
     colName: { width: '40%', padding: 4 },

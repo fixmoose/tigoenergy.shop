@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { Customer } from '@/types/database'
 import { createCustomer } from '@/app/actions/customers'
 import { adminCreateCustomerAction, adminUpdateCustomerAction } from '@/app/actions/admin'
@@ -214,6 +215,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
         }
     }
 
+    const router = useRouter()
     const selectedCustomerDocs = allDocs.filter(d => d.customerId === docsModal.customerId)
 
     return (
@@ -276,9 +278,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                 {filteredCustomers.map((c) => {
                                     const pendingDocs = getPendingCount(c.id)
                                     return (
-                                        <tr key={c.id} className="hover:bg-slate-50 transition-colors">
+                                        <tr
+                                            key={c.id}
+                                            className="hover:bg-slate-50 transition-colors cursor-pointer group"
+                                            onClick={() => router.push(`/admin/customers/${c.id}`)}
+                                        >
                                             <td className="px-4 py-3">
-                                                <div className="font-medium text-slate-900">{c.first_name} {c.last_name}</div>
+                                                <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{c.first_name} {c.last_name}</div>
                                                 <div className="text-xs text-slate-400 font-mono">{c.id}</div>
                                             </td>
                                             <td className="px-4 py-3">
@@ -294,7 +300,10 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                             <td className="px-4 py-3">
                                                 {pendingDocs > 0 ? (
                                                     <button
-                                                        onClick={() => setDocsModal({ isOpen: true, customerId: c.id })}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setDocsModal({ isOpen: true, customerId: c.id })
+                                                        }}
                                                         className="inline-flex items-center gap-1.5 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-orange-200"
                                                     >
                                                         <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
@@ -304,7 +313,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                     <span className="text-slate-400 text-xs">-</span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 text-right space-x-2">
+                                            <td className="px-4 py-3 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
                                                 {pendingDocs > 0 && (
                                                     <button
                                                         onClick={() => setDocsModal({ isOpen: true, customerId: c.id })}

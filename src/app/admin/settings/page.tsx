@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { getAdminsAction, inviteAdminAction, deleteAdminAction } from '@/app/actions/admin'
+import TemplateManager from '@/components/admin/TemplateManager'
 
 type Category = {
     id: string
@@ -336,6 +337,9 @@ export default function SettingsPage() {
                 </div>
 
             </div>
+
+            {/* Document Templates Section */}
+            <TemplateManager />
 
             {/* Modal */}
             {isModalOpen && (

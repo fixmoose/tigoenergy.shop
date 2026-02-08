@@ -4,7 +4,7 @@ import type { Order, OrderItem } from '@/types/database'
 
 const styles = StyleSheet.create({
     page: { flexDirection: 'column', backgroundColor: '#FFFFFF', padding: 40, fontSize: 10, fontFamily: 'Helvetica' },
-    header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30, borderBottomWidth: 1, borderBottomColor: '#EEEEEE', paddingBottom: 20 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30, borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#EEEEEE', paddingBottom: 20 },
     logoContainer: { width: 150 },
     addressContainer: { textAlign: 'right', color: '#666666', lineHeight: 1.4 },
     companyTitle: { fontSize: 16, fontWeight: 'bold', color: '#111111', marginBottom: 5 },
@@ -14,13 +14,13 @@ const styles = StyleSheet.create({
     infoText: { fontSize: 10, color: '#333333', lineHeight: 1.4 },
 
     table: { marginTop: 10 },
-    tableHeader: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEEEEE', backgroundColor: '#F9FAFB', padding: 6, fontWeight: 'bold' },
-    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#F3F4F6', padding: 6, minHeight: 40, alignItems: 'center' },
+    tableHeader: { flexDirection: 'row', borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#EEEEEE', backgroundColor: '#F9FAFB', padding: 6, fontWeight: 'bold' },
+    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#F3F4F6', padding: 6, minHeight: 40, alignItems: 'center' },
     colSku: { width: '20%' },
     colDesc: { width: '65%' },
     colQty: { width: '15%', textAlign: 'center' },
 
-    footer: { marginTop: 50, borderTopWidth: 1, borderTopColor: '#EEEEEE', paddingTop: 20, textAlign: 'center', color: '#888888', fontSize: 8 },
+    footer: { marginTop: 50, borderTopWidth: 1, borderStyle: 'solid', borderTopColor: '#EEEEEE', paddingTop: 20, textAlign: 'center', color: '#888888', fontSize: 8 },
     packingLabel: {
         position: 'absolute',
         top: 20,

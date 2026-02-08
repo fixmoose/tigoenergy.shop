@@ -36,9 +36,9 @@ export async function GET(
 
     try {
         // 3. Get Pinned Template
-        const template = await getPinnedTemplate('invoice', order.language || 'en')
+        const template = await getPinnedTemplate('storno_invoice', order.language || 'en')
         if (!template) {
-            return NextResponse.json({ error: 'Invoice template not found' }, { status: 404 })
+            return NextResponse.json({ error: 'Storno invoice template not found' }, { status: 404 })
         }
 
         // 4. Prepare Data for Placeholders
@@ -49,6 +49,8 @@ export async function GET(
             if (!addr) return 'N/A'
             return `${addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
         }
+
+        const originalInvoiceNumber = order.invoice_number || `INV-${order.order_number}`
 
         const documentData: DocumentData = {
             order_number: order.order_number,
@@ -65,9 +67,10 @@ export async function GET(
             total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
             payment_method: order.payment_method || 'Bank Transfer',
             items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
-            invoice_number: order.invoice_number || `INV-${order.order_number}`,
+            invoice_number: originalInvoiceNumber,
+            storno_number: `STORNO-${originalInvoiceNumber}`,
             invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString() : new Date().toLocaleDateString(),
-            due_date: order.invoice_created_at ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() : 'N/A'
+            due_date: 'N/A'
         }
 
         // 5. Replace Placeholders
@@ -80,7 +83,7 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=Invoice_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=Storno_${order.order_number}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })

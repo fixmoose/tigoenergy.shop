@@ -45,11 +45,16 @@ export function useRecaptcha() {
                 document.head.appendChild(script)
             }
 
+            let attempts = 0
             const check = setInterval(() => {
+                attempts++
                 if (window.grecaptcha?.ready) {
                     window.grecaptcha.ready(() => {
                         renderRecaptcha()
                     })
+                    clearInterval(check)
+                } else if (attempts > 50) { // 5 seconds
+                    console.warn('reCAPTCHA failed to load within 5s. Check network or API key restrictions.')
                     clearInterval(check)
                 }
             }, 100)

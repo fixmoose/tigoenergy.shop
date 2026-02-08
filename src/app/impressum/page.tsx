@@ -1,7 +1,12 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import Link from 'next/link'
 
 export default function ImpressumPage() {
+    const [emailRevealed, setEmailRevealed] = useState(false)
+    const email = "support@tigoenergy.shop"
+
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +27,25 @@ export default function ImpressumPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">Contact Information</h2>
                         <div className="space-y-2 text-gray-700">
-                            <p>Email: <a href="mailto:support@tigoenergy.shop" className="text-green-600 hover:text-green-700">support@tigoenergy.shop</a></p>
+                            <div className="flex items-center gap-2">
+                                <span>Email:</span>
+                                {emailRevealed ? (
+                                    <a href={`mailto:${email}`} className="text-green-600 hover:text-green-700 font-medium">
+                                        {email}
+                                    </a>
+                                ) : (
+                                    <button
+                                        onClick={() => setEmailRevealed(true)}
+                                        className="text-green-600 hover:text-green-700 font-medium filter blur-[4px] select-none cursor-pointer transition-all hover:blur-none"
+                                        title="Click to reveal"
+                                    >
+                                        {email}
+                                        <span className="ml-2 text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded opacity-0 transition-opacity group-hover:opacity-100 italic">
+                                            Click to reveal
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
                             <p>Website: <a href="https://tigoenergy.shop" className="text-green-600 hover:text-green-700">tigoenergy.shop</a></p>
                         </div>
                     </section>

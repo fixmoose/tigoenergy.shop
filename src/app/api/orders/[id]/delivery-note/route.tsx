@@ -36,18 +36,15 @@ export async function GET(
 
     try {
         // 3. Get Pinned Template
-        const template = await getPinnedTemplate('invoice', order.language || 'en')
+        const template = await getPinnedTemplate('delivery_note', order.language || 'en')
         if (!template) {
-            return NextResponse.json({ error: 'Invoice template not found' }, { status: 404 })
+            return NextResponse.json({ error: 'Delivery note template not found' }, { status: 404 })
         }
 
         // 4. Prepare Data for Placeholders
-        const billing = order.billing_address as any
-        const shipping = order.shipping_address as any
-
         const formatAddress = (addr: any) => {
             if (!addr) return 'N/A'
-            return `${addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
+            return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
         }
 
         const documentData: DocumentData = {
@@ -56,18 +53,16 @@ export async function GET(
             customer_name: `${order.billing_address?.first_name || ''} ${order.billing_address?.last_name || ''}`.trim() || order.customer_email,
             customer_email: order.customer_email,
             customer_company: order.company_name,
-            customer_vat: order.vat_id,
-            billing_address: formatAddress(billing),
-            shipping_address: formatAddress(shipping),
+            billing_address: formatAddress(order.billing_address),
+            shipping_address: formatAddress(order.shipping_address),
             subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
             vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
             shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
             total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
-            payment_method: order.payment_method || 'Bank Transfer',
+            payment_method: order.payment_method || 'N/A',
             items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
-            invoice_number: order.invoice_number || `INV-${order.order_number}`,
-            invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString() : new Date().toLocaleDateString(),
-            due_date: order.invoice_created_at ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() : 'N/A'
+            tracking_number: order.tracking_number || 'N/A',
+            carrier_name: order.shipping_carrier || 'Standard'
         }
 
         // 5. Replace Placeholders
@@ -80,12 +75,12 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=Invoice_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=DeliveryNote_${order.order_number}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })
     } catch (err) {
-        console.error('PDF Generation Error:', err)
+        console.error('Packing Slip Generation Error:', err)
         return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
     }
 }

@@ -14,61 +14,89 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
     const inputRef = useRef<HTMLInputElement>(null)
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [hasError, setHasError] = useState(false)
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
     useEffect(() => {
         if (typeof window === 'undefined') return
-
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
         if (!apiKey) {
-            console.error('Google Maps API Key missing')
+            setHasError(true)
             return
         }
 
-        // Check if script is already present
+        const handleLoad = () => {
+            setIsLoaded(true)
+            setHasError(false)
+        }
+
+        const handleError = () => {
+            setIsLoaded(false)
+            setHasError(true)
+        }
+
+        // 1. If already loaded
         if (window.google?.maps?.places) {
-            setIsLoaded(true)
+            handleLoad()
             return
         }
 
-        const scriptId = 'google-maps-script'
-        let script = document.getElementById(scriptId) as HTMLScriptElement
+        // 2. Listen for singleton events
+        window.addEventListener('google-maps-loaded', handleLoad)
+        window.addEventListener('google-maps-error', handleError)
 
-        if (!script) {
-            script = document.createElement('script');
-            script.id = scriptId;
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapAutocomplete`;
-            script.async = true;
-            script.defer = true;
-
-            // Define global callback before appending script
+        // 3. Define global callbacks (shared)
+        if (!(window as any).initMapAutocomplete) {
             (window as any).initMapAutocomplete = () => {
-                setIsLoaded(true);
-            };
-
-            script.onerror = () => {
-                console.error('Failed to load Google Maps script');
-            };
-
-            document.head.appendChild(script);
-        } else if (window.google?.maps?.places) {
-            setIsLoaded(true)
-        } else {
-            // Script exists but not yet loaded, wait for the callback or onload
-            const interval = setInterval(() => {
-                if (window.google?.maps?.places) {
-                    setIsLoaded(true)
-                    clearInterval(interval)
-                }
-            }, 500)
-            return () => clearInterval(interval)
+                window.dispatchEvent(new Event('google-maps-loaded'))
+            }
         }
-    }, [])
+        if (!(window as any).gm_authFailure) {
+            (window as any).gm_authFailure = () => {
+                console.error('Google Maps Authentication Failed (RefererNotAllowedMapError)');
+                window.dispatchEvent(new Event('google-maps-error'))
+            }
+        }
+
+        // 4. Load script if not present
+        const scriptId = 'google-maps-script'
+        if (!document.getElementById(scriptId)) {
+            const script = document.createElement('script')
+            script.id = scriptId
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapAutocomplete`
+            script.async = true
+            script.defer = true
+            script.onerror = () => window.dispatchEvent(new Event('google-maps-error'))
+            document.head.appendChild(script)
+        }
+
+        // 5. Polling fallback for edge cases where script is already in DOM but stalled
+        const checkInterval = setInterval(() => {
+            if (window.google?.maps?.places) {
+                handleLoad()
+                clearInterval(checkInterval)
+            }
+        }, 1000)
+
+        // 6. Timeout
+        const timeout = setTimeout(() => {
+            if (!window.google?.maps?.places && !isLoaded) {
+                console.warn('Google Maps Autocomplete timeout')
+                handleError()
+            }
+        }, 8000)
+
+        return () => {
+            window.removeEventListener('google-maps-loaded', handleLoad)
+            window.removeEventListener('google-maps-error', handleError)
+            clearInterval(checkInterval)
+            clearTimeout(timeout)
+        }
+    }, [apiKey])
 
     useEffect(() => {
         if (!isLoaded || !inputRef.current || !window.google?.maps?.places) return
 
         try {
-            // Initialize Autocomplete
             autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
                 types: ['address'],
                 fields: ['address_components', 'formatted_address', 'geometry'],
@@ -95,42 +123,19 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
                 place.address_components.forEach((component: any) => {
                     const types = component.types as string[]
-
-                    if (types.includes('street_number')) {
-                        streetNumber = component.long_name
-                    }
-                    if (types.includes('route')) {
-                        route = component.long_name
-                    }
-                    if (types.includes('locality')) {
-                        locality = component.long_name
-                    }
-                    if (types.includes('postal_town')) {
-                        postal_town = component.long_name
-                    }
-                    if (types.includes('sublocality_level_1')) {
-                        sublocality = component.long_name
-                    }
-                    if (types.includes('neighborhood')) {
-                        neighborhood = component.long_name
-                    }
-                    if (types.includes('administrative_area_level_2')) {
-                        admin_area_2 = component.long_name
-                    }
-                    if (types.includes('postal_code')) {
-                        address.postal_code = component.long_name
-                    }
-                    if (types.includes('country')) {
-                        address.country = component.short_name
-                    }
-                    if (types.includes('administrative_area_level_1')) {
-                        address.state = component.long_name
-                    }
+                    if (types.includes('street_number')) streetNumber = component.long_name
+                    if (types.includes('route')) route = component.long_name
+                    if (types.includes('locality')) locality = component.long_name
+                    if (types.includes('postal_town')) postal_town = component.long_name
+                    if (types.includes('sublocality_level_1')) sublocality = component.long_name
+                    if (types.includes('neighborhood')) neighborhood = component.long_name
+                    if (types.includes('administrative_area_level_2')) admin_area_2 = component.long_name
+                    if (types.includes('postal_code')) address.postal_code = component.long_name
+                    if (types.includes('country')) address.country = component.short_name
+                    if (types.includes('administrative_area_level_1')) address.state = component.long_name
                 })
 
-                // Set city based on hierarchy: locality > postal_town > sublocality > neighborhood > administrative_area_level_2
                 address.city = locality || postal_town || sublocality || neighborhood || admin_area_2 || ''
-
                 address.street = streetNumber ? `${route} ${streetNumber}` : route
                 onAddressSelected(address)
             })
@@ -139,14 +144,11 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                 if (window.google?.maps?.event && listener) {
                     window.google.maps.event.removeListener(listener)
                 }
-                // Clear the Pac container (Google's dropdown div) if component unmounts
-                const pacContainers = document.querySelectorAll('.pac-container')
-                pacContainers.forEach(container => container.remove())
             }
         } catch (error) {
             console.error('Error initializing Autocomplete:', error)
         }
     }, [isLoaded, onAddressSelected])
 
-    return { inputRef, isLoaded }
+    return { inputRef, isLoaded, hasError }
 }

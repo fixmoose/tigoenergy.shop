@@ -233,36 +233,86 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         if (itemsError) throw new Error(itemsError.message)
 
-        // 7. Send Confirmation Email (fire-and-forget — don't block checkout)
+        // 7. Determine Business Flow (Proforma vs Invoice)
+        const isHighVolume = totalWeight > 500 || subtotal > 2500
+        const isBankTransfer = rawData.payment_method === 'bank_transfer'
+        const isProformaFlow = isBankTransfer || isHighVolume
+        const isInterEuropa = shippingCarrier === 'InterEuropa'
+
+        // Update order with these flags if columns exist (assuming they don't, we just use logic for email)
+        // If we want to persist these, we might need a migration, but for now we follow the flow:
+        const documentType = isProformaFlow ? 'proforma_invoice' : 'order_confirmation'
+
+        // 8. Send Confirmation Email (fire-and-forget — don't block checkout)
         const orderLanguage = (rawData.language as string) || market.defaultLanguage || 'en'
         try {
-            const { subject, html } = buildOrderConfirmationEmail({
-                orderNumber: order.order_number,
-                customerName: `${rawData.shipping_first_name} ${rawData.shipping_last_name}`,
-                email,
-                items: orderItemsData.map(i => ({
-                    sku: i.sku,
-                    name: i.product_name,
-                    quantity: i.quantity,
-                    unitPrice: i.unit_price,
-                    originalUnitPrice: i.b2c_unit_price,
-                    totalPrice: i.total_price,
-                })),
-                subtotal,
-                shippingCost,
-                vatAmount,
-                total: grandTotal,
-                currency: 'EUR',
-                shippingAddress: orderPayload.shipping_address as { first_name?: string; last_name?: string; street?: string; street2?: string; city?: string; postal_code?: string; country?: string },
-                paymentMethod: (rawData.payment_method as string) || 'invoice',
-                language: orderLanguage,
-            })
+            const { renderDatabaseTemplate } = await import('@/lib/email')
+            const { generateItemsTableHtml } = await import('@/lib/document-service')
+
+            const formatAddress = (addr: any) => {
+                if (!addr) return 'N/A'
+                return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
+            }
+
+            const emailData: Record<string, string> = {
+                order_number: String(order.order_number),
+                order_date: new Date(order.created_at).toLocaleDateString(),
+                customer_name: `${rawData.shipping_first_name} ${rawData.shipping_last_name}`,
+                customer_email: String(email),
+                customer_company: String(rawData.company_name || ''),
+                customer_vat: String(rawData.vat_id || ''),
+                shipping_address: formatAddress(orderPayload.shipping_address),
+                billing_address: formatAddress(orderPayload.billing_address),
+                subtotal_net: `EUR ${subtotal.toFixed(2)}`,
+                vat_total: `EUR ${vatAmount.toFixed(2)}`,
+                shipping_cost: `EUR ${shippingCost.toFixed(2)}`,
+                total_amount: `EUR ${grandTotal.toFixed(2)}`,
+                payment_method: String(rawData.payment_method || 'invoice'),
+                items_table: generateItemsTableHtml(orderItemsData, 'EUR')
+            }
+
+            // Try to get dynamic template from DB
+            const dbHtml = await renderDatabaseTemplate(documentType, emailData, orderLanguage)
+
+            let finalHtml = ''
+            let finalSubject = isProformaFlow
+                ? (orderLanguage === 'sl' ? `Predračun — #${order.order_number}` : `Proforma Invoice — #${order.order_number}`)
+                : (orderLanguage === 'sl' ? `Potrditev naročila — #${order.order_number}` : `Order Confirmation — #${order.order_number}`)
+
+            if (dbHtml) {
+                finalHtml = dbHtml
+            } else {
+                // Fallback to old hardcoded builder
+                const fallback = buildOrderConfirmationEmail({
+                    orderNumber: order.order_number,
+                    customerName: emailData.customer_name,
+                    email,
+                    items: orderItemsData.map(i => ({
+                        sku: i.sku,
+                        name: i.product_name,
+                        quantity: i.quantity,
+                        unitPrice: i.unit_price,
+                        originalUnitPrice: i.b2c_unit_price,
+                        totalPrice: i.total_price,
+                    })),
+                    subtotal,
+                    shippingCost,
+                    vatAmount,
+                    total: grandTotal,
+                    currency: 'EUR',
+                    shippingAddress: orderPayload.shipping_address as any,
+                    paymentMethod: emailData.payment_method,
+                    language: orderLanguage,
+                })
+                finalHtml = fallback.html
+                finalSubject = fallback.subject
+            }
 
             await sendEmail({
                 from: 'Tigo Energy Shop <noreply@tigoenergy.shop>',
                 to: email,
-                subject,
-                html,
+                subject: finalSubject,
+                html: finalHtml,
             })
         } catch (emailErr) {
             // Log but don't fail the order

@@ -216,7 +216,7 @@ export default function PaymentMethods({ customer }: Props) {
     const METHODS: { id: MethodId, name: string, icon: any, desc: string, note?: string }[] = [
         {
             id: 'wise',
-            name: 'Quick Pay (Wise, ApplePay, Cards)',
+            name: 'Quick Pay (Wise, ApplePay, Credit & Debit Cards)',
             icon: (
                 <div className="flex -space-x-2">
                     <img src="/wise-logo.png" alt="Wise" className="w-10 h-10 object-contain bg-white rounded-full border border-gray-100 p-1 z-20" />
@@ -236,7 +236,7 @@ export default function PaymentMethods({ customer }: Props) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
                 </svg>
             ),
-            desc: 'Traditional bank wire transfer or SEPA Direct Debit.',
+            desc: 'Prepayment via Wise BE account. Proforma Invoice will be issued after placing an order. Goods will ship after payment confirmed on our side.',
             note: 'Manual verification required'
         }
     ]

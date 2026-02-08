@@ -422,13 +422,13 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                   className="border rounded w-full px-2 py-1"
                 >
                   <option value="">Not Applicable</option>
-                  <option value="1">1 - Large Household Appliances</option>
-                  <option value="2">2 - Small Household Appliances</option>
-                  <option value="3">3 - IT & Telecom Equipment</option>
-                  <option value="4">4 - Consumer Equipment</option>
-                  <option value="5">5 - Lighting Equipment</option>
-                  <option value="6">6 - Electrical & Electronic Tools</option>
-                  <option value="7">7 - Solar Equipment & Inverters</option>
+                  <option value="1">1 - Heat Exchange Equipment</option>
+                  <option value="2">2 - Screens, Monitors (&gt;100 cm²)</option>
+                  <option value="3">3 - Lamps (Sijalke)</option>
+                  <option value="4">4 - Large Equipment (&gt;50 cm)</option>
+                  <option value="5">5 - Small Equipment (≤50 cm)</option>
+                  <option value="6">6 - Small IT & Telecom Equipment</option>
+                  <option value="7">7-PBA - Portable Batteries & Accumulators</option>
                 </select>
               </div>
             </div>

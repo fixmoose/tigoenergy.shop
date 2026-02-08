@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Customer } from '@/types/database'
 import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignment'
+import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -21,6 +22,13 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
   const { data: orderReturns } = await supabase
     .from('order_returns')
     .select('*, orders(order_number)')
+    .eq('customer_id', id)
+    .order('created_at', { ascending: false })
+
+  // Fetch Orders (for documents)
+  const { data: orders } = await supabase
+    .from('orders')
+    .select('id, order_number, invoice_number, invoice_url, packing_slip_url, shipping_label_url, created_at, status')
     .eq('customer_id', id)
     .order('created_at', { ascending: false })
 
@@ -198,24 +206,73 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 )}
               </div>
             </section>
+
+            {/* Documents Section */}
+            <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Documents</h3>
+                  <p className="text-sm font-bold text-gray-900 mt-0.5">Invoices & Logistics</p>
+                </div>
+                <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-blue-400 border border-blue-100 uppercase tracking-widest">
+                  Collection
+                </span>
+              </div>
+              <div className="p-8">
+                {!orders || orders.length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 font-medium">
+                    No order documents found for this customer.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {orders.flatMap((order: any) => {
+                      const docs = []
+                      if (order.invoice_url) docs.push({ type: 'Invoice', url: order.invoice_url, date: order.created_at, order: order.order_number })
+                      if (order.packing_slip_url) docs.push({ type: 'Packing Slip', url: order.packing_slip_url, date: order.created_at, order: order.order_number })
+                      if (order.shipping_label_url) docs.push({ type: 'Label', url: order.shipping_label_url, date: order.created_at, order: order.order_number })
+                      return docs
+                    }).map((doc: any, idx: number) => (
+                      <a
+                        key={idx}
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-4 rounded-2xl border border-gray-100 bg-white hover:bg-blue-50 hover:border-blue-100 transition group flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-blue-600 transition-colors">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-gray-900">{doc.type}</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order #{doc.order} • {new Date(doc.date).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <svg className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      </a>
+                    ))}
+                    {orders.filter((o: any) => !o.invoice_url && !o.packing_slip_url && !o.shipping_label_url).length === orders.length && (
+                      <div className="col-span-2 py-8 text-center text-gray-400 text-sm">
+                        Orders exist, but no files have been generated/uploaded yet.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
 
           <div className="space-y-8">
             {/* Customer Details Card */}
+            <CustomerDetailsEditor customer={customer} />
+
             <aside className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/50">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Details</h3>
-                <p className="text-xl font-black text-gray-900">{customer.first_name} {customer.last_name}</p>
+              <div className="p-8 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Carts & Activity</h3>
+                <Link href={`/admin/customers/${id}/carts`} className="text-[10px] font-black text-blue-600 uppercase hover:underline">View Carts</Link>
               </div>
-              <div className="p-8 space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Company</label>
-                  <p className="text-sm font-bold text-gray-900">{customer.company_name || 'N/A'}</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">VAT ID</label>
-                  <p className="text-sm font-bold text-gray-900">{customer.vat_id || 'N/A'}</p>
-                </div>
+              <div className="p-8">
+                <p className="text-sm text-gray-500">View abandoned carts and active shopping sessions for this customer.</p>
               </div>
             </aside>
 

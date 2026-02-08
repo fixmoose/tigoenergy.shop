@@ -56,8 +56,8 @@ interface PaymentPrefs {
 }
 
 const PAYMENT_METHODS = [
-    { id: 'wise', label: 'Quick Pay (Wise, ApplePay, Cards)', desc: 'Pay instantly via Wise landing page.', icon: '⚡', enabled: true },
-    { id: 'invoice', label: 'IBAN Bank Transfer', desc: 'Prepayment via Wise BE account. Details on next page.', icon: '🏦', enabled: true },
+    { id: 'wise', label: 'Quick Pay (Wise, ApplePay, Credit & Debit Cards)', desc: 'Pay instantly via Wise landing page.', icon: '⚡', enabled: true },
+    { id: 'invoice', label: 'IBAN Bank Transfer', desc: 'Prepayment via Wise BE account. Proforma Invoice will be issued after placing an order. Goods will ship after payment confirmed on our side.', icon: '🏦', enabled: true },
 ]
 
 export default function CheckoutPage() {
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
     const [localIsB2B, setLocalIsB2B] = useState<boolean | null>(null)
     const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
-    const { inputRef: shippingRef } = useAddressAutocomplete((parsed) => {
+    const { inputRef: shippingRef, isLoaded: isShippingLoaded, hasError: hasShippingError } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
             shipping_street: parsed.street,
@@ -100,7 +100,7 @@ export default function CheckoutPage() {
         }))
     })
 
-    const { inputRef: billingRef } = useAddressAutocomplete((parsed) => {
+    const { inputRef: billingRef, isLoaded: isBillingLoaded, hasError: hasBillingError } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
             billing_street: parsed.street,
@@ -113,29 +113,43 @@ export default function CheckoutPage() {
     const effectiveIsB2B = localIsB2B !== null ? localIsB2B : isB2B
 
     // Prefill State
-    const [formData, setFormData] = useState({
-        email: '',
-        shipping_first_name: '',
-        shipping_last_name: '',
-        shipping_street: '',
-        shipping_street2: '',
-        shipping_city: '',
-        shipping_postal_code: '',
-        shipping_country: 'DE',
-        shipping_phone: '',
-        company_name: '',
-        vat_id: '',
-        billing_first_name: '',
-        billing_last_name: '',
-        billing_street: '',
-        billing_street2: '',
-        billing_city: '',
-        billing_postal_code: '',
-        billing_country: 'DE',
-        password: '',
-        confirm_password: '',
-        commercial_access: false,
-        truck_access_notes: ''
+    const [formData, setFormData] = useState(() => {
+        let initialCountry = 'DE'
+        if (typeof window !== 'undefined') {
+            const { getMarketKeyFromHostname, MARKETS } = require('@/lib/constants/markets')
+            const marketKey = getMarketKeyFromHostname(window.location.hostname)
+            const market = MARKETS[marketKey]
+            if (market && market.country !== 'EU') {
+                initialCountry = market.country
+            } else if (marketKey === 'SI') {
+                initialCountry = 'SI'
+            }
+        }
+
+        return {
+            email: '',
+            shipping_first_name: '',
+            shipping_last_name: '',
+            shipping_street: '',
+            shipping_street2: '',
+            shipping_city: '',
+            shipping_postal_code: '',
+            shipping_country: initialCountry,
+            shipping_phone: '',
+            company_name: '',
+            vat_id: '',
+            billing_first_name: '',
+            billing_last_name: '',
+            billing_street: '',
+            billing_street2: '',
+            billing_city: '',
+            billing_postal_code: '',
+            billing_country: initialCountry,
+            password: '',
+            confirm_password: '',
+            commercial_access: false,
+            truck_access_notes: ''
+        }
     })
 
     useEffect(() => {
@@ -311,9 +325,14 @@ export default function CheckoutPage() {
             setVatResult(data)
             if (data.valid) {
                 setLocalIsB2B(true)
-                if (data.name) {
-                    setFormData(prev => ({ ...prev, company_name: data.name }))
-                }
+                setFormData(prev => ({
+                    ...prev,
+                    company_name: data.name || prev.company_name,
+                    shipping_street: data.address || prev.shipping_street,
+                    shipping_country: data.countryCode || prev.shipping_country,
+                    billing_street: billingSame ? (data.address || prev.billing_street) : prev.billing_street,
+                    billing_country: billingSame ? (data.countryCode || prev.billing_country) : prev.billing_country
+                }))
             } else {
                 setLocalIsB2B(false)
             }
@@ -539,9 +558,15 @@ export default function CheckoutPage() {
                                     )}
                                 </div>
                                 <div className="md:col-span-2">
-                                    <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-2.5 rounded-lg border border-blue-100 mb-2">
-                                        <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
-                                    </p>
+                                    {hasShippingError ? (
+                                        <p className="text-[11px] text-amber-600 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-100 mb-2">
+                                            <strong>Note:</strong> Automatic address lookup is currently unavailable (Referer restricted). Please enter your address details manually into the fields below.
+                                        </p>
+                                    ) : (
+                                        <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-2.5 rounded-lg border border-blue-100 mb-2">
+                                            <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
+                                        </p>
+                                    )}
                                 </div>
                                 <input type="text" name="shipping_first_name" required value={formData.shipping_first_name} onChange={handleChange} className={getInputClass('shipping_first_name')} placeholder={t('firstName')} />
                                 <input type="text" name="shipping_last_name" required value={formData.shipping_last_name} onChange={handleChange} className={getInputClass('shipping_last_name')} placeholder={t('lastName')} />

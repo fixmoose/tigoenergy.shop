@@ -182,6 +182,16 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                                 >
                                     View Packing Slip
                                 </a>
+                                {status === 'processing' && (
+                                    <a
+                                        href={`/api/orders/${orderId}/delivery-note`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs font-bold text-amber-600 hover:text-amber-700 underline"
+                                    >
+                                        View Delivery Note
+                                    </a>
+                                )}
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <button

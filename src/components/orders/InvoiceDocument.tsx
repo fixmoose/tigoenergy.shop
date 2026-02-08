@@ -3,7 +3,7 @@ import type { Order, OrderItem } from '@/types/database'
 
 const styles = StyleSheet.create({
     page: { flexDirection: 'column', backgroundColor: '#FFFFFF', padding: 40, fontSize: 10, fontFamily: 'Helvetica' },
-    header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30, borderBottomWidth: 1, borderBottomColor: '#EEEEEE', paddingBottom: 20 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30, borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#EEEEEE', paddingBottom: 20 },
     logoContainer: { width: 150 },
     addressContainer: { textAlign: 'right', color: '#666666', lineHeight: 1.4 },
     companyTitle: { fontSize: 16, fontWeight: 'bold', color: '#111111', marginBottom: 5 },
@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
     infoText: { fontSize: 10, color: '#333333', lineHeight: 1.4 },
 
     table: { marginTop: 10 },
-    tableHeader: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#EEEEEE', backgroundColor: '#F9FAFB', padding: 6, fontWeight: 'bold' },
-    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#F3F4F6', padding: 6, minHeight: 30, alignItems: 'center' },
+    tableHeader: { flexDirection: 'row', borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#EEEEEE', backgroundColor: '#F9FAFB', padding: 6, fontWeight: 'bold' },
+    tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderStyle: 'solid', borderBottomColor: '#F3F4F6', padding: 6, minHeight: 30, alignItems: 'center' },
     colSku: { width: '15%' },
     colDesc: { width: '45%' },
     colQty: { width: '10%', textAlign: 'center' },
@@ -25,15 +25,15 @@ const styles = StyleSheet.create({
     summaryTable: { width: 200 },
     summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
     summaryText: { color: '#666666' },
-    totalRow: { marginTop: 10, borderTopWidth: 1, borderTopColor: '#EEEEEE', paddingTop: 10 },
+    totalRow: { marginTop: 10, borderTopWidth: 1, borderStyle: 'solid', borderTopColor: '#EEEEEE', paddingTop: 10 },
     totalText: { fontSize: 14, fontWeight: 'bold', color: '#458400' },
 
-    legalContainer: { marginTop: 40, borderTopWidth: 1, borderTopColor: '#EEEEEE', paddingTop: 20 },
+    legalContainer: { marginTop: 40, borderTopWidth: 1, borderStyle: 'solid', borderTopColor: '#EEEEEE', paddingTop: 20 },
     legalTitle: { fontSize: 9, fontWeight: 'bold', color: '#333333', marginBottom: 5 },
     legalText: { fontSize: 8, color: '#666666', lineHeight: 1.5, marginBottom: 10 },
     complianceBox: { backgroundColor: '#F9FAFB', padding: 10, borderRadius: 4, marginTop: 10 },
     complianceText: { fontSize: 8, color: '#444444', fontWeight: 'bold' },
-    bankDetailsBox: { marginTop: 20, padding: 12, backgroundColor: '#F0FDF4', borderLeftWidth: 3, borderLeftColor: '#458400' },
+    bankDetailsBox: { marginTop: 20, padding: 12, backgroundColor: '#F0FDF4', borderLeftWidth: 3, borderStyle: 'solid', borderLeftColor: '#458400' },
     bankDetailsTitle: { fontSize: 9, fontWeight: 'bold', color: '#166534', marginBottom: 4 },
     bankDetailsText: { fontSize: 8, color: '#166534', lineHeight: 1.4 }
 })
@@ -283,7 +283,7 @@ export const InvoiceDocument = ({ order, items, termsAgreedAt, language }: Invoi
 
                 {/* Bank Transfer Instructions */}
                 {(order.payment_method === 'invoice' || order.payment_method === 'bank_transfer' || order.payment_method === 'wise' || order.payment_method === 'iban') && (
-                    <View style={{ marginTop: 15, padding: 10, backgroundColor: '#f9fafb', borderRadius: 8, border: '1pt solid #e5e7eb' }}>
+                    <View style={{ marginTop: 15, padding: 10, backgroundColor: '#f9fafb', borderRadius: 8, borderWidth: 1, borderStyle: 'solid', borderColor: '#e5e7eb' }}>
                         <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 5, color: '#111827' }}>Payment Instructions (Account: Initra Energija d.o.o.)</Text>
 
                         <View style={{ flexDirection: 'row', gap: 15 }}>
@@ -295,13 +295,13 @@ export const InvoiceDocument = ({ order, items, termsAgreedAt, language }: Invoi
                             {/* Details Section */}
                             <View style={{ flex: 1 }}>
                                 <Text style={{ fontSize: 8, color: '#4b5563', marginBottom: 2 }}>Option 1: Scan QR above with your mobile Banking App or Camera.</Text>
-                                <View style={{ borderTop: '0.5pt solid #e5e7eb', marginTop: 4, paddingTop: 4 }}>
+                                <View style={{ borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 4 }}>
                                     <Text style={{ fontSize: 8, color: '#4b5563', marginBottom: 2 }}>Option 2: Use Wise Quick Pay URL (ApplePay, Cards supported):</Text>
                                     <Text style={{ fontSize: 8, color: '#3b82f6', fontWeight: 'bold' }}>
                                         {`https://wise.com/pay/business/initraenergijadoo?reference=${order.order_number}`}
                                     </Text>
                                 </View>
-                                <View style={{ borderTop: '0.5pt solid #e5e7eb', marginTop: 4, paddingTop: 4 }}>
+                                <View style={{ borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 4 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 1 }}>
                                         <Text style={{ fontSize: 8, color: '#4b5563' }}>Bank:</Text>
                                         <Text style={{ fontSize: 8, fontWeight: 'bold' }}>Wise</Text>
