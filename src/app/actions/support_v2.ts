@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { verifyRecaptcha } from '@/lib/recaptcha'
 import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
 import { headers } from 'next/headers'
@@ -14,13 +14,14 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
     }
 
     const supabase = await createClient()
+    const adminSupabase = await createAdminClient()
 
     // 2. Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 mins
 
-    // 3. Save to DB
-    const { error } = await supabase
+    // 3. Save to DB (Use admin client to bypass RLS for guests)
+    const { error } = await adminSupabase
         .from('guest_verifications')
         .upsert({
             email,
@@ -62,7 +63,7 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
 }
 
 export async function verifySupportOTP(email: string, code: string) {
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
     const { data, error } = await supabase
         .from('guest_verifications')
         .select('*')
@@ -103,11 +104,12 @@ export async function submitSupportRequestV2(formData: {
     }
 
     const supabase = await createClient()
+    const adminSupabase = await createAdminClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // 2. If guest, check if email is verified
     if (!user && formData.email) {
-        const { data: ver } = await supabase
+        const { data: ver } = await adminSupabase
             .from('guest_verifications')
             .select('verified')
             .eq('email', formData.email)
@@ -119,7 +121,7 @@ export async function submitSupportRequestV2(formData: {
     }
 
     // 3. Create Request
-    const { data: request, error: reqError } = await supabase
+    const { data: request, error: reqError } = await adminSupabase
         .from('support_requests')
         .insert({
             customer_id: user?.id || null,
@@ -137,7 +139,7 @@ export async function submitSupportRequestV2(formData: {
     if (reqError) throw reqError
 
     // 4. Create first message
-    const { error: msgError } = await supabase
+    const { error: msgError } = await adminSupabase
         .from('support_messages')
         .insert({
             request_id: request.id,
@@ -150,7 +152,7 @@ export async function submitSupportRequestV2(formData: {
 
     // 5. Notify Admins
     try {
-        const adminUsers = await supabase.auth.admin.listUsers()
+        const adminUsers = await adminSupabase.auth.admin.listUsers()
         const admins = (adminUsers.data.users || [])
             .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === 'dejan@haywilson.com')
             .map((u: any) => u.email)
