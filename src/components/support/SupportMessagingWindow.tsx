@@ -5,7 +5,7 @@ import { sendSupportOTP, verifySupportOTP, submitSupportRequestV2, addMessageToS
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 
 interface Props {
-    type?: 'shipping' | 'return' | 'general'
+    type?: 'shipping' | 'return' | 'general' | 'sales'
     title?: string
     orderId?: string
     prefillMessage?: string

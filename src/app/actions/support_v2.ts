@@ -89,7 +89,7 @@ export async function verifySupportOTP(email: string, code: string) {
 }
 
 export async function submitSupportRequestV2(formData: {
-    type: 'shipping' | 'return' | 'general'
+    type: 'shipping' | 'return' | 'general' | 'sales'
     subject: string
     message: string
     orderId?: string
@@ -162,8 +162,14 @@ export async function submitSupportRequestV2(formData: {
             // Determine Subject based on type
             // shipping/return => Online Shop Support => Shopping help
             // general => Tigo Product Support => Tigo Support
-            const isShopHelp = formData.type === 'shipping' || formData.type === 'return'
-            const subjectPrefix = isShopHelp ? 'Tigo Energy SHOP> Shopping help' : 'Tigo Energy SHOP> Tigo Support'
+            // sales => Contact Sales
+            let subjectPrefix = 'Tigo Energy SHOP> Tigo Support'
+            if (formData.type === 'shipping' || formData.type === 'return') {
+                subjectPrefix = 'Tigo Energy SHOP> Shopping help'
+            } else if (formData.type === 'sales') {
+                subjectPrefix = 'Tigo Energy SHOP> Contact Sales'
+            }
+
             const userEmail = user?.email || formData.email
             const userName = user?.user_metadata?.first_name ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}` : formData.name
 
@@ -171,7 +177,7 @@ export async function submitSupportRequestV2(formData: {
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #16a34a;">New Support Message</h2>
                     <p><strong>From:</strong> ${userName} (${userEmail})</p>
-                    <p><strong>Type:</strong> ${formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support'}</p>
+                    <p><strong>Type:</strong> ${formData.type === 'sales' ? 'Sales Inquiry' : (formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support')}</p>
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
                         ${formData.message}
                     </div>
