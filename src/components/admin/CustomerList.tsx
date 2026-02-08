@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { Customer } from '@/types/database'
 import { createCustomer } from '@/app/actions/customers'
+import { adminCreateCustomerAction, adminUpdateCustomerAction } from '@/app/actions/admin'
 import { createClient } from '@/lib/supabase/client'
 
 type Tab = 'guest' | 'b2c' | 'b2b'
@@ -29,6 +30,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
 
     // Admin Actions State
     const [docsModal, setDocsModal] = useState<{ isOpen: boolean, customerId: string | null }>({ isOpen: false, customerId: null })
+    const [editModal, setEditModal] = useState<{ isOpen: boolean, customer: Customer | null }>({ isOpen: false, customer: null })
     const [allDocs, setAllDocs] = useState<UploadedDoc[]>([])
     const [noteInput, setNoteInput] = useState('')
 
@@ -95,8 +97,12 @@ export default function CustomerList({ customers }: CustomerListProps) {
         email: '',
         first_name: '',
         last_name: '',
+        phone: '',
+        password: '',
         type: 'b2c' as Tab
     })
+
+    const [editData, setEditData] = useState<Partial<Customer>>({})
 
     // Filter Logic
     const filteredCustomers = customers.filter(c => {
@@ -116,18 +122,36 @@ export default function CustomerList({ customers }: CustomerListProps) {
         e.preventDefault()
         setLoading(true)
         try {
-            await createCustomer({
+            await adminCreateCustomerAction({
                 email: formData.email,
                 first_name: formData.first_name,
                 last_name: formData.last_name,
+                phone: formData.phone,
+                password: formData.password,
                 is_b2b: formData.type === 'b2b',
                 customer_type: formData.type === 'guest' ? 'guest' : undefined
             })
             setIsModalOpen(false)
-            // Ideally trigger a refresh or optimistically update
+            alert('Customer account created and verified.')
             window.location.reload()
         } catch (error) {
             alert('Failed to create customer: ' + (error as Error).message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!editModal.customer) return
+        setLoading(true)
+        try {
+            await adminUpdateCustomerAction(editModal.customer.id, editData)
+            setEditModal({ isOpen: false, customer: null })
+            alert('Customer updated.')
+            window.location.reload()
+        } catch (error) {
+            alert('Failed to update customer: ' + (error as Error).message)
         } finally {
             setLoading(false)
         }
@@ -232,9 +256,18 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                         Review
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={() => {
+                                                        setEditData(c)
+                                                        setEditModal({ isOpen: true, customer: c })
+                                                    }}
+                                                    className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                                                >
+                                                    Edit
+                                                </button>
                                                 <Link
                                                     href={`/admin/customers/${c.id}`}
-                                                    className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                                                    className="text-slate-500 hover:text-slate-800 font-medium text-xs"
                                                 >
                                                     Details
                                                 </Link>
@@ -378,6 +411,27 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                 />
                             </div>
 
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                <input
+                                    type="text"
+                                    value={formData.phone}
+                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Set Password (optional)</label>
+                                <input
+                                    type="text"
+                                    placeholder="Leave blank for random"
+                                    value={formData.password}
+                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
                             <div className="pt-2 flex gap-3">
                                 <button
                                     type="button"
@@ -392,6 +446,82 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
                                 >
                                     {loading ? 'Creating...' : 'Create Customer'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center text-slate-800">
+                            <h3 className="text-lg font-bold">Edit Customer: {editModal.customer?.email}</h3>
+                            <button onClick={() => setEditModal({ isOpen: false, customer: null })} className="text-slate-400 hover:text-slate-600">
+                                ✕
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleUpdate} className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={editData.first_name || ''}
+                                        onChange={e => setEditData({ ...editData, first_name: e.target.value })}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={editData.last_name || ''}
+                                        onChange={e => setEditData({ ...editData, last_name: e.target.value })}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                <input
+                                    type="text"
+                                    value={editData.phone || ''}
+                                    onChange={e => setEditData({ ...editData, phone: e.target.value })}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Company Name (B2B)</label>
+                                <input
+                                    type="text"
+                                    value={editData.company_name || ''}
+                                    onChange={e => setEditData({ ...editData, company_name: e.target.value })}
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+
+                            <div className="pt-2 flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditModal({ isOpen: false, customer: null })}
+                                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </form>

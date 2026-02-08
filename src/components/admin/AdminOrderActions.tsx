@@ -13,6 +13,7 @@ interface AdminOrderActionsProps {
 
 export default function AdminOrderActions({ orderId, status, createdAt, confirmedAt }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
+    const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
     const router = useRouter()
     const supabase = createClient()
@@ -87,6 +88,53 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
             alert(err.message || 'Failed to process shipping.')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleUploadDoc = async (e: React.ChangeEvent<HTMLInputElement>, type: 'invoice' | 'packing_slip' | 'delivery_note') => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploadingDoc(type)
+        try {
+            const fileName = `${type}_${orderId}_${Date.now()}.${file.name.split('.').pop()}`
+            const filePath = `orders/${orderId}/${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('invoices')
+                .upload(filePath, file)
+
+            if (uploadError) throw uploadError
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('invoices')
+                .getPublicUrl(filePath)
+
+            // Update order record
+            const updates: any = {}
+            if (type === 'invoice') {
+                updates.invoice_url = publicUrl
+                updates.invoice_created_at = new Date().toISOString()
+            } else if (type === 'packing_slip') {
+                updates.packing_slip_url = publicUrl
+            } else if (type === 'delivery_note') {
+                updates.shipping_label_url = publicUrl
+            }
+
+            const { error: updateError } = await supabase
+                .from('orders')
+                .update(updates)
+                .eq('id', orderId)
+
+            if (updateError) throw updateError
+
+            alert(`${type.replace('_', ' ')} uploaded successfully.`)
+            router.refresh()
+        } catch (err: any) {
+            console.error('Upload error:', err)
+            alert('Failed to upload document: ' + err.message)
+        } finally {
+            setUploadingDoc(null)
         }
     }
 
@@ -169,6 +217,45 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                             </div>
                         </div>
                     )}
+
+                    <div className="pt-4 border-t space-y-3">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Manual Uploads</p>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="flex flex-col">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Invoice</span>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleUploadDoc(e, 'invoice')}
+                                    disabled={!!uploadingDoc}
+                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                />
+                                {uploadingDoc === 'invoice' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
+                            </label>
+
+                            <label className="flex flex-col">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Packing Slip</span>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleUploadDoc(e, 'packing_slip')}
+                                    disabled={!!uploadingDoc}
+                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
+                                />
+                                {uploadingDoc === 'packing_slip' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
+                            </label>
+
+                            <label className="flex flex-col">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Delivery Note</span>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleUploadDoc(e, 'delivery_note')}
+                                    disabled={!!uploadingDoc}
+                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"
+                                />
+                                {uploadingDoc === 'delivery_note' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
+                            </label>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

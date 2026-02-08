@@ -53,10 +53,15 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
     useEffect(() => {
         if (!isLoaded || !inputRef.current || !window.google?.maps?.places) return
 
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-            types: ['address'],
-            fields: ['address_components', 'formatted_address'],
-        })
+        try {
+            autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+                types: ['address'],
+                fields: ['address_components', 'formatted_address'],
+            })
+        } catch (error) {
+            console.error('Failed to initialize Google Maps Autocomplete:', error)
+            return
+        }
 
         const listener = autocompleteRef.current.addListener('place_changed', () => {
             const place = autocompleteRef.current?.getPlace()

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { getAdminsAction, inviteAdminAction, deleteAdminAction } from '@/app/actions/admin'
 
 type Category = {
     id: string
@@ -20,12 +21,64 @@ export default function SettingsPage() {
     const [editingCat, setEditingCat] = useState<Category | null>(null)
     const [formData, setFormData] = useState({ name: '', slug: '', parent_id: '', description: '', image_url: '' })
 
+    // Admin Team State
+    const [admins, setAdmins] = useState<any[]>([])
+    const [adminsLoading, setAdminsLoading] = useState(true)
+    const [inviteEmail, setInviteEmail] = useState('')
+    const [currentUser, setCurrentUser] = useState<any>(null)
+
     const supabase = createClient()
     const router = useRouter()
 
     useEffect(() => {
         fetchCategories()
+        fetchAdmins()
+        fetchCurrentUser()
     }, [])
+
+    async function fetchCurrentUser() {
+        const { data: { user } } = await supabase.auth.getUser()
+        setCurrentUser(user)
+    }
+
+    async function fetchAdmins() {
+        setAdminsLoading(true)
+        try {
+            const data = await getAdminsAction()
+            setAdmins(data)
+        } catch (err) {
+            console.error('Error fetching admins:', err)
+        }
+        setAdminsLoading(false)
+    }
+
+    async function handleInviteAdmin(e: React.FormEvent) {
+        e.preventDefault()
+        if (!inviteEmail) return
+        setAdminsLoading(true)
+        try {
+            await inviteAdminAction(inviteEmail)
+            setInviteEmail('')
+            alert('Invitation sent to ' + inviteEmail)
+            fetchAdmins()
+        } catch (err: any) {
+            alert('Error inviting admin: ' + err.message)
+        }
+        setAdminsLoading(false)
+    }
+
+    async function handleDeleteAdmin(userId: string) {
+        if (!confirm('Are you sure you want to remove this admin?')) return
+        setAdminsLoading(true)
+        try {
+            await deleteAdminAction(userId)
+            alert('Admin removed.')
+            fetchAdmins()
+        } catch (err: any) {
+            alert('Error deleting admin: ' + err.message)
+        }
+        setAdminsLoading(false)
+    }
 
     async function fetchCategories() {
         setLoading(true)
@@ -224,9 +277,62 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
-                {/* Placeholder for Next Card (e.g. Shipping) */}
-                <div className="hidden lg:block border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center text-gray-400">
-                    <span>Additional Settings Cards (Shipping, Taxes) will go here.</span>
+                {/* Admin Team Card */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+                    <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+                        <h3 className="text-lg font-bold text-gray-800">Admin Team</h3>
+                        <p className="text-xs text-gray-500 mt-1">Manage administrative access and permissions.</p>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        {/* Invite Form */}
+                        <form onSubmit={handleInviteAdmin} className="flex gap-2">
+                            <input
+                                type="email"
+                                placeholder="Email address"
+                                value={inviteEmail}
+                                onChange={e => setInviteEmail(e.target.value)}
+                                className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+                            <button
+                                type="submit"
+                                disabled={adminsLoading}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 disabled:opacity-50"
+                            >
+                                {adminsLoading ? 'Sending...' : 'Invite Admin'}
+                            </button>
+                        </form>
+
+                        {/* Admins List */}
+                        <div className="space-y-3">
+                            {adminsLoading && admins.length === 0 ? (
+                                <div className="text-center py-4 text-gray-400 text-sm">Loading admins...</div>
+                            ) : (
+                                admins.map(admin => (
+                                    <div key={admin.id} className="flex justify-between items-center p-3 border rounded-lg group">
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold text-gray-800 truncate">{admin.email}</span>
+                                                {admin.role === 'Master Admin' && (
+                                                    <span className="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded font-bold uppercase">Master</span>
+                                                )}
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 font-mono">ID: {admin.id}</div>
+                                        </div>
+                                        {currentUser?.email === 'dejan@haywilson.com' && admin.role !== 'Master Admin' && (
+                                            <button
+                                                onClick={() => handleDeleteAdmin(admin.id)}
+                                                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 text-xs font-bold transition-opacity"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
 
             </div>
