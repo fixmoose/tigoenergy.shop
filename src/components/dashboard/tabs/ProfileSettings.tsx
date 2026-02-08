@@ -1,11 +1,23 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Customer } from '@/types/database'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useMarket } from '@/contexts/MarketContext'
 import { SORTED_CURRENCIES } from '@/lib/constants/currencies'
 import { LANGUAGES } from '@/lib/constants/languages'
+import { getCustomerContacts, setDefaultContact, removeContact } from '@/app/actions/contacts'
+import { CheckCircleIcon, PlusIcon, TrashIcon, StarIcon } from '@heroicons/react/24/solid'
+import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
+import { useRecaptcha } from '@/hooks/useRecaptcha'
+
+interface Contact {
+    id: string
+    type: 'email' | 'phone'
+    value: string
+    is_default: boolean
+    verified_at: string | null
+}
 
 interface Props {
     customer: Customer
@@ -15,14 +27,28 @@ export default function ProfileSettings({ customer }: Props) {
     const supabase = createClient()
     const { currentCurrency, setCurrency } = useCurrency()
     const { market, currentLanguage, setLanguage } = useMarket()
+    const { recaptchaRef, execute: executeRecaptcha, resetRecaptcha } = useRecaptcha()
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState('')
+    const [contacts, setContacts] = useState<Contact[]>([])
+    const [showAddContact, setShowAddContact] = useState<'email' | 'phone' | null>(null)
+    const [newContactValue, setNewContactValue] = useState('')
+    const [verificationStep, setVerificationStep] = useState(false)
+    const [verificationCode, setVerificationCode] = useState('')
     const [formData, setFormData] = useState({
         firstName: customer.first_name || '',
         lastName: customer.last_name || '',
-        phone: customer.phone || '',
         company: customer.company_name || ''
     })
+
+    useEffect(() => {
+        loadContacts()
+    }, [])
+
+    const loadContacts = async () => {
+        const data = await getCustomerContacts(customer.id)
+        setContacts(data as Contact[])
+    }
 
     const handleSave = async () => {
         setLoading(true)
@@ -33,7 +59,6 @@ export default function ProfileSettings({ customer }: Props) {
             .update({
                 first_name: formData.firstName,
                 last_name: formData.lastName,
-                phone: formData.phone,
                 company_name: formData.company,
                 updated_at: new Date().toISOString()
             })
@@ -47,6 +72,80 @@ export default function ProfileSettings({ customer }: Props) {
         } else {
             setSuccess('Profile updated successfully!')
             setTimeout(() => setSuccess(''), 3000)
+        }
+    }
+
+    const handleAddContact = async () => {
+        if (!newContactValue) return
+        setLoading(true)
+        try {
+            const token = showAddContact === 'email' ? await executeRecaptcha('REGISTRATION') : null
+            const endpoint = showAddContact === 'email' ? '/api/validate/email' : '/api/validate/phone'
+            const body = showAddContact === 'email'
+                ? { email: newContactValue, recaptchaToken: token }
+                : { phone: newContactValue }
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            const data = await res.json()
+            if (data.success) {
+                setVerificationStep(true)
+            } else {
+                alert(data.error || 'Failed to send verification code')
+                if (showAddContact === 'email') resetRecaptcha()
+            }
+        } catch (err) {
+            alert('Error adding contact')
+            if (showAddContact === 'email') resetRecaptcha()
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleVerifyContact = async () => {
+        if (!verificationCode) return
+        setLoading(true)
+        try {
+            const endpoint = showAddContact === 'email' ? '/api/validate/email/verify' : '/api/validate/phone/verify'
+            const body = showAddContact === 'email'
+                ? { email: newContactValue, code: verificationCode }
+                : { phone: newContactValue, code: verificationCode }
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            const data = await res.json()
+
+            if (data.success) {
+                // Now permanently add to customer_contacts
+                const { error } = await supabase.from('customer_contacts').insert({
+                    customer_id: customer.id,
+                    type: showAddContact,
+                    value: newContactValue,
+                    verified_at: new Date().toISOString(),
+                    is_default: contacts.filter(c => c.type === showAddContact).length === 0
+                })
+
+                if (error) throw error
+
+                await loadContacts()
+                setShowAddContact(null)
+                setNewContactValue('')
+                setVerificationStep(false)
+                setVerificationCode('')
+                setSuccess(`${showAddContact === 'email' ? 'Email' : 'Phone'} added successfully!`)
+            } else {
+                alert(data.error || 'Verification failed')
+            }
+        } catch (err) {
+            alert('Error during verification')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -77,15 +176,143 @@ export default function ProfileSettings({ customer }: Props) {
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input
-                        type="tel"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    />
+                <div className="grid md:grid-cols-2 gap-8 py-6 border-t border-gray-100">
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-bold text-gray-900">Email Addresses</h3>
+                            {contacts.filter(c => c.type === 'email').length < 2 && (
+                                <button onClick={() => setShowAddContact('email')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
+                                    <PlusIcon className="w-5 h-5" />
+                                </button>
+                            )}
+                        </div>
+                        <div className="space-y-3">
+                            {contacts.filter(c => c.type === 'email').map(contact => (
+                                <div key={contact.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <span className="text-sm font-medium text-gray-700 truncate">{contact.value}</span>
+                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => setDefaultContact(customer.id, contact.id, 'email').then(() => loadContacts())}
+                                            className={`p-1.5 rounded-lg transition ${contact.is_default ? 'text-orange-500' : 'text-gray-400 hover:text-orange-400'}`}
+                                            title={contact.is_default ? "Default Email" : "Set as Default"}
+                                        >
+                                            {contact.is_default ? <StarIcon className="w-5 h-5" /> : <StarOutlineIcon className="w-5 h-5" />}
+                                        </button>
+                                        {!contact.is_default && (
+                                            <button
+                                                onClick={() => removeContact(customer.id, contact.id).then(() => loadContacts())}
+                                                className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
+                                            >
+                                                <TrashIcon className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-bold text-gray-900">Phone Numbers</h3>
+                            {contacts.filter(c => c.type === 'phone').length < 2 && (
+                                <button onClick={() => setShowAddContact('phone')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
+                                    <PlusIcon className="w-5 h-5" />
+                                </button>
+                            )}
+                        </div>
+                        <div className="space-y-3">
+                            {contacts.filter(c => c.type === 'phone').map(contact => (
+                                <div key={contact.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <span className="text-sm font-medium text-gray-700 truncate">{contact.value}</span>
+                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => setDefaultContact(customer.id, contact.id, 'phone').then(() => loadContacts())}
+                                            className={`p-1.5 rounded-lg transition ${contact.is_default ? 'text-orange-500' : 'text-gray-400 hover:text-orange-400'}`}
+                                            title={contact.is_default ? "Default Phone" : "Set as Default"}
+                                        >
+                                            {contact.is_default ? <StarIcon className="w-5 h-5" /> : <StarOutlineIcon className="w-5 h-5" />}
+                                        </button>
+                                        {!contact.is_default && (
+                                            <button
+                                                onClick={() => removeContact(customer.id, contact.id).then(() => loadContacts())}
+                                                className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
+                                            >
+                                                <TrashIcon className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
+
+                {/* Add Contact Modal/Overlay */}
+                {showAddContact && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+                            <div className="p-8">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                    {verificationStep ? 'Verify ' : 'Add '} {showAddContact === 'email' ? 'Email' : 'Phone'}
+                                </h3>
+                                <p className="text-sm text-gray-500 mb-6">
+                                    {verificationStep
+                                        ? `We sent a code to ${newContactValue}`
+                                        : `Enter your new ${showAddContact} and we'll send a code.`}
+                                </p>
+
+                                {!verificationStep ? (
+                                    <div className="space-y-4">
+                                        <input
+                                            type={showAddContact === 'email' ? 'email' : 'tel'}
+                                            placeholder={showAddContact === 'email' ? 'new@email.com' : '+00 000 000 000'}
+                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                                            value={newContactValue}
+                                            onChange={(e) => setNewContactValue(e.target.value)}
+                                        />
+                                        <div className="flex gap-3 pt-2">
+                                            <button onClick={() => setShowAddContact(null)} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">Cancel</button>
+                                            <button
+                                                onClick={handleAddContact}
+                                                disabled={loading || !newContactValue}
+                                                className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                                            >
+                                                {loading ? 'Sending...' : 'Send Code'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <input
+                                            maxLength={6}
+                                            placeholder="000000"
+                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest outline-none focus:ring-2 focus:ring-green-500"
+                                            value={verificationCode}
+                                            onChange={(e) => setVerificationCode(e.target.value)}
+                                        />
+                                        <div className="flex gap-3 pt-2">
+                                            <button onClick={() => { setVerificationStep(false); setVerificationCode('') }} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">Back</button>
+                                            <button
+                                                onClick={handleVerifyContact}
+                                                disabled={loading || verificationCode.length < 6}
+                                                className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                                            >
+                                                {loading ? 'Verifying...' : 'Verify'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {customer.is_b2b && (
                     <div>
@@ -213,6 +440,8 @@ export default function ProfileSettings({ customer }: Props) {
                     {success && <span className="text-green-600 font-medium text-sm animate-in fade-in">{success}</span>}
                 </div>
             </div>
+            {/* Hidden reCAPTCHA badge container */}
+            <div ref={recaptchaRef}></div>
         </div>
     )
 }
