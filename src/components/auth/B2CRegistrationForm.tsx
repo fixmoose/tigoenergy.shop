@@ -64,7 +64,7 @@ export default function B2CRegistrationForm() {
         address: '',
         city: '',
         postalCode: '',
-        country: 'SI', // Default
+        country: '', // Will be detected from domain
         username: '',
         password: '',
         confirmPassword: '',
@@ -81,16 +81,40 @@ export default function B2CRegistrationForm() {
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
 
-    // Auto-prefill phone code based on market
+    // Auto-prefill phone code based on market or detected country
     React.useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const marketKey = getMarketKeyFromHostname(window.location.hostname)
-            const code = MARKET_PHONE_CODES[marketKey]
-            if (code && !formData.phone) {
-                setFormData(prev => ({ ...prev, phone: code + ' ', country: marketKey }))
+        let targetCountry = formData.country
+
+        // On mount, if no country is set, detect from domain
+        if (!targetCountry && typeof window !== 'undefined') {
+            targetCountry = getMarketKeyFromHostname(window.location.hostname)
+        }
+
+        if (targetCountry) {
+            const code = MARKET_PHONE_CODES[targetCountry]
+            if (code) {
+                setFormData(prev => {
+                    const currentPhone = prev.phone.trim()
+                    const isPrefixOnly = Object.values(MARKET_PHONE_CODES).some(p => currentPhone === p)
+
+                    const updates: any = {}
+                    // Set prefix if empty or just an old prefix
+                    if (!currentPhone || isPrefixOnly) {
+                        updates.phone = code + ' '
+                    }
+                    // Sync the country field if it was empty (initial detection)
+                    if (!prev.country) {
+                        updates.country = targetCountry
+                    }
+
+                    if (Object.keys(updates).length > 0) {
+                        return { ...prev, ...updates }
+                    }
+                    return prev
+                })
             }
         }
-    }, [])
+    }, [formData.country])
 
     // Auto-generate username when names change
     const generateUsername = () => {

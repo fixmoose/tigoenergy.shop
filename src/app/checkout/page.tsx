@@ -270,6 +270,25 @@ export default function CheckoutPage() {
         fetchRates()
     }, [formData.shipping_country, totalWeight])
 
+    // Auto-prefill phone prefix based on country
+    useEffect(() => {
+        const country = formData.shipping_country
+        if (!country) return
+
+        const code = COUNTRY_PREFIXES[country]
+        if (!code) return
+
+        setFormData(prev => {
+            const currentPhone = prev.shipping_phone.trim()
+            // If empty or just an old prefix, update it
+            const isPrefixOnly = Object.values(COUNTRY_PREFIXES).some(p => currentPhone === p)
+            if (!currentPhone || isPrefixOnly) {
+                return { ...prev, shipping_phone: code + ' ' }
+            }
+            return prev
+        })
+    }, [formData.shipping_country])
+
     const handleVatValidate = async () => {
         console.log('Validating VAT:', formData.vat_id)
         if (!formData.vat_id || formData.vat_id.length < 4) return
