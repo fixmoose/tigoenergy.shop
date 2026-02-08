@@ -16,99 +16,115 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
     const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
-        const loadScript = () => {
-            if (typeof window === 'undefined') return
+        if (typeof window === 'undefined') return
 
-            if (window.google?.maps?.places) {
-                setIsLoaded(true)
-                return
-            }
-
-            const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-            if (!apiKey) {
-                console.warn('Google Maps API Key missing in environment variables')
-                return
-            }
-
-            const scriptId = 'google-maps-places-script'
-            if (document.getElementById(scriptId)) {
-                if (window.google?.maps?.places) {
-                    setIsLoaded(true)
-                }
-                return
-            }
-
-            const script = document.createElement('script')
-            script.id = scriptId
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`
-            script.async = true
-            script.defer = true
-            script.onload = () => setIsLoaded(true)
-            document.head.appendChild(script)
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+        if (!apiKey) {
+            console.error('Google Maps API Key missing')
+            return
         }
 
-        loadScript()
+        // Check if script is already present
+        if (window.google?.maps?.places) {
+            setIsLoaded(true)
+            return
+        }
+
+        const scriptId = 'google-maps-script'
+        let script = document.getElementById(scriptId) as HTMLScriptElement
+
+        if (!script) {
+            script = document.createElement('script');
+            script.id = scriptId;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapAutocomplete`;
+            script.async = true;
+            script.defer = true;
+
+            // Define global callback before appending script
+            (window as any).initMapAutocomplete = () => {
+                setIsLoaded(true);
+            };
+
+            script.onerror = () => {
+                console.error('Failed to load Google Maps script');
+            };
+
+            document.head.appendChild(script);
+        } else if (window.google?.maps?.places) {
+            setIsLoaded(true)
+        } else {
+            // Script exists but not yet loaded, wait for the callback or onload
+            const interval = setInterval(() => {
+                if (window.google?.maps?.places) {
+                    setIsLoaded(true)
+                    clearInterval(interval)
+                }
+            }, 500)
+            return () => clearInterval(interval)
+        }
     }, [])
 
     useEffect(() => {
         if (!isLoaded || !inputRef.current || !window.google?.maps?.places) return
 
         try {
+            // Initialize Autocomplete
             autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
                 types: ['address'],
-                fields: ['address_components', 'formatted_address'],
+                fields: ['address_components', 'formatted_address', 'geometry'],
             })
+
+            const listener = autocompleteRef.current.addListener('place_changed', () => {
+                const place = autocompleteRef.current?.getPlace()
+                if (!place?.address_components) return
+
+                const address: ParsedAddress = {
+                    street: '',
+                    city: '',
+                    postal_code: '',
+                    country: '',
+                }
+
+                let streetNumber = ''
+                let route = ''
+
+                place.address_components.forEach((component: any) => {
+                    const types = component.types as string[]
+
+                    if (types.includes('street_number')) {
+                        streetNumber = component.long_name
+                    }
+                    if (types.includes('route')) {
+                        route = component.long_name
+                    }
+                    if (types.includes('locality')) {
+                        address.city = component.long_name
+                    }
+                    if (types.includes('postal_code')) {
+                        address.postal_code = component.long_name
+                    }
+                    if (types.includes('country')) {
+                        address.country = component.short_name
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        address.state = component.long_name
+                    }
+                })
+
+                address.street = streetNumber ? `${route} ${streetNumber}` : route
+                onAddressSelected(address)
+            })
+
+            return () => {
+                if (window.google?.maps?.event && listener) {
+                    window.google.maps.event.removeListener(listener)
+                }
+                // Clear the Pac container (Google's dropdown div) if component unmounts
+                const pacContainers = document.querySelectorAll('.pac-container')
+                pacContainers.forEach(container => container.remove())
+            }
         } catch (error) {
-            console.error('Failed to initialize Google Maps Autocomplete:', error)
-            return
-        }
-
-        const listener = autocompleteRef.current.addListener('place_changed', () => {
-            const place = autocompleteRef.current?.getPlace()
-            if (!place?.address_components) return
-
-            const address: ParsedAddress = {
-                street: '',
-                city: '',
-                postal_code: '',
-                country: '',
-            }
-
-            let streetNumber = ''
-            let route = ''
-
-            place.address_components.forEach((component: any) => {
-                const types = component.types as string[]
-
-                if (types.includes('street_number')) {
-                    streetNumber = component.long_name
-                }
-                if (types.includes('route')) {
-                    route = component.long_name
-                }
-                if (types.includes('locality')) {
-                    address.city = component.long_name
-                }
-                if (types.includes('postal_code')) {
-                    address.postal_code = component.long_name
-                }
-                if (types.includes('country')) {
-                    address.country = component.short_name
-                }
-                if (types.includes('administrative_area_level_1')) {
-                    address.state = component.long_name
-                }
-            })
-
-            // Format street as "Route StreetNumber" or just "Route"
-            address.street = streetNumber ? `${route} ${streetNumber}` : route
-            onAddressSelected(address)
-        })
-
-        return () => {
-            if (listener && (window as any).google?.maps?.event) {
-                (window as any).google.maps.event.removeListener(listener)
-            }
+            console.error('Error initializing Autocomplete:', error)
         }
     }, [isLoaded, onAddressSelected])
 
