@@ -76,6 +76,7 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
             const listener = autocompleteRef.current.addListener('place_changed', () => {
                 const place = autocompleteRef.current?.getPlace()
+                console.log('DEBUG: Google Place Result:', place)
                 if (!place?.address_components) return
 
                 const address: ParsedAddress = {
@@ -87,6 +88,9 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
                 let streetNumber = ''
                 let route = ''
+                let cityLocality = ''
+                let cityPostalTown = ''
+                let cityAdminArea2 = ''
 
                 place.address_components.forEach((component: any) => {
                     const types = component.types as string[]
@@ -98,7 +102,13 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                         route = component.long_name
                     }
                     if (types.includes('locality')) {
-                        address.city = component.long_name
+                        cityLocality = component.long_name
+                    }
+                    if (types.includes('postal_town')) {
+                        cityPostalTown = component.long_name
+                    }
+                    if (types.includes('administrative_area_level_2')) {
+                        cityAdminArea2 = component.long_name
                     }
                     if (types.includes('postal_code')) {
                         address.postal_code = component.long_name
@@ -110,6 +120,9 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                         address.state = component.long_name
                     }
                 })
+
+                // Set city based on priority: locality > postal_town > admin_area_2
+                address.city = cityLocality || cityPostalTown || cityAdminArea2 || ''
 
                 address.street = streetNumber ? `${route} ${streetNumber}` : route
                 onAddressSelected(address)
