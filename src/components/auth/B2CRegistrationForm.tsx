@@ -5,6 +5,26 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
+import { getMarketKeyFromHostname } from '@/lib/constants/markets'
+
+const MARKET_PHONE_CODES: Record<string, string> = {
+    SI: '+386',
+    DE: '+49',
+    AT: '+43',
+    IT: '+39',
+    FR: '+33',
+    ES: '+34',
+    HR: '+385',
+    CH: '+41',
+    PL: '+48',
+    CZ: '+420',
+    SK: '+421',
+    HU: '+36',
+    RO: '+40',
+    BE: '+32',
+    NL: '+31',
+    GB: '+44',
+}
 
 // Steps: 
 // 1. Email (Send Code) -> Verify Code
@@ -60,6 +80,17 @@ export default function B2CRegistrationForm() {
     const [phoneVerified, setPhoneVerified] = useState(false)
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
+
+    // Auto-prefill phone code based on market
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const marketKey = getMarketKeyFromHostname(window.location.hostname)
+            const code = MARKET_PHONE_CODES[marketKey]
+            if (code && !formData.phone) {
+                setFormData(prev => ({ ...prev, phone: code + ' ', country: marketKey }))
+            }
+        }
+    }, [])
 
     // Auto-generate username when names change
     const generateUsername = () => {
@@ -306,7 +337,19 @@ export default function B2CRegistrationForm() {
                             type="tel"
                             autoComplete="tel"
                             value={formData.phone}
-                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={e => {
+                                let val = e.target.value
+                                const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : 'SHOP'
+                                const code = MARKET_PHONE_CODES[marketKey]
+
+                                if (code && val.startsWith(code)) {
+                                    const rest = val.slice(code.length).trim()
+                                    if (rest.startsWith('0')) {
+                                        val = code + ' ' + rest.slice(1)
+                                    }
+                                }
+                                setFormData({ ...formData, phone: val })
+                            }}
                             className="flex-1 border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                             placeholder="+386 00 000 000"
                         />

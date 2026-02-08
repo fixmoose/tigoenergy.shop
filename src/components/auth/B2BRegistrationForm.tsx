@@ -6,21 +6,27 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
+import { getMarketKeyFromHostname } from '@/lib/constants/markets'
 
-const COUNTRY_PREFIXES: Record<string, string> = {
-    'SI': '+386',
-    'DE': '+49',
-    'AT': '+43',
-    'FR': '+33',
-    'IT': '+39',
-    'ES': '+34',
-    'NL': '+31',
-    'BE': '+32',
-    'PL': '+48',
-    'CZ': '+420',
-    'CH': '+41',
-    'HR': '+385'
+const MARKET_PHONE_CODES: Record<string, string> = {
+    SI: '+386',
+    DE: '+49',
+    AT: '+43',
+    IT: '+39',
+    FR: '+33',
+    ES: '+34',
+    HR: '+385',
+    CH: '+41',
+    PL: '+48',
+    CZ: '+420',
+    SK: '+421',
+    HU: '+36',
+    RO: '+40',
+    BE: '+32',
+    NL: '+31',
+    GB: '+44',
 }
+
 
 export default function B2BRegistrationForm() {
     const supabase = createClient()
@@ -81,6 +87,17 @@ export default function B2BRegistrationForm() {
     const [phoneVerified, setPhoneVerified] = useState(false)
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
+
+    // Auto-prefill phone code based on market
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const marketKey = getMarketKeyFromHostname(window.location.hostname)
+            const code = MARKET_PHONE_CODES[marketKey]
+            if (code && !formData.phone) {
+                setFormData(prev => ({ ...prev, phone: code + ' ' }))
+            }
+        }
+    }, [])
 
     // --- HANDLERS ---
 
@@ -418,8 +435,30 @@ export default function B2BRegistrationForm() {
                     <div className="space-y-2">
                         <label htmlFor="contact-phone" className="text-xs font-medium text-gray-500">Mobile Phone</label>
                         <div className="flex gap-2">
-                            <input id="contact-phone" name="phone" type="tel" placeholder={`${COUNTRY_PREFIXES[formData.country] || ''} Mobile Phone`} className="flex-1 border p-2.5 rounded-lg" value={formData.phone} onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))} />
-                            <button type="button" onClick={handleSendPhoneCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send SMS</button>
+                            <input
+                                id="contact-phone"
+                                name="phone"
+                                type="tel"
+                                placeholder="Mobile Phone"
+                                className="flex-1 border p-2.5 rounded-lg"
+                                value={formData.phone}
+                                onChange={e => {
+                                    let val = e.target.value
+                                    const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : 'SHOP'
+                                    const code = MARKET_PHONE_CODES[marketKey]
+
+                                    if (code && val.startsWith(code)) {
+                                        const rest = val.slice(code.length).trim()
+                                        if (rest.startsWith('0')) {
+                                            val = code + ' ' + rest.slice(1)
+                                        }
+                                    }
+                                    setFormData(prev => ({ ...prev, phone: val }))
+                                }}
+                            />
+                            <button type="button" onClick={handleSendPhoneCode} disabled={loading || !formData.phone} className="bg-gray-900 text-white px-4 rounded-lg text-sm">
+                                {phoneCodeSent ? 'Resend SMS' : 'Send SMS'}
+                            </button>
                         </div>
                     </div>
                     {phoneCodeSent && !phoneVerified && (
