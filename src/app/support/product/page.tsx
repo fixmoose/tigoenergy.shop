@@ -6,10 +6,10 @@ export default function ProductSupportPage() {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Tigo Product Support</h1>
-                    <p className="text-gray-600">Get technical help with your Tigo Energy products via chat</p>
+                    <p className="text-gray-600">Get technical help with your Tigo Energy products via Shop Messenger</p>
                 </div>
 
-                <SupportMessagingWindow type="general" />
+                <SupportMessagingWindow type="general" title="Tigo Product Support" />
             </div>
         </div>
     )

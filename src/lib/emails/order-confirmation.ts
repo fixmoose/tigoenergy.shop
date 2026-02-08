@@ -24,6 +24,7 @@ interface OrderEmailData {
         first_name?: string
         last_name?: string
         street?: string
+        street2?: string
         city?: string
         postal_code?: string
         country?: string
@@ -230,7 +231,7 @@ export function buildOrderConfirmationEmail(data: OrderEmailData) {
                 <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin:0 0 8px">${l.shippingTo}</h3>
                 <p style="font-size:14px;color:#333;margin:0;line-height:1.6">
                     ${addr.first_name || ''} ${addr.last_name || ''}<br>
-                    ${addr.street || ''}<br>
+                    ${addr.street || ''}${addr.street2 ? `<br>${addr.street2}` : ''}<br>
                     ${addr.postal_code || ''} ${addr.city || ''}<br>
                     ${addr.country || ''}
                 </p>

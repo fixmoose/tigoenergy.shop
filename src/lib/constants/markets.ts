@@ -294,7 +294,7 @@ export const MARKETS: Record<string, MarketConfig> = {
         countryName: 'Bulgaria',
         defaultLanguage: 'bg',
         availableLanguages: ['bg'],
-        currency: 'BGN',
+        currency: 'EUR',
         vatRate: 0.20,
         isEU: true,
         locale: 'bg-BG',

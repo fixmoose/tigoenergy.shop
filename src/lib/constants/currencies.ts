@@ -18,7 +18,6 @@ export const CURRENCIES: Record<string, CurrencyMetadata> = {
     CZK: { code: 'CZK', name: 'Czech Koruna', symbol: 'Kč', flag: '🇨🇿', locale: 'cs-CZ', isEU: true },
     HUF: { code: 'HUF', name: 'Hungarian Forint', symbol: 'Ft', flag: '🇭🇺', locale: 'hu-HU', isEU: true },
     RON: { code: 'RON', name: 'Romanian Leu', symbol: 'lei', flag: '🇷🇴', locale: 'ro-RO', isEU: true },
-    BGN: { code: 'BGN', name: 'Bulgarian Lev', symbol: 'лв', flag: '🇧🇬', locale: 'bg-BG', isEU: true },
     BAM: { code: 'BAM', name: 'Bosnian Mark', symbol: 'KM', flag: '🇧🇦', locale: 'bs-BA', isEU: false },
     RSD: { code: 'RSD', name: 'Serbian Dinar', symbol: 'din', flag: '🇷🇸', locale: 'sr-RS', isEU: false },
     MKD: { code: 'MKD', name: 'Macedonian Denar', symbol: 'den', flag: '🇲🇰', locale: 'mk-MK', isEU: false },

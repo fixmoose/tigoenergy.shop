@@ -62,6 +62,7 @@ export default function B2CRegistrationForm() {
         dob: '',
         occupation: '',
         address: '',
+        address2: '',
         city: '',
         postalCode: '',
         country: '', // Will be detected from domain
@@ -347,7 +348,21 @@ export default function B2CRegistrationForm() {
                             </div>
                         </div>
                     )}
-                    {emailVerified && <div className="text-green-600 text-sm font-medium">✓ Email verified successfully</div>}
+                    {emailVerified && (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-1">
+                            <div className="text-green-600 text-sm font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                Email verified successfully
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setStep(2)}
+                                className="w-full bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition-all shadow-sm"
+                            >
+                                Continue to Next Step
+                            </button>
+                        </div>
+                    )}
                 </div>
             </StepCard>
 
@@ -405,7 +420,31 @@ export default function B2CRegistrationForm() {
                             </div>
                         </div>
                     )}
-                    {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ Phone verified successfully</div>}
+                    {phoneVerified && (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-1">
+                            <div className="text-green-600 text-sm font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                Phone verified successfully
+                            </div>
+                            <div className="flex gap-3">
+                                <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(3)}
+                                    className="flex-[2] bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition-all shadow-sm"
+                                >
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    {!phoneVerified && (
+                        <div className="pt-2">
+                            <button type="button" onClick={() => setStep(1)} className="w-full text-xs text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1 mt-2">
+                                <span>← Back to Email</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </StepCard>
 
@@ -430,25 +469,42 @@ export default function B2CRegistrationForm() {
                         <label htmlFor="reg-occ" className="text-xs font-medium text-gray-500">Occupation (Optional)</label>
                         <input id="reg-occ" name="occupation" className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formData.occupation} onChange={e => setFormData(prev => ({ ...prev, occupation: e.target.value }))} />
                     </div>
-                    <div className="md:col-span-2 pt-2">
-                        <button type="button" onClick={() => { generateUsername(); setStep(4); }} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">Continue</button>
+                    <div className="md:col-span-2 pt-2 flex gap-3">
+                        <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                        <button type="button" onClick={() => { generateUsername(); setStep(4); }} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm">Continue</button>
                     </div>
                 </div>
             </StepCard>
 
             <StepCard number={4} title="Address" isActive={step === 4} isCompleted={step > 4} setStep={setStep}>
+                <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-3 rounded-lg border border-blue-100 mb-2">
+                    <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
+                </p>
                 <div className="space-y-4">
-                    <label htmlFor="reg-address" className="sr-only">Street Address</label>
-                    <input
-                        id="reg-address"
-                        name="address"
-                        ref={addressInputRef}
-                        placeholder="Street Address"
-                        autoComplete="street-address"
-                        className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                        value={formData.address}
-                        onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    />
+                    <div>
+                        <label htmlFor="reg-address" className="sr-only">Street Address</label>
+                        <input
+                            id="reg-address"
+                            name="address"
+                            ref={addressInputRef}
+                            placeholder="Street Address"
+                            autoComplete="street-address"
+                            className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                            value={formData.address}
+                            onChange={e => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="reg-address2" className="sr-only">Suite, Apt, PO, etc.</label>
+                        <input
+                            id="reg-address2"
+                            name="address2"
+                            placeholder="Suite, Apt, PO, etc. (Optional)"
+                            className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                            value={formData.address2}
+                            onChange={e => setFormData(prev => ({ ...prev, address2: e.target.value }))}
+                        />
+                    </div>
                     <div className="flex gap-4">
                         <label htmlFor="reg-city" className="sr-only">City</label>
                         <input id="reg-city" name="city" autoComplete="address-level2" placeholder="City" className="flex-1 border p-2.5 rounded-lg" value={formData.city} onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))} />
@@ -463,7 +519,10 @@ export default function B2CRegistrationForm() {
                         <option value="AT">Austria</option>
                         <option value="IT">Italy</option>
                     </select>
-                    <button type="button" onClick={validateAddress} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">Validate Address</button>
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                        <button type="button" onClick={validateAddress} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm">Validate Address</button>
+                    </div>
                 </div>
             </StepCard>
 
@@ -486,7 +545,10 @@ export default function B2CRegistrationForm() {
                             <input id="reg-pwd-confirm" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Confirm Password" className="w-full border p-2.5 rounded-lg" value={formData.confirmPassword} onChange={e => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))} />
                         </div>
                     </div>
-                    <button type="button" onClick={() => setStep(6)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">Proceed to Review</button>
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setStep(4)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                        <button type="button" onClick={() => setStep(6)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm">Proceed to Review</button>
+                    </div>
                 </div>
             </StepCard>
 
@@ -536,14 +598,23 @@ export default function B2CRegistrationForm() {
                             </label>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={!formData.terms || !formData.privacy || loading}
-                        className="w-full bg-green-600 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
-                    >
-                        {loading ? 'Creating Account...' : 'Confirm & Create Account'}
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!formData.terms || !formData.privacy || loading}
+                            className="w-full bg-green-600 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
+                        >
+                            {loading ? 'Creating Account...' : 'Confirm & Create Account'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setStep(5)}
+                            className="w-full py-2 text-sm text-gray-500 hover:text-gray-900 border border-transparent hover:border-gray-200 rounded-lg transition-all"
+                        >
+                            ← Back to Account Security
+                        </button>
+                    </div>
                 </div>
             </StepCard>
         </div>

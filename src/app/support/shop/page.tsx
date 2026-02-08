@@ -6,10 +6,10 @@ export default function ShopSupportPage() {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Online Shop Support</h1>
-                    <p className="text-gray-600">Get help with orders, shipping, and account issues via chat</p>
+                    <p className="text-gray-600">Get help with orders, shipping, and account issues via Shop Messenger</p>
                 </div>
 
-                <SupportMessagingWindow type="general" />
+                <SupportMessagingWindow type="shipping" title="Online Shop Support" />
             </div>
         </div>
     )

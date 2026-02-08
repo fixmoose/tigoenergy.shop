@@ -118,6 +118,7 @@ export default function CheckoutPage() {
         shipping_first_name: '',
         shipping_last_name: '',
         shipping_street: '',
+        shipping_street2: '',
         shipping_city: '',
         shipping_postal_code: '',
         shipping_country: 'DE',
@@ -127,6 +128,7 @@ export default function CheckoutPage() {
         billing_first_name: '',
         billing_last_name: '',
         billing_street: '',
+        billing_street2: '',
         billing_city: '',
         billing_postal_code: '',
         billing_country: 'DE',
@@ -536,6 +538,11 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
                                 </div>
+                                <div className="md:col-span-2">
+                                    <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-2.5 rounded-lg border border-blue-100 mb-2">
+                                        <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
+                                    </p>
+                                </div>
                                 <input type="text" name="shipping_first_name" required value={formData.shipping_first_name} onChange={handleChange} className={getInputClass('shipping_first_name')} placeholder={t('firstName')} />
                                 <input type="text" name="shipping_last_name" required value={formData.shipping_last_name} onChange={handleChange} className={getInputClass('shipping_last_name')} placeholder={t('lastName')} />
                                 <div className="md:col-span-2">
@@ -548,6 +555,16 @@ export default function CheckoutPage() {
                                         onChange={handleChange}
                                         className={getInputClass('shipping_street')}
                                         placeholder={t('streetAddress')}
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <input
+                                        type="text"
+                                        name="shipping_street2"
+                                        value={formData.shipping_street2}
+                                        onChange={handleChange}
+                                        className={getInputClass('shipping_street2')}
+                                        placeholder="Suite, Apt, PO Box, etc. (Optional)"
                                     />
                                 </div>
                                 <input type="text" name="shipping_postal_code" required value={formData.shipping_postal_code} onChange={handleChange} className={getInputClass('shipping_postal_code')} placeholder={t('postalCode')} />
@@ -641,6 +658,16 @@ export default function CheckoutPage() {
                                             onChange={handleChange}
                                             className={getInputClass('billing_street')}
                                             placeholder={t('streetAddress')}
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <input
+                                            type="text"
+                                            name="billing_street2"
+                                            value={formData.billing_street2}
+                                            onChange={handleChange}
+                                            className={getInputClass('billing_street2')}
+                                            placeholder="Suite, Apt, PO Box, etc. (Optional)"
                                         />
                                     </div>
                                     <input type="text" name="billing_postal_code" required={!billingSame} value={formData.billing_postal_code} onChange={handleChange} className={getInputClass('billing_postal_code')} placeholder={t('postalCode')} />

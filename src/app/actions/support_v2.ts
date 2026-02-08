@@ -148,6 +148,51 @@ export async function submitSupportRequestV2(formData: {
 
     if (msgError) throw msgError
 
+    // 5. Notify Admins
+    try {
+        const adminUsers = await supabase.auth.admin.listUsers()
+        const admins = (adminUsers.data.users || [])
+            .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === 'dejan@haywilson.com')
+            .map((u: any) => u.email)
+            .filter((email: string | undefined): email is string => !!email)
+
+        if (admins.length > 0) {
+            // Determine Subject based on type
+            // shipping/return => Online Shop Support => Shopping help
+            // general => Tigo Product Support => Tigo Support
+            const isShopHelp = formData.type === 'shipping' || formData.type === 'return'
+            const subjectPrefix = isShopHelp ? 'Tigo Energy SHOP> Shopping help' : 'Tigo Energy SHOP> Tigo Support'
+            const userEmail = user?.email || formData.email
+            const userName = user?.user_metadata?.first_name ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}` : formData.name
+
+            const adminHtml = `
+                <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
+                    <h2 style="color: #16a34a;">New Support Message</h2>
+                    <p><strong>From:</strong> ${userName} (${userEmail})</p>
+                    <p><strong>Type:</strong> ${formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support'}</p>
+                    <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+                        ${formData.message}
+                    </div>
+                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/support/${request.id}" 
+                          style="background: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        View in Admin Dashboard
+                    </a></p>
+                </div>
+            `
+
+            // Send to all admins
+            await Promise.all(admins.map((adminEmail: string) =>
+                sendEmail({
+                    to: adminEmail,
+                    subject: `${subjectPrefix} - Request #${request.id.slice(0, 8)}`,
+                    html: adminHtml
+                })
+            ))
+        }
+    } catch (notifyError) {
+        console.error('Failed to notify admins of support request:', notifyError)
+    }
+
     return { success: true, requestId: request.id }
 }
 

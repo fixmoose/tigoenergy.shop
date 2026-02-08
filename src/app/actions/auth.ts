@@ -8,7 +8,7 @@ import { getMarketFromKey } from '@/lib/constants/markets'
 
 export async function registerUserAction(formData: any) {
     const supabase = await createAdminClient()
-    const { email, password, firstName, lastName, phone, dob, occupation, address, city, postalCode, country, newsletter, marketing, username } = formData
+    const { email, password, firstName, lastName, phone, dob, occupation, address, address2, city, postalCode, country, newsletter, marketing, username } = formData
 
     try {
         // 1. Create user in Supabase (Marked as confirmed because they verified via code in form)
@@ -23,6 +23,7 @@ export async function registerUserAction(formData: any) {
                 dob,
                 occupation,
                 address,
+                address_line2: address2,
                 city,
                 postal_code: postalCode,
                 country,

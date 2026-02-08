@@ -52,6 +52,7 @@ export default function B2BRegistrationForm() {
         vatNumber: '',
         companyName: '',
         companyAddress: '',
+        companyAddress2: '',
         city: '',
         postalCode: '',
         country: '',
@@ -92,16 +93,30 @@ export default function B2BRegistrationForm() {
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
 
-    // Auto-prefill phone code based on market
+    // Auto-prefill phone code based on market or detected company country
     React.useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const marketKey = getMarketKeyFromHostname(window.location.hostname)
-            const code = MARKET_PHONE_CODES[marketKey]
-            if (code && !formData.phone) {
-                setFormData(prev => ({ ...prev, phone: code + ' ' }))
+        let targetCountry = formData.country
+
+        // Fallback to market if no country detected yet
+        if (!targetCountry && typeof window !== 'undefined') {
+            targetCountry = getMarketKeyFromHostname(window.location.hostname)
+        }
+
+        if (targetCountry) {
+            const code = MARKET_PHONE_CODES[targetCountry]
+            if (code) {
+                setFormData(prev => {
+                    const currentPhone = prev.phone.trim()
+                    // If empty or just an old prefix, update it
+                    const isPrefixOnly = Object.values(MARKET_PHONE_CODES).some(p => currentPhone === p)
+                    if (!currentPhone || isPrefixOnly) {
+                        return { ...prev, phone: code + ' ' }
+                    }
+                    return prev
+                })
             }
         }
-    }, [])
+    }, [formData.country])
 
     // --- HANDLERS ---
 
@@ -218,6 +233,7 @@ export default function B2BRegistrationForm() {
                         company_name: formData.companyName,
                         vat_id: formData.vatNumber,
                         company_address: formData.companyAddress,
+                        company_address2: formData.companyAddress2,
                         city: formData.city,
                         postal_code: formData.postalCode,
                         country: formData.country,
@@ -295,7 +311,7 @@ export default function B2BRegistrationForm() {
                         </label>
                     </div>
 
-                    {!formData.isNonEU && (
+                    {!formData.isNonEU && !vatVerified && (
                         <>
                             <div className="text-xs text-blue-600 font-medium bg-blue-50 p-2 rounded">
                                 Format: CC12345678 (e.g., DE12345678). Country code is mandatory.
@@ -304,6 +320,22 @@ export default function B2BRegistrationForm() {
                                 * Verification happens in real-time. If VIES is offline, we will fallback to manual verification.
                             </div>
                         </>
+                    )}
+
+                    {vatVerified && (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-1">
+                            <div className="text-green-600 text-sm font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                VAT verified successfully
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setStep(2)}
+                                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm"
+                            >
+                                Continue to Next Step
+                            </button>
+                        </div>
                     )}
                 </div>
             </StepCard>
@@ -325,6 +357,9 @@ export default function B2BRegistrationForm() {
                             readOnly={!formData.isNonEU}
                         />
                     </div>
+                    <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-3 rounded-lg border border-blue-100 mb-2">
+                        <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
+                    </p>
                     <div>
                         <label htmlFor="company-address" className="text-xs font-medium text-gray-500">Registered Address (Street & No)</label>
                         <input
@@ -335,6 +370,17 @@ export default function B2BRegistrationForm() {
                             value={formData.companyAddress}
                             onChange={e => setFormData(prev => ({ ...prev, companyAddress: e.target.value }))}
                             placeholder="Type company address..."
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="company-address2" className="text-xs font-medium text-gray-500">Suite, Apt, PO Box, etc. (Optional)</label>
+                        <input
+                            id="company-address2"
+                            name="companyAddress2"
+                            className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            value={formData.companyAddress2}
+                            onChange={e => setFormData(prev => ({ ...prev, companyAddress2: e.target.value }))}
+                            placeholder="Suite, Apt, Unit, PO Box..."
                         />
                     </div>
 
@@ -391,7 +437,10 @@ export default function B2BRegistrationForm() {
                             </select>
                         </div>
                     </div>
-                    <button type="button" onClick={() => setStep(3)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Confirm & Continue</button>
+                    <div className="flex gap-3">
+                        <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                        <button type="button" onClick={() => setStep(3)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700">Confirm & Continue</button>
+                    </div>
                 </div>
             </StepCard>
 
@@ -425,7 +474,10 @@ export default function B2BRegistrationForm() {
                         </div>
                     </div>
 
-                    <button type="button" onClick={() => setStep(4)} className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Next Step</button>
+                    <div className="flex gap-3">
+                        <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                        <button type="button" onClick={() => setStep(4)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700">Next Step</button>
+                    </div>
                 </div>
             </StepCard>
 
@@ -507,7 +559,27 @@ export default function B2BRegistrationForm() {
                     )}
                     {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ Phone Verified</div>}
 
-                    <button type="button" onClick={() => setStep(5)} disabled={!emailVerified || !phoneVerified} className="w-full bg-blue-600 text-white py-2.5 rounded-lg disabled:opacity-50 font-medium">Continue</button>
+                    {(emailVerified && phoneVerified) && (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-1 mt-4">
+                            <div className="flex gap-3">
+                                <button type="button" onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(5)}
+                                    className="flex-[2] bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition-all shadow-sm"
+                                >
+                                    Continue to Final Step
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    {(!emailVerified || !phoneVerified) && (
+                        <div className="pt-2">
+                            <button type="button" onClick={() => setStep(3)} className="w-full text-xs text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1 mt-2">
+                                <span>← Back to Business Type</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </StepCard>
 
@@ -550,14 +622,23 @@ export default function B2BRegistrationForm() {
                         </div>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={!formData.terms || !formData.privacy || !formData.legitimateBusiness || loading}
-                        className="w-full bg-blue-800 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-blue-900 shadow-md transition-all disabled:opacity-50"
-                    >
-                        {loading ? 'Creating Account...' : 'Create Business Account'}
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!formData.terms || !formData.privacy || !formData.legitimateBusiness || loading}
+                            className="w-full bg-blue-800 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-blue-900 shadow-md transition-all disabled:opacity-50"
+                        >
+                            {loading ? 'Creating Account...' : 'Create Business Account'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setStep(4)}
+                            className="w-full py-2 text-sm text-gray-500 hover:text-gray-900 border border-transparent hover:border-gray-200 rounded-lg transition-all"
+                        >
+                            ← Back to Contact Person
+                        </button>
+                    </div>
                 </div>
             </StepCard>
 

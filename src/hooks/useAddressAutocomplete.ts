@@ -76,7 +76,6 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
             const listener = autocompleteRef.current.addListener('place_changed', () => {
                 const place = autocompleteRef.current?.getPlace()
-                console.log('DEBUG: Google Place Result:', place)
                 if (!place?.address_components) return
 
                 const address: ParsedAddress = {
@@ -88,9 +87,11 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
 
                 let streetNumber = ''
                 let route = ''
-                let cityLocality = ''
-                let cityPostalTown = ''
-                let cityAdminArea2 = ''
+                let locality = ''
+                let postal_town = ''
+                let sublocality = ''
+                let neighborhood = ''
+                let admin_area_2 = ''
 
                 place.address_components.forEach((component: any) => {
                     const types = component.types as string[]
@@ -102,13 +103,19 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                         route = component.long_name
                     }
                     if (types.includes('locality')) {
-                        cityLocality = component.long_name
+                        locality = component.long_name
                     }
                     if (types.includes('postal_town')) {
-                        cityPostalTown = component.long_name
+                        postal_town = component.long_name
+                    }
+                    if (types.includes('sublocality_level_1')) {
+                        sublocality = component.long_name
+                    }
+                    if (types.includes('neighborhood')) {
+                        neighborhood = component.long_name
                     }
                     if (types.includes('administrative_area_level_2')) {
-                        cityAdminArea2 = component.long_name
+                        admin_area_2 = component.long_name
                     }
                     if (types.includes('postal_code')) {
                         address.postal_code = component.long_name
@@ -121,8 +128,8 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                     }
                 })
 
-                // Set city based on priority: locality > postal_town > admin_area_2
-                address.city = cityLocality || cityPostalTown || cityAdminArea2 || ''
+                // Set city based on hierarchy: locality > postal_town > sublocality > neighborhood > administrative_area_level_2
+                address.city = locality || postal_town || sublocality || neighborhood || admin_area_2 || ''
 
                 address.street = streetNumber ? `${route} ${streetNumber}` : route
                 onAddressSelected(address)

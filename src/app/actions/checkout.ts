@@ -162,6 +162,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 first_name: rawData.shipping_first_name,
                 last_name: rawData.shipping_last_name,
                 street: rawData.shipping_street,
+                street2: rawData.shipping_street2,
                 city: rawData.shipping_city,
                 postal_code: rawData.shipping_postal_code,
                 country: rawData.shipping_country
@@ -170,6 +171,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 first_name: rawData.shipping_first_name,
                 last_name: rawData.shipping_last_name,
                 street: rawData.shipping_street,
+                street2: rawData.shipping_street2,
                 city: rawData.shipping_city,
                 postal_code: rawData.shipping_postal_code,
                 country: rawData.shipping_country
@@ -178,6 +180,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 first_name: rawData.billing_first_name || rawData.shipping_first_name,
                 last_name: rawData.billing_last_name || rawData.shipping_last_name,
                 street: rawData.billing_street,
+                street2: rawData.billing_street2,
                 city: rawData.billing_city,
                 postal_code: rawData.billing_postal_code,
                 country: rawData.billing_country
@@ -250,7 +253,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 vatAmount,
                 total: grandTotal,
                 currency: 'EUR',
-                shippingAddress: orderPayload.shipping_address as { first_name?: string; last_name?: string; street?: string; city?: string; postal_code?: string; country?: string },
+                shippingAddress: orderPayload.shipping_address as { first_name?: string; last_name?: string; street?: string; street2?: string; city?: string; postal_code?: string; country?: string },
                 paymentMethod: (rawData.payment_method as string) || 'invoice',
                 language: orderLanguage,
             })
