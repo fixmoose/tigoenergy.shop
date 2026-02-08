@@ -188,9 +188,11 @@ export function buildOrderConfirmationEmail(data: OrderEmailData) {
 <div style="max-width:640px;margin:0 auto;padding:24px">
 
     <!-- Header -->
-    <div style="background:#458400;padding:24px 32px;border-radius:12px 12px 0 0;text-align:center">
-        <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">TIGO ENERGY</h1>
-        <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:13px">${l.orderNumber}: ${data.orderNumber}</p>
+    <div style="background:#16a34a;padding:5px 0;text-align:center;border-radius:12px 12px 0 0;">
+        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" style="height:20px; width:auto; display:block; margin:0 auto;">
+    </div>
+    <div style="background:#f9fafb; padding:8px; text-align:center; border-bottom:1px solid #e5e7eb; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">
+        <p style="color:#666;margin:0;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px">${l.orderNumber}: ${data.orderNumber}</p>
     </div>
 
     <!-- Body -->

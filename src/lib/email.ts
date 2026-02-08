@@ -14,6 +14,7 @@ interface SendEmailParams {
     html?: string
     templateId?: string
     substitutions?: Record<string, string>
+    skipUnsubscribe?: boolean
 }
 
 export async function sendEmail({
@@ -22,7 +23,8 @@ export async function sendEmail({
     subject,
     html,
     templateId,
-    substitutions
+    substitutions,
+    skipUnsubscribe = true
 }: SendEmailParams) {
     const apiKey = process.env.UNIONE_API_KEY
     if (!apiKey) {
@@ -46,6 +48,7 @@ export async function sendEmail({
             subject,
             from_email: fromEmail,
             ...(fromName && { from_name: fromName }),
+            ...(skipUnsubscribe && { skip_unsubscribe: 1 }),
         },
     }
 
@@ -70,8 +73,8 @@ export async function sendEmail({
 /**
  * Sends a transactional email using a UniOne template ID.
  */
-export async function sendTemplateEmail({ from, to, subject, templateId, substitutions }: Omit<SendEmailParams, 'html'> & { templateId: string }) {
-    return sendEmail({ from, to, subject, templateId, substitutions })
+export async function sendTemplateEmail({ from, to, subject, templateId, substitutions, skipUnsubscribe = true }: Omit<SendEmailParams, 'html'> & { templateId: string }) {
+    return sendEmail({ from, to, subject, templateId, substitutions, skipUnsubscribe })
 }
 
 /**
