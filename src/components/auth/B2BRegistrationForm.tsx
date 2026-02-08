@@ -266,6 +266,7 @@ export default function B2BRegistrationForm() {
                         </div>
                         <button
                             type="button"
+                            onClick={formData.isNonEU ? () => setStep(2) : handleValidateVat}
                             disabled={loading || !formData.vatNumber}
                             className="bg-blue-800 text-white px-6 rounded-lg hover:bg-blue-900 font-medium disabled:opacity-50"
                         >

@@ -99,7 +99,9 @@ export default function CustomerList({ customers }: CustomerListProps) {
         last_name: '',
         phone: '',
         password: '',
-        type: 'b2c' as Tab
+        type: 'b2c' as Tab,
+        company_name: '',
+        vat_id: ''
     })
 
     const [editData, setEditData] = useState<Partial<Customer>>({})
@@ -129,6 +131,8 @@ export default function CustomerList({ customers }: CustomerListProps) {
                 phone: formData.phone,
                 password: formData.password,
                 is_b2b: formData.type === 'b2b',
+                company_name: formData.company_name,
+                vat_id: formData.vat_id,
                 customer_type: formData.type === 'guest' ? 'guest' : undefined
             })
             setIsModalOpen(false)
@@ -152,6 +156,59 @@ export default function CustomerList({ customers }: CustomerListProps) {
             window.location.reload()
         } catch (error) {
             alert('Failed to update customer: ' + (error as Error).message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleVerifyVATInEdit = async () => {
+        if (!editData.vat_id) return
+        setLoading(true)
+        try {
+            const res = await fetch('/api/validate/vat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vatNumber: editData.vat_id })
+            })
+            const data = await res.json()
+            if (data.valid) {
+                setEditData({
+                    ...editData,
+                    company_name: data.name
+                })
+                alert('VAT Verified! Company name updated.')
+            } else {
+                alert(data.error || 'Invalid VAT number')
+            }
+        } catch (error) {
+            alert('Connection error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleVerifyVATInCreate = async () => {
+        if (!formData.vat_id) return
+        setLoading(true)
+        try {
+            const res = await fetch('/api/validate/vat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vatNumber: formData.vat_id })
+            })
+            const data = await res.json()
+            if (data.valid) {
+                setFormData({
+                    ...formData,
+                    company_name: data.name,
+                    type: 'b2b'
+                })
+                alert('VAT Verified! Company name auto-filled and type set to B2B.')
+            } else {
+                alert(data.error || 'Invalid VAT number')
+            }
+        } catch (error) {
+            alert('Connection error')
         } finally {
             setLoading(false)
         }
@@ -421,6 +478,39 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                 />
                             </div>
 
+                            <div className="pt-2 border-t mt-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-1">VAT ID (for B2B)</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="DE12345678"
+                                        value={formData.vat_id}
+                                        onChange={e => setFormData({ ...formData, vat_id: e.target.value })}
+                                        className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase font-mono text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleVerifyVATInCreate}
+                                        disabled={loading || !formData.vat_id}
+                                        className="bg-slate-800 text-white px-3 rounded-lg text-xs font-bold hover:bg-slate-900 disabled:opacity-50"
+                                    >
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+
+                            {formData.type === 'b2b' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+                                    <input
+                                        type="text"
+                                        value={formData.company_name}
+                                        onChange={e => setFormData({ ...formData, company_name: e.target.value })}
+                                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                            )}
+
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Set Password (optional)</label>
                                 <input
@@ -499,7 +589,27 @@ export default function CustomerList({ customers }: CustomerListProps) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Company Name (B2B)</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">VAT ID</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={editData.vat_id || ''}
+                                        onChange={e => setEditData({ ...editData, vat_id: e.target.value })}
+                                        className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase font-mono text-sm"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleVerifyVATInEdit}
+                                        disabled={loading || !editData.vat_id}
+                                        className="bg-slate-800 text-white px-3 rounded-lg text-xs font-bold hover:bg-slate-900 disabled:opacity-50"
+                                    >
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
                                 <input
                                     type="text"
                                     value={editData.company_name || ''}
