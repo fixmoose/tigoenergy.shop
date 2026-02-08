@@ -140,8 +140,18 @@ export default function AddressBook({ customer }: Props) {
                                 onChange={e => setNewAddress({ ...newAddress, street: e.target.value })}
                             />
                             <div className="grid grid-cols-2 gap-4">
-                                <input placeholder="City" className="border p-2.5 rounded-lg" onChange={e => setNewAddress({ ...newAddress, city: e.target.value })} />
-                                <input placeholder="Postal Code" className="border p-2.5 rounded-lg" onChange={e => setNewAddress({ ...newAddress, postalCode: e.target.value })} />
+                                <input
+                                    placeholder="City"
+                                    className="border p-2.5 rounded-lg"
+                                    value={newAddress.city || ''}
+                                    onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
+                                />
+                                <input
+                                    placeholder="Postal Code"
+                                    className="border p-2.5 rounded-lg"
+                                    value={newAddress.postalCode || ''}
+                                    onChange={e => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+                                />
                             </div>
                             <select className="w-full border p-2.5 rounded-lg" onChange={e => setNewAddress({ ...newAddress, country: e.target.value })} defaultValue="SI">
                                 <option value="SI">Slovenia</option>

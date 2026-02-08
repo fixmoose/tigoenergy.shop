@@ -39,7 +39,9 @@ export default function B2BRegistrationForm() {
     const { inputRef: addressInputRef } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
-            companyAddress: `${parsed.street}, ${parsed.postal_code} ${parsed.city}`,
+            companyAddress: parsed.street,
+            city: parsed.city,
+            postalCode: parsed.postal_code,
             country: parsed.country
         }))
     })
@@ -50,6 +52,8 @@ export default function B2BRegistrationForm() {
         vatNumber: '',
         companyName: '',
         companyAddress: '',
+        city: '',
+        postalCode: '',
         country: '',
         website: '',
         businessType: '', // 'installer', 'distributor', 'reseller'
@@ -116,9 +120,9 @@ export default function B2BRegistrationForm() {
                 setVatVerified(true)
                 setFormData(prev => ({
                     ...prev,
-                    companyName: data.name,
-                    companyAddress: data.address,
-                    country: data.countryCode
+                    companyName: data.name || prev.companyName,
+                    companyAddress: data.address || '',
+                    country: data.countryCode || prev.country
                 }))
                 // Auto-advance
                 setStep(2)
@@ -213,6 +217,10 @@ export default function B2BRegistrationForm() {
                         last_name: formData.lastName,
                         company_name: formData.companyName,
                         vat_id: formData.vatNumber,
+                        company_address: formData.companyAddress,
+                        city: formData.city,
+                        postal_code: formData.postalCode,
+                        country: formData.country,
                         customer_type: 'b2b',
                         phone: formData.phone,
                         commercial_access: formData.commercialAccess,
@@ -318,7 +326,7 @@ export default function B2BRegistrationForm() {
                         />
                     </div>
                     <div>
-                        <label htmlFor="company-address" className="text-xs font-medium text-gray-500">Registered Address</label>
+                        <label htmlFor="company-address" className="text-xs font-medium text-gray-500">Registered Address (Street & No)</label>
                         <input
                             id="company-address"
                             name="companyAddress"
@@ -329,19 +337,44 @@ export default function B2BRegistrationForm() {
                             placeholder="Type company address..."
                         />
                     </div>
-                    {formData.isNonEU && (
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="company-country" className="text-xs font-medium text-gray-500">Country</label>
+                            <label htmlFor="company-city" className="text-xs font-medium text-gray-500">City</label>
                             <input
-                                id="company-country"
-                                name="country"
+                                id="company-city"
+                                name="city"
                                 className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.country}
-                                onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
-                                placeholder="e.g. United States, United Kingdom..."
+                                value={formData.city}
+                                onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                                placeholder="City"
                             />
                         </div>
-                    )}
+                        <div>
+                            <label htmlFor="company-postal" className="text-xs font-medium text-gray-500">Postal Code</label>
+                            <input
+                                id="company-postal"
+                                name="postalCode"
+                                className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                value={formData.postalCode}
+                                onChange={e => setFormData(prev => ({ ...prev, postalCode: e.target.value }))}
+                                placeholder="ZIP"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="company-country" className="text-xs font-medium text-gray-500">Country</label>
+                        <input
+                            id="company-country"
+                            name="country"
+                            className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${!formData.isNonEU ? 'bg-gray-50' : 'bg-white'}`}
+                            value={formData.country}
+                            onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                            placeholder="Country"
+                            readOnly={!formData.isNonEU}
+                        />
+                    </div>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="company-website" className="text-xs font-medium text-gray-500">Website (Optional)</label>
