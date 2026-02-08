@@ -1,4 +1,3 @@
-
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -69,7 +68,6 @@ export default function B2CRegistrationForm() {
         const base = `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}`.replace(/[^a-z0-9.]/g, '')
         const suggested = `${base}.${random}`
         setFormData(prev => ({ ...prev, username: suggested }))
-        // Optionally check availability immediately here
     }
 
     // Effect to trigger generation if username is empty and we have names
@@ -130,15 +128,20 @@ export default function B2CRegistrationForm() {
     const handleSendPhoneCode = async () => {
         setLoading(true)
         setError('')
-        const res = await fetch('/api/validate/phone', {
-            method: 'POST', body: JSON.stringify({ phone: formData.phone })
-        })
-        const data = await res.json()
-        setLoading(false)
-        if (data.success) {
-            setPhoneCodeSent(true)
-        } else {
-            setError(data.error)
+        try {
+            const res = await fetch('/api/validate/phone', {
+                method: 'POST', body: JSON.stringify({ phone: formData.phone })
+            })
+            const data = await res.json()
+            if (data.success) {
+                setPhoneCodeSent(true)
+            } else {
+                setError(data.error || 'Failed to send SMS')
+            }
+        } catch (err) {
+            setError('Error sending SMS')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -164,7 +167,6 @@ export default function B2CRegistrationForm() {
         }
     }
 
-    // STEP 4: Address — validated via Google Places Autocomplete on input
     const validateAddress = () => {
         if (!formData.address || !formData.city || !formData.postalCode || !formData.country) {
             setError('Please fill in all address fields')
@@ -173,64 +175,46 @@ export default function B2CRegistrationForm() {
         setStep(5)
     }
 
-    // STEP 5: Username Check
-    const checkUsername = async () => {
-        const res = await fetch('/api/validate/username', {
-            method: 'POST', body: JSON.stringify({ username: formData.username })
-        })
-        const data = await res.json()
-        return data.available
-    }
-
     const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
-    // Scroll to top when registration succeeds
     React.useEffect(() => {
         if (registrationSuccess) {
             window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }, [registrationSuccess])
 
-    // FINAL SUBMIT
+    // FINAL SUBMIT (Custom UniOne Action)
     const handleSubmit = async () => {
-        // 1. Create Supabase Auth User
         setLoading(true)
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: formData.email,
-            password: formData.password,
-            options: {
-                emailRedirectTo: `${window.location.origin}/auth/callback`,
-                data: {
-                    first_name: formData.firstName,
-                    last_name: formData.lastName,
-                    phone: formData.phone,
-                    username: formData.username,
-                    customer_type: 'b2c',
-                    newsletter_subscribed: (formData as any).newsletter,
-                    marketing_consent: (formData as any).marketing,
-                    // Save address to metadata for auto-creation logic
-                    address: formData.address,
-                    city: formData.city,
-                    postal_code: formData.postalCode,
-                    country: formData.country
+        setError('')
+
+        // 0. Recaptcha check
+        const token = await executeRecaptcha('B2C_SIGNUP')
+
+        try {
+            const { registerUserAction } = await import('@/app/actions/auth')
+            const result = await registerUserAction({ ...formData, recaptchaToken: token })
+
+            if (result.error) {
+                setError(result.error)
+            } else if (result.success) {
+                // Since they are auto-confirmed in registerUserAction, we can auto-login
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: formData.email,
+                    password: formData.password
+                })
+
+                if (signInError) {
+                    // If auto-login fails for some reason, show success screen and tell them to sign in
+                    setRegistrationSuccess(true)
+                } else {
+                    router.push('/auth/welcome')
+                    router.refresh()
                 }
             }
-        })
-
-        if (authError) {
-            setError(authError.message)
-            setLoading(false)
-            return
-        }
-
-        // 2. Check for Session (Email Confirmation Logic)
-        if (authData.session) {
-            // Auto-login successful
-            router.push('/dashboard')
-            router.refresh()
-        } else {
-            // No session = Email Confirmation Required
-            setRegistrationSuccess(true)
+        } catch (err: any) {
+            setError(err.message || 'An unexpected error occurred')
+        } finally {
             setLoading(false)
         }
     }
@@ -241,10 +225,9 @@ export default function B2CRegistrationForm() {
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" /></svg>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Check Your Email</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Registration Successful!</h2>
                 <p className="text-lg text-gray-600 mb-8">
-                    We've sent a confirmation link to <span className="font-semibold text-gray-900">{formData.email}</span>.<br />
-                    Please click the link to activate your account and access the dashboard.
+                    Your account has been created. A welcome email has been sent to <span className="font-semibold text-gray-900">{formData.email}</span>.
                 </p>
                 <Link href="/auth/login" className="inline-block bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg">
                     Go to Sign In
@@ -254,8 +237,11 @@ export default function B2CRegistrationForm() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto py-6">
-            <h2 className="text-2xl font-bold mb-6 text-center">Complete Registration</h2>
+        <div className="max-w-2xl mx-auto py-8 px-4">
+            <div className="text-center mb-10">
+                <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Create B2C Account</h2>
+                <p className="mt-2 text-gray-500 font-medium">Step-by-step registration for a seamless experience</p>
+            </div>
 
             {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-6 text-sm flex items-center gap-2">⚠️ {error}</div>}
 
@@ -474,11 +460,11 @@ export default function B2CRegistrationForm() {
                         </label>
                         <div className="border-t pt-2 mt-2">
                             <label className="flex items-start gap-3 cursor-pointer">
-                                <input id="check-newsletter" name="newsletter" type="checkbox" className="mt-1 w-4 h-4 text-green-600 rounded" checked={(formData as any).newsletter} onChange={e => setFormData(prev => ({ ...prev, newsletter: e.target.checked }))} />
+                                <input id="check-newsletter" name="newsletter" type="checkbox" className="mt-1 w-4 h-4 text-green-600 rounded" checked={formData.newsletter} onChange={e => setFormData(prev => ({ ...prev, newsletter: e.target.checked }))} />
                                 <span>Subscribe to our **Newsletter** for latest news and updates.</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer mt-2">
-                                <input id="check-marketing" name="marketing" type="checkbox" className="mt-1 w-4 h-4 text-green-600 rounded" checked={(formData as any).marketing} onChange={e => setFormData(prev => ({ ...prev, marketing: e.target.checked }))} />
+                                <input id="check-marketing" name="marketing" type="checkbox" className="mt-1 w-4 h-4 text-green-600 rounded" checked={formData.marketing} onChange={e => setFormData(prev => ({ ...prev, marketing: e.target.checked }))} />
                                 <span>I agree to receive **Promotional Pricing** and special offers.</span>
                             </label>
                         </div>
