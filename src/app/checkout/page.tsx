@@ -94,11 +94,10 @@ export default function CheckoutPage() {
         setSendingEmailCode(true)
         setError(null)
         try {
-            const token = await executeRecaptcha('CHECKOUT_VERIFY')
             const res = await fetch('/api/validate/email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: formData.email, recaptchaToken: token })
+                body: JSON.stringify({ email: formData.email })
             })
             const data = await res.json()
             if (data.success) {
