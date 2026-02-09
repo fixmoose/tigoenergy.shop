@@ -425,9 +425,14 @@ export default function CheckoutPage() {
 
     const validateForm = (): boolean => {
         const requiredFields = [
-            'email', 'shipping_phone', 'shipping_first_name', 'shipping_last_name',
+            'email', 'shipping_phone',
             'shipping_street', 'shipping_city', 'shipping_postal_code'
         ]
+        if (user) {
+            requiredFields.push('shipping_first_name', 'shipping_last_name')
+        } else {
+            requiredFields.push('company_name')
+        }
         if (!billingSame) {
             requiredFields.push('billing_first_name', 'billing_last_name', 'billing_street', 'billing_city', 'billing_postal_code')
         }
@@ -474,6 +479,16 @@ export default function CheckoutPage() {
         try {
             const token = await executeRecaptcha('CHECKOUT')
             const data = new FormData(e.currentTarget)
+
+            // Logic for guest name handling
+            if (!user) {
+                const guestName = data.get('company_name') as string
+                if (guestName && !data.get('shipping_first_name')) {
+                    data.set('shipping_first_name', guestName)
+                    data.set('shipping_last_name', '')
+                }
+            }
+
             data.append('cart_items', JSON.stringify(items))
             data.append('language', currentLanguage.code)
             data.append('recaptcha_token', token)
@@ -666,7 +681,7 @@ export default function CheckoutPage() {
                                     <label className="block text-sm font-medium mb-1">
                                         {!user ? "Name (First, Last and/or Company)" : t('companyName')}
                                     </label>
-                                    <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                                    <input type="text" name="company_name" required={!user} value={formData.company_name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('vatId')}</label>
@@ -693,8 +708,12 @@ export default function CheckoutPage() {
                                         </p>
                                     )}
                                 </div>
-                                <input type="text" name="shipping_first_name" required value={formData.shipping_first_name} onChange={handleChange} className={getInputClass('shipping_first_name')} placeholder={t('firstName')} />
-                                <input type="text" name="shipping_last_name" required value={formData.shipping_last_name} onChange={handleChange} className={getInputClass('shipping_last_name')} placeholder={t('lastName')} />
+                                {user && (
+                                    <>
+                                        <input type="text" name="shipping_first_name" required value={formData.shipping_first_name} onChange={handleChange} className={getInputClass('shipping_first_name')} placeholder={t('firstName')} />
+                                        <input type="text" name="shipping_last_name" required value={formData.shipping_last_name} onChange={handleChange} className={getInputClass('shipping_last_name')} placeholder={t('lastName')} />
+                                    </>
+                                )}
                                 <div className="md:col-span-2">
                                     <input
                                         ref={shippingRef}
