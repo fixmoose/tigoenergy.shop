@@ -872,8 +872,8 @@ export default function CheckoutPage() {
                                 <span className="text-amber-500 text-sm">ℹ️</span>
                                 <div className="text-[11px] text-amber-900 leading-relaxed">
                                     <span className="font-bold block mb-0.5 uppercase tracking-wider opacity-70">Payment Information</span>
-                                    Direct bank transfers via Wise are <strong>100% free</strong>.
-                                    Please note that a <strong>3% processing fee</strong> applies to the total order amount only if paying via Credit or Debit Card.
+                                    Direct bank transfers via Wise (IBAN) have a <strong>€ 0 fee</strong>.
+                                    Please note that a <strong>3% processing fee</strong> applies to all other payments, including Apple Pay and Credit/Debit cards.
                                 </div>
                             </div>
                         </div>
