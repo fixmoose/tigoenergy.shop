@@ -477,6 +477,7 @@ export default function CheckoutPage() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        const form = e.currentTarget
         setError(null)
         setInvalidFields([])
         console.log('Submitting form...')
@@ -493,7 +494,7 @@ export default function CheckoutPage() {
 
         try {
             const token = await executeRecaptcha('CHECKOUT')
-            const data = new FormData(e.currentTarget)
+            const data = new FormData(form)
 
             // Logic for guest name handling
             if (!user) {
