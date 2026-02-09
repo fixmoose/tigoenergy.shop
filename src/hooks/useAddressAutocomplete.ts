@@ -131,7 +131,7 @@ export function useAddressAutocomplete(onAddressSelected: (address: ParsedAddres
                     if (types.includes('neighborhood')) neighborhood = component.long_name
                     if (types.includes('administrative_area_level_2')) admin_area_2 = component.long_name
                     if (types.includes('postal_code')) address.postal_code = component.long_name
-                    if (types.includes('country')) address.country = component.short_name
+                    if (types.includes('country')) address.country = component.short_name.toUpperCase()
                     if (types.includes('administrative_area_level_1')) address.state = component.long_name
                 })
 

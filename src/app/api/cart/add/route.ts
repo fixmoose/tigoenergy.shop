@@ -13,13 +13,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid item' }, { status: 400 })
     }
 
-    // Determine server-side user (if logged in)
+    // Determine identifier (user or guest cart)
     const supabase = await createClient()
     const { data: { user } = {} } = await supabase.auth.getUser()
     const userId = user?.id
 
+    // Check for cartId in body or cookie
+    const cookieCartId = request.cookies.get('cartId')?.value
+    const cartId = bodyCartId || cookieCartId
+
     // Allow guest carts, but don't persist them (session cookie)
-    const cart = await addToCart({ userId }, item)
+    const cart = await addToCart({ userId, cartId }, item)
 
     const res = NextResponse.json({ cart, cartId: cart.id })
 

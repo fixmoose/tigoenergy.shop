@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useMarket } from '@/contexts/MarketContext'
@@ -10,21 +10,13 @@ import { useTranslations } from 'next-intl'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 
-// Mock countries for valid EU selection
-const COUNTRIES = [
-    { code: 'DE', name: 'Germany' },
-    { code: 'AT', name: 'Austria' },
-    { code: 'FR', name: 'France' },
-    { code: 'IT', name: 'Italy' },
-    { code: 'ES', name: 'Spain' },
-    { code: 'NL', name: 'Netherlands' },
-    { code: 'BE', name: 'Belgium' },
-    { code: 'PL', name: 'Poland' },
-    { code: 'CZ', name: 'Czech Republic' },
-    { code: 'CH', name: 'Switzerland' },
-    { code: 'SI', name: 'Slovenia' },
-    { code: 'HR', name: 'Croatia' }
-]
+import { MARKETS, getMarketKeyFromHostname } from '@/lib/constants/markets'
+
+// Deriving comprehensive countries list from MARKETS config
+const COUNTRIES = Object.values(MARKETS)
+    .filter(m => m.key !== 'SHOP' && m.key !== 'EU')
+    .map(m => ({ code: m.country, name: m.countryName }))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
 const COUNTRY_PREFIXES: Record<string, string> = {
     'SI': '+386',
@@ -88,6 +80,63 @@ export default function CheckoutPage() {
     const [validatingVat, setValidatingVat] = useState(false)
     const [vatResult, setVatResult] = useState<any>(null)
     const [localIsB2B, setLocalIsB2B] = useState<boolean | null>(null)
+    const [emailVerified, setEmailVerified] = useState(false)
+    const [emailCodeSent, setEmailCodeSent] = useState(false)
+    const [emailCode, setEmailCode] = useState('')
+    const [sendingEmailCode, setSendingEmailCode] = useState(false)
+    const [verifyingEmail, setVerifyingEmail] = useState(false)
+
+    const isValidEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+
+    const handleSendEmailCode = async () => {
+        setSendingEmailCode(true)
+        setError(null)
+        try {
+            const token = await executeRecaptcha('CHECKOUT_VERIFY')
+            const res = await fetch('/api/validate/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, recaptchaToken: token })
+            })
+            const data = await res.json()
+            if (data.success) {
+                setEmailCodeSent(true)
+            } else {
+                setError(data.error || 'Failed to send verification code')
+                resetRecaptcha()
+            }
+        } catch (err: any) {
+            setError('Verification service unavailable. Please try again.')
+            resetRecaptcha()
+        } finally {
+            setSendingEmailCode(false)
+        }
+    }
+
+    const handleVerifyEmail = async () => {
+        setVerifyingEmail(true)
+        setError(null)
+        try {
+            const res = await fetch('/api/validate/email/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email, code: emailCode })
+            })
+            const data = await res.json()
+            if (data.success) {
+                setEmailVerified(true)
+            } else {
+                setError(data.error || 'Invalid verification code')
+            }
+        } catch (err) {
+            setError('Verification failed. Please try again.')
+        } finally {
+            setVerifyingEmail(false)
+        }
+    }
+
     const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const { inputRef: shippingRef, isLoaded: isShippingLoaded, hasError: hasShippingError } = useAddressAutocomplete((parsed) => {
@@ -100,6 +149,8 @@ export default function CheckoutPage() {
         }))
     })
 
+    const passwordRef = useRef<HTMLInputElement>(null)
+
     const { inputRef: billingRef, isLoaded: isBillingLoaded, hasError: hasBillingError } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
@@ -110,13 +161,22 @@ export default function CheckoutPage() {
         }))
     })
 
+    useEffect(() => {
+        if (createAccount) {
+            // Short delay to allow the animation/rendering to complete
+            const timer = setTimeout(() => {
+                passwordRef.current?.focus()
+            }, 100)
+            return () => clearTimeout(timer)
+        }
+    }, [createAccount])
+
     const effectiveIsB2B = localIsB2B !== null ? localIsB2B : isB2B
 
     // Prefill State
     const [formData, setFormData] = useState(() => {
         let initialCountry = 'DE'
         if (typeof window !== 'undefined') {
-            const { getMarketKeyFromHostname, MARKETS } = require('@/lib/constants/markets')
             const marketKey = getMarketKeyFromHostname(window.location.hostname)
             const market = MARKETS[marketKey]
             if (market && market.country !== 'EU') {
@@ -387,6 +447,12 @@ export default function CheckoutPage() {
             window.scrollTo({ top: 0, behavior: 'smooth' })
             return false
         }
+        if (!user && !emailVerified) {
+            setError("Please verify your email address first")
+            setInvalidFields(['email'])
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return false
+        }
         return true
     }
 
@@ -394,7 +460,11 @@ export default function CheckoutPage() {
         e.preventDefault()
         setError(null)
         setInvalidFields([])
-        if (!validateForm()) return
+        console.log('Submitting form...')
+        if (!validateForm()) {
+            console.log('Form validation failed:', { invalidFields, error })
+            return
+        }
         if (createAccount && formData.password !== formData.confirm_password) {
             setError("Passwords do not match")
             setInvalidFields(['password', 'confirm_password'])
@@ -469,12 +539,14 @@ export default function CheckoutPage() {
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('secureCheckout')}</h1>
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        {invalidFields.length > 0 && (
-                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+                        {(invalidFields.length > 0 || error) && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
                                 <span className="text-2xl">⚠️</span>
                                 <div>
-                                    <h3 className="font-bold text-red-800">{t('requiredFields')}</h3>
-                                    <p className="text-sm text-red-600">{t('requiredFieldsDesc')}</p>
+                                    <h3 className="font-bold text-red-800">{error || t('requiredFields')}</h3>
+                                    {invalidFields.length > 0 && (
+                                        <p className="text-sm text-red-600">{t('requiredFieldsDesc')}</p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -487,10 +559,62 @@ export default function CheckoutPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('emailAddress')} <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="email" name="email" required value={formData.email} onChange={handleChange} readOnly={!!user}
-                                        className={`${getInputClass('email')} ${user ? 'bg-gray-100 text-gray-500' : ''}`}
-                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="email" name="email" required value={formData.email}
+                                            onChange={handleChange}
+                                            readOnly={!!user || emailVerified}
+                                            className={`${getInputClass('email')} ${(user || emailVerified) ? 'bg-gray-100 text-gray-500' : ''}`}
+                                        />
+                                        {!user && !emailVerified && isValidEmail(formData.email) && !emailCodeSent && (
+                                            <button
+                                                type="button"
+                                                onClick={handleSendEmailCode}
+                                                disabled={sendingEmailCode}
+                                                className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-700 transition shrink-0 shadow-sm"
+                                            >
+                                                {sendingEmailCode ? '...' : 'Verify'}
+                                            </button>
+                                        )}
+                                        {emailVerified && (
+                                            <div className="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shrink-0">
+                                                ✓ Verified
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {!user && emailCodeSent && !emailVerified && (
+                                        <div className="mt-3 p-4 bg-green-50 rounded-xl border border-green-100 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-[11px] font-bold text-green-800 uppercase tracking-wider">Verification Code Sent</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEmailCodeSent(false)}
+                                                    className="text-[10px] text-green-600 hover:text-green-800 font-bold uppercase tracking-widest bg-white px-2 py-1 rounded border border-green-200"
+                                                >
+                                                    Change Email
+                                                </button>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={emailCode}
+                                                    onChange={(e) => setEmailCode(e.target.value)}
+                                                    className="flex-1 border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm text-center tracking-[0.5em] font-black"
+                                                    placeholder="000000"
+                                                    maxLength={6}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleVerifyEmail}
+                                                    disabled={verifyingEmail || emailCode.length < 6}
+                                                    className="bg-green-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-green-700 transition shadow-sm"
+                                                >
+                                                    {verifyingEmail ? '...' : 'Confirm'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('phoneNumber')} <span className="text-red-500">*</span></label>
@@ -510,7 +634,7 @@ export default function CheckoutPage() {
                                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-green-50/50 p-6 rounded-xl border border-green-100 animate-in slide-in-from-top-2 duration-300">
                                             <div>
                                                 <label className="block text-xs font-bold text-green-800 mb-1 uppercase tracking-wider">{t('password')}</label>
-                                                <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
+                                                <input ref={passwordRef} type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-bold text-green-800 mb-1 uppercase tracking-wider">{t('confirmPassword')}</label>
@@ -540,7 +664,9 @@ export default function CheckoutPage() {
                             )}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium mb-1">{t('companyName')}</label>
+                                    <label className="block text-sm font-medium mb-1">
+                                        {!user ? "Name (First, Last and/or Company)" : t('companyName')}
+                                    </label>
                                     <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" />
                                 </div>
                                 <div className="md:col-span-2">
@@ -794,6 +920,12 @@ export default function CheckoutPage() {
                             <div className="mt-4 py-2 flex justify-center">
                                 <div ref={recaptchaRef}></div>
                             </div>
+
+                            {error && (
+                                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-bold animate-pulse">
+                                    ⚠️ {error}
+                                </div>
+                            )}
 
                             <button type="submit" disabled={submitting} className="w-full mt-6 bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
                                 {submitting ? t('processing') : t('placeOrder')}

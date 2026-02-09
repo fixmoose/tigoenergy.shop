@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { Product } from '@/types/database'
+import { useCart } from '@/contexts/CartContext'
 import { useTranslations } from 'next-intl'
 import { EffectivePrice } from '@/lib/db/pricing'
 
@@ -18,6 +19,7 @@ function setCookie(name: string, value: string, days = 30) {
 }
 
 export default function AddToCartButton({ product, userId, pricing }: { product: Product; userId?: string | null; pricing?: EffectivePrice }) {
+  const { addItem, openDrawer } = useCart()
   const tc = useTranslations('common')
   const productName = product.name_en
   const [quantity, setQuantity] = useState(1)
@@ -26,40 +28,26 @@ export default function AddToCartButton({ product, userId, pricing }: { product:
 
   async function handleAdd() {
     setMessage(null)
-
     setLoading(true)
     try {
-      const cartId = getCookie('cartId')
       const unitPrice = pricing?.isDiscounted ? pricing.discountedPrice : product.price_eur
 
-      const res = await fetch('/api/cart/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          cartId,
-          item: {
-            product_id: product.id,
-            sku: product.sku,
-            name: productName,
-            quantity,
-            unit_price: unitPrice,
-            image_url: product.images?.[0],
-            metadata: {
-              category: product.category,
-              subcategory: product.subcategory
-            }
-          }
-        }),
+      await addItem({
+        product_id: product.id,
+        sku: product.sku,
+        name: productName,
+        quantity,
+        unit_price: unitPrice,
+        image_url: product.images?.[0],
+        weight_kg: product.weight_kg,
+        metadata: {
+          category: product.category,
+          subcategory: product.subcategory
+        }
       })
 
-      const payload = await res.json()
-      if (!res.ok) throw new Error(payload?.error || 'Failed to add to cart')
-
-      // Persist cartId for guest users
-      if (!userId && payload?.cartId) setCookie('cartId', payload.cartId, 30)
-
       setMessage('Added to cart')
+      openDrawer() // Open drawer to show the success
     } catch (err: any) {
       setMessage(err?.message ?? 'Error')
     } finally {
