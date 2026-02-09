@@ -950,7 +950,8 @@ export default function CheckoutPage() {
                                             : ` ${t('warrantyReturnInfo')}`}
                                     </span>
                                 </label>
-                                <label className="flex items-start gap-2 cursor-pointer group">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" name="newsletter_subscribe" className="rounded text-green-600 focus:ring-green-500" />
                                     <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">
                                         {t('newsletterSubscribe')}
                                     </span>
