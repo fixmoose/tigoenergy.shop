@@ -867,6 +867,15 @@ export default function CheckoutPage() {
                                     </label>
                                 ))}
                             </div>
+
+                            <div className="mt-4 p-3 bg-amber-50/50 rounded-xl border border-amber-100 flex items-start gap-3 animate-in fade-in slide-in-from-top-1 duration-500">
+                                <span className="text-amber-500 text-sm">ℹ️</span>
+                                <div className="text-[11px] text-amber-900 leading-relaxed">
+                                    <span className="font-bold block mb-0.5 uppercase tracking-wider opacity-70">Payment Information</span>
+                                    Direct bank transfers via Wise are <strong>100% free</strong>.
+                                    Please note that a <strong>3% processing fee</strong> applies to the total order amount only if paying via Credit or Debit Card.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
