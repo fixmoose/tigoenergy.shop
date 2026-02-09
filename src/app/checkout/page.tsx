@@ -347,6 +347,7 @@ export default function CheckoutPage() {
                         setSelectedShippingId(filtered[0].id)
                     }
                 } else {
+                    console.warn(`No shipping rates found for ${formData.shipping_country} at weight ${totalWeight}kg`);
                     setSelectedShippingId(null)
                 }
             } catch (err) {
