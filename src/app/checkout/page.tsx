@@ -303,19 +303,32 @@ export default function CheckoutPage() {
                 const isSI = formData.shipping_country === 'SI'
 
                 if (isPalletMode) {
-                    // Only InterEuropa allowed for pallet shipments
-                    // EXCEPT for SI where we also allow Personal Pick-up
+                    // Large orders: Only InterEuropa or Personal Pick-up
                     filtered = filtered.filter(r =>
                         r.carrier === 'InterEuropa' ||
-                        (isSI && r.carrier === 'Personal Pick-up')
+                        r.carrier === 'Personal Pick-up'
                     )
                 } else {
-                    // Normal mode: Hide InterEuropa, allow GLS/DPD
-                    filtered = filtered.filter(r => r.carrier !== 'InterEuropa')
+                    // Normal orders: Show GLS and DPD, Hide InterEuropa
+                    filtered = filtered.filter(r =>
+                        r.carrier === 'GLS' ||
+                        r.carrier === 'DPD' ||
+                        r.carrier === 'Personal Pick-up'
+                    )
                 }
 
+                // Sorting: GLS > DPD > Others
+                filtered.sort((a, b) => {
+                    const order = ['GLS', 'DPD', 'InterEuropa', 'Personal Pick-up']
+                    const indexA = order.indexOf(a.carrier)
+                    const indexB = order.indexOf(b.carrier)
+                    if (indexA !== -1 && indexB !== -1) return indexA - indexB
+                    if (indexA !== -1) return -1
+                    if (indexB !== -1) return 1
+                    return 0
+                })
+
                 // Deduplication: Keep only one rate per carrier (the cheapest one)
-                // This prevents "InterEuropa appearing 5 times" issues
                 const uniqueRates = new Map<string, any>();
                 filtered.forEach(rate => {
                     const existing = uniqueRates.get(rate.carrier);
