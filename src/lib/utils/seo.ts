@@ -13,7 +13,7 @@ export const MARKET_DOMAINS: Record<string, string> = {
     IT: 'tigoenergy.it',
     ES: 'tigoenergy.es',
     BE: 'tigoenergy.be',
-    NL: 'tigoenergy.be', // Belgium domain serves Dutch speakers too
+    NL: 'tigoenergy.nl',
     PL: 'tigoenergy.pl',
     CZ: 'tigoenergy.cz',
     SK: 'tigoenergy.sk',
