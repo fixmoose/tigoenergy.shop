@@ -317,6 +317,17 @@ export default function CheckoutPage() {
                     )
                 }
 
+                // Deduplication: Keep only one rate per carrier + service type (the cheapest one)
+                const uniqueRates = new Map<string, any>();
+                filtered.forEach(rate => {
+                    const key = `${rate.carrier}-${rate.service_type}`;
+                    const existing = uniqueRates.get(key);
+                    if (!existing || rate.rate_eur < existing.rate_eur) {
+                        uniqueRates.set(key, rate);
+                    }
+                });
+                filtered = Array.from(uniqueRates.values());
+
                 // Sorting: GLS > DPD > Others
                 filtered.sort((a, b) => {
                     const order = ['GLS', 'DPD', 'InterEuropa', 'Personal Pick-up']
@@ -327,16 +338,6 @@ export default function CheckoutPage() {
                     if (indexB !== -1) return 1
                     return 0
                 })
-
-                // Deduplication: Keep only one rate per carrier (the cheapest one)
-                const uniqueRates = new Map<string, any>();
-                filtered.forEach(rate => {
-                    const existing = uniqueRates.get(rate.carrier);
-                    if (!existing || rate.rate_eur < existing.rate_eur) {
-                        uniqueRates.set(rate.carrier, rate);
-                    }
-                });
-                filtered = Array.from(uniqueRates.values());
 
                 setShippingRates(filtered)
 
