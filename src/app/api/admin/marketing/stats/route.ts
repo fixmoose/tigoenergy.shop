@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         const countryStats: Record<string, { count: number, revenue: number }> = {}
         const cityStats: Record<string, { count: number, country: string }> = {}
 
-        orders?.forEach(order => {
+        orders?.forEach((order: any) => {
             const country = order.delivery_country || 'Unknown'
             const revenue = Number(order.total) || 0
 
