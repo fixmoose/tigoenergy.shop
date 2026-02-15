@@ -12,21 +12,19 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 
+export const dynamic = 'force-dynamic'
+
 const inter = Inter({ subsets: ['latin'] })
 
 export async function generateMetadata(): Promise<Metadata> {
-  let marketKey = 'SHOP'
-  try {
-    const headersList = await headers()
-    marketKey = headersList.get('x-market-key') || 'SHOP'
-  } catch {
-    // Static rendering fallback
-  }
+  const headersList = await headers()
+  const marketKey = headersList.get('x-market-key') || 'SHOP'
   const market = getMarketFromKey(marketKey)
-  const domain = MARKET_DOMAINS[marketKey] || 'tigoenergy.shop'
+  const hostname = headersList.get('host') || 'tigoenergy.shop'
+  const protocol = hostname.includes('localhost') ? 'http' : 'https'
 
   return {
-    metadataBase: new URL(`https://${domain}`),
+    metadataBase: new URL(`${protocol}://${hostname}`),
     title: `Tigo Energy ${market.countryName} | Professional Solar Solutions`,
     description: 'Tigo Energy products across 21+ European markets. Optimizers, inverters, batteries and monitoring solutions.',
     alternates: {
