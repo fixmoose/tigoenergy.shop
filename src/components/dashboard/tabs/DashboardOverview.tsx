@@ -45,7 +45,17 @@ export default function DashboardOverview({ user, customer }: Props) {
             }
         }
 
-        window.location.href = `mailto:support@tigoenergy.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+        const params = new URLSearchParams({
+            subject: subject,
+            message: body
+        })
+
+        if (selectedOrder) {
+            const order = orders.find(o => o.id === selectedOrder)
+            if (order) params.set('orderId', order.id)
+        }
+
+        window.location.href = `/contact?${params.toString()}`
     }
 
     const scrollToSection = (id: string) => {

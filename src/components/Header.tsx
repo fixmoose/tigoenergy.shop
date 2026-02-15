@@ -253,7 +253,7 @@ export default function Header() {
               )}
 
               <span className="hidden md:inline">|</span>
-              <a href="mailto:support@tigoenergy.shop" className="hover:text-green-700 transition">{t('help')}</a>
+              <Link href="/contact" className="hover:text-green-700 transition">{t('help')}</Link>
             </div>
           </div>
         </div>
