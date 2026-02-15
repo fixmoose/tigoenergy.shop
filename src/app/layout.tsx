@@ -10,7 +10,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { buildHreflangAlternates, buildCanonicalUrl } from '@/lib/utils/seo'
+import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,8 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
     // Static rendering fallback
   }
   const market = getMarketFromKey(marketKey)
+  const domain = MARKET_DOMAINS[marketKey] || 'tigoenergy.shop'
 
   return {
+    metadataBase: new URL(`https://${domain}`),
     title: `Tigo Energy ${market.countryName} | Professional Solar Solutions`,
     description: 'Tigo Energy products across 21+ European markets. Optimizers, inverters, batteries and monitoring solutions.',
     alternates: {
