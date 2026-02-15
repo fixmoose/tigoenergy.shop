@@ -4,13 +4,16 @@ import type { Product } from '@/types/database'
 import { useCart } from '@/contexts/CartContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useTranslations } from 'next-intl'
+import { useMarket } from '@/contexts/MarketContext'
+import { getLocalizedName } from '@/lib/utils/localization'
 import type { EffectivePrice } from '@/lib/db/pricing'
 
 export default function ProductCard({ product, pricing }: { product: Product; pricing?: EffectivePrice }) {
   const { addItem } = useCart()
   const { formatPrice } = useCurrency()
+  const { currentLanguage } = useMarket()
   const tc = useTranslations('common')
-  const productName = product.name_en
+  const productName = getLocalizedName(product, currentLanguage.code) || ''
   const image = product.images && product.images.length ? product.images[0] : null
   const displayPrice = pricing?.isDiscounted ? pricing.discountedPrice : product.price_eur
 

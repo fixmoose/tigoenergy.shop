@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
-import { getLocalizedDescription } from '@/lib/utils/localization'
+import { getLocalizedDescription, getLocalizedName } from '@/lib/utils/localization'
 import { buildHreflangAlternates, buildCanonicalUrl } from '@/lib/utils/seo'
 import { getTranslations } from 'next-intl/server'
 import { getEffectivePrice } from '@/lib/db/pricing'
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const headersList = await headers()
   const marketKey = headersList.get('x-market-key') || 'SHOP'
   const market = getMarketFromKey(marketKey)
-  const productName = product.name_en
+  const productName = getLocalizedName(product, market.defaultLanguage) || product.name_en
   const productDescription = getLocalizedDescription(product, market.defaultLanguage)
   const path = `/products/${slug}`
 
@@ -67,7 +67,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const headersList = await headers()
   const marketKey = headersList.get('x-market-key') || 'SHOP'
   const market = getMarketFromKey(marketKey)
-  const productName = product.name_en
+  const productName = getLocalizedName(product, market.defaultLanguage) || product.name_en
 
   const tsub = await getTranslations('subcategories')
 

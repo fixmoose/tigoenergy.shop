@@ -5,7 +5,7 @@ import ReviewsSection from './ReviewsSection'
 import type { Product, Review } from '@/types/database'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useMarket } from '@/contexts/MarketContext'
-import { getLocalizedDescription } from '@/lib/utils/localization'
+import { getLocalizedDescription, getLocalizedName } from '@/lib/utils/localization'
 import { useTranslations } from 'next-intl'
 import { EffectivePrice } from '@/lib/db/pricing'
 
@@ -14,7 +14,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
   const { currentLanguage } = useMarket()
   const tc = useTranslations('common')
   const tp = useTranslations('products')
-  const productName = product.name_en
+  const productName = getLocalizedName(product, currentLanguage.code) || ''
   const productDescription = getLocalizedDescription(product, currentLanguage.code)
   // Use product images or placeholder
   const images = product.images && product.images.length ? product.images : ['/placeholder.png']
