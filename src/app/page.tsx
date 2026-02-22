@@ -7,11 +7,21 @@ import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 
 export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  let featuredProducts: any[] = []
 
-  // Get featured products
-  const { products: featuredProducts } = await getProducts({ limit: 4, featured: true })
+  try {
+    const supabase = await createClient()
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    user = authUser
+
+    // Get featured products
+    const { products } = await getProducts({ limit: 4, featured: true })
+    featuredProducts = products
+  } catch (error) {
+    console.error('Error fetching home page data:', error)
+    // Fallback: featuredProducts remains empty, user remains null
+  }
 
   const t = await getTranslations('home')
   const tsub = await getTranslations('subcategories')

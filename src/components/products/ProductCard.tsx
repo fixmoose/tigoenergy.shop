@@ -125,9 +125,14 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                   </div>
                 </div>
               ) : (
-                <span className="text-xl font-bold text-gray-900">
-                  {formatPrice(product.price_eur)}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-gray-900 leading-tight">
+                    {formatPrice(product.price_eur)}
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-medium leading-none">
+                    DDV vključen
+                  </span>
+                </div>
               )}
             </div>
             <button

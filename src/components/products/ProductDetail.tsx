@@ -153,7 +153,10 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                   </div>
                 </div>
               ) : (
-                formatPrice(product.price_eur)
+                <div className="flex flex-col">
+                  <span>{formatPrice(product.price_eur)}</span>
+                  <span className="text-sm text-gray-400 font-medium -mt-1">DDV vključen</span>
+                </div>
               )}
             </div>
             {product.weight_kg > 0 && (
