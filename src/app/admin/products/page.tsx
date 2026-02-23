@@ -6,7 +6,6 @@ import AdminReviewsList from '@/components/admin/AdminReviewsList'
 import ProductInventoryList from '@/components/admin/ProductInventoryList'
 import CategoryManager from '@/components/admin/CategoryManager'
 import CatalogGenerator from '@/components/admin/CatalogGenerator'
-import MockStockCleanupButton from '@/components/admin/MockStockCleanupButton'
 
 export default async function AdminProductsPage({ searchParams }: { searchParams?: Promise<{ q?: string }> }) {
   const supabase = await createClient()
@@ -46,7 +45,6 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
               <Link href="/admin/products/new" className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 font-medium transition-colors">
                 + Add a New Product
               </Link>
-              <MockStockCleanupButton />
             </div>
             <span className="text-xs bg-gray-200 px-2 py-1 rounded-full text-gray-600">{products.length}</span>
           </div>

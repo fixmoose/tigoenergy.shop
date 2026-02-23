@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
       } else {
         setMessage('Password reset successfully! Redirecting...')
         setTimeout(() => {
-          router.push('/admin/sign-in')
+          router.push('/auth/login')
         }, 2000)
       }
     } catch (err: any) {
@@ -56,29 +56,57 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto mt-12">
-      <h1 className="text-2xl font-semibold mb-4">Reset Password</h1>
-      {error && <div className="bg-red-100 text-red-700 p-3 mb-4 rounded">{error}</div>}
-      {message && <div className="bg-green-100 text-green-700 p-3 mb-4 rounded">{message}</div>}
-      <form onSubmit={handleResetPassword} className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium">New Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter new password (min 6 chars)"
-            className="w-full border rounded px-3 py-2"
+    <div className="min-h-[60vh] flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Set New Password</h2>
+          <p className="text-sm text-gray-500 mt-2">Enter a secure new password for your account.</p>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100 mb-6 font-medium text-center">
+            {message}
+          </div>
+        )}
+
+        <form onSubmit={handleResetPassword} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Min 6 characters"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="py-2">
+            <div ref={recaptchaRef}></div>
+          </div>
+
+          <button
+            type="submit"
             disabled={loading}
-          />
-        </div>
-        <div className="py-2">
-          <div ref={recaptchaRef}></div>
-        </div>
-        <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 disabled:opacity-50">
-          {loading ? 'Resetting...' : 'Reset Password'}
-        </button>
-      </form>
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : 'Update Password'}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

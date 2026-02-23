@@ -78,7 +78,7 @@ export default function LoginForm() {
                 <div>
                     <div className="flex items-center justify-between mb-1">
                         <label htmlFor="login-pwd" className="block text-sm font-medium text-gray-700">Password</label>
-                        <Link href="/auth/reset-password" className="text-xs text-green-600 hover:text-green-700 font-medium">Forgot Password?</Link>
+                        <Link href="/auth/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-medium">Forgot Password?</Link>
                     </div>
                     <input
                         id="login-pwd"

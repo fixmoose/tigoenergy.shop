@@ -374,6 +374,60 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
             <input type="number" value={product.low_stock_threshold ?? ''} onChange={(e) => setField('low_stock_threshold', Number(e.target.value))} className="border rounded w-full px-2 py-1 text-sm" />
           </div>
         </div>
+
+        {/* New Card: Images */}
+        <div className="bg-white p-5 rounded-xl border shadow-sm space-y-4 md:col-span-2 lg:col-span-4">
+          <div className="flex justify-between items-center border-b pb-2">
+            <h3 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Product Images</h3>
+            <div className="text-[10px] text-gray-400 font-bold">{(product.images?.length || 0) + files.length} Total</div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+            {product.images?.map((url, idx) => (
+              <div key={idx} className="relative group aspect-square bg-gray-50 rounded-lg border overflow-hidden">
+                <img src={url} alt="" className="w-full h-full object-contain" />
+                <button
+                  onClick={() => {
+                    const updated = [...(product.images ?? [])]
+                    updated.splice(idx, 1)
+                    setField('images', updated)
+                  }}
+                  className="absolute top-1 right-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+            ))}
+            {files.map((file, idx) => (
+              <div key={`new-${idx}`} className="relative aspect-square bg-blue-50/50 rounded-lg border border-blue-100 border-dashed overflow-hidden flex items-center justify-center">
+                <span className="text-[10px] text-blue-500 font-bold uppercase text-center px-1 truncate">{file.name}</span>
+                <div className="absolute top-0 right-0 bg-blue-500 text-white text-[8px] px-1 rounded-bl">New</div>
+                <button
+                  onClick={() => {
+                    const f = [...files]
+                    f.splice(idx, 1)
+                    setFiles(f)
+                  }}
+                  className="absolute top-1 right-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-full p-1 shadow-sm"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+            ))}
+            <label className="aspect-square bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer flex flex-col items-center justify-center gap-1 group">
+              <svg className="w-6 h-6 text-gray-300 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-500">Upload</span>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files) setFiles(prev => [...prev, ...Array.from(e.target.files!)])
+                }}
+              />
+            </label>
+          </div>
+        </div>
       </div>
 
       {/* Description */}
@@ -386,10 +440,51 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
         <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4 h-fit">
           <h3 className="font-semibold text-gray-800 border-b pb-2">Procurement & Packaging</h3>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold">CN Code</label>
-              <input value={product.cn_code ?? ''} onChange={(e) => setField('cn_code', e.target.value)} className="border rounded w-48 px-2 py-1 font-mono" />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold">CN Code</label>
+                <input value={product.cn_code ?? ''} onChange={(e) => setField('cn_code', e.target.value)} className="border rounded w-full px-2 py-1 font-mono text-sm" placeholder="e.g. 85044085" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold">Country of Origin</label>
+                <input value={product.country_of_origin ?? ''} onChange={(e) => setField('country_of_origin', e.target.value)} className="border rounded w-full px-2 py-1 font-mono text-sm" placeholder="e.g. CN, DE, SI" />
+              </div>
             </div>
+
+            <div className="border-t pt-4 space-y-3">
+              <h4 className="font-semibold text-sm">Environmental Compliance</h4>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="is_electrical"
+                  checked={product.is_electrical_equipment ?? false}
+                  onChange={(e) => setField('is_electrical_equipment', e.target.checked)}
+                  className="w-4 h-4 text-green-600 rounded"
+                />
+                <label htmlFor="is_electrical" className="text-xs font-bold text-gray-700">Electrical / Electronic Equipment (WEEE)</label>
+              </div>
+
+              {product.is_electrical_equipment && (
+                <div className="pl-6 space-y-2">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">WEEE Reporting Category (eTROD)</label>
+                  <select
+                    value={product.trod_category_code ?? ''}
+                    onChange={(e) => setField('trod_category_code', e.target.value)}
+                    className="border rounded w-full px-2 py-1.5 text-xs font-medium"
+                  >
+                    <option value="">Select Category...</option>
+                    <option value="1">1 - Oprema za toplotno izmenjavo</option>
+                    <option value="2">2 - Zasloni, monitorji in oprema z zasloni ( &gt; 100 cm²)</option>
+                    <option value="3">3 - Sijalke (Lamps)</option>
+                    <option value="4">4 - Velika oprema ( &gt; 50 cm)</option>
+                    <option value="5">5 - Majhna oprema ( ≤ 50 cm)</option>
+                    <option value="6">6 - Majhna oprema za IT in telekomunikacije</option>
+                    <option value="7-PBA">7-PBA - Prenosne baterije in akumulatorji</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <div className="border-t pt-4">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-semibold text-sm">Packaging Materials</h4>
@@ -448,10 +543,15 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
             {(product.supplier_invoices as any[] ?? []).sort((a, b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime()).map(inv => (
               <div key={inv.id} className="flex-none w-56 bg-white border border-gray-100 rounded-xl p-3 shadow-sm hover:shadow-md transition">
                 <div className="flex justify-between items-start mb-2">
-                  <div className="font-black text-gray-900 truncate flex-1 pr-2">{inv.invoice_number}</div>
-                  {isIntrastatLocked(inv.invoice_date) && (
-                    <span className="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 font-bold uppercase">Locked</span>
-                  )}
+                  <div className="font-black text-gray-900 truncate flex-1 pr-2">#{inv.invoice_number}</div>
+                  <div className="flex flex-col items-end gap-1">
+                    {inv.country_of_purchase && (
+                      <span className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100 font-bold uppercase">{inv.country_of_purchase}</span>
+                    )}
+                    {isIntrastatLocked(inv.invoice_date) && (
+                      <span className="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 font-bold uppercase">Locked</span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-gray-400 text-[10px] uppercase font-black tracking-widest mb-3">{new Date(inv.invoice_date).toLocaleDateString()}</div>
                 <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-100 mb-3">
@@ -472,6 +572,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                       (m.querySelector('[name=inv_date]') as HTMLInputElement).value = inv.invoice_date;
                       (m.querySelector('[name=inv_qty]') as HTMLInputElement).value = inv.quantity;
                       (m.querySelector('[name=inv_cost]') as HTMLInputElement).value = inv.unit_cost_gross;
+                      (m.querySelector('[name=inv_origin]') as HTMLInputElement).value = inv.country_of_purchase || '';
                     }
                   }} className="text-gray-400 hover:text-blue-600">✎</button>
                   <button onClick={() => {
@@ -605,6 +706,10 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quantity</label>
                 <input name="inv_qty" type="number" placeholder="20" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
               </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Country of Purchase</label>
+                <input name="inv_origin" placeholder="DE" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -671,6 +776,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                 unit_cost_gross: Number((m?.querySelector('[name=inv_cost]') as HTMLInputElement).value) * conversionRate,
                 currency: invoiceCurrency,
                 conversion_rate: conversionRate,
+                country_of_purchase: (m?.querySelector('[name=inv_origin]') as HTMLInputElement).value || '',
                 url: path || ((product.supplier_invoices as any[])?.find(x => x.id === editingInvoiceId)?.url)
               };
 

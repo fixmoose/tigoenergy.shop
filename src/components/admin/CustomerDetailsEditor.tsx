@@ -61,12 +61,33 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                 </div>
                 <div className="flex gap-2">
                     {!isEditing ? (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="bg-white border border-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 shadow-sm"
-                        >
-                            Edit
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Send password reset email to this customer?')) return
+                                    setLoading(true)
+                                    try {
+                                        const { adminResetCustomerPasswordAction } = await import('@/app/actions/admin')
+                                        const res = await adminResetCustomerPasswordAction(customer.id)
+                                        if (res.success) alert('Reset email sent successfully!')
+                                    } catch (err: any) {
+                                        alert('Error: ' + err.message)
+                                    } finally {
+                                        setLoading(false)
+                                    }
+                                }}
+                                disabled={loading}
+                                className="bg-white border border-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-orange-600 hover:bg-orange-50 shadow-sm disabled:opacity-50"
+                            >
+                                Reset Password
+                            </button>
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="bg-white border border-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 shadow-sm"
+                            >
+                                Edit
+                            </button>
+                        </div>
                     ) : (
                         <div className="flex gap-2">
                             <button

@@ -207,6 +207,56 @@ export async function adminDeleteCustomerAction(id: string) {
 }
 
 /**
+ * Admin triggers a password reset for a customer
+ */
+export async function adminResetCustomerPasswordAction(customerId: string) {
+    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+    try {
+        const supabase = await createAdminClient()
+
+        // 1. Get the customer email
+        const { data: customer, error: fetchError } = await supabase
+            .from('customers')
+            .select('email')
+            .eq('id', customerId)
+            .single()
+
+        if (fetchError || !customer) throw new Error('Customer not found')
+
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+        if (!siteUrl) throw new Error('Site configuration error')
+
+        // 2. Generate the recovery link
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: customer.email,
+            options: {
+                redirectTo: `${siteUrl}/auth/reset-password`
+            }
+        })
+
+        if (linkError) throw linkError
+
+        // 3. Render and send the email
+        const html = await renderTemplate('password-reset', {
+            reset_link: linkData.properties.action_link
+        }, 'en') // Defaulting to en, could be expanded to use customer.language
+
+        await sendEmail({
+            to: customer.email,
+            subject: 'Password Reset Request',
+            html
+        })
+
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminResetCustomerPasswordAction:', err)
+        throw new Error(err.message || 'Failed to trigger password reset')
+    }
+}
+
+/**
  * Admin creates an order
  */
 export async function adminCreateOrderAction(payload: any) {

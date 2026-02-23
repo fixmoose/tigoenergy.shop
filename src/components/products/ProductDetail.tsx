@@ -140,7 +140,9 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
 
           <div className="mt-6 flex items-baseline gap-4 border-b border-gray-100 pb-6">
             <div className="text-4xl font-bold text-gray-900">
-              {pricing?.isDiscounted ? (
+              {product.stock_status === 'out_of_stock' ? (
+                <span className="text-xl font-bold text-gray-400 uppercase tracking-widest">{tc('outOfStock')}</span>
+              ) : pricing?.isDiscounted ? (
                 <div className="flex flex-col">
                   <span className="text-sm text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
                   <div className="flex items-center gap-2">

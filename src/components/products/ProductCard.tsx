@@ -20,9 +20,11 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
   const displayPrice = pricing?.isDiscounted ? pricing.discountedPrice : product.price_eur
 
   // Logic for Stock Status
-  const isOutOfStock = product.stock_status === 'out_of_stock' || (product.stock_quantity ?? 0) <= 0
-  const isComingSoon = product.stock_status === 'coming_soon'
+  const isAvailableToOrder = product.stock_status === 'available_to_order'
   const isSpecialOrder = product.stock_status === 'special_order'
+  const isComingSoon = product.stock_status === 'coming_soon'
+  const isOutOfStock = product.stock_status === 'out_of_stock' ||
+    (!isAvailableToOrder && !isSpecialOrder && !isComingSoon && (product.stock_quantity ?? 0) <= 0)
 
   // Can add to cart? (In Stock or Special Order, but NOT Out of Stock or Coming Soon)
   const canAddToCart = !isOutOfStock && !isComingSoon
@@ -89,12 +91,17 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
               {tc('specialOrder')}
             </span>
           )}
-          {isLowStock && (
+          {!isOutOfStock && isAvailableToOrder && (
+            <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
+              {tc('availableToOrder')}
+            </span>
+          )}
+          {!isAvailableToOrder && !isSpecialOrder && isLowStock && (
             <span className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('lowStock')}
             </span>
           )}
-          {isNormalStock && (
+          {!isAvailableToOrder && !isSpecialOrder && isNormalStock && (
             <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('inStock')}
             </span>
@@ -114,7 +121,9 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
           {/* Price & Add to Cart */}
           <div className="mt-4 flex items-center justify-between">
             <div>
-              {pricing?.isDiscounted ? (
+              {isOutOfStock ? (
+                <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">{tc('outOfStock')}</span>
+              ) : pricing?.isDiscounted ? (
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
                   <div className="flex items-center gap-1">
