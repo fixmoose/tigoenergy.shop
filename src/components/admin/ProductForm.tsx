@@ -19,7 +19,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
   const [mounted, setMounted] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [files, setFiles] = useState<File[]>([])
-  const [allProducts, setAllProducts] = useState<Array<Pick<Product, 'id' | 'name_en' | 'sku' | 'images'>>>([])
+  const [allProducts, setAllProducts] = useState<Array<Pick<Product, 'id' | 'name_en' | 'sku' | 'images' | 'stock_quantity'>>>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [categories, setCategories] = useState<{ id: string, name: string, parent_id: string | null }[]>([])
   const [loading, setLoading] = useState(true)
@@ -125,7 +125,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     async function fetchProducts() {
       const { data } = await supabase
         .from('products')
-        .select('id, name_en, sku, images')
+        .select('id, name_en, sku, images, stock_quantity')
         .order('name_en', { ascending: true })
       if (data) setAllProducts(data)
     }
@@ -398,24 +398,42 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                 </div>
               </div>
               <div className="space-y-2">
-                {Object.entries(product.packaging_material_weights || { 'cardboard': 0 }).map(([material, weight], idx) => (
-                  <div key={idx} className="flex gap-2 items-end">
-                    <select value={material} onChange={(e) => {
-                      const cur = { ...product.packaging_material_weights }; delete cur[material]; cur[e.target.value] = weight; setField('packaging_material_weights', cur)
-                    }} className="border rounded flex-1 px-2 py-1 text-xs">
-                      <option value="cardboard">Cardboard</option>
-                      <option value="plastic">Plastic</option>
-                      <option value="foam">Foam</option>
-                      <option value="metal">Metal</option>
-                      <option value="wood">Wood</option>
-                    </select>
-                    <input type="number" step="0.001" value={weight} onChange={(e) => {
-                      const cur = { ...product.packaging_material_weights }; cur[material] = parseFloat(e.target.value) || 0; setField('packaging_material_weights', cur)
-                    }} className="border rounded w-28 px-2 py-1 text-xs font-mono" />
-                    <button onClick={() => { const cur = { ...product.packaging_material_weights }; delete cur[material]; setField('packaging_material_weights', cur) }} className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-red-500">×</button>
-                  </div>
-                ))}
-                <button onClick={() => setField('packaging_material_weights', { ...product.packaging_material_weights, '': 0 })} className="text-xs text-blue-600 font-bold hover:underline">+ Add Material</button>
+                <div className="space-y-2">
+                  {Object.entries(product.packaging_material_weights || { 'cardboard': 0 }).map(([material, weight], idx) => (
+                    <div key={idx} className="flex gap-2 items-end">
+                      <select
+                        value={material.startsWith('temp_') ? '' : material}
+                        onChange={(e) => {
+                          const cur = { ...product.packaging_material_weights };
+                          delete cur[material];
+                          cur[e.target.value] = weight;
+                          setField('packaging_material_weights', cur)
+                        }}
+                        className="border rounded flex-1 px-2 py-1 text-xs"
+                      >
+                        <option value="" disabled>Select type...</option>
+                        <option value="cardboard">Cardboard</option>
+                        <option value="plastic">Plastic</option>
+                        <option value="foam">Foam</option>
+                        <option value="metal">Metal</option>
+                        <option value="wood">Wood</option>
+                      </select>
+                      <input type="number" step="0.001" value={weight} onChange={(e) => {
+                        const cur = { ...product.packaging_material_weights }; cur[material] = parseFloat(e.target.value) || 0; setField('packaging_material_weights', cur)
+                      }} className="border rounded w-28 px-2 py-1 text-xs font-mono" />
+                      <button onClick={() => { const cur = { ...product.packaging_material_weights }; delete cur[material]; setField('packaging_material_weights', cur) }} className="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-red-500">×</button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      const tempKey = `temp_${Date.now()}`;
+                      setField('packaging_material_weights', { ...product.packaging_material_weights, [tempKey]: 0 });
+                    }}
+                    className="text-xs text-blue-600 font-bold hover:underline"
+                  >
+                    + Add Material
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -507,7 +525,12 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                       <img src={p.images?.[0] || ''} alt="" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-gray-900 truncate">{p.name_en}</p>
+                      <div className="flex justify-between items-start">
+                        <p className="text-xs font-bold text-gray-900 truncate">{p.name_en}</p>
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${p.stock_quantity && p.stock_quantity > 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+                          {p.stock_quantity || 0} in stock
+                        </span>
+                      </div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{p.sku}</p>
                     </div>
                     <input type="checkbox" checked={isSelected} readOnly className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
