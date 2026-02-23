@@ -109,3 +109,38 @@ export async function unassignSchemaFromCustomer(customerId: string, schemaId: s
     if (error) throw new Error(error.message)
     revalidatePath(`/admin/customers/${customerId}`)
 }
+
+export async function getB2BCustomerPrices(productId: string) {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('b2b_customer_prices')
+        .select('*, customer:customers(company_name, email)')
+        .eq('product_id', productId)
+
+    if (error) {
+        console.error('Error fetching B2B customer prices:', error)
+        return []
+    }
+    return data || []
+}
+
+export async function setB2BCustomerPrice(customerId: string, productId: string, price: number) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('b2b_customer_prices')
+        .upsert({ customer_id: customerId, product_id: productId, price_eur: price })
+
+    if (error) throw new Error(error.message)
+    revalidatePath(`/admin/products/${productId}`)
+}
+
+export async function deleteB2BCustomerPrice(id: string, productId: string) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('b2b_customer_prices')
+        .delete()
+        .eq('id', id)
+
+    if (error) throw new Error(error.message)
+    revalidatePath(`/admin/products/${productId}`)
+}

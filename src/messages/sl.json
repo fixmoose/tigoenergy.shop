@@ -15,7 +15,8 @@
     "noImage": "Ni slike",
     "weight": "Teža",
     "packaging": "Embalaža",
-    "unitsPerBox": "enot na škatlo"
+    "unitsPerBox": "enot na škatlo",
+    "vatIncluded": "DDV vključen"
   },
   "header": {
     "selectCurrency": "Izberi valuto",

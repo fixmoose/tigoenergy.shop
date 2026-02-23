@@ -9,6 +9,8 @@ import { getLocalizedName } from '@/lib/utils/localization'
 import type { EffectivePrice } from '@/lib/db/pricing'
 
 export default function ProductCard({ product, pricing }: { product: Product; pricing?: EffectivePrice }) {
+  const t = useTranslations()
+  const { market } = useMarket()
   const { addItem } = useCart()
   const { formatPrice } = useCurrency()
   const { currentLanguage } = useMarket()
@@ -122,6 +124,9 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                         {pricing.appliedSchemaName.split(' ')[0]}
                       </span>
                     )}
+                    {market.key === 'SI' && (
+                      <span className="text-[8px] text-gray-400 font-medium">{t('common.vatIncluded')}</span>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -129,9 +134,11 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                   <span className="text-xl font-bold text-gray-900 leading-tight">
                     {formatPrice(product.price_eur)}
                   </span>
-                  <span className="text-[10px] text-gray-400 font-medium leading-none">
-                    DDV vključen
-                  </span>
+                  {market.key === 'SI' && (
+                    <span className="text-[10px] text-gray-400 font-medium leading-none">
+                      {t('common.vatIncluded')}
+                    </span>
+                  )}
                 </div>
               )}
             </div>

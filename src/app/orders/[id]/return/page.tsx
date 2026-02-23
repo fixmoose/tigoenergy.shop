@@ -45,7 +45,13 @@ export default function ReturnFlowPage() {
             const { data: orderData } = await supabase.from('orders').select('*').eq('id', orderId).single()
             const { data: itemsData } = await supabase.from('order_items').select('*, products(images)').eq('order_id', orderId)
 
-            if (orderData) setOrder(orderData)
+            if (orderData) {
+                if (orderData.is_b2b) {
+                    router.push(`/orders/${orderId}`)
+                    return
+                }
+                setOrder(orderData)
+            }
             if (itemsData) {
                 setItems(itemsData)
                 // Default select all if no selection yet

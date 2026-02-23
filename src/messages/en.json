@@ -15,7 +15,8 @@
     "noImage": "No Image",
     "weight": "Weight",
     "packaging": "Packaging",
-    "unitsPerBox": "units per box"
+    "unitsPerBox": "units per box",
+    "vatIncluded": "Inc. VAT"
   },
   "header": {
     "selectCurrency": "Select Currency",

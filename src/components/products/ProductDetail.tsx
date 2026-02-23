@@ -11,7 +11,7 @@ import { EffectivePrice } from '@/lib/db/pricing'
 
 export default function ProductDetail({ product, userId, reviews, pricing }: { product: Product; userId?: string | null; reviews: Review[]; pricing?: EffectivePrice }) {
   const { formatPrice } = useCurrency()
-  const { currentLanguage } = useMarket()
+  const { currentLanguage, market } = useMarket()
   const tc = useTranslations('common')
   const tp = useTranslations('products')
   const productName = getLocalizedName(product, currentLanguage.code) || ''
@@ -150,12 +150,19 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                         {pricing.appliedSchemaName}
                       </span>
                     )}
+                    {market.key === 'SI' && (
+                      <span className="text-xs text-gray-400 font-medium ml-2">{tc('vatIncluded')}</span>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col">
                   <span>{formatPrice(product.price_eur)}</span>
-                  <span className="text-sm text-gray-400 font-medium -mt-1">DDV vključen</span>
+                  {market.key === 'SI' && (
+                    <span className="text-sm text-gray-400 font-medium -mt-1">
+                      {tc('vatIncluded')}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
