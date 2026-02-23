@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import RichTextEditor from './RichTextEditor'
 import Link from 'next/link'
 import { getB2BCustomerPrices, setB2BCustomerPrice, deleteB2BCustomerPrice } from '@/app/actions/pricing'
+import { getB2BCustomers } from '@/app/actions/customers'
 
 export default function ProductForm({ initial, onSaved }: { initial?: Partial<Product>; onSaved?: (p: Product) => void }) {
   const [product, setProduct] = useState<Partial<Product>>(initial ?? {})
@@ -26,10 +27,9 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
   // B2B Custom Pricing State
   const [b2bPrices, setB2BPrices] = useState<any[]>([])
   const [b2bPricesLoading, setB2BPricesLoading] = useState(false)
-  const [customerSearch, setCustomerSearch] = useState('')
-  const [foundCustomers, setFoundCustomers] = useState<any[]>([])
   const [selectedCustomerId, setSelectedCustomerId] = useState('')
   const [newB2BPrice, setNewB2BPrice] = useState<number>(0)
+  const [allB2BCustomers, setAllB2BCustomers] = useState<any[]>([])
 
   // Invoice Currency State
   const [invoiceCurrency, setInvoiceCurrency] = useState('EUR')
@@ -97,6 +97,13 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
       setB2BPricesLoading(false)
     }
     fetchB2BPrices()
+
+    // Fetch All B2B Customers
+    const fetchB2BCustomers = async () => {
+      const data = await getB2BCustomers()
+      setAllB2BCustomers(data)
+    }
+    fetchB2BCustomers()
   }, [product.id])
 
   useEffect(() => {
@@ -125,21 +132,6 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     fetchProducts()
   }, [])
 
-  useEffect(() => {
-    if (customerSearch.length < 3) {
-      setFoundCustomers([])
-      return
-    }
-    const timer = setTimeout(async () => {
-      const { data } = await supabase
-        .from('customers')
-        .select('id, company_name, email')
-        .or(`company_name.ilike.%${customerSearch}%,email.ilike.%${customerSearch}%`)
-        .limit(10)
-      if (data) setFoundCustomers(data)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [customerSearch])
 
   function setField<K extends keyof Product>(k: K, v: any) {
     setProduct((p) => ({ ...(p ?? {}), [k]: v }))
@@ -233,7 +225,6 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
       const updated = await getB2BCustomerPrices(product.id)
       setB2BPrices(updated)
       setSelectedCustomerId('')
-      setCustomerSearch('')
       setNewB2BPrice(0)
     } catch (err) {
       alert('Failed to set B2B price')
@@ -333,25 +324,18 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
               }
             </div>
             <div className="mt-2 space-y-1">
-              <input
-                placeholder="Customer email/company..."
+              <select
                 className="w-full text-[10px] p-1 border rounded"
-                value={customerSearch}
-                onChange={e => setCustomerSearch(e.target.value)}
-              />
-              {foundCustomers.length > 0 && (
-                <div className="absolute z-10 bg-white border shadow-xl rounded-lg mt-1 w-64 max-h-40 overflow-y-auto">
-                  {foundCustomers.map(c => (
-                    <div
-                      key={c.id}
-                      className="p-2 hover:bg-blue-50 cursor-pointer text-[10px]"
-                      onClick={() => { setSelectedCustomerId(c.id); setCustomerSearch(c.company_name || c.email); setFoundCustomers([]) }}
-                    >
-                      {c.company_name} ({c.email})
-                    </div>
-                  ))}
-                </div>
-              )}
+                value={selectedCustomerId}
+                onChange={e => setSelectedCustomerId(e.target.value)}
+              >
+                <option value="">Select B2B Customer...</option>
+                {allB2BCustomers.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.company_name} ({c.email})
+                  </option>
+                ))}
+              </select>
               <div className="flex gap-1">
                 <input
                   type="number"

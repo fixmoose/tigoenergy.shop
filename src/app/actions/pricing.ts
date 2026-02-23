@@ -126,12 +126,26 @@ export async function getB2BCustomerPrices(productId: string) {
 
 export async function setB2BCustomerPrice(customerId: string, productId: string, price: number) {
     const supabase = await createClient()
-    const { error } = await supabase
+
+    // 1. Fetch SKU and current notes
+    const { data: product } = await supabase.from('products').select('sku').eq('id', productId).single()
+    const { data: customer } = await supabase.from('customers').select('internal_notes').eq('id', customerId).single()
+
+    // 2. Upsert the price
+    const { error: priceError } = await supabase
         .from('b2b_customer_prices')
         .upsert({ customer_id: customerId, product_id: productId, price_eur: price })
 
-    if (error) throw new Error(error.message)
+    if (priceError) throw new Error(priceError.message)
+
+    // 3. Append internal note
+    const note = `[SYSTEM] Custom B2B price set for SKU: ${product?.sku || productId} (€${price.toFixed(2)}) on ${new Date().toLocaleDateString()}`
+    const updatedNotes = customer?.internal_notes ? `${customer.internal_notes}\n${note}` : note
+
+    await supabase.from('customers').update({ internal_notes: updatedNotes }).eq('id', customerId)
+
     revalidatePath(`/admin/products/${productId}`)
+    revalidatePath(`/admin/customers/${customerId}`)
 }
 
 export async function deleteB2BCustomerPrice(id: string, productId: string) {

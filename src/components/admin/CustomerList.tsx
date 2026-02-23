@@ -321,7 +321,17 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-lg" title={marketInfo.domain}>{marketInfo.flag}</span>
                                                     <div>
-                                                        <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{c.first_name} {c.last_name}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                                                                {c.first_name} {c.last_name}
+                                                            </div>
+                                                            {((c as any).b2b_customer_prices?.length > 0) && (
+                                                                <span className="bg-blue-50 text-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-100 flex items-center gap-1" title="Custom pricing set up for this user">
+                                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                                                                    Custom Pricing
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <div className="text-[10px] text-slate-500 font-medium">{marketInfo.domain}</div>
                                                     </div>
                                                 </div>

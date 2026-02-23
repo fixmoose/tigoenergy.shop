@@ -86,3 +86,18 @@ export async function getMarketingPreferences() {
     if (error) return null
     return data
 }
+
+export async function getB2BCustomers() {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('customers')
+        .select('id, company_name, email')
+        .eq('is_b2b', true)
+        .order('company_name', { ascending: true })
+
+    if (error) {
+        console.error('Error fetching B2B customers:', error)
+        return []
+    }
+    return data || []
+}
