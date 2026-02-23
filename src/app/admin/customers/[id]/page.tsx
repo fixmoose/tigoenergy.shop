@@ -25,16 +25,31 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
     .eq('customer_id', id)
     .order('created_at', { ascending: false })
 
-  // Fetch Orders (for documents)
+  // Fetch Orders (detailed history)
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, order_number, invoice_number, invoice_url, packing_slip_url, shipping_label_url, created_at, status')
+    .select('id, order_number, invoice_number, invoice_url, packing_slip_url, shipping_label_url, created_at, status, payment_status, fulfillment_status, total, currency, payment_method, confirmed_at, paid_at')
     .eq('customer_id', id)
     .order('created_at', { ascending: false })
 
   // Fetch Pricing Data
   const allSchemas = await getPricingSchemas()
   const currentSchemas = await getCustomerSchemas(id)
+
+  const STATUS_COLORS: Record<string, string> = {
+    pending: 'bg-yellow-50 text-yellow-700 border-yellow-100',
+    processing: 'bg-blue-50 text-blue-700 border-blue-100',
+    shipped: 'bg-purple-50 text-purple-700 border-purple-100',
+    delivered: 'bg-green-50 text-green-700 border-green-100',
+    cancelled: 'bg-red-50 text-red-700 border-red-100',
+  }
+
+  const PAYMENT_COLORS: Record<string, string> = {
+    pending: 'bg-yellow-50 text-yellow-700 border-yellow-100',
+    paid: 'bg-green-50 text-green-700 border-green-100',
+    failed: 'bg-red-50 text-red-700 border-red-100',
+    refunded: 'bg-gray-50 text-gray-700 border-gray-100',
+  }
 
   if (error) return <div className="p-6 text-red-600 font-bold bg-red-50 rounded-xl">Error loading customer: {error.message}</div>
 
@@ -55,6 +70,80 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
+            {/* Recent Orders Section */}
+            <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Order History</h3>
+                  <p className="text-sm font-bold text-gray-900 mt-0.5">Sales & Status tracking</p>
+                </div>
+                <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-green-600 border border-green-100 uppercase tracking-widest">
+                  {orders?.length || 0} Orders
+                </span>
+              </div>
+              <div className="p-0">
+                {!orders || orders.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                    </div>
+                    <p className="text-gray-400 font-medium">No orders found for this customer.</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-50">
+                    {orders.map((order: any) => {
+                      const needsProcessing = order.payment_status === 'paid' && !['delivered', 'shipped', 'cancelled'].includes(order.status || '')
+                      return (
+                        <div key={order.id} className="p-6 hover:bg-gray-50/50 transition-colors group relative">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-3">
+                                <Link
+                                  href={`/admin/orders/${order.id}`}
+                                  className="text-lg font-black text-gray-900 hover:text-green-600 transition-colors"
+                                >
+                                  #{order.order_number}
+                                </Link>
+                                {needsProcessing && (
+                                  <span className="flex items-center gap-1 text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-100 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
+                                    Needs Processing
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                {new Date(order.created_at).toLocaleString()} • {order.payment_method?.replace(/_/g, ' ') || 'Unknown Method'}
+                              </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-3">
+                              <div className="flex flex-col items-end mr-4">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Total Amount</p>
+                                <p className="text-lg font-black text-gray-900">{order.currency || '€'} {order.total?.toFixed(2)}</p>
+                              </div>
+                              <div className="flex flex-col gap-1.5 min-w-[100px]">
+                                <span className={`text-[10px] px-3 py-1 rounded-lg border font-black uppercase tracking-widest text-center ${PAYMENT_COLORS[order.payment_status || 'pending']}`}>
+                                  Payment: {order.payment_status || 'pending'}
+                                </span>
+                                <span className={`text-[10px] px-3 py-1 rounded-lg border font-black uppercase tracking-widest text-center ${STATUS_COLORS[order.status || 'pending']}`}>
+                                  {order.status || 'pending'}
+                                </span>
+                              </div>
+                              <Link
+                                href={`/admin/orders/${order.id}`}
+                                className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-100 transition shadow-sm group/btn"
+                              >
+                                <svg className="w-5 h-5 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+
             {/* Pricing Assignment Section */}
             <CustomerPricingAssignment
               customerId={id}
