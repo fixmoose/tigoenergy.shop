@@ -7,7 +7,7 @@ export default async function AdminCustomersPage() {
   const supabase = await createClient()
   const { data: customers, error } = await (supabase
     .from('customers') as any)
-    .select('id,email,first_name,last_name,created_at,is_b2b,customer_type')
+    .select('*, orders(market, shipping_address)')
     .order('created_at', { ascending: false })
     .limit(200)
 

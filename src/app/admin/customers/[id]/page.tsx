@@ -219,90 +219,92 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               </div>
             </section>
 
-            {/* Order Returns Section */}
-            <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                <div>
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Order Returns</h3>
-                  <p className="text-sm font-bold text-gray-900 mt-0.5">B2C 14-Day Return Requests</p>
-                </div>
-                <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-orange-400 border border-orange-100 uppercase tracking-widest">
-                  {orderReturns?.length || 0} Returns
-                </span>
-              </div>
-              <div className="p-8">
-                {!orderReturns || orderReturns.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 font-medium">
-                    No return requests found.
+            {/* Order Returns Section (B2C Only) */}
+            {!customer.is_b2b && (
+              <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                  <div>
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Order Returns</h3>
+                    <p className="text-sm font-bold text-gray-900 mt-0.5">B2C 14-Day Return Requests</p>
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    {orderReturns.map((ret: any) => (
-                      <div key={ret.id} className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange-100 transition-colors group">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center gap-3">
-                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${ret.status === 'requested' ? 'bg-blue-50 text-blue-700' :
-                              ret.status === 'refunded' ? 'bg-green-50 text-green-700' :
-                                'bg-gray-50 text-gray-700'
-                              }`}>
-                              {ret.status}
-                            </span>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                              {new Date(ret.created_at).toLocaleString()}
-                            </span>
-                          </div>
-                          <Link
-                            href={`/admin/orders/${ret.order_id}`}
-                            className="text-xs font-black text-green-600 hover:underline"
-                          >
-                            Order #{ret.orders?.order_number}
-                          </Link>
-                        </div>
-
-                        <div className="flex flex-col gap-4">
-                          <div>
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Reason</span>
-                            <p className="text-sm font-bold text-gray-900 capitalize">{ret.reason.replace(/_/g, ' ')}</p>
-                          </div>
-
-                          {ret.customer_notes && (
-                            <div>
-                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Customer Note</span>
-                              <p className="text-sm text-gray-600 italic">"{ret.customer_notes}"</p>
+                  <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-orange-400 border border-orange-100 uppercase tracking-widest">
+                    {orderReturns?.length || 0} Returns
+                  </span>
+                </div>
+                <div className="p-8">
+                  {!orderReturns || orderReturns.length === 0 ? (
+                    <div className="py-12 text-center text-gray-400 font-medium">
+                      No return requests found.
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {orderReturns.map((ret: any) => (
+                        <div key={ret.id} className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-orange-100 transition-colors group">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                              <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${ret.status === 'requested' ? 'bg-blue-50 text-blue-700' :
+                                ret.status === 'refunded' ? 'bg-green-50 text-green-700' :
+                                  'bg-gray-50 text-gray-700'
+                                }`}>
+                                {ret.status}
+                              </span>
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                {new Date(ret.created_at).toLocaleString()}
+                              </span>
                             </div>
-                          )}
-
-                          <div>
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Items</span>
-                            <div className="space-y-1">
-                              {(ret.items as any[]).map((item, idx) => (
-                                <div key={idx} className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg border border-gray-100 flex justify-between">
-                                  <span>{item.product_name} x{item.quantity}</span>
-                                  <span className="font-bold">€{(item.unit_price * item.quantity).toFixed(2)}</span>
-                                </div>
-                              ))}
-                            </div>
+                            <Link
+                              href={`/admin/orders/${ret.order_id}`}
+                              className="text-xs font-black text-green-600 hover:underline"
+                            >
+                              Order #{ret.orders?.order_number}
+                            </Link>
                           </div>
 
-                          {ret.images && ret.images.length > 0 && (
+                          <div className="flex flex-col gap-4">
                             <div>
-                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Evidence Photos</span>
-                              <div className="flex gap-2 overflow-x-auto pb-2">
-                                {ret.images.map((img: string, idx: number) => (
-                                  <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
-                                    <img src={img} className="w-full h-full object-cover" alt="" />
-                                  </a>
+                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Reason</span>
+                              <p className="text-sm font-bold text-gray-900 capitalize">{ret.reason.replace(/_/g, ' ')}</p>
+                            </div>
+
+                            {ret.customer_notes && (
+                              <div>
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Customer Note</span>
+                                <p className="text-sm text-gray-600 italic">"{ret.customer_notes}"</p>
+                              </div>
+                            )}
+
+                            <div>
+                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Items</span>
+                              <div className="space-y-1">
+                                {(ret.items as any[]).map((item, idx) => (
+                                  <div key={idx} className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg border border-gray-100 flex justify-between">
+                                    <span>{item.product_name} x{item.quantity}</span>
+                                    <span className="font-bold">€{(item.unit_price * item.quantity).toFixed(2)}</span>
+                                  </div>
                                 ))}
                               </div>
                             </div>
-                          )}
+
+                            {ret.images && ret.images.length > 0 && (
+                              <div>
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Evidence Photos</span>
+                                <div className="flex gap-2 overflow-x-auto pb-2">
+                                  {ret.images.map((img: string, idx: number) => (
+                                    <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                                      <img src={img} className="w-full h-full object-cover" alt="" />
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
 
             {/* Documents Section */}
             <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">

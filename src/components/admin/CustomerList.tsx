@@ -11,7 +11,40 @@ import { createClient } from '@/lib/supabase/client'
 type Tab = 'guest' | 'b2c' | 'b2b'
 
 interface CustomerListProps {
-    customers: Customer[]
+    customers: (Customer & { orders?: any[] })[]
+}
+
+const MARKET_MAP: Record<string, { domain: string, flag: string }> = {
+    'de': { domain: 'tigoenergy.de', flag: '🇩🇪' },
+    'si': { domain: 'tigoenergy.si', flag: '🇸🇮' },
+    'fr': { domain: 'tigoenergy.fr', flag: '🇫🇷' },
+    'it': { domain: 'tigoenergy.it', flag: '🇮🇹' },
+    'es': { domain: 'tigoenergy.es', flag: '🇪🇸' },
+    'nl': { domain: 'tigoenergy.nl', flag: '🇳🇱' },
+    'pl': { domain: 'tigoenergy.pl', flag: '🇵🇱' },
+    'at': { domain: 'tigoenergy.at', flag: '🇦🇹' },
+    'ch': { domain: 'tigoenergy.ch', flag: '🇨🇭' },
+    'be': { domain: 'tigoenergy.be', flag: '🇧🇪' },
+    'uk': { domain: 'tigoenergy.org.uk', flag: '🇬🇧' },
+    'global': { domain: 'tigoenergy.shop', flag: '🌍' }
+}
+
+function getMarketInfo(customer: any) {
+    // 1. Try to get from orders first
+    const latestOrder = customer.orders?.[0]
+    if (latestOrder?.market && MARKET_MAP[latestOrder.market.toLowerCase()]) {
+        return MARKET_MAP[latestOrder.market.toLowerCase()]
+    }
+
+    // 2. Try to get from shipping address country
+    const shippingAddr = customer.addresses?.find((a: any) => a.type === 'shipping') || customer.addresses?.[0]
+    const country = shippingAddr?.country?.toLowerCase()
+    if (country && MARKET_MAP[country]) {
+        return MARKET_MAP[country]
+    }
+
+    // 3. Fallback
+    return MARKET_MAP['global']
 }
 
 interface UploadedDoc {
@@ -277,6 +310,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                             <tbody className="divide-y divide-slate-100">
                                 {filteredCustomers.map((c) => {
                                     const pendingDocs = getPendingCount(c.id)
+                                    const marketInfo = getMarketInfo(c)
                                     return (
                                         <tr
                                             key={c.id}
@@ -284,8 +318,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                             onClick={() => router.push(`/admin/customers/${c.id}`)}
                                         >
                                             <td className="px-4 py-3">
-                                                <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{c.first_name} {c.last_name}</div>
-                                                <div className="text-xs text-slate-400 font-mono">{c.id}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg" title={marketInfo.domain}>{marketInfo.flag}</span>
+                                                    <div>
+                                                        <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{c.first_name} {c.last_name}</div>
+                                                        <div className="text-[10px] text-slate-500 font-medium">{marketInfo.domain}</div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {c.account_status === 'banned' ? (

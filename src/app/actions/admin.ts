@@ -28,35 +28,58 @@ async function checkIsMasterAdmin() {
  * Invite a new admin
  */
 export async function inviteAdminAction(email: string) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
-
-    const supabase = await createAdminClient()
-
-    // Create an invitation link using Supabase Auth
-    const { data, error } = await supabase.auth.admin.generateLink({
-        type: 'invite',
-        email: email,
-        options: {
-            data: { role: 'admin' },
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/admin/sign-in`
+    console.log(`Starting invitation for: ${email}`)
+    try {
+        if (!await checkIsAdmin()) {
+            console.error('Permission denied: User is not an admin.')
+            throw new Error('Unauthorized')
         }
-    })
 
-    if (error) throw error
+        console.log('Creating admin client...')
+        const supabase = await createAdminClient()
 
-    // Send the custom email via UniOne
-    const html = await renderTemplate('admin-invite', {
-        invite_link: data.properties.action_link
-    }, 'en')
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+        if (!siteUrl) {
+            console.error('NEXT_PUBLIC_SITE_URL is not defined in environment variables.')
+            throw new Error('Site configuration error')
+        }
 
-    await sendEmail({
-        to: email,
-        subject: 'Invitation to Tigo Energy SHOP Admin Team',
-        html
-    })
+        console.log(`Generating invitation link for ${email} with redirect to ${siteUrl}/admin/sign-in`)
+        // Create an invitation link using Supabase Auth
+        const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'invite',
+            email: email,
+            options: {
+                data: { role: 'admin' },
+                redirectTo: `${siteUrl}/admin/sign-in`
+            }
+        })
 
-    revalidatePath('/admin/settings')
-    return { success: true }
+        if (error) {
+            console.error('Supabase generateLink error:', error)
+            throw error
+        }
+
+        console.log('Invitation link generated. Rendering email template...')
+        // Send the custom email via UniOne
+        const html = await renderTemplate('admin-invite', {
+            invite_link: data.properties.action_link
+        }, 'en')
+
+        console.log('Template rendered. Sending email via UniOne...')
+        await sendEmail({
+            to: email,
+            subject: 'Invitation to Tigo Energy SHOP Admin Team',
+            html
+        })
+
+        console.log('Email sent successfully. Revalidating path...')
+        revalidatePath('/admin/settings')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in inviteAdminAction:', err)
+        throw new Error(err.message || 'An unexpected error occurred during admin invitation')
+    }
 }
 
 /**
