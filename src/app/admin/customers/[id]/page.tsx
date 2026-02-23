@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Customer } from '@/types/database'
 import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignment'
 import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
+import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -136,6 +137,13 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                               </Link>
                             </div>
                           </div>
+
+                          <CustomerOrderActions
+                            orderId={order.id}
+                            orderNumber={order.order_number}
+                            isPaid={order.payment_status === 'paid'}
+                            hasLabel={!!order.shipping_label_url}
+                          />
                         </div>
                       )
                     })}

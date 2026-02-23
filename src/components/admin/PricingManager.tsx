@@ -319,7 +319,11 @@ function RulesTable({ schema, products, categories, subcategories, onUpdate }: {
                                             onChange={e => setNewRule({ ...newRule, product_id: e.target.value })}
                                         >
                                             <option value="">Select Product...</option>
-                                            {products.map(p => <option key={p.id} value={p.id}>{p.name_en} ({p.sku})</option>)}
+                                            {products.map(p => (
+                                                <option key={p.id} value={p.id}>
+                                                    {p.name_en} ({p.sku}) {p.stock_quantity && p.stock_quantity > 0 ? `[Stock: ${p.stock_quantity}]` : ''}
+                                                </option>
+                                            ))}
                                         </select>
                                     )}
                                     {newRule.type === 'global_discount' && <span className="text-slate-400 italic">Apply to everything</span>}

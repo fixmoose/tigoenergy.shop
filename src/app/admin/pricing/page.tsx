@@ -10,7 +10,7 @@ export default async function AdminPricingPage() {
     // Fetch products for the rules editor
     const { data: products } = await supabase
         .from('products')
-        .select('id, name_en, sku')
+        .select('id, name_en, sku, stock_quantity')
         .order('name_en')
 
     // Fetch categories and subcategories
