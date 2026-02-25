@@ -16,7 +16,9 @@
     "weight": "Teža",
     "packaging": "Embalaža",
     "unitsPerBox": "enot na škatlo",
-    "vatIncluded": "DDV vključen"
+    "vatIncluded": "DDV vključen",
+    "retailPriceLabel": "MPC",
+    "b2bPriceLabel": "B2B cena"
   },
   "header": {
     "selectCurrency": "Izberi valuto",
@@ -60,7 +62,7 @@
     "contactUs": "Kontakt prodaja",
     "shippingInfo": "Informacije o dostavi",
     "returnsWarranty": "Vračila & Garancija",
-    "faq": "Pogosta vprašanja",
+    "faq": "FAQ",
     "tigoGlobal": "Tigo Global",
     "impressum": "Impressum",
     "privacyPolicy": "Politika zasebnosti",
@@ -116,7 +118,7 @@
     "cancel": "Preklici",
     "saving": "Shranjevanje...",
     "b2bPricing": "B2B cene:",
-    "b2bPricingDesc": "Prikazane cene so brez DDV. DDV bo izračunan na blagajni glede na vašo lokacijo in ID za DDV.",
+    "b2bPricingDesc": "Prikazane cene so brez DDV. DDV bo izračunan na blagajni glede na vašo lokacij in ID za DDV.",
     "priceIncludesVat": "Cena z DDV:",
     "priceIncludesVatDesc": "Vse prikazane cene vključujejo {rate}% DDV. Stroški dostave bodo dodani na blagajni."
   },
@@ -181,7 +183,7 @@
   },
   "home": {
     "heroTitle": "Specializirana spletna trgovina za Tigo Energy izdelke",
-    "heroSubtitle": "Brez pribitkov. Brez presenečenj. Samo neposreden dostop.",
+    "heroSubtitle": "Brez pribitkov. Bez presenečenj. Samo neposreden dostop.",
     "heroServing": "Strežemo celotni sončni skupnosti: Monterjem, Trgovcem in Lastnikom hiš.",
     "shopNow": "Nakupuj zdaj",
     "signIn": "Prijava",
@@ -214,7 +216,7 @@
     "whyChoose": "Zakaj izbrati Tigo Energy?",
     "whyChooseSubtitle": "Naredimo optimizacijo sončne energije preprosto in dostopno",
     "moreEnergy": "Do 20% več energije",
-    "moreEnergyDesc": "Optimizacija na ravni modulov zagotavlja maksimalno izrabo energije iz vsakega panela, tudi v delni senci.",
+    "moreEnergyDesc": "Optimizacija na razni modulov zagotavlja maksimalno izrabo energije iz vsakega panela, tudi v delni senci.",
     "enhancedSafety": "Izboljšana varnost",
     "enhancedSafetyDesc": "Skladnost s hitrim izklopom in spremljanje na ravni modulov za duševni mir.",
     "smartMonitoring": "Pametno spremljanje",
@@ -367,6 +369,84 @@
       "tracking": "Številka za sledenje",
       "button": "Sledi pošiljki",
       "footerNote": "Upoštevajte, da lahko traja do 24 ur, da se podatki o sledenju posodobijo na spletni strani prevoznika."
+    }
+  },
+  "staticPages": {
+    "returns": {
+      "title": "Vračila in garancija",
+      "h14DayReturns": "14-dnevno vračilo",
+      "p14DayReturns": "Za B2C stranke ponujamo 14-dnevno vračilo brez težav za nerabljene artikle v originalni embalaži.",
+      "hWarranty": "Garancija",
+      "pWarranty": "Izdelki Tigo Energy imajo vodilne garancije proizvajalca v panogi (do 25 let za komponente MLPE)."
+    },
+    "shipping": {
+      "title": "Informacije o pošiljanju",
+      "pLead": "Rešitve Tigo Energy dostavljamo po celotni Evropski uniji med delovnimi dnevi.",
+      "hDeliveryTimes": "Časi dostave",
+      "pDeliveryTimes": "Povprečni čas dostave je 2-4 delovne dni, odvisno od vaše lokacije.",
+      "hCarriers": "Prevozniki",
+      "pCarriers": "Za standardne pošiljke prvenstveno uporabljamo GLS in DPD, za večja naročila pa specializirane tovorne prevoze."
+    },
+    "privacy": {
+      "title": "Politika zasebnosti",
+      "lastUpdated": "Zadnja posodobitev: 7. februar 2026",
+      "intro": "Vaša zasebnost nam je pomembna. Ta politika zasebnosti pojasnjuje, kako zbiramo, uporabljamo in varujemo vaše osebne podatke, ko uporabljate Tigo Energy SHOP.",
+      "h1": "1. Podatki, ki jih zbiramo",
+      "p1": "Zbiramo podatke, ki jih navedete ob registraciji, kot so vaše ime, e-pošta, telefonska številka in naslov.",
+      "h2": "2. Kako uporabljamo podatke",
+      "p2": "Vaše podatke uporabljamo za obdelavo naročil, zagotavljanje podpore in izboljšanje naših storitev."
+    },
+    "terms": {
+      "title": "Splošni pogoji",
+      "lastUpdated": "Zadnja posodobitev: 7. februar 2026",
+      "intro": "Z dostopom in uporabo Tigo Energy SHOP se strinjate s temi pogoji.",
+      "h1": "1. Sprejetje pogojev",
+      "p1": "Ti pogoji urejajo vašo uporabo naše spletne strani in storitev.",
+      "h2": "2. Licenca za uporabo",
+      "p2": "Dovoljen je začasen prenos ene kopije gradiv na spletni strani Tigo Energy SHOP samo za osebno, nekomercialno prehodno ogledovanje."
+    },
+    "impressum": {
+      "title": "Impressum",
+      "hCompany": "Podatki o podjetju",
+      "companyName": "Initra Energija d.o.o.",
+      "vat": "ID za DDV: SI62518313",
+      "registration": "Matična številka: 9624007000",
+      "hContact": "Kontaktni podatki",
+      "emailLabel": "E-pošta:",
+      "clickToReveal": "Kliknite za prikaz",
+      "hAuthorized": "Pooblaščeni Tigo Energy distributer",
+      "pAuthorized1": "Initra Energija d.o.o. je pooblaščeni distributer izdelkov Tigo Energy v Evropi. Specializirani smo izključno za rešitve Tigo Energy, kar zagotavlja strokovno znanje in avtentične izdelke.",
+      "hResponsible": "Odgovoren za vsebino",
+      "pResponsible": "Initra Energija d.o.o. je odgovorna za vso vsebino, objavljeno na tej spletni strani."
+    },
+    "cookies": {
+      "title": "Politika piškotkov",
+      "lastUpdated": "Zadnja posodobitev: 7. februar 2026",
+      "intro": "Ta politika piškotkov pojasnjuje, kako Tigo Energy SHOP uporablja piškotke in podobne tehnologije za vašo prepoznavo, ko obiščete našo spletno stran.",
+      "h1": "1. Kaj so piškotki?",
+      "p1": "Piškotki so majhne podatkovne datoteke, ki se shranijo na vaš računalnik ali mobilno napravo, ko obiščete spletno stran.",
+      "h2": "2. Kako uporabljamo piškotke",
+      "p2": "Uporabljamo nujne piškotke za delovanje spletne strani in neobvezne piškotke za analitiko."
+    },
+    "faq": {
+      "title": "Pogosta vprašanja",
+      "q1": "Kako hitra je dostava?",
+      "a1": "Standardna dostava traja 2-4 delovne dni.",
+      "q2": "Ali nudite tehnično podporo?",
+      "a2": "Da, naši strokovnjaki so vam na voljo za pomoč pri izbiri in konfiguraciji izdelkov Tigo."
+    },
+    "contact": {
+      "title": "Kontakt prodaja",
+      "intro": "Iščete količinske cene ali imate vprašanja o vaši sončni namestitvi? Spodaj potrdite svojo e-pošto, da začnete pogovor z našo prodajno ekipo.",
+      "prefillTitle": "Kontaktirajte Tigo prodajo"
+    },
+    "productSupport": {
+      "title": "Tigo podpora izdelkom",
+      "intro": "Prejmite tehnično pomoč za vaše Tigo Energy izdelke prek Shop Messengerja"
+    },
+    "shopSupport": {
+      "title": "Podpora spletne trgovine",
+      "intro": "Prejmite pomoč pri naročilih, dostavi in težavah z računom prek Shop Messengerja"
     }
   }
 }

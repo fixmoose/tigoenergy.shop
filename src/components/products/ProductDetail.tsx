@@ -147,7 +147,10 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                   <span className="text-sm text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-green-600">{formatPrice(pricing.discountedPrice)}</span>
-                    {pricing.appliedSchemaName && (
+                    <span className="text-xs text-gray-400 font-medium ml-1">
+                      {pricing?.appliedSchemaName ? tc('b2bPriceLabel') : tc('retailPriceLabel')}
+                    </span>
+                    {pricing?.appliedSchemaName && (
                       <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-100">
                         {pricing.appliedSchemaName}
                       </span>
@@ -159,7 +162,12 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                 </div>
               ) : (
                 <div className="flex flex-col">
-                  <span>{formatPrice(product.price_eur)}</span>
+                  <span>
+                    {formatPrice(product.price_eur)}
+                    <span className="text-sm text-gray-400 font-medium ml-2">
+                      {tc('retailPriceLabel')}
+                    </span>
+                  </span>
                   {market.key === 'SI' && (
                     <span className="text-sm text-gray-400 font-medium -mt-1">
                       {tc('vatIncluded')}

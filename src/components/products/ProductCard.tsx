@@ -128,11 +128,14 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                   <span className="text-xs text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
                   <div className="flex items-center gap-1">
                     <span className="text-xl font-bold text-green-600">{formatPrice(pricing.discountedPrice)}</span>
-                    {pricing.appliedSchemaName && (
+                    {pricing?.appliedSchemaName && (
                       <span className="text-[8px] bg-green-50 text-green-700 px-1 py-0.5 rounded font-black uppercase border border-green-100">
                         {pricing.appliedSchemaName.split(' ')[0]}
                       </span>
                     )}
+                    <span className="text-[8px] text-gray-400 font-medium ml-1">
+                      {pricing?.appliedSchemaName ? t('common.b2bPriceLabel') : t('common.retailPriceLabel')}
+                    </span>
                     {market.key === 'SI' && (
                       <span className="text-[8px] text-gray-400 font-medium">{t('common.vatIncluded')}</span>
                     )}
@@ -142,6 +145,9 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-gray-900 leading-tight">
                     {formatPrice(product.price_eur)}
+                    <span className="text-[10px] text-gray-400 font-medium ml-1">
+                      {t('common.retailPriceLabel')}
+                    </span>
                   </span>
                   {market.key === 'SI' && (
                     <span className="text-[10px] text-gray-400 font-medium leading-none">
