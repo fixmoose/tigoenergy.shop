@@ -391,7 +391,7 @@
     "privacy": {
       "title": "Politika privatnosti",
       "lastUpdated": "Zadnje ažuriranje: 7. veljače 2026.",
-      "intro": "Vaša privatnost nam je važna. Ova politika privatnosti objašnjava kako prikupljamo, koristimo i štitimo vaše osebne podatke kada koristite Tigo Energy SHOP.",
+      "intro": "Vaša privatnost nam je važna. Ova politika privatnosti objašnjava kako prikupljamo, koristimo i štitimo vaše osobne podatke kada koristite Tigo Energy SHOP.",
       "h1": "1. Informacije koje prikupljamo",
       "p1": "Prikupljamo informacije koje nam date tijekom registracije, kao što su vaše ime, e-pošta, telefonski broj i adresa.",
       "h2": "2. Kako koristimo informacije",
@@ -447,7 +447,7 @@
     },
     "shopSupport": {
       "title": "Podrška za online trgovinu",
-      "intro": "Dobijte pomoć oko narudžbi, dostave i računa putem Shop Messengera"
+      "intro": "Dobijte pomoć oko narudžbi, dostavi i računa putem Shop Messengera"
     }
   }
 }
