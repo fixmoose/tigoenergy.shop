@@ -36,7 +36,7 @@
     "createB2BAccount": "Създай B2B акаунт",
     "signInRegister": "Вход / Регистрация",
     "shopAll": "Всички продукти",
-    "shopAllProducts": "Всички продукти",
+    "shopAllProducts": "Виж всички продукти",
     "support": "Поддръжка",
     "searchPlaceholder": "Търси оптимизатори, инвертори или аксесоари...",
     "searchProducts": "Търси продукти...",
@@ -48,8 +48,8 @@
     "loggedInAs": "Влезли сте като \"{role}\"",
     "inStockCount": "{count} в наличност",
     "availToOrder": "Налично за поръчка",
-    "tigoProductSupport": "Tigo продуктова поддръжка",
-    "tigoProductSupportDesc": "Техническа помощ за продукти Tigo",
+    "tigoProductSupport": "Tigo Energy продуктова поддръжка",
+    "tigoProductSupportDesc": "Техническа помощ за продукти Tigo Energy",
     "onlineShopSupport": "Поддръжка на онлайн магазина",
     "onlineShopSupportDesc": "Помощ с поръчки и доставка"
   },
@@ -61,7 +61,7 @@
     "shippingInfo": "Информация за доставка",
     "returnsWarranty": "Връщания и гаранция",
     "faq": "Често задавани въпроси",
-    "tigoGlobal": "Tigo Global",
+    "tigoGlobal": "Tigo Energy глобален",
     "impressum": "Impressum",
     "privacyPolicy": "Политика за поверителност",
     "termsOfService": "Общи условия",
@@ -187,7 +187,7 @@
     "signIn": "Вход",
     "createAccount": "Създай акаунт",
     "createB2BAccount": "Създай B2B акаунт",
-    "authorizedDealer": "Оторизиран EU дилър",
+    "authorizedDealer": "Оторизиран EU дистрибутор",
     "fastShipping": "Бърза EU доставка",
     "warranty25": "25-годишна гаранция",
     "worryFreeReturns": "Безпроблемни връщания",
@@ -201,16 +201,16 @@
     "shopByCategory": "Пазарувай по категория",
     "shopByCategorySubtitle": "Намерете правилните продукти за вашия слънчев проект",
     "globalReach": "Глобален обхват, локален фокус",
-    "logisticsTitle": "Централно разположени в Slovenia",
+    "logisticsTitle": "Централно разположени в Словения",
     "logisticsHighlight": "За бърза EU дистрибуция",
-    "logisticsP1": "От нашия стратегически център в Slovenia свързваме производственото съвършенство на <strong>Thailand и China</strong> директно до вашата врата. Стоките пристигат през пристанище Koper—най-краткият маршрут от Азия до Централна Европа.",
+    "logisticsP1": "От нашия стратегически център в Словения свързваме производственото съвършенство на <strong>Тайланд и Китай</strong> директно до вашата врата. Стоките пристигат през пристанище Копер—най-краткият маршрут от Азия до Централна Европа.",
     "logisticsP2": "Това логистично предимство минимизира времето за транзит и елиминира ненужни посредници. Резултатът? Можем да дистрибутираме продукти Tigo Energy навсякъде в EU на <strong>възможно най-ниската цена</strong>.",
     "deliveryDays": "2-4 дни",
     "avgDelivery": "Средна доставка до EU",
     "direct": "Директно",
-    "fromKoper": "От пристанище Koper",
+    "fromKoper": "От пристанище Копер",
     "orderNow": "Поръчай сега",
-    "mapAlt": "Карта на EU дистрибуция на Tigo Energy - център Slovenia",
+    "mapAlt": "Карта на EU дистрибуция на Tigo Energy - словенски център",
     "whyChoose": "Защо да изберете Tigo Energy?",
     "whyChooseSubtitle": "Правим оптимизацията на слънчевата енергия проста и достъпна",
     "moreEnergy": "До 20% повече енергия",
@@ -247,204 +247,315 @@
     "officialShopInvoice": "Официална фактура от магазина"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Здравейте,",
+    "bestRegards": "С най-добри пожелания,",
+    "team": "Екипът на Tigo Energy SHOP",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "Потвърдете вашия имейл адрес",
+      "text": "Благодарим ви, че се присъединихте към Tigo Energy SHOP. За да завършите регистрацията си и да защитите акаунта си, моля, използвайте следния код за потвърждение:",
+      "expire": "Този код ще изтече след 10 минути. Ако не сте го поискали, моля, игнорирайте този имейл."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "Потвърдете вашия имейл адрес",
+      "helloWithName": "Здравейте, {{name}},",
+      "text": "Добре дошли в Tigo Energy SHOP! Моля, кликнете върху бутона по-долу, за да потвърдите имейл адреса си и да активирате акаунта си.",
+      "button": "Потвърди имейл адреса",
+      "linkHelp": "Ако бутонът по-горе не работи, можете също да копирате и поставите следната връзка във вашия браузър:",
+      "ignore": "Ако не сте създали акаунт, не е необходимо по-нататъшно действие."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Добре дошли в семейството!",
+      "text": "Радваме се, че се присъединихте към нас в Tigo Energy SHOP. Вече сте свързани със специализирания дистрибутор на Tigo Energy соларни решения в Европа.",
+      "feature1": "Експертна поддръжка",
+      "feature1Desc": "Директен достъп до технически експерти, които познават продуктите на Tigo до съвършенство.",
+      "feature2": "Директна дистрибуция",
+      "feature2Desc": "Оригинални продукти на най-добрите възможни цени, доставяни директно в цяла Европа.",
+      "feature3": "Интелигентни соларни инструменти",
+      "feature3Desc": "Управлявайте вашите поръчки, проследяване и B2B предимства от един профил.",
+      "button": "Започнете да разглеждате",
+      "footerNote": "Ако имате въпроси, нашият екип по поддръжка е само на едно съобщение разстояние."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Съобщението е изпратено успешно",
+      "title": "Получихме вашето запитване",
+      "text": "Благодарим ви, че се свързахте с нас. Вашето съобщение беше успешно доставено на нашия екип по поддръжка. Включихме копие от вашето съобщение по-долу за ваша информация.",
+      "footerNote": "Член на нашия екип ще прегледа вашето запитване и ще се свърже с вас възможно най-скоро. Обикновено отговаряме в рамките на един работен ден."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Имате ново съобщение",
+      "text": "Член на екипа отговори на вашето запитване. Можете да прегледате съобщението и да продължите разговора във вашия профил в магазина.",
+      "dateLabel": "Получено на:",
+      "button": "Виж съобщението",
+      "footerNote": "Ако имате проблеми с влизането, моля, свържете се с нашия екип по поддръжка."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "title": "Благодарим ви за поръчката!",
+      "text": "Получихме вашата поръчка и я подготвяме. Ще получите друг имейл, когато поръчката ви бъде изпратена.",
+      "orderNumber": "Номер на поръчка:",
+      "date": "Дата:",
+      "paymentMethod": "Начин на плащане:",
+      "product": "Продукт",
+      "qty": "Количество",
+      "price": "Цена",
+      "subtotal": "Междинна сума",
+      "shipping": "Доставка",
+      "vat": "ДДС",
+      "total": "Общо платено",
+      "footerNote": "Можете да проследите състоянието на поръчката си във вашия профил."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Поръчката е получена",
+      "bannerTitle": "Изчисляване на доставката в ход",
+      "bannerText": "Вашата поръчка е получена успешно и е частично платена. Поради естеството или размера на вашата поръчка, в момента изчисляваме най-точната цена за доставка за вашето местоположение.",
+      "text": "Ще ви уведомим по имейл веднага щом цената за доставка бъде определена. След като бъде потвърдена, ще можете да извършите окончателното плащане във вашия профил, за да завършите поръчката.",
+      "amountPaid": "Платена сума (продукти):",
+      "shippingStatus": "Статус на доставката:",
+      "pending": "В изчакване на изчисление",
+      "footerNote": "Благодарим ви за търпението и за това, че избрахте Tigo Energy SHOP."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Забравихте ли нещо?",
+      "text": "Забелязахме, че сте оставили някои артикули в количката си. Запазихме ги за вас, за да можете да продължите точно оттам, където сте спрели.",
+      "itemsTitle": "Артикули във вашата количка:",
+      "button": "Завърши покупката си",
+      "footerNote": "Нуждаете се от помощ с вашата поръчка? Просто отговорете на този имейл и нашият екип ще се радва да ви съдейства."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Вълнуваща актуализация на цените!",
+      "text": "Помислихме си, че бихте искали да знаете, че продукт, който преди сте купували или към който сте проявявали интерес, вече има нова цена.",
+      "footerNote": "Сега е чудесен момент да разширите соларната си инсталация или да се запасите с компоненти.",
+      "button": "Виж продукта"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Доставено!",
+      "text": "Страхотни новини! Вашата поръчка #{{order_number}} беше успешно доставена. Надяваме се, че сте доволни от новите си продукти на Tigo Energy.",
+      "attachmentNote": "За ваша информация приложихме следните документи към този имейл:",
+      "doc1": "Потвърждение за доставка",
+      "doc2": "Официална фактура",
+      "footerNote": "Благодарим ви, че избрахте Initra Energija за ваш партньор на Tigo Energy. Ако имате въпроси относно инсталирането или настройката на продукта, нашият технически екип е тук, за да помогне."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES потвърден",
+      "title": "Вашият B2B акаунт е активен",
+      "helloWithCompany": "Здравейте, екип на {{company_name}},",
+      "text": "Радваме се да ви информираме, че вашият ДДС номер (VIES) е успешно потвърден. Вашият B2B акаунт вече е напълно активен и можете да се възползвате от всички предимства на нашата програма за професионални партньори.",
+      "benefit1": "0% ДДС (вътреобщностно придобиване)",
+      "benefit2": "Професионални B2B цени",
+      "benefit3": "Приоритетни опции за доставка",
+      "benefit4": "Директна техническа поддръжка",
+      "button": "Влезте във вашия B2B портал",
+      "footerNote": "Добре дошли на борда! Очакваме с нетърпение да подкрепим вашите соларни проекти."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "Получено B2B заявление",
+      "bannerTitle": "Проверката е в ход",
+      "bannerText": "В момента нашият екип преглежда вашата документация и фирмена информация. Този процес обикновено отнема до 48 часа.",
+      "text": "След като информацията ви бъде потвърдена, ще ви уведомим по имейл и акаунтът ви ще бъде напълно оперативен с достъп до B2B цени и професионални инструменти.",
+      "footerNote": "Междувременно, ако имате спешни въпроси, не се колебайте да отговорите на този имейл."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Нулиране на паролата",
+      "text": "Получихме заявка за нулиране на паролата за вашия акаунт в Tigo Energy SHOP. Моля, кликнете върху бутона по-долу, за да изберете нова парола.",
+      "button": "Нулирай паролата",
+      "linkHelp": "Ако бутонът по-горе не работи, можете също да копирате и поставите следната връзка във вашия браузър:",
+      "expire": "Тази връзка ще изтече след 1 час. Ако не сте поискали нулиране на паролата, моля, игнорирайте този имейл."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Вашата поръчка пътува!",
+      "text": "Вашата поръчка #{{order_number}} е изпратена и вече пътува към вас.",
+      "carrier": "Превозвач",
+      "tracking": "Номер за проследяване",
+      "button": "Проследи пратката",
+      "footerNote": "Моля, имайте предвид, че може да отнеме до 24 часа за актуализиране на информацията за проследяване на уебсайта на превозвача."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Връщане и гаранция",
+      "h14DayReturns": "14-дневно връщане",
+      "p14DayReturns": "Предлагаме 14-дневно безпроблемно връщане за B2C клиенти за неупотребявани артикули в оригинална опаковка.",
+      "hWarranty": "Гаранция",
+      "pWarranty": "Продуктите на Tigo Energy се предлагат с водещи в индустрията производителски гаранции (до 25 години за MLPE компоненти)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Информация за доставка",
+      "pLead": "Доставяме решения на Tigo Energy в целия Европейски съюз през работните дни.",
+      "hDeliveryTimes": "Срокове за доставка",
+      "pDeliveryTimes": "Средното време за доставка е 2-4 работни дни в зависимост от вашето местоположение.",
+      "hCarriers": "Превозвачи",
+      "pCarriers": "Използваме предимно GLS и DPD за стандартни пратки и специализиран товарен транспорт за по-големи поръчки."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Политика за поверителност",
+      "lastUpdated": "Последна актуализация: 7 февруари 2026 г.",
+      "intro": "Вашата поверителност е важна за нас. Тази Политика за поверителност обяснява как събираме, използваме и защитаваме вашите лични данни, когато използвате Tigo Energy SHOP.",
+      "h1": "1. Информация, която събираме",
+      "p1": "Събираме информацията, която предоставяте по време на регистрация, като вашето име, имейл, телефонен номер и адрес.",
+      "h2": "2. Как използваме информацията",
+      "p2": "Използваме вашата информация, за да обработваме поръчки, да предоставяме поддръжка и да подобряваме нашите услуги."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Условия за ползване",
+      "lastUpdated": "Последна актуализация: 7 февруари 2026 г.",
+      "intro": "Чрез достъпа и използването на Tigo Energy SHOP вие се съгласявате да бъдете обвързани с тези условия.",
+      "h1": "1. Приемане на условията",
+      "p1": "Тези условия уреждат използването на нашия уебсайт и услуги.",
+      "h2": "2. Лиценз за ползване",
+      "p2": "Дава се разрешение за временно изтегляне на едно копие от материалите на уебсайта на Tigo Energy SHOP само за лично, некомерсиално преходно разглеждане."
     },
     "impressum": {
       "title": "Impressum",
-      "hCompany": "Company Information",
+      "hCompany": "Информация за компанията",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "ДДС номер: SI62518313",
+      "registration": "Регистрационен номер: 9624007000",
+      "hContact": "Контактна информация",
+      "emailLabel": "Имейл:",
+      "clickToReveal": "Кликнете, за да видите",
+      "hAuthorized": "Оторизиран дистрибутор на Tigo Energy",
+      "pAuthorized1": "Initra Energija d.o.o. е оторизиран дистрибутор на продукти на Tigo Energy в Европа. Специализираме се изключително в решения на Tigo Energy, гарантирайки експертни познания и автентични продукти.",
+      "hResponsible": "Отговорен за съдържанието",
+      "pResponsible": "Initra Energija d.o.o. носи отговорност за цялото съдържание, публикувано на този уебсайт."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Политика за бисквитки",
+      "lastUpdated": "Последна актуализация: 7 февруари 2026 г.",
+      "intro": "Тази Политика за бисквитки обяснява как Tigo Energy SHOP използва бисквитки и подобни технологии, за да ви разпознае, когато посещавате нашия уебсайт.",
+      "h1": "1. Какво представляват бисквитките?",
+      "p1": "Бисквитките са малки файлове с данни, които се поставят на вашия компютър или мобилно устройство, когато посещавате уебсайт.",
+      "h2": "2. Как използваме бисквитките",
+      "p2": "Използваме основни бисквитки за функционирането на уебсайта и незадължителни бисквитки за анализи."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Често задавани въпроси",
+      "q1": "Колко бърза е доставката?",
+      "a1": "Стандартната доставка отнема 2-4 работни дни.",
+      "q2": "Предлагате ли техническа поддръжка?",
+      "a2": "Да, нашите експерти са на разположение, за да ви помогнат с избора и конфигурирането на продукти на Tigo."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Контакт с продажби",
+      "intro": "Търсите цени за обем или имате въпроси относно вашата соларна инсталация? Потвърдете имейла си по-долу, за да започнете разговор с нашия екип по продажбите.",
+      "prefillTitle": "Контакт с Tigo Продажби"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Поддръжка на продукти на Tigo",
+      "intro": "Получете техническа помощ за вашите продукти на Tigo Energy чрез Shop Messenger"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Поддръжка на онлайн магазина"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Добре дошли отново",
+      "subtitle": "Влезте в акаунта си",
+      "email": "Имейл адрес",
+      "password": "Парола",
+      "forgotPassword": "Забравена парола?",
+      "signIn": "Вход",
+      "signingIn": "Влизане...",
+      "noAccount": "Нямате акаунт?",
+      "createAccount": "Създай акаунт"
+    },
+    "register": {
+      "title": "Изберете тип акаунт",
+      "personalAccount": "Личен акаунт",
+      "personalDesc": "За собственици на жилища, купуващи оборудване на Tigo.",
+      "businessAccount": "Бизнес акаунт",
+      "businessDesc": "За инсталатори, дистрибутори и препродавачи.",
+      "createCustomer": "Създай клиентски акаунт",
+      "forHomeowners": "За собственици на жилища и индивидуални купувачи",
+      "businessSwitch": "Вие сте бизнес? Създайте B2B акаунт",
+      "personalSwitch": "Не сте бизнес? Създайте личен акаунт",
+      "b2bTitle": "Бизнес регистрация",
+      "b2bSubtitle": "За инсталатори, препродавачи и дистрибутори",
+      "steps": {
+        "email": "Потвърждение на имейл",
+        "phone": "Мобилно потвърждение",
+        "personal": "Лични данни",
+        "address": "Адрес",
+        "security": "Сигурност на акаунта",
+        "review": "Преглед и политики",
+        "vat": "ДДС потвърждение",
+        "company": "Данни за компанията",
+        "business": "Тип бизнес",
+        "contact": "Лице за контакт",
+        "finish": "Завърши регистрацията"
+      },
+      "labels": {
+        "firstName": "Име",
+        "lastName": "Фамилия",
+        "dob": "Дата на раждане",
+        "occupation": "Професия (по избор)",
+        "address": "Улица и номер",
+        "address2": "Вход, ап., пощенска кутия и др. (по избор)",
+        "city": "Град",
+        "zip": "Пощенски код",
+        "country": "Държава",
+        "username": "Потребителско име (предлага се автоматично)",
+        "password": "Парола",
+        "confirmPassword": "Потвърди паролата",
+        "vatNumber": "ДДС номер",
+        "companyName": "Име на компанията",
+        "website": "Уебсайт (по избор)",
+        "employees": "Служители",
+        "commercialAccess": "Има ли мястото на доставка търговски достъп?",
+        "jobTitle": "Длъжност",
+        "businessType": "Тип бизнес",
+        "truckAccess": "Може ли голям камион/бус да достигне до вашия склад/офис за доставка на палети?"
+      },
+      "messages": {
+        "emailCheck": "Проверете пощата си за 6-цифрения код",
+        "phoneCheck": "Проверете телефона си за 6-цифрения код",
+        "emailDone": "Имейлът е потвърден успешно",
+        "phoneDone": "Телефонът е потвърден успешно",
+        "dobNote": "Вашата дата на раждане е необходима, за да потвърдим, че отговаряте на изискването за минимална възраст (18+) за тази услуга.",
+        "addressNote": "Моля, потвърдете адреса си с Google, като кликнете в прозореца за адрес и след това върху предложен от Google адрес.",
+        "vatNote": "Въведете вашия валиден ДДС номер в ЕС, за да потвърдите бизнес статуса си чрез VIES.",
+        "vatFormat": "Формат: CC12345678 (напр. BG123456789). Кодът на държавата е задължителен.",
+        "vatFallback": "* Проверката става в реално време. Ако VIES е офлайн, ще пре преминем към ръчна проверка.",
+        "commercialYes": "Да, стандартен достъп за камиони",
+        "commercialNo": "Не, ограничен достъп",
+        "nonEu": "Намирате се извън Европейския съюз?",
+        "nonEuNote": "Въведете данъчния идентификационен номер на вашата компания за ръчна проверка.",
+        "euNote": "Въведете вашия валиден ДДС номер в ЕС, за да потвърдите бизнес статуса си чрез VIES.",
+        "successTitle": "Регистрацията е успешна!",
+        "successDesc": "Вашият акаунт е създаден. Изпратен е приветствен имейл на {email}.",
+        "goSignIn": "Към вход"
+      },
+      "agreements": {
+        "reviewInfo": "Преглед на вашата информация",
+        "editDetails": "Редактиране на данни",
+        "terms": "Съгласявам се с Условията за ползване и Политиката за приемливо ползване.",
+        "privacy": "Потвърждавам, че се запознах с Политиката за поверителност и разбирам как се обработват данните ми.",
+        "newsletter": "Абонирайте се за нашия бюлетин за последните новини и актуализации.",
+        "marketing": "Съгласявам се да получавам промоционални предложения и специални отстъпки.",
+        "authorized": "Потвърждавам, че съм оторизиран от компанията да се регистрирам от нейно име.",
+        "legitimate": "Това е легитимно бизнес лице.",
+        "confirmCreate": "Потвърди и създай акаунт",
+        "creating": "Създаване на акаунт..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Забравена парола?",
+      "subtitle": "Въведете вашия имейл и ще ви изпратим връзка за нулиране на паролата.",
+      "sendLink": "Изпрати връзка",
+      "success": "Ако съществува акаунт за този имейл, скоро ще получите връзка за нулиране на паролата.",
+      "backToLogin": "Обратно към вход"
+    },
+    "resetPassword": {
+      "title": "Задайте нова парола",
+      "subtitle": "Въведете сигурна нова парола за вашия акаунт.",
+      "newPassword": "Нова парола",
+      "update": "Актуализирай паролата",
+      "updating": "Актуализиране...",
+      "success": "Паролата е нулирана успешно! Пренасочване...",
+      "errorTitle": "Грешка",
+      "requestNew": "Поискай нова връзка",
+      "noToken": "Не е намерен токен за нулиране. Моля, използвайте връзката от вашия имейл.",
+      "expireNote": "Връзките за нулиране изтичат след 1 час или могат да се използват само веднъж. Моля, поискайте нова връзка.",
+      "pwdPlaceholder": "Мин. 6 знака"
     }
   }
 }

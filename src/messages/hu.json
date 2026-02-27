@@ -201,28 +201,28 @@
     "shopByCategory": "Vásárlás kategória szerint",
     "shopByCategorySubtitle": "Találja meg a megfelelő termékeket napenergia projektjéhez",
     "globalReach": "Globális elérés, helyi fókusz",
-    "logisticsTitle": "Központi elhelyezkedés Slovenia-ban",
-    "logisticsHighlight": "Gyors EU szállításért",
-    "logisticsP1": "A Slovenia-i stratégiai központunkból közvetlenül az Ön ajtajáig kötjük össze <strong>Thaiföld és Kína</strong> gyártási kiválóságát. Az áru Koper kikötőjén keresztül érkezik - ez a legrövidebb útvonal Ázsiából Közép-Európába.",
-    "logisticsP2": "Ez a logisztikai előny minimalizálja a szállítási időket és kiküszöböli a szükségtelen közvetítőket. Az eredmény? A <strong>lehető legalacsonyabb áron</strong> szállíthatjuk a Tigo Energy termékeket bárhová az EU-ban.",
+    "logisticsTitle": "Központi elhelyezkedés Szlovéniában",
+    "logisticsHighlight": "A gyors EU-s disztribúcióért",
+    "logisticsP1": "Szlovéniai stratégiai központunkból a <strong>thaiföldi és kínai</strong> gyártási kiválóságot közvetlenül az Ön ajtajáig hozzuk. Az áruk Koper kikötőjén keresztül érkeznek – ez a legrövidebb útvonal Ázsiából Közép-Európába.",
+    "logisticsP2": "Ez a logisztikai előny minimalizálja a szállítási időt és kiküszöböli a felesleges közvetítőket. Az eredmény? A Tigo Energy termékeket a <strong>lehető legalacsonyabb áron</strong> tudjuk eljuttatni az EU bármely pontjára.",
     "deliveryDays": "2-4 nap",
     "avgDelivery": "Átlagos szállítási idő az EU-ban",
     "direct": "Közvetlen",
-    "fromKoper": "Koper kikötőből",
-    "orderNow": "Rendeljen most",
-    "mapAlt": "Tigo Energy EU szállítási térkép - Slovenia központ",
+    "fromKoper": "Koper kikötőjéből",
+    "orderNow": "Rendelje meg most",
+    "mapAlt": "Tigo Energy EU disztribúciós térkép - szlovéniai központ",
     "whyChoose": "Miért válassza a Tigo Energy-t?",
-    "whyChooseSubtitle": "Egyszerűvé és elérhetővé tesszük a napenergia optimalizálást",
+    "whyChooseSubtitle": "Egyszerűvé és elérhetővé tesszük a napenergia-optimalizálást",
     "moreEnergy": "Akár 20%-kal több energia",
-    "moreEnergyDesc": "A modul szintű optimalizálás maximális energiatermelést biztosít minden panelből, még részleges árnyékolás esetén is.",
+    "moreEnergyDesc": "A modulszintű optimalizálás maximális energiatermelést biztosít minden panelből, még részleges árnyékolás esetén is.",
     "enhancedSafety": "Fokozott biztonság",
-    "enhancedSafetyDesc": "Gyors leállítás megfelelőség és modul szintű monitoring a nyugalom érdekében.",
-    "smartMonitoring": "Intelligens monitoring",
-    "smartMonitoringDesc": "Valós idejű teljesítmény adatok minden modulhoz a Tigo Energy Intelligence platformmal.",
-    "ctaTitle": "Készen áll napenergia rendszere optimalizálására?",
-    "ctaSubtitle": "Csatlakozzon a telepítők és háztulajdonosok ezreihez, akik a Tigo-ban bíznak napenergia optimalizálási igényeikhez.",
+    "enhancedSafetyDesc": "Gyors leállítási megfelelőség és modulszintű felügyelet a nyugalom érdekében.",
+    "smartMonitoring": "Intelligens felügyelet",
+    "smartMonitoringDesc": "Valós idejű teljesítményadatok minden modulhoz a Tigo Energy Intelligence platformmal.",
+    "ctaTitle": "Készen áll napelemrendszere optimalizálására?",
+    "ctaSubtitle": "Csatlakozzon a telepítők és háztulajdonosok ezreihez, akik a Tigóra bízzák napenergia-optimalizálási igényeiket.",
     "browseProducts": "Termékek böngészése",
-    "contactSales": "Értékesítés elérése"
+    "contactSales": "Kapcsolat az értékesítéssel"
   },
   "invoice": {
     "billedTo": "Számlázva",
@@ -247,204 +247,315 @@
     "officialShopInvoice": "Hivatalos áruház számla"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Üdvözöljük,",
+    "bestRegards": "Üdvözlettel,",
+    "team": "A Tigo Energy SHOP csapata",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "E-mail cím megerősítése",
+      "text": "Köszönjük, hogy csatlakozott a Tigo Energy SHOP-hoz. A regisztráció befejezéséhez és fiókja biztonságához kérjük, használja az alábbi ellenőrző kódot:",
+      "expire": "Ez a kód 10 perc múlva lejár. Ha nem Ön kérte ezt, kérjük, hagyja figyelmen kívül ezt az e-mailt."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "E-mail cím megerősítése",
+      "helloWithName": "Üdvözöljük {{name}},",
+      "text": "Üdvözöljük a Tigo Energy SHOP-ban! Kérjük, kattintson az alábbi gombra e-mail címe megerősítéséhez és fiókja aktiválásához.",
+      "button": "E-mail cím megerősítése",
+      "linkHelp": "Ha a fenti gomb nem működik, másolhatja és beillesztheti az alábbi linket a böngészőjébe:",
+      "ignore": "Ha nem hozott létre fiókot, nincs szükség további intézkedésre."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Üdvözöljük a családban!",
+      "text": "Örülünk, hogy a Tigo Energy SHOP vásárlói között üdvözölhetjük. Mostantól kapcsolatban áll Európa specializált Tigo Energy napelem megoldások forgalmazójával.",
+      "feature1": "Szakértői támogatás",
+      "feature1Desc": "Közvetlen hozzáférés műszaki szakértőkhöz, akik kívül-belül ismerik a Tigo termékeket.",
+      "feature2": "Közvetlen disztribúció",
+      "feature2Desc": "Eredeti termékek a lehető legjobb áron, közvetlenül Európa-szerte szállítva.",
+      "feature3": "Okos napelem eszközök",
+      "feature3Desc": "Kezelje rendeléseit, nyomon követését és B2B előnyeit egyetlen profilból.",
+      "button": "Kezdje el a felfedezést",
+      "footerNote": "Ha bármilyen kérdése van, ügyfélszolgálatunk csak egy üzenetre van."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Üzenet sikeresen elküldve",
+      "title": "Megkaptuk érdeklődését",
+      "text": "Köszönjük, hogy felvette velünk a kapcsolatot. Üzenetét sikeresen továbbítottuk ügyfélszolgálati csapatunknak. Alább mellékeljük üzenete másolatát saját nyilvántartása számára.",
+      "footerNote": "Csapatunk tagja felülvizsgálja érdeklődését, és a lehető leghamarabb válaszol. Általában egy munkanapon belül válaszolunk."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Új üzenete érkezett",
+      "text": "Egy csapattag válaszolt az érdeklődésére. Az üzenetet megtekintheti és folytathatja a beszélgetést az áruházi profiljában.",
+      "dateLabel": "Érkezett:",
+      "button": "Üzenet megtekintése",
+      "footerNote": "Ha problémái adódnának a bejelentkezéssel, kérjük, lépjen kapcsolatba ügyfélszolgálatunkkal."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "title": "Köszönjük a rendelését!",
+      "text": "Megkaptuk rendelését, és már készítjük is. Újabb e-mailt küldünk, amint a rendelését kiszállítottuk.",
+      "orderNumber": "Rendelésszám:",
+      "date": "Dátum:",
+      "paymentMethod": "Fizetési mód:",
+      "product": "Termék",
+      "qty": "Menny.",
+      "price": "Ár",
+      "subtotal": "Részösszeg",
+      "shipping": "Szállítás",
+      "vat": "ÁFA",
+      "total": "Összesen fizetve",
+      "footerNote": "Rendelése állapotát nyomon követheti Fiókprofiljában."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Rendelés beérkezett",
+      "bannerTitle": "Szállítási költség kiszámítása folyamatban",
+      "bannerText": "Rendelését sikeresen fogadtuk és részben kifizetésre került. A rendelés jellege vagy mérete miatt jelenleg számítjuk ki a legpontosabb szállítási költséget az Ön tartózkodási helyére.",
+      "text": "E-mailben értesítjük, amint a szállítási díj meghatározásra került. A megerősítést követően az áruházi profiljában tudja majd rendezni a végső kifizetést a rendelés befejezéséhez.",
+      "amountPaid": "Fizetett összeg (termékek):",
+      "shippingStatus": "Szállítás állapota:",
+      "pending": "Számítás alatt",
+      "footerNote": "Köszönjük türelmét, és hogy a Tigo Energy SHOP-ot választotta."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Elfelejtett valamit?",
+      "text": "Észrevettük, hogy maradt néhány tétel a kosarában. Elmentettük őket Önnek, így pontosan onnan folytathatja, ahol abbahagyta.",
+      "itemsTitle": "Tételek a kosarában:",
+      "button": "Vásárlás befejezése",
+      "footerNote": "Segítségre van szüksége a rendeléséhez? Csak válaszoljon erre az e-mailre, és csapatunk örömmel segít."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Izgalmas árváltozás!",
+      "text": "Gondoltuk, örömmel értesülne róla, hogy egy korábban vásárolt vagy érdeklődésre számot tartó termék ára megváltozott.",
+      "footerNote": "Ez egy remek alkalom napelemrendszere bővítésére vagy az alkatrészkészletek feltöltésére.",
+      "button": "Termék megtekintése"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Kézbesítve!",
+      "text": "Nagyszerű hírek! Rendelését (#{{order_number}}) sikeresen kézbesítettük. Reméljük, elégedett az új Tigo Energy termékeivel.",
+      "attachmentNote": "Nyilvántartása számára az alábbi dokumentumokat mellékeltük ehhez az e-mailhez:",
+      "doc1": "Kézbesítési igazolás",
+      "doc2": "Hivatalos számla",
+      "footerNote": "Köszönjük, hogy az Initra Energija-t választotta Tigo Energy partnerének. Ha bármilyen kérdése van a termék telepítésével vagy beállításával kapcsolatban, műszaki csapatunk készséggel áll rendelkezésére."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES megerősítve",
+      "title": "B2B fiókja aktív",
+      "helloWithCompany": "Üdvözöljük a {{company_name}} csapatát,",
+      "text": "Örömmel értesítjük, hogy ÁFA-számát (VIES) sikeresen megerősítettük. B2B fiókja mostantól teljes mértékben aktív, és élvezheti professzionális partnerprogramunk összes előnyét.",
+      "benefit1": "0% ÁFA (közösségen belüli beszerzés)",
+      "benefit2": "Professzionális B2B árazás",
+      "benefit3": "Prioritási szállítási opciók",
+      "benefit4": "Közvetlen műszaki támogatás",
+      "button": "Bejelentkezés a B2B portálra",
+      "footerNote": "Üdvözöljük fedélzetén! Várjuk, hogy támogassuk napelem projektjeit."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "B2B jelentkezés beérkezett",
+      "bannerTitle": "Ellenőrzés folyamatban",
+      "bannerText": "Csapatunk jelenleg is vizsgálja a dokumentációját és a céginformációkat. Ez a folyamat általában legfeljebb 48 órát vesz igénybe.",
+      "text": "Amint adatait ellenőriztük, e-mailben értesítjük, és fiókja teljes mértékben működőképessé válik a B2B árakhoz és professzionális eszközökhöz való hozzáféréssel.",
+      "footerNote": "Addig is, ha sürgős kérdése van, bátran válaszoljon erre az e-mailre."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Jelszó visszaállítása",
+      "text": "Kérést kaptunk a Tigo Energy SHOP fiókjához tartozó jelszó visszaállítására. Kérjük, kattintson az alábbi gombra új jelszó megadásához.",
+      "button": "Jelszó visszaállítása",
+      "linkHelp": "Ha a fenti gomb nem működik, másolhatja és beillesztheti az alábbi linket a böngészőjébe:",
+      "expire": "Ez a link 1 óra múlva lejár. Ha nem kérte a jelszó visszaállítását, kérjük, hagyja figyelmen kívül ezt az e-mailt, vagy forduljon az ügyfélszolgálathoz, ha aggályai vannak."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Rendelése úton van!",
+      "text": "A #{{order_number}} számú rendelését feladtuk, és már úton van Önhöz.",
+      "carrier": "Szállító",
+      "tracking": "Nyomon követési szám",
+      "button": "Csomag nyomon követése",
+      "footerNote": "Kérjük, vegye figyelembe, hogy akár 24 órát is igénybe vehet, amíg a nyomon követési adatok frissülnek a szállító weboldalán."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Visszaküldés és garancia",
+      "h14DayReturns": "14 napos visszaküldés",
+      "p14DayReturns": "B2C vásárlóink számára 14 napos, gondtalan visszaküldést biztosítunk az eredeti csomagolásban lévő, nem használt termékekre.",
+      "hWarranty": "Garancia",
+      "pWarranty": "A Tigo Energy termékek iparágvezető gyártói garanciával rendelkeznek (akár 25 év az MLPE alkatrészekre)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Szállítási információk",
+      "pLead": "A Tigo Energy megoldásokat az Európai Unió egész területére szállítjuk munkanapokon.",
+      "hDeliveryTimes": "Szállítási idők",
+      "pDeliveryTimes": "Az átlagos szállítási idő 2-4 munkanap, tartózkodási helyétől függően.",
+      "hCarriers": "Szállítók",
+      "pCarriers": "A szabványos szállítmányokhoz elsősorban a GLS-t és a DPD-t, nagyobb megrendelésekhez pedig speciális teherfuvarozást használunk."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Adatvédelmi szabályzat",
+      "lastUpdated": "Utolsó frissítés: 2026. február 7.",
+      "intro": "Az Ön adatainak védelme fontos számunkra. Ez az adatvédelmi szabályzat elmagyarázza, hogyan gyűjtjük, használjuk és védjük személyes adatait, amikor a Tigo Energy SHOP-ot használja.",
+      "h1": "1. Gyűjtött információk",
+      "p1": "Összegyűjtjük a regisztráció során megadott információkat, például nevét, e-mail címét, telefonszámát és címét.",
+      "h2": "2. Az információk felhasználása",
+      "p2": "Adatait a megrendelések feldolgozására, támogatás nyújtására és szolgáltatásaink fejlesztésére használjuk fel."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Felhasználási feltételek",
+      "lastUpdated": "Utolsó frissítés: 2026. február 7.",
+      "intro": "A Tigo Energy SHOP elérésével és használatával Ön beleegyezik, hogy magára nézve kötelezőnek ismeri el ezeket a feltételeket.",
+      "h1": "1. Feltételek elfogadása",
+      "p1": "Jelen feltételek szabályozzák weboldalunk és szolgáltatásaink használatát.",
+      "h2": "2. Licenc használata",
+      "p2": "Engedélyezett a Tigo Energy SHOP weboldalán található anyagok egy példányának ideiglenes letöltése kizárólag személyes, nem kereskedelmi célú, átmeneti megtekintésre."
     },
     "impressum": {
-      "title": "Impressum",
-      "hCompany": "Company Information",
+      "title": "Impresszum",
+      "hCompany": "Céginformáció",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "Adószám: SI62518313",
+      "registration": "Regisztrációs szám: 9624007000",
+      "hContact": "Kapcsolattartási adatok",
+      "emailLabel": "E-mail:",
+      "clickToReveal": "Kattintson a megjelenítéshez",
+      "hAuthorized": "Hivatalos Tigo Energy forgalmazó",
+      "pAuthorized1": "Az Initra Energija d.o.o. a Tigo Energy termékek hivatalos forgalmazója Európában. Kizárólag a Tigo Energy megoldásokra szakosodtunk, biztostíva a szakértelmet és az eredeti termékeket.",
+      "hResponsible": "Felelős a tartalomért",
+      "pResponsible": "A weboldalon közzétett minden tartalomért az Initra Energija d.o.o. felelős."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Süti szabályzat",
+      "lastUpdated": "Utolsó frissítés: 2026. február 7.",
+      "intro": "Ez a süti szabályzat elmagyarázza, hogyan használ a Tigo Energy SHOP sütiket és hasonló technológiákat az Ön felismerésére, amikor meglátogatja weboldalunkat.",
+      "h1": "1. Mik azok a sütik?",
+      "p1": "A sütik kis adatfájlok, amelyek a weboldal meglátogatásakor kerülnek az Ön számítógépére vagy mobileszközére.",
+      "h2": "2. Hogyan használjuk a sütiket",
+      "p2": "A weboldal működéséhez elengedhetetlen sütiket, valamint elemzésekhez opcionális sütiket használunk."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Gyakran Ismételt Kérdések",
+      "q1": "Milyen gyors a szállítás?",
+      "a1": "A szabványos szállítás 2-4 munkanapot vesz igénybe.",
+      "q2": "Kínálnak technikai támogatást?",
+      "a2": "Igen, szakértőink rendelkezésre állnak, hogy segítsenek a Tigo termékek kiválasztásában és konfigurálásában."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Kapcsolat az értékesítéssel",
+      "intro": "Mennyiségi árazást keres, vagy kérdései vannak napelemrendszerével kapcsolatban? Erősítse meg e-mail címét alább, hogy beszélgetést kezdeményezzen értékesítési csapatunkkal.",
+      "prefillTitle": "Kapcsolat a Tigo értékesítéssel"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Tigo termék támogatás",
+      "intro": "Műszaki segítség Tigo Energy termékeihez a Shop Messenger segítségével"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Online áruház támogatás"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Üdvözöljük ismét",
+      "subtitle": "Jelentkezzen be fiókjához való hozzáféréshez",
+      "email": "E-mail cím",
+      "password": "Jelszó",
+      "forgotPassword": "Elfelejtette jelszavát?",
+      "signIn": "Bejelentkezés",
+      "signingIn": "Bejelentkezés...",
+      "noAccount": "Nincs még fiókja?",
+      "createAccount": "Fiók létrehozása"
+    },
+    "register": {
+      "title": "Válassza ki a fiók típusát",
+      "personalAccount": "Személyes fiók",
+      "personalDesc": "Háztulajdonosok számára, akik Tigo berendezéseket vásárolnak.",
+      "businessAccount": "Üzleti fiók",
+      "businessDesc": "Telepítők, forgalmazók és viszonteladók számára.",
+      "createCustomer": "Ügyfélfiók létrehozása",
+      "forHomeowners": "Háztulajdonosok és egyéni vásárlók számára",
+      "businessSwitch": "Ön cég? Hozzon létre B2B fiókot",
+      "personalSwitch": "Nem cég? Hozzon létre személyes fiókot",
+      "b2bTitle": "Üzleti regisztráció",
+      "b2bSubtitle": "Telepítők, viszonteladók és forgalmazók számára",
+      "steps": {
+        "email": "E-mail megerősítés",
+        "phone": "Mobil megerősítés",
+        "personal": "Személyes adatok",
+        "address": "Cím",
+        "security": "Fiókbiztonság",
+        "review": "Áttekintés és szabályzat",
+        "vat": "ÁFA ellenőrzés",
+        "company": "Cégadatok",
+        "business": "Üzleti típus",
+        "contact": "Kapcsolattartó",
+        "finish": "Jelentkezés befejezése"
+      },
+      "labels": {
+        "firstName": "Keresztnév",
+        "lastName": "Vezetéknév",
+        "dob": "Születési dátum",
+        "occupation": "Foglalkozás (opcionális)",
+        "address": "Utca és házszám",
+        "address2": "Emelet, ajtó, postafiók stb. (opcionális)",
+        "city": "Város",
+        "zip": "Irányítószám",
+        "country": "Ország",
+        "username": "Felhasználónév (automatikus javaslat)",
+        "password": "Jelszó",
+        "confirmPassword": "Jelszó megerősítése",
+        "vatNumber": "ÁFA szám",
+        "companyName": "Cégnév",
+        "website": "Weboldal (opcionális)",
+        "employees": "Alkalmazottak száma",
+        "commercialAccess": "A szállítási helyem rendelkezik kereskedelmi hozzáféréssel?",
+        "jobTitle": "Beosztás",
+        "businessType": "Üzleti típus",
+        "truckAccess": "Egy nagy teherautó/furgon be tud hajtani raktárába/irodájába raklapos szállításhoz?"
+      },
+      "messages": {
+        "emailCheck": "Ellenőrizze az e-mail postaládáját a 6 számjegyű kódért",
+        "phoneCheck": "Ellenőrizze a telefonját a 6 számjegyű kódért",
+        "emailDone": "E-mail sikeresen megerősítve",
+        "phoneDone": "Telefonszám sikeresen megerősítve",
+        "dobNote": "A születési dátumra azért van szükség, hogy megerősítsük, megfelel a szolgáltatás használatához szükséges alsó korhatárnak (18+).",
+        "addressNote": "Kérjük, ellenőrizze címét a Google segítségével úgy, hogy a cím ablakba kattint, majd kiválaszt egy Google által javasolt címet.",
+        "vatNote": "Adja meg érvényes EU-s ÁFA számát vállalkozása állapotának VIES rendszeren keresztüli ellenőrzéséhez.",
+        "vatFormat": "Formátum: CC12345678 (pl. HU12345678). Az országkód kötelező.",
+        "vatFallback": "* Az ellenőrzés valós időben történik. Ha a VIES offline, manuális ellenőrzésre váltunk.",
+        "commercialYes": "Igen, szabványos teherautó hozzáférés",
+        "commercialNo": "Nem, korlátozott hozzáférés",
+        "nonEu": "Az Európai Unión kívül tartózkodik?",
+        "nonEuNote": "Manuális ellenőrzéshez adja meg cége adószámát vagy ÁFA regisztrációs számát.",
+        "euNote": "Adja meg érvényes EU-s ÁFA számát vállalkozása állapotának VIES rendszeren keresztüli ellenőrzéséhez.",
+        "successTitle": "Regisztráció sikeres!",
+        "successDesc": "Fiókja létrejött. Egy üdvözlő e-mailt küldtünk a következő címre: {email}.",
+        "goSignIn": "Tovább a bejelentkezéshez"
+      },
+      "agreements": {
+        "reviewInfo": "Információk áttekintése",
+        "editDetails": "Adatok szerkesztése",
+        "terms": "Elfogadom a felhasználási feltételeket és a megfelelő használatra vonatkozó szabályzatot.",
+        "privacy": "Tudomásul veszem az adatvédelmi szabályzatot és megértettem az adataim feldolgozásának módját.",
+        "newsletter": "Feliratkozom a hírlevélre a legfrissebb hírekért és frissítésekért.",
+        "marketing": "Beleegyezem promóciós árak és speciális ajánlatok fogadásába.",
+        "authorized": "Megerősítem, hogy felhatalmazással rendelkezem a cég nevében történő regisztrációhoz.",
+        "legitimate": "Ez egy legitim gazdasági egység.",
+        "confirmCreate": "Megerősítés és fiók létrehozása",
+        "creating": "Fiók létrehozása..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Elfelejtette jelszavát?",
+      "subtitle": "Adja meg e-mail címét, és küldünk Önnek egy linket a jelszó visszaállításához.",
+      "sendLink": "Visszaállító link küldése",
+      "success": "Ha létezik fiók ezzel az e-mail címmel, hamarosan kap egy jelszó-visszaállító linket.",
+      "backToLogin": "Vissza a bejelentkezéshez"
+    },
+    "resetPassword": {
+      "title": "Új jelszó beállítása",
+      "subtitle": "Adjon meg egy biztonságos új jelszót fiókjához.",
+      "newPassword": "Új jelszó",
+      "update": "Jelszó frissítése",
+      "updating": "Frissítés...",
+      "success": "Jelszó sikeresen visszaállítva! Átirányítás...",
+      "errorTitle": "Hiba",
+      "requestNew": "Új link kérése",
+      "noToken": "Nem található visszaállító token. Kérjük, használja az e-mailben kapott visszaállító linket.",
+      "expireNote": "A visszaállító linkek 1 óra után lejárnak, vagy csak egyszer használhatók fel. Kérjük, kérjen új linket.",
+      "pwdPlaceholder": "Min. 6 karakter"
     }
   }
 }

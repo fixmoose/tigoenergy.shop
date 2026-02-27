@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { getMarketKeyFromHostname } from '@/lib/constants/markets'
+import React, { useState, useEffect } from 'react'
 
 const MARKET_PHONE_CODES: Record<string, string> = {
     SI: '+386',
@@ -29,8 +30,9 @@ const MARKET_PHONE_CODES: Record<string, string> = {
 
 
 export default function B2BRegistrationForm() {
-    const supabase = createClient()
+    const t = useTranslations('auth.register')
     const router = useRouter()
+    const supabase = createClient()
 
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
@@ -39,7 +41,7 @@ export default function B2BRegistrationForm() {
     const { inputRef: addressInputRef } = useAddressAutocomplete((parsed) => {
         setFormData(prev => ({
             ...prev,
-            companyAddress: parsed.street,
+            address: parsed.street,
             city: parsed.city,
             postalCode: parsed.postal_code,
             country: parsed.country
@@ -51,7 +53,7 @@ export default function B2BRegistrationForm() {
         // Company
         vatNumber: '',
         companyName: '',
-        companyAddress: '',
+        address: '', // Changed from companyAddress
         companyAddress2: '',
         city: '',
         postalCode: '',
@@ -82,8 +84,10 @@ export default function B2BRegistrationForm() {
         // Agreements
         terms: false,
         privacy: false,
-        legitimateBusiness: false,
-        isNonEU: false
+        authorized: false, // New field
+        legitimate: false, // New field, replaced legitimateBusiness
+        newsletter: false, // New field
+        marketing: false // New field
     })
 
     // Verification States
@@ -94,7 +98,7 @@ export default function B2BRegistrationForm() {
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
 
     // Auto-prefill phone code based on market or detected company country
-    React.useEffect(() => {
+    useEffect(() => {
         let targetCountry = formData.country
 
         // Fallback to market if no country detected yet
@@ -136,17 +140,17 @@ export default function B2BRegistrationForm() {
                 setFormData(prev => ({
                     ...prev,
                     companyName: data.name || prev.companyName,
-                    companyAddress: data.address || '',
+                    address: data.address || '', // Changed from companyAddress
                     country: data.countryCode || prev.country
                 }))
                 // Auto-advance
                 setStep(2)
             } else {
-                setError(data.error || 'VAT validation failed')
+                setError(data.error || t('errors.vatValidationFailed'))
             }
         } catch (e) {
             setLoading(false)
-            setError('Connection error')
+            setError(t('errors.connectionError'))
         }
     }
 
@@ -168,7 +172,7 @@ export default function B2BRegistrationForm() {
             }
         } catch (err: any) {
             setLoading(false)
-            setError('reCAPTCHA verification failed. Please try again.')
+            setError(t('errors.verificationFailed'))
             resetRecaptcha()
         }
     }
@@ -182,9 +186,9 @@ export default function B2BRegistrationForm() {
             })
             const data = await res.json()
             if (data.success) setEmailVerified(true)
-            else setError(data.error || 'Invalid code')
+            else setError(data.error || t('errors.invalidCode'))
         } catch (err) {
-            setError('Verification failed')
+            setError(t('errors.verificationFailed'))
         } finally {
             setLoading(false)
         }
@@ -209,9 +213,9 @@ export default function B2BRegistrationForm() {
             })
             const data = await res.json()
             if (data.success) setPhoneVerified(true)
-            else setError(data.error || 'Invalid code')
+            else setError(data.error || t('errors.invalidCode'))
         } catch (err) {
-            setError('Verification failed')
+            setError(t('errors.verificationFailed'))
         } finally {
             setLoading(false)
         }
@@ -232,7 +236,7 @@ export default function B2BRegistrationForm() {
                         last_name: formData.lastName,
                         company_name: formData.companyName,
                         vat_id: formData.vatNumber,
-                        company_address: formData.companyAddress,
+                        company_address: formData.address, // Changed from companyAddress
                         company_address2: formData.companyAddress2,
                         city: formData.city,
                         postal_code: formData.postalCode,
@@ -241,7 +245,10 @@ export default function B2BRegistrationForm() {
                         phone: formData.phone,
                         commercial_access: formData.commercialAccess,
                         business_type: formData.businessType,
-                        website: formData.website
+                        website: formData.website,
+                        job_title: formData.jobTitle, // Added
+                        newsletter: formData.newsletter, // Added
+                        marketing: formData.marketing // Added
                     }
                 }
             })
@@ -252,203 +259,138 @@ export default function B2BRegistrationForm() {
             // User requested mock to real signUp, usually profile is auto-created.
 
             setLoading(false)
-            alert('Registration request submitted! Please check your email to verify your account.')
+            alert(t('messages.registrationSuccess'))
             router.push('/checkout') // Redirect to checkout or dashboard
         } catch (err: any) {
             setLoading(false)
-            setError(err.message || 'Registration failed')
+            setError(err.message || t('errors.registrationFailed'))
         }
     }
 
     return (
         <div className="max-w-2xl mx-auto py-6">
-            <h2 className="text-2xl font-bold mb-2 text-center text-blue-900">Business Registration</h2>
-            <p className="text-center text-gray-500 mb-8">For Installers, Resellers & Distributors</p>
+            <div className="text-center mb-10">
+                <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">{t('b2bTitle')}</h2>
+                <p className="mt-2 text-gray-500 font-medium">{t('b2bSubtitle')}</p>
+            </div>
 
             {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-6 text-sm flex items-center gap-2">⚠️ {error}</div>}
 
             {/* STEP 1: VAT */}
-            <StepCard number={1} title="VAT Verification" isActive={step === 1} isCompleted={step > 1} setStep={setStep}>
+            <StepCard number={1} title={t('steps.vat')} isActive={step === 1} isCompleted={step > 1} setStep={setStep}>
                 <div className="space-y-4">
-                    <p className="text-sm text-gray-600">
-                        {formData.isNonEU
-                            ? "Enter your company's Tax ID or VAT registration number for manual verification."
-                            : "Enter your valid EU VAT number to verify your business status via VIES."}
+                    <p className="text-sm text-gray-500 italic pb-2">
+                        {t('messages.euNote')}
                     </p>
                     <div className="flex gap-2">
-                        <div className="relative flex-1">
-                            <label htmlFor="vat-input" className="sr-only">VAT Number</label>
-                            <input
-                                id="vat-input"
-                                name="vatNumber"
-                                className="w-full border p-2.5 rounded-lg uppercase tracking-wider font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                                placeholder={formData.isNonEU ? "Tax ID / Registration #" : "DE12345678"}
-                                value={formData.vatNumber}
-                                onChange={e => setFormData(prev => ({ ...prev, vatNumber: e.target.value }))}
-                                autoFocus
-                            />
-                        </div>
+                        <input
+                            id="reg-vat"
+                            name="vatNumber"
+                            type="text"
+                            placeholder={t('placeholders.vat')}
+                            value={formData.vatNumber}
+                            onChange={e => setFormData({ ...formData, vatNumber: e.target.value.toUpperCase() })}
+                            className="flex-1 border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-mono"
+                        />
                         <button
                             type="button"
-                            onClick={formData.isNonEU ? () => setStep(2) : handleValidateVat}
+                            onClick={handleValidateVat}
                             disabled={loading || !formData.vatNumber}
-                            className="bg-blue-800 text-white px-6 rounded-lg hover:bg-blue-900 font-medium disabled:opacity-50"
+                            className="bg-gray-900 text-white px-4 rounded-lg hover:bg-black disabled:opacity-50 transition-colors"
                         >
-                            {loading ? 'Verifying...' : formData.isNonEU ? 'Continue' : 'Verify VAT'}
+                            {loading ? t('buttons.sending') : t('buttons.verifyVat')}
                         </button>
                     </div>
-
-                    <div className="flex items-center gap-2 py-1">
-                        <input
-                            type="checkbox"
-                            id="nonEuCheckbox"
-                            className="w-4 h-4 text-blue-600 rounded"
-                            checked={formData.isNonEU}
-                            onChange={e => setFormData(prev => ({ ...prev, isNonEU: e.target.checked }))}
-                        />
-                        <label htmlFor="nonEuCheckbox" className="text-sm font-medium text-gray-700 cursor-pointer">
-                            Located outside of European Union?
-                        </label>
+                    <p className="text-[10px] text-gray-400">
+                        {t('messages.vatFormat')}
+                    </p>
+                    <div className="pt-4 border-t">
+                        <button type="button" onClick={() => setStep(2)} className="text-xs text-blue-600 hover:underline">
+                            {t('messages.nonEu')}
+                        </button>
+                        <p className="text-[10px] text-gray-400 mt-1 italic">
+                            {t('messages.vatFallback')}
+                        </p>
                     </div>
-
-                    {!formData.isNonEU && !vatVerified && (
-                        <>
-                            <div className="text-xs text-blue-600 font-medium bg-blue-50 p-2 rounded">
-                                Format: CC12345678 (e.g., DE12345678). Country code is mandatory.
-                            </div>
-                            <div className="text-xs text-gray-400">
-                                * Verification happens in real-time. If VIES is offline, we will fallback to manual verification.
-                            </div>
-                        </>
-                    )}
-
-                    {vatVerified && (
-                        <div className="space-y-3 animate-in fade-in slide-in-from-top-1">
-                            <div className="text-green-600 text-sm font-medium flex items-center gap-2">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                VAT verified successfully
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setStep(2)}
-                                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm"
-                            >
-                                Continue to Next Step
-                            </button>
-                        </div>
-                    )}
                 </div>
             </StepCard>
 
             {/* STEP 2: Company Details */}
-            <StepCard number={2} title="Company Details" isActive={step === 2} isCompleted={step > 2} setStep={setStep}>
+            <StepCard number={2} title={t('steps.company')} isActive={step === 2} isCompleted={step > 2} setStep={setStep}>
                 <div className="space-y-4">
-                    <div className="bg-blue-50 p-3 rounded border border-blue-100 text-sm text-blue-800 mb-2">
-                        <strong>✓ VAT Verified.</strong> Please confirm your company details below.
-                    </div>
+                    {!vatVerified && (
+                        <div className="bg-yellow-50 p-3 rounded border border-yellow-100 mb-4">
+                            <p className="text-[11px] text-yellow-700">
+                                {t('messages.nonEuNote')}
+                            </p>
+                        </div>
+                    )}
                     <div>
-                        <label htmlFor="company-name" className="text-xs font-medium text-gray-500">Company Name</label>
-                        <input
-                            id="company-name"
-                            name="companyName"
-                            className={`w-full border p-2.5 rounded-lg ${formData.isNonEU ? 'bg-white' : 'bg-gray-50'}`}
-                            value={formData.companyName}
-                            onChange={e => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-                            readOnly={!formData.isNonEU}
-                        />
+                        <label htmlFor="reg-company" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.companyName')}</label>
+                        <input id="reg-company" name="companyName" className="w-full border p-2.5 rounded-lg" value={formData.companyName} onChange={e => setFormData({ ...formData, companyName: e.target.value })} />
                     </div>
-                    <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-3 rounded-lg border border-blue-100 mb-2">
-                        <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
-                    </p>
-                    <div>
-                        <label htmlFor="company-address" className="text-xs font-medium text-gray-500">Registered Address (Street & No)</label>
-                        <input
-                            id="company-address"
-                            name="companyAddress"
-                            ref={addressInputRef}
-                            className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            value={formData.companyAddress}
-                            onChange={e => setFormData(prev => ({ ...prev, companyAddress: e.target.value }))}
-                            placeholder="Type company address..."
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="company-address2" className="text-xs font-medium text-gray-500">Suite, Apt, PO Box, etc. (Optional)</label>
-                        <input
-                            id="company-address2"
-                            name="companyAddress2"
-                            className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            value={formData.companyAddress2}
-                            onChange={e => setFormData(prev => ({ ...prev, companyAddress2: e.target.value }))}
-                            placeholder="Suite, Apt, Unit, PO Box..."
-                        />
-                    </div>
-
+                    {!vatVerified && (
+                        <div>
+                            <label htmlFor="reg-taxid" className="block text-xs font-medium text-gray-500 mb-1">Tax ID / Registration #</label>
+                            <input id="reg-taxid" name="vatNumber" placeholder={t('placeholders.taxId')} className="w-full border p-2.5 rounded-lg" value={formData.vatNumber} onChange={e => setFormData({ ...formData, vatNumber: e.target.value })} />
+                        </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="company-city" className="text-xs font-medium text-gray-500">City</label>
-                            <input
-                                id="company-city"
-                                name="city"
-                                className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.city}
-                                onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                                placeholder="City"
-                            />
+                            <label htmlFor="reg-website" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.website')}</label>
+                            <input id="reg-website" name="website" placeholder="https://..." className="w-full border p-2.5 rounded-lg" value={formData.website} onChange={e => setFormData({ ...formData, website: e.target.value })} />
                         </div>
                         <div>
-                            <label htmlFor="company-postal" className="text-xs font-medium text-gray-500">Postal Code</label>
-                            <input
-                                id="company-postal"
-                                name="postalCode"
-                                className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.postalCode}
-                                onChange={e => setFormData(prev => ({ ...prev, postalCode: e.target.value }))}
-                                placeholder="ZIP"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label htmlFor="company-country" className="text-xs font-medium text-gray-500">Country</label>
-                        <input
-                            id="company-country"
-                            name="country"
-                            className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${!formData.isNonEU ? 'bg-gray-50' : 'bg-white'}`}
-                            value={formData.country}
-                            onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
-                            placeholder="Country"
-                            readOnly={!formData.isNonEU}
-                        />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="company-website" className="text-xs font-medium text-gray-500">Website (Optional)</label>
-                            <input id="company-website" name="website" className="w-full border p-2.5 rounded-lg" placeholder="https://..." value={formData.website} onChange={e => setFormData(prev => ({ ...prev, website: e.target.value }))} />
-                        </div>
-                        <div>
-                            <label htmlFor="company-employees" className="text-xs font-medium text-gray-500">Employees</label>
-                            <select id="company-employees" name="employees" className="w-full border p-2.5 rounded-lg bg-white" value={formData.employees} onChange={e => setFormData(prev => ({ ...prev, employees: e.target.value }))}>
-                                <option value="">Select...</option>
+                            <label htmlFor="reg-employees" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.employees')}</label>
+                            <select id="reg-employees" name="employees" className="w-full border p-2.5 rounded-lg bg-white" value={formData.employees} onChange={e => setFormData({ ...formData, employees: e.target.value })}>
+                                <option value="">{t('placeholders.select')}</option>
                                 <option value="1-5">1-5</option>
                                 <option value="6-20">6-20</option>
-                                <option value="21-50">21-50</option>
-                                <option value="50+">50+</option>
+                                <option value="21-100">21-100</option>
+                                <option value="100+">100+</option>
                             </select>
                         </div>
                     </div>
-                    <div className="flex gap-3">
-                        <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
-                        <button type="button" onClick={() => setStep(3)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700">Confirm & Continue</button>
+
+                    <div className="pt-2">
+                        <h4 className="text-xs font-bold text-gray-700 mb-3">{t('labels.address')}</h4>
+                        <div className="space-y-3">
+                            <input
+                                ref={addressInputRef}
+                                placeholder={t('labels.address')}
+                                className="w-full border p-2.5 rounded-lg"
+                                value={formData.address}
+                                onChange={e => setFormData({ ...formData, address: e.target.value })}
+                            />
+                            <div className="flex gap-3">
+                                <input placeholder={t('labels.city')} className="flex-1 border p-2.5 rounded-lg" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
+                                <input placeholder={t('labels.zip')} className="w-24 border p-2.5 rounded-lg" value={formData.postalCode} onChange={e => setFormData({ ...formData, postalCode: e.target.value })} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded-lg border">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" className="w-4 h-4 text-blue-600" checked={formData.commercialAccess} onChange={e => setFormData({ ...formData, commercialAccess: e.target.checked })} />
+                            <span className="text-xs font-medium">{t('labels.commercialAccess')}</span>
+                        </label>
+                        <p className="text-[10px] text-gray-500 mt-1 ml-7">
+                            {t('labels.truckAccess')}
+                        </p>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                        <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 border">{t('buttons.back')}</button>
+                        <button type="button" onClick={() => setStep(3)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-sm">{t('buttons.continue')}</button>
                     </div>
                 </div>
             </StepCard>
 
             {/* STEP 3: Business Type & Logistics */}
-            <StepCard number={3} title="Business Type" isActive={step === 3} isCompleted={step > 3} setStep={setStep}>
+            <StepCard number={3} title={t('steps.business')} isActive={step === 3} isCompleted={step > 3} setStep={setStep}>
                 <div className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium mb-2">Type of Business</label>
+                        <label className="block text-sm font-medium mb-2">{t('labels.businessType')}</label>
                         <div className="grid grid-cols-2 gap-3">
                             {['Installer', 'Reseller', 'Distributor', 'Other'].map(type => (
                                 <label key={type} className={`border rounded-lg p-3 cursor-pointer flex items-center gap-2 hover:bg-gray-50 ${formData.businessType === type ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}>
@@ -459,47 +401,37 @@ export default function B2BRegistrationForm() {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-2">My Delivery Location has Commercial Access?</label>
-                        <p className="text-xs text-gray-500 mb-2">Can a large truck/van access your warehouse/office for pallet delivery?</p>
-                        <div className="flex gap-4">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="commercialAccess" checked={formData.commercialAccess === true} onChange={() => setFormData(prev => ({ ...prev, commercialAccess: true }))} />
-                                <span className="text-sm">Yes, Standard Truck Access</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="commercialAccess" checked={formData.commercialAccess === false} onChange={() => setFormData(prev => ({ ...prev, commercialAccess: false }))} />
-                                <span className="text-sm">No, Limited Access</span>
-                            </label>
-                        </div>
-                    </div>
-
                     <div className="flex gap-3">
-                        <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
-                        <button type="button" onClick={() => setStep(4)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700">Next Step</button>
+                        <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">{t('buttons.back')}</button>
+                        <button type="button" onClick={() => setStep(4)} className="flex-[2] bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700">{t('buttons.nextStep')}</button>
                     </div>
                 </div>
             </StepCard>
 
             {/* STEP 4: Contact Verification (Simplified for brevity as logic is same as B2C) */}
-            <StepCard number={4} title="Contact Person" isActive={step === 4} isCompleted={step > 4} setStep={setStep}>
+            <StepCard number={4} title={t('steps.contact')} isActive={step === 4} isCompleted={step > 4} setStep={setStep}>
                 <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label htmlFor="contact-fname" className="text-xs font-medium text-gray-500">First Name</label>
-                            <input id="contact-fname" name="firstName" placeholder="First Name" className="w-full border p-2.5 rounded-lg" value={formData.firstName} onChange={e => setFormData(prev => ({ ...prev, firstName: e.target.value }))} />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="b2b-fname" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.firstName')}</label>
+                            <input id="b2b-fname" placeholder={t('labels.firstName')} className="w-full border p-2.5 rounded-lg" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
                         </div>
-                        <div className="space-y-1">
-                            <label htmlFor="contact-lname" className="text-xs font-medium text-gray-500">Last Name</label>
-                            <input id="contact-lname" name="lastName" placeholder="Last Name" className="w-full border p-2.5 rounded-lg" value={formData.lastName} onChange={e => setFormData(prev => ({ ...prev, lastName: e.target.value }))} />
+                        <div>
+                            <label htmlFor="b2b-lname" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.lastName')}</label>
+                            <input id="b2b-lname" placeholder={t('labels.lastName')} className="w-full border p-2.5 rounded-lg" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
                         </div>
                     </div>
-
-                    <div className="space-y-2">
-                        <label htmlFor="contact-email" className="text-xs font-medium text-gray-500">Business Email</label>
+                    <div>
+                        <label htmlFor="b2b-job" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.jobTitle')}</label>
+                        <input id="b2b-job" placeholder={t('labels.jobTitle')} className="w-full border p-2.5 rounded-lg" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} />
+                    </div>
+                    <div>
+                        <label htmlFor="b2b-email" className="block text-xs font-medium text-gray-500 mb-1">{t('labels.email')}</label>
                         <div className="flex gap-2">
-                            <input id="contact-email" name="email" type="email" placeholder="Business Email" className="flex-1 border p-2.5 rounded-lg" value={formData.email} onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))} />
-                            <button type="button" onClick={handleSendEmailCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">Send Code</button>
+                            <input id="b2b-email" type="email" placeholder={t('placeholders.email')} className="flex-1 border p-2.5 rounded-lg" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                            <button type="button" onClick={handleSendEmailCode} disabled={loading} className="bg-gray-900 text-white px-4 rounded-lg text-sm">
+                                {emailCodeSent ? t('buttons.resendEmail') : t('buttons.sendCode')}
+                            </button>
                         </div>
                     </div>
 
@@ -508,24 +440,24 @@ export default function B2BRegistrationForm() {
                     </div>
                     {emailCodeSent && !emailVerified && (
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
-                            <span className="text-xs font-medium text-blue-800 block italic">Check your email for the verification code</span>
+                            <span className="text-xs font-medium text-blue-800 block italic">{t('messages.checkEmailCode')}</span>
                             <div className="flex gap-2 items-center">
-                                <label htmlFor="email-verify-code" className="sr-only">Code</label>
+                                <label htmlFor="email-verify-code" className="sr-only">{t('labels.code')}</label>
                                 <input id="email-verify-code" name="emailCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.emailCode} onChange={e => setFormData(prev => ({ ...prev, emailCode: e.target.value }))} />
-                                <button type="button" onClick={handleVerifyEmail} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">Verify Email</button>
+                                <button type="button" onClick={handleVerifyEmail} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">{t('buttons.verifyEmail')}</button>
                             </div>
                         </div>
                     )}
-                    {emailVerified && <div className="text-green-600 text-sm font-medium">✓ Email Verified</div>}
+                    {emailVerified && <div className="text-green-600 text-sm font-medium">✓ {t('messages.emailVerified')}</div>}
 
                     <div className="space-y-2">
-                        <label htmlFor="contact-phone" className="text-xs font-medium text-gray-500">Mobile Phone</label>
+                        <label htmlFor="contact-phone" className="text-xs font-medium text-gray-500">{t('labels.mobilePhone')}</label>
                         <div className="flex gap-2">
                             <input
                                 id="contact-phone"
                                 name="phone"
                                 type="tel"
-                                placeholder="Mobile Phone"
+                                placeholder={t('placeholders.mobilePhone')}
                                 className="flex-1 border p-2.5 rounded-lg"
                                 value={formData.phone}
                                 onChange={e => {
@@ -543,32 +475,32 @@ export default function B2BRegistrationForm() {
                                 }}
                             />
                             <button type="button" onClick={handleSendPhoneCode} disabled={loading || !formData.phone} className="bg-gray-900 text-white px-4 rounded-lg text-sm">
-                                {phoneCodeSent ? 'Resend SMS' : 'Send SMS'}
+                                {phoneCodeSent ? t('buttons.resendSms') : t('buttons.sendSms')}
                             </button>
                         </div>
                     </div>
                     {phoneCodeSent && !phoneVerified && (
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
-                            <span className="text-xs font-medium text-blue-800 block italic">Check your phone for the 6-digit code</span>
+                            <span className="text-xs font-medium text-blue-800 block italic">{t('messages.checkPhoneCode')}</span>
                             <div className="flex gap-2 items-center">
-                                <label htmlFor="phone-verify-code" className="sr-only">Code</label>
+                                <label htmlFor="phone-verify-code" className="sr-only">{t('labels.code')}</label>
                                 <input id="phone-verify-code" name="phoneCode" maxLength={6} placeholder="000000" className="w-32 border p-2.5 rounded-lg text-center font-mono tracking-widest" value={formData.phoneCode} onChange={e => setFormData(prev => ({ ...prev, phoneCode: e.target.value }))} />
-                                <button type="button" onClick={handleVerifyPhone} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">Verify Phone</button>
+                                <button type="button" onClick={handleVerifyPhone} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium">{t('buttons.verifyPhone')}</button>
                             </div>
                         </div>
                     )}
-                    {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ Phone Verified</div>}
+                    {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ {t('messages.phoneVerified')}</div>}
 
                     {(emailVerified && phoneVerified) && (
                         <div className="space-y-3 animate-in fade-in slide-in-from-top-1 mt-4">
                             <div className="flex gap-3">
-                                <button type="button" onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">Back</button>
+                                <button type="button" onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">{t('buttons.back')}</button>
                                 <button
                                     type="button"
                                     onClick={() => setStep(5)}
                                     className="flex-[2] bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition-all shadow-sm"
                                 >
-                                    Continue to Final Step
+                                    {t('buttons.continueToFinalStep')}
                                 </button>
                             </div>
                         </div>
@@ -576,7 +508,7 @@ export default function B2BRegistrationForm() {
                     {(!emailVerified || !phoneVerified) && (
                         <div className="pt-2">
                             <button type="button" onClick={() => setStep(3)} className="w-full text-xs text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1 mt-2">
-                                <span>← Back to Business Type</span>
+                                ← {t('buttons.backToBusinessType')}
                             </button>
                         </div>
                     )}
@@ -584,40 +516,40 @@ export default function B2BRegistrationForm() {
             </StepCard>
 
             {/* STEP 5: Security & Submit */}
-            <StepCard number={5} title="Finish Application" isActive={step === 5} isCompleted={false} setStep={setStep}>
+            <StepCard number={5} title={t('steps.security')} isActive={step === 5} isCompleted={step > 5} setStep={setStep}>
                 <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <label htmlFor="reg-password" ref={null} className="text-xs font-medium text-gray-500">Password</label>
-                            <input id="reg-password" name="password" type="password" autoComplete="new-password" placeholder="Password" className="w-full border p-2.5 rounded-lg" value={formData.password} onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))} />
+                            <label htmlFor="reg-password" className="text-xs font-medium text-gray-500">{t('labels.password')}</label>
+                            <input id="reg-password" name="password" type="password" autoComplete="new-password" placeholder={t('placeholders.password')} className="w-full border p-2.5 rounded-lg" value={formData.password} onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))} />
                         </div>
                         <div className="space-y-1">
-                            <label htmlFor="reg-confirm" className="text-xs font-medium text-gray-500">Confirm Password</label>
-                            <input id="reg-confirm" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Confirm Password" className="w-full border p-2.5 rounded-lg" value={formData.confirmPassword} onChange={e => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))} />
+                            <label htmlFor="reg-confirm" className="text-xs font-medium text-gray-500">{t('labels.confirmPassword')}</label>
+                            <input id="reg-confirm" name="confirmPassword" type="password" autoComplete="new-password" placeholder={t('placeholders.confirmPassword')} className="w-full border p-2.5 rounded-lg" value={formData.confirmPassword} onChange={e => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))} />
                         </div>
                     </div>
 
                     <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600 space-y-3">
                         <label className="flex items-start gap-3 cursor-pointer">
-                            <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.legitimateBusiness} onChange={e => setFormData(prev => ({ ...prev, legitimateBusiness: e.target.checked }))} />
-                            <span className="font-bold text-gray-800">I confirm that I am authorized by the company to register on their behalf.</span>
+                            <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.legitimate} onChange={e => setFormData(prev => ({ ...prev, legitimate: e.target.checked }))} />
+                            <span className="font-bold text-gray-800">{t('agreements.legitimate')}</span>
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.terms} onChange={e => setFormData(prev => ({ ...prev, terms: e.target.checked }))} />
-                            <span>I agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>.</span>
+                            <span>{t('agreements.terms')}</span>
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.privacy} onChange={e => setFormData(prev => ({ ...prev, privacy: e.target.checked }))} />
-                            <span>I agree to the <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.</span>
+                            <span>{t('agreements.privacy')}</span>
                         </label>
                         <div className="border-t pt-2 mt-2">
                             <label className="flex items-start gap-3 cursor-pointer">
-                                <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={(formData as any).newsletter} onChange={e => setFormData(prev => ({ ...prev, newsletter: e.target.checked }))} />
-                                <span>Subscribe to our **Newsletter** (Industry Insights).</span>
+                                <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.newsletter} onChange={e => setFormData(prev => ({ ...prev, newsletter: e.target.checked }))} />
+                                <span>{t('agreements.newsletter')}</span>
                             </label>
                             <label className="flex items-start gap-3 cursor-pointer mt-2">
-                                <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={(formData as any).marketing} onChange={e => setFormData(prev => ({ ...prev, marketing: e.target.checked }))} />
-                                <span>Receive **B2B Promotional Pricing** and clearance updates.</span>
+                                <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.marketing} onChange={e => setFormData(prev => ({ ...prev, marketing: e.target.checked }))} />
+                                <span>{t('agreements.marketing')}</span>
                             </label>
                         </div>
                     </div>
@@ -625,18 +557,85 @@ export default function B2BRegistrationForm() {
                     <div className="flex flex-col gap-3">
                         <button
                             type="button"
-                            onClick={handleSubmit}
-                            disabled={!formData.terms || !formData.privacy || !formData.legitimateBusiness || loading}
+                            onClick={() => setStep(6)} // Changed to go to review step
+                            disabled={!formData.terms || !formData.privacy || !formData.legitimate || loading}
                             className="w-full bg-blue-800 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-blue-900 shadow-md transition-all disabled:opacity-50"
                         >
-                            {loading ? 'Creating Account...' : 'Create Business Account'}
+                            {t('buttons.continueToReview')}
                         </button>
                         <button
                             type="button"
                             onClick={() => setStep(4)}
                             className="w-full py-2 text-sm text-gray-500 hover:text-gray-900 border border-transparent hover:border-gray-200 rounded-lg transition-all"
                         >
-                            ← Back to Contact Person
+                            ← {t('buttons.backToContactPerson')}
+                        </button>
+                    </div>
+                </div>
+            </StepCard>
+
+            {/* STEP 6: Review & Final Submit */}
+            <StepCard number={6} title={t('steps.review')} isActive={step === 6} isCompleted={false} setStep={setStep}>
+                <div className="space-y-6">
+                    {/* B2B REVIEW SUMMARY */}
+                    <div className="bg-gray-50 rounded-xl p-4 border text-[11px] space-y-3">
+                        <h4 className="font-bold text-gray-700 border-b pb-2 uppercase tracking-wider">{t('agreements.reviewInfo')}</h4>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                            <div>
+                                <span className="block text-gray-400 font-medium">{t('steps.company')}</span>
+                                <span className="font-bold text-gray-800">{formData.companyName}</span>
+                                <span className="block text-gray-500">{formData.vatNumber}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-400 font-medium">{t('steps.contact')}</span>
+                                <span className="font-bold text-gray-800">{formData.firstName} {formData.lastName}</span>
+                                <span className="block text-gray-500">{formData.email}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-400 font-medium">{t('labels.address')}</span>
+                                <span className="text-gray-700">{formData.address}, {formData.city}, {formData.postalCode}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-400 font-medium">{t('steps.business')}</span>
+                                <span className="text-gray-700 font-bold">{formData.businessType}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl text-xs text-gray-600 space-y-3 bg-blue-50/30 border border-blue-100">
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input id="b2b-terms" name="terms" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.terms} onChange={e => setFormData(prev => ({ ...prev, terms: e.target.checked }))} />
+                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.terms')}</span>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input id="b2b-privacy" name="privacy" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.privacy} onChange={e => setFormData(prev => ({ ...prev, privacy: e.target.checked }))} />
+                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.privacy')}</span>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input id="b2b-auth" name="authorized" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.authorized} onChange={e => setFormData(prev => ({ ...prev, authorized: e.target.checked }))} />
+                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.authorized')}</span>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input id="b2b-legit" name="legitimate" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.legitimate} onChange={e => setFormData(prev => ({ ...prev, legitimate: e.target.checked }))} />
+                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.legitimate')}</span>
+                        </label>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!formData.terms || !formData.privacy || !formData.authorized || !formData.legitimate || loading}
+                            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-100 transition-all transform hover:-translate-y-0.5"
+                        >
+                            {loading ? t('agreements.creating') : t('agreements.confirmCreate')}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setStep(5)}
+                            className="w-full py-2 text-sm text-gray-500 hover:text-gray-900 flex items-center justify-center gap-2"
+                        >
+                            ← {t('buttons.back')}
                         </button>
                     </div>
                 </div>

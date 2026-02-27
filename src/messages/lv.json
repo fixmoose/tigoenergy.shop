@@ -47,9 +47,9 @@
     "menu": "Izvēlne",
     "loggedInAs": "Pierakstījies kā \"{role}\"",
     "inStockCount": "{count} noliktavā",
-    "availToOrder": "Pieej. pasūt.",
-    "tigoProductSupport": "Tigo produktu atbalsts",
-    "tigoProductSupportDesc": "Tehniskā palīdzība ar Tigo produktiem",
+    "availToOrder": "Pieejams pasūtīšanai",
+    "tigoProductSupport": "Tigo Energy produktu atbalsts",
+    "tigoProductSupportDesc": "Tehniskā palīdzība ar Tigo Energy produktiem",
     "onlineShopSupport": "Tiešsaistes veikala atbalsts",
     "onlineShopSupportDesc": "Palīdzība ar pasūtījumiem un piegādi"
   },
@@ -71,7 +71,7 @@
     "operatedBy": "Uztur: Initra Energija d.o.o. - Pilnvarots Tigo Energy izplatītājs",
     "designBy": "Dizains:",
     "allRightsReserved": "Visas tiesības aizsargātas.",
-    "disclaimer1": "Piegāde ir atkarīga no trešo pušu pakalpojumu sniedzējiem, un mums nav kontroles pār piegādes laikiem vai kavējumiem.",
+    "disclaimer1": "Piegāde ir atkarīga od trešo pušu pakalpojumu sniedzējiem, un mums nav kontroles pār piegādes laikiem vai kavējumiem.",
     "disclaimer2": "Ražotāja garantija attiecas uz MLPE ierīcēm.",
     "disclaimer3": "Bezrūpīga atgriešana attiecas uz B2C klientiem personiskai lietošanai 14 dienu laikā. Pircējs ir atbildīgs par atgriešanas piegādes izmaksām."
   },
@@ -182,12 +182,12 @@
   "home": {
     "heroTitle": "Specializēts tiešsaistes veikals Tigo Energy produktiem",
     "heroSubtitle": "Bez uzcenojumiem. Bez pārsteigumiem. Tikai tieša piekļuve.",
-    "heroServing": "Apkalpo visu saules enerģijas kopienu: uzstādītājus, mazumtirgotājus un māju īpašniekus.",
+    "heroServing": "Apkalpojam visu saules enerģijas kopienu: uzstādītājus, mazumtirgotājus un māju īpašniekus.",
     "shopNow": "Iepirkties tagad",
     "signIn": "Pierakstīties",
     "createAccount": "Izveidot kontu",
     "createB2BAccount": "Izveidot B2B kontu",
-    "authorizedDealer": "Pilnvarots EU tirgotājs",
+    "authorizedDealer": "Pilnvarots EU izplatītājs",
     "fastShipping": "Ātra piegāde EU",
     "warranty25": "25 gadu garantija",
     "worryFreeReturns": "Bezrūpīga atgriešana",
@@ -201,22 +201,22 @@
     "shopByCategory": "Iepirkšanās pēc kategorijas",
     "shopByCategorySubtitle": "Atrodiet pareizos produktus savam saules enerģijas projektam",
     "globalReach": "Globāls sasniedzamība, vietējs fokuss",
-    "logisticsTitle": "Centrāli izvietots Slovenia",
+    "logisticsTitle": "Centrāli izvietoti Slovēnijā",
     "logisticsHighlight": "Ātrai EU izplatīšanai",
-    "logisticsP1": "No mūsu stratēģiskā centra Slovenia mēs savienojam ražošanas izcilību no <strong>Taizemes un Ķīnas</strong> tieši pie jūsu durvīm. Preces ierodas caur Koper ostu — īsākais maršruts no Āzijas uz Centrāleiropu.",
-    "logisticsP2": "Šī loģistikas priekšrocība samazina tranzīta laikus un novērš nevajadzīgus starpniekus. Rezultāts? Mēs varam izplatīt Tigo Energy produktus jebkur EU par <strong>zemāko iespējamo cenu</strong>.",
+    "logisticsP1": "No mūsu stratēģiskā centra Slovēnijā mēs savienojam ražošanas izcilību no <strong>Taizemes un Ķīnas</strong> tieši pie jūsu durvīm. Preces ierodas caur Koper ostu — īsākais maršruts no Āzijas uz Centrāleiropu.",
+    "logisticsP2": "Šī loģistikas priekšrocība samazina tranzīta laikus un novērš nevajadzīgus starpniekus. Rezultāts? Mēs varam izplatīt Tigo Energy produktus jebkurā vietā EU par <strong>zemāko iespējamo cenu</strong>.",
     "deliveryDays": "2-4 dienas",
-    "avgDelivery": "Vidējā piegāde uz EU",
+    "avgDelivery": "Vidējais piegādes laiks uz EU",
     "direct": "Tieši",
     "fromKoper": "No Koper ostas",
     "orderNow": "Pasūtīt tagad",
-    "mapAlt": "Tigo Energy EU izplatīšanas karte - Slovenia centrs",
+    "mapAlt": "Tigo Energy EU izplatīšanas karte - Slovēnijas centrs",
     "whyChoose": "Kāpēc izvēlēties Tigo Energy?",
     "whyChooseSubtitle": "Mēs padarām saules optimizāciju vienkāršu un pieejamu",
     "moreEnergy": "Līdz 20% vairāk enerģijas",
     "moreEnergyDesc": "Moduļa līmeņa optimizācija nodrošina maksimālu enerģijas iegūšanu no katra paneļa, pat daļējā ēnā.",
     "enhancedSafety": "Uzlabota drošība",
-    "enhancedSafetyDesc": "Ātrās izslēgšanas atbilstība un moduļa līmeņa uzraudzība drošībai.",
+    "enhancedSafetyDesc": "Ātrās izslēgšanas atbilstība un moduļa līmeņa uzraudzība mieram.",
     "smartMonitoring": "Viedā uzraudzība",
     "smartMonitoringDesc": "Reāllaika veiktspējas dati katram modulim ar Tigo Energy Intelligence platformu.",
     "ctaTitle": "Gatavs optimizēt savu saules instalāciju?",
@@ -247,204 +247,315 @@
     "officialShopInvoice": "Oficiālais veikala rēķins"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Sveicināti,",
+    "bestRegards": "Ar cieņu,",
+    "team": "Tigo Energy SHOP komanda",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "Apstipriniet savu e-pasta adresi",
+      "text": "Paldies, ka pievienojāties Tigo Energy SHOP. Lai pabeigtu reģistrāciju un nodrošinātu savu kontu, lūdzu, izmantojiet šo verifikācijas kodu:",
+      "expire": "Šis kods būs derīgs 10 minūtes. Ja jūs nepieprasījāt šo kodu, lūdzu, ignorējiet šo e-pastu."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "Apstipriniet savu e-pasta adresi",
+      "helloWithName": "Sveiki, {{name}}!",
+      "text": "Laipni lūdzam Tigo Energy SHOP! Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai apstiprinātu savu e-pasta adresi un aktivizētu savu kontu.",
+      "button": "Apstiprināt e-pasta adresi",
+      "linkHelp": "Ja augstāk esošā poga nedarbojas, varat arī nokopēt un ielīmēt šo saiti savā pārlūkprogrammā:",
+      "ignore": "Ja jūs neizveidojāt kontu, nekāda turpmāka rīcība nav nepieciešama."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Laipni lūdzam ģimenē!",
+      "text": "Mēs priecājamies, ka esat kopā ar mums Tigo Energy SHOP. Tagad jūs esat saistīts ar Eiropas specializēto Tigo Energy saules enerģijas risinājumu izplatītāju.",
+      "feature1": "Ekspertu atbalsts",
+      "feature1Desc": "Tieša piekļuve tehniskajiem ekspertiem, kuri pārzina Tigo produktus no iekšienes.",
+      "feature2": "Tiešā izplatīšana",
+      "feature2Desc": "Oriģināli produkti par labākajām iespējamajām cenām, kas tiek piegādāti tieši visā Eiropā.",
+      "feature3": "Viedie saules rīki",
+      "feature3Desc": "Pārvaldiet savus pasūtījumus, izsekošanu un B2B priekšrocības vienā profilā.",
+      "button": "Sākt izpēti",
+      "footerNote": "Ja jums ir kādi jautājumi, mūsu atbalsta komanda ir tikai viena ziņojuma attālumā."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Ziņojums veiksmīgi nosūtīts",
+      "title": "Mēs esam saņēmuši jūsu pieprasījumu",
+      "text": "Paldies, ka sazinājāties ar mums. Jūsu ziņojums ir veiksmīgi piegādāts mūsu atbalsta komandai. Zemāk mēs esam pievienojuši jūsu ziņojuma kopiju jūsu vajadzībām.",
+      "footerNote": "Mūsu komandas loceklis izskatīs jūsu pieprasījumu un sazināsies ar jums pēc iespējas ātrāk. Parasti mēs atbildam vienas darba dienas laikā."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Jums ir jauns ziņojums",
+      "text": "Komandas loceklis ir atbildējis uz jūsu pieprasījumu. Jūs varat apskatīt ziņojumu un turpināt sarunu savā veikala profilā.",
+      "dateLabel": "Saņemts:",
+      "button": "Skatīt ziņojumu",
+      "footerNote": "Ja jums rodas problēmas ar pieteikšanos, lūdzu, sazinieties ar mūsu atbalsta komandu."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "title": "Paldies par jūsu pasūtījumu!",
+      "text": "Mēs esam saņēmuši jūsu pasūtījumu un gatavojam to. Jūs saņemsiet vēl vienu e-pastu, kad jūsu pasūtījums tiks izsūtīts.",
+      "orderNumber": "Pasūtījuma numurs:",
+      "date": "Datums:",
+      "paymentMethod": "Maksāšanas veids:",
+      "product": "Produkts",
+      "qty": "Skaits",
+      "price": "Cena",
+      "subtotal": "Starpsumma",
+      "shipping": "Piegāde",
+      "vat": "PVN",
+      "total": "Kopā apmaksai",
+      "footerNote": "Jūs varat izsekot sava pasūtījuma statusam savā konta profilā."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Pasūtījums saņemts",
+      "bannerTitle": "Notiek piegādes aprēķināšana",
+      "bannerText": "Jūsu pasūtījums ir veiksmīgi saņemts un daļēji apmaksāts. Pasūtījuma veida vai izmēra dēļ mēs šobrīd aprēķinām visprecīzākās piegādes izmaksas jūsu atrašanās vietai.",
+      "text": "Mēs jūs informēsim pa e-pastu, tiklīdz tiks noteikta piegādes cena. Pēc apstiprināšanas jūs varēsiet veikt galīgo maksājumu savā veikala profilā, lai pabeigtu pasūtījumu.",
+      "amountPaid": "Apmaksātā summa (Produkti):",
+      "shippingStatus": "Piegādes statuss:",
+      "pending": "Gaida aprēķinu",
+      "footerNote": "Paldies par pacietību un par to, ka izvēlējāties Tigo Energy SHOP."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Vai kaut ko aizmirsāt?",
+      "text": "Mēs pamanījām, ka jūsu grozā palika dažas preces. Mēs tās saglabājām jums, lai jūs varētu turpināt tieši tur, kur apstājāties.",
+      "itemsTitle": "Preces jūsu grozā:",
+      "button": "Pabeigt pirkumu",
+      "footerNote": "Nepieciešama palīdzība ar pasūtījumu? Vienkārši atbildiet uz šo e-pastu, un mūsu komanda labprāt jums palīdzēs."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Aizraujošas cenu izmaiņas!",
+      "text": "Mēs domājām, ka jūs vēlētos uzzināt, ka produktam, kuru iepriekš iegādājāties vai par kuru izrādījāt interesi, tagad ir jauna cena.",
+      "footerNote": "Šis ir lielisks laiks, lai paplašinātu saules enerģijas instalāciju vai papildinātu komponentu krājumus.",
+      "button": "Skatīt produktu"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Piegādāts!",
+      "text": "Lieliskas ziņas! Jūsu pasūtījums #{{order_number}} ir veiksmīgi piegādāts. Ceram, ka esat apmierināti ar saviem jaunajiem Tigo Energy produktiem.",
+      "attachmentNote": "Jūsu vajadzībām mēs šim e-pastam esam pievienojuši šādus dokumentus:",
+      "doc1": "Piegādes apstiprinājums",
+      "doc2": "Oficiālais rēķins",
+      "footerNote": "Paldies, ka izvēlējāties Initra Energija kā savu Tigo Energy partneri. Ja jums ir kādi jautājumi par uzstādīšanu vai produkta iestatīšanu, mūsu tehniskā komanda ir gatava palīdzēt."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES apstiprināts",
+      "title": "Jūsu B2B konts ir aktīvs",
+      "helloWithCompany": "Sveiki, {{company_name}} komanda!",
+      "text": "Mēs ar prieku informējam, ka jūsu PVN maksātāja numurs (VIES) ir veiksmīgi apstiprināts. Jūsu B2B konts tagad ir pilnībā aktīvs, un jūs varat izbaudīt visas mūsu profesionālo partneru programmas priekšrocības.",
+      "benefit1": "0% PVN (Iegāde ES teritorijā)",
+      "benefit2": "Profesionālas B2B cenas",
+      "benefit3": "Prioritāras piegādes iespējas",
+      "benefit4": "Tiešais tehniskais atbalsts",
+      "button": "Pieteikties savā B2B portālā",
+      "footerNote": "Laipni lūdzam! Mēs ar nepacietību gaidām iespēju atbalstīt jūsu saules enerģijas projektus."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "B2B pieteikums saņemts",
+      "bannerTitle": "Notiek pārbaude",
+      "bannerText": "Mūsu komanda šobrīd pārbauda jūsu dokumentāciju un uzņēmuma informāciju. Šis process parasti aizņem līdz 48 stundām.",
+      "text": "Tiklīdz jūsu informācija tiks apstiprināta, mēs jūs informēsim pa e-pastu, un jūsu konts būs pilnībā operatīvs ar piekļuvi B2B cenām un profesionāliem rīkiem.",
+      "footerNote": "Tikmēr, ja jums ir kādi steidzami jautājumi, droši atbildiet uz šo e-pastu."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Atiestatiet savu paroli",
+      "text": "Mēs saņēmām pieprasījumu atiestatīt jūsu Tigo Energy SHOP konta paroli. Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai izvēlētos jaunu paroli.",
+      "button": "Atiestatīt paroli",
+      "linkHelp": "Ja augstāk esošā poga nedarbojas, varat arī nokopēt un ielīmēt šo saiti savā pārlūkprogrammā:",
+      "expire": "Šī saite būs derīga 1 stundu. Ja jūs nepieprasījāt paroles atiestatīšanu, lūdzu, ignorējiet šo e-pastu vai sazinieties ar atbalsta dienestu, ja jums ir bažas."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Jūsu pasūtījums ir ceļā!",
+      "text": "Jūsu pasūtījums #{{order_number}} ir izsūtīts un šobrīd ir ceļā pie jums.",
+      "carrier": "Pārvadātājs",
+      "tracking": "Izsekošanas numurs",
+      "button": "Izsekot sūtījumu",
+      "footerNote": "Lūdzu, ņemiet vērā, ka var paiet līdz 24 stundām, līdz izsekošanas informācija tiek atjaunināta pārvadātāja vietnē."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Atgriešana un garantija",
+      "h14DayReturns": "14 dienu atgriešanas politika",
+      "p14DayReturns": "Mēs piedāvājam B2C klientiem 14 dienu vienkāršu atgriešanas procesu nelietotām precēm oriģinālajā iepakojumā.",
+      "hWarranty": "Garantija",
+      "pWarranty": "Tigo Energy produktiem ir nozares vadošās ražotāja garantijas (līdz 25 gadiem MLPE komponentiem)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Piegādes informācija",
+      "pLead": "Mēs piegādājam Tigo Energy risinājumus visā Eiropas Savienībā darba dienās.",
+      "hDeliveryTimes": "Piegādes laiki",
+      "pDeliveryTimes": "Vidējais piegādes laiks ir 2-4 darba dienas atkarībā no jūsu atrašanās vietas.",
+      "hCarriers": "Pārvadātāji",
+      "pCarriers": "Standarta sūtījumiem mēs galvenokārt izmantojam GLS un DPD, bet lielākiem pasūtījumiem - specializētos kravu pārvadājumus."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Privātuma politika",
+      "lastUpdated": "Pēdējo reizi atjaunināts: 2026. gada 7. februārī",
+      "intro": "Jūsu privātums mums ir svarīgs. Šī privātuma politika izskaidro, kā mēs apkopojam, izmantojam un aizsargājam jūsu personas datus, kad izmantojat Tigo Energy SHOP.",
+      "h1": "1. Apkopotā informācija",
+      "p1": "Mēs apkopojam informāciju, kuru jūs sniedzat reģistrācijas laikā, piemēram, vārdu, e-pastu, tālruņa numuru un adresi.",
+      "h2": "2. Informācijas izmantošana",
+      "p2": "Mēs izmantojam jūsu informāciju, lai apstrādātu pasūtījumus, sniegtu atbalstu un uzlabotu mūsu pakalpojumus."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Lietošanas noteikumi",
+      "lastUpdated": "Pēdējo reizi atjaunināts: 2026. gada 7. februārī",
+      "intro": "Piekļūstot un izmantojot Tigo Energy SHOP, jūs piekrītat šiem noteikumiem.",
+      "h1": "1. Noteikumu pieņemšana",
+      "p1": "Šie noteikumi regulē mūsu tīmekļa vietnes un pakalpojumu lietošanu.",
+      "h2": "2. Lietošanas licence",
+      "p2": "Ir atļauts uz laiku lejupielādēt vienu materiālu kopiju no Tigo Energy SHOP tīmekļa vietnes tikai personīgai, nekomerciālai īslaicīgai apskatei."
     },
     "impressum": {
       "title": "Impressum",
-      "hCompany": "Company Information",
+      "hCompany": "Uzņēmuma informācija",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "PVN numurs: SI62518313",
+      "registration": "Reģistrācijas numurs: 9624007000",
+      "hContact": "Kontaktinformācija",
+      "emailLabel": "E-pasts:",
+      "clickToReveal": "Noklikšķiniet, lai redzētu",
+      "hAuthorized": "Pilnvarotais Tigo Energy izplatītājs",
+      "pAuthorized1": "Initra Energija d.o.o. ir pilnvarots Tigo Energy produktu izplatītājs Eiropā. Mēs specializējamies tikai Tigo Energy risinājumos, nodrošinot ekspertu zināšanas un oriģinālus produktus.",
+      "hResponsible": "Atbildīgais par saturu",
+      "pResponsible": "Initra Energija d.o.o. ir atbildīga par visu šajā tīmekļa vietnē publicēto saturu."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Sīkfailu politika",
+      "lastUpdated": "Pēdējo reizi atjaunināts: 2026. gada 7. februārī",
+      "intro": "Šī sīkfailu politika paskaidro, kā Tigo Energy SHOP izmanto sīkfailus un līdzīgas tehnoloģijas, lai jūs atpazītu, kad apmeklējat mūsu tīmekļa vietni.",
+      "h1": "1. Kas ir sīkfaili?",
+      "p1": "Sīkfaili ir mazi datu faili, kas tiek saglabāti jūsu datorā vai mobilajā ierīcē, kad apmeklējat tīmekļa vietni.",
+      "h2": "2. Kā mēs izmantojam sīkfailus",
+      "p2": "Mēs izmantojam nepieciešamos sīkfailus vietnes darbībai un papildu sīkfailus analītikai."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Bieži uzdotie jautājumi",
+      "q1": "Cik ātra ir piegāde?",
+      "a1": "Standarta piegāde aizņem 2-4 darba dienas.",
+      "q2": "Vai jūs piedāvājat tehnisko atbalstu?",
+      "a2": "Jā, mūsu eksperti ir pieejami, lai palīdzētu jums ar Tigo produktu izvēli un konfigurāciju."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Sazināties ar pārdošanas nodaļu",
+      "intro": "Meklējat vairumtirdzniecības cenas vai jums ir jautājumi par saules enerģijas instalāciju? Apstipriniet savu e-pastu zemāk, lai sāktu sarunu ar mūsu pārdošanas komandu.",
+      "prefillTitle": "Sazināties ar Tigo pārdošanas nodaļu"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Tigo produktu atbalsts",
+      "intro": "Saņemiet tehnisko palīdzību Tigo Energy produktiem, izmantojot Shop Messenger"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Tiešsaistes veikala atbalsts"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Laipni lūdzam atpakaļ",
+      "subtitle": "Pierakstieties, lai piekļūtu savam kontam",
+      "email": "E-pasta adrese",
+      "password": "Parole",
+      "forgotPassword": "Aizmirsu paroli?",
+      "signIn": "Pierakstīties",
+      "signingIn": "Pierakstās...",
+      "noAccount": "Nav konta?",
+      "createAccount": "Izveidot kontu"
+    },
+    "register": {
+      "title": "Izvēlieties konta veidu",
+      "personalAccount": "Privāts konts",
+      "personalDesc": "Māju īpašniekiem, kuri pērk Tigo aprīkojumu.",
+      "businessAccount": "Uzņēmuma konts",
+      "businessDesc": "Uzstādītājiem, izplatītājiem un tālākpārdevējiem.",
+      "createCustomer": "Izveidot klienta kontu",
+      "forHomeowners": "Mājsaimniecībām un privātpersonām",
+      "businessSwitch": "Esat uzņēmums? Izveidiet B2B kontu",
+      "personalSwitch": "Neesat uzņēmums? Izveidiet privātu kontu",
+      "b2bTitle": "Biznesa reģistrācija",
+      "b2bSubtitle": "Uzstādītājiem, tālākpārdevējiem un izplatītājiem",
+      "steps": {
+        "email": "E-pasta verifikācija",
+        "phone": "Mobilā tālruņa verifikācija",
+        "personal": "Personas dati",
+        "address": "Adrese",
+        "security": "Konta drošība",
+        "review": "Pārskats un noteikumi",
+        "vat": "PVN verifikācija",
+        "company": "Uzņēmuma dati",
+        "business": "Biznesa veids",
+        "contact": "Kontaktpersona",
+        "finish": "Pabeigt pieteikumu"
+      },
+      "labels": {
+        "firstName": "Vārds",
+        "lastName": "Uzvārds",
+        "dob": "Dzimšanas datums",
+        "occupation": "Nodarbošanās (pēc izvēles)",
+        "address": "Iela un numurs",
+        "address2": "Dzīvoklis, birojs utt. (pēc izvēles)",
+        "city": "Pilsēta",
+        "zip": "Pasta indekss",
+        "country": "Valsts",
+        "username": "Lietotājvārds (automātiski ieteikts)",
+        "password": "Parole",
+        "confirmPassword": "Apstiprināt paroli",
+        "vatNumber": "PVN maksātāja numurs",
+        "companyName": "Uzņēmuma nosaukums",
+        "website": "Mājaslapa (pēc izvēles)",
+        "employees": "Darbinieku skaits",
+        "commercialAccess": "Vai piegādes vietai ir komerciāla piekļuve?",
+        "jobTitle": "Amats",
+        "businessType": "Biznesa veids",
+        "truckAccess": "Vai liela kravas automašīna var piekļūt jūsu noliktavai/birojam palešu piegādei?"
+      },
+      "messages": {
+        "emailCheck": "Pārbaudiet savu e-pastu, lai saņemtu 6 ciparu kodu",
+        "phoneCheck": "Pārbaudiet savu tālruni, lai saņemtu 6 ciparu kodu",
+        "emailDone": "E-pasts veiksmīgi verificēts",
+        "phoneDone": "Tālrunis veiksmīgi verificēts",
+        "dobNote": "Dzimšanas datums ir nepieciešams, lai apstiprinātu, ka esat sasniedzis minimālo vecumu (18+) šī pakalpojuma lietošanai.",
+        "addressNote": "Lūdzu, apstipriniet savu adresi ar Google, noklikšķinot adreses logā un pēc tam izvēloties Google ieteikto adresi.",
+        "vatNote": "Ievadiet savu derīgo ES PVN numuru, lai pārbaudītu uzņēmuma statusu, izmantojot VIES.",
+        "vatFormat": "Formāts: CC12345678 (piemēram, LV40001234567). Valsts kods ir obligāts.",
+        "vatFallback": "* Pārbaude notiek reāllaikā. Ja VIES nav pieejams, mēs veiksim manuālu pārbaudi.",
+        "commercialYes": "Jā, standarta piekļuve kravas auto",
+        "commercialNo": "Nē, ierobežota piekļuve",
+        "nonEu": "Atrodaties ārpus Eiropas Savienības?",
+        "nonEuNote": "Ievadiet uzņēmuma nodokļu maksātāja ID manuālai pārbaudei.",
+        "euNote": "Ievadiet savu derīgo ES PVN numuru, lai pārbaudītu uzņēmuma statusu, izmantojot VIES.",
+        "successTitle": "Reģistrācija veiksmīga!",
+        "successDesc": "Jūsu konts ir izveidots. Sveiciena e-pasts ir nosūtīts uz {email}.",
+        "goSignIn": "Doties uz pieteikšanos"
+      },
+      "agreements": {
+        "reviewInfo": "Pārskatiet savu informāciju",
+        "editDetails": "Labot datus",
+        "terms": "Es piekrītu Noteikumiem un nosacījumiem un Pieņemamas lietošanas politikai.",
+        "privacy": "Es apstiprinu Privātuma politiku un saprotu, kā tiek apstrādāti mani dati.",
+        "newsletter": "Abonējiet mūsu ziņu izdevumu jaunākajām ziņām.",
+        "marketing": "Es piekrītu saņemt reklāmas un īpašos piedāvājumus.",
+        "authorized": "Es apstiprinu, ka uzņēmums mani ir pilnvarojis reģistrēties tā vārdā.",
+        "legitimate": "Šī ir likumīga uzņēmējdarbības vienība.",
+        "confirmCreate": "Apstiprināt un izveidot kontu",
+        "creating": "Izveido kontu..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Aizmirsu paroli?",
+      "subtitle": "Ievadiet savu e-pastu, un mēs nosūtīsim saiti paroles atiestatīšanai.",
+      "sendLink": "Sūtīt atiestatīšanas saiti",
+      "success": "Ja šim e-pastam eksistē konts, drīzumā saņemsiet paroles atiestatīšanas saiti.",
+      "backToLogin": "Atpakaļ uz pieteikšanos"
+    },
+    "resetPassword": {
+      "title": "Iestatīt jaunu paroli",
+      "subtitle": "Ievadiet drošu jaunu paroli savam kontam.",
+      "newPassword": "Jaunā parole",
+      "update": "Atjaunināt paroli",
+      "updating": "Atjaunina...",
+      "success": "Parole veiksmīgi atiestatīta! Pāradresācija...",
+      "errorTitle": "Kļūda",
+      "requestNew": "Pieprasīt jaunu saiti",
+      "noToken": "Atiestatīšanas marķieris netika atrasts. Lūdzu, izmantojiet saiti e-pastā.",
+      "expireNote": "Atiestatīšanas saites ir derīgas 1 stundu vai tās var izmantot tikai vienreiz. Lūdzu, pieprasiet jaunu saiti.",
+      "pwdPlaceholder": "Minimāli 6 rakstzīmes"
     }
   }
 }

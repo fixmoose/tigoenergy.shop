@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { useTranslations } from 'next-intl'
 
 export default function ForgotPasswordPage() {
+    const t = useTranslations('auth.forgotPassword')
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
@@ -27,7 +29,7 @@ export default function ForgotPasswordPage() {
 
             if (error) throw error
 
-            setMessage('If an account exists for this email, you will receive a password reset link shortly.')
+            setMessage(t('success'))
         } catch (error: any) {
             setError(error.message)
             resetRecaptcha()
@@ -40,8 +42,8 @@ export default function ForgotPasswordPage() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center p-6">
             <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
                 <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>
-                    <p className="text-sm text-gray-500 mt-2">Enter your email and we&apos;ll send you a link to reset your password.</p>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
+                    <p className="text-sm text-gray-500 mt-2">{t('subtitle')}</p>
                 </div>
 
                 {error && (
@@ -57,13 +59,13 @@ export default function ForgotPasswordPage() {
                             {message}
                         </div>
                         <Link href="/auth/login" className="inline-block text-green-600 font-bold hover:underline">
-                            Back to Login
+                            {t('backToLogin')}
                         </Link>
                     </div>
                 ) : (
                     <form onSubmit={handleRequestReset} className="space-y-6">
                         <div>
-                            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 mb-1">{t('subtitle')}</label>
                             <input
                                 id="reset-email"
                                 type="email"
@@ -86,12 +88,12 @@ export default function ForgotPasswordPage() {
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            ) : 'Send Reset Link'}
+                            ) : t('sendLink')}
                         </button>
 
                         <div className="text-center">
                             <Link href="/auth/login" className="text-sm text-gray-400 hover:text-gray-600 transition">
-                                Back to Login
+                                {t('backToLogin')}
                             </Link>
                         </div>
                     </form>

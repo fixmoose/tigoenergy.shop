@@ -35,8 +35,8 @@
     "createAccount": "Creează cont",
     "createB2BAccount": "Creează cont B2B",
     "signInRegister": "Autentificare / Înregistrare",
-    "shopAll": "Toate",
-    "shopAllProducts": "Toate produsele",
+    "shopAll": "Toate produsele",
+    "shopAllProducts": "Vizualizează toate produsele",
     "support": "Suport",
     "searchPlaceholder": "Caută optimizatoare, invertoare sau accesorii...",
     "searchProducts": "Caută produse...",
@@ -47,7 +47,7 @@
     "menu": "Meniu",
     "loggedInAs": "Autentificat ca \"{role}\"",
     "inStockCount": "{count} în stoc",
-    "availToOrder": "Disponibil comandă",
+    "availToOrder": "Disponibil pentru comandă",
     "tigoProductSupport": "Tigo Energy suport produse",
     "tigoProductSupportDesc": "Asistență tehnică pentru produsele Tigo Energy",
     "onlineShopSupport": "Suport magazin online",
@@ -247,204 +247,315 @@
     "officialShopInvoice": "Factură oficială magazin"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Bună ziua,",
+    "bestRegards": "Cu stimă,",
+    "team": "Echipa Tigo Energy SHOP",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "Verificați-vă adresa de e-mail",
+      "text": "Vă mulțumim că v-ați alăturat Tigo Energy SHOP. Pentru a finaliza înregistrarea și a vă securiza contul, vă rugăm să utilizați următorul cod de verificare:",
+      "expire": "Acest cod va expira în 10 minute. Dacă nu ați solicitat acest lucru, vă rugăm să ignorați acest e-mail."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "Verificați-vă adresa de e-mail",
+      "helloWithName": "Bună ziua {{name}},",
+      "text": "Bine ați venit la Tigo Energy SHOP! Vă rugăm să faceți clic pe butonul de mai jos pentru a vă verifica adresa de e-mail și a vă activa contul.",
+      "button": "Verifică adresa de e-mail",
+      "linkHelp": "Dacă butonul de mai sus nu funcționează, puteți copia și lipi următorul link în browserul dvs.:",
+      "ignore": "Dacă nu ați creat un cont, nu este necesară nicio altă acțiune."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Bine ați venit în familie!",
+      "text": "Suntem încântați să vă avem la Tigo Energy SHOP. Acum sunteți conectat la distribuitorul specializat din Europa pentru soluții solare Tigo Energy.",
+      "feature1": "Suport de specialitate",
+      "feature1Desc": "Acces direct la experți tehnici care cunosc produsele Tigo în detaliu.",
+      "feature2": "Distribuție directă",
+      "feature2Desc": "Produse autentice la cele mai bune prețuri posibile, expediate direct în toată Europa.",
+      "feature3": "Instrumente solare inteligente",
+      "feature3Desc": "Gestionați-vă comenzile, urmărirea și beneficiile B2B, toate dintr-un singur profil.",
+      "button": "Începeți explorarea",
+      "footerNote": "Dacă aveți întrebări, echipa noastră de suport este la doar un mesaj distanță."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Mesaj trimis cu succes",
+      "title": "Am primit solicitarea dvs.",
+      "text": "Vă mulțumim că ne-ați contactat. Mesajul dvs. a fost livrat cu succes echipei noastre de suport. Am inclus o copie a mesajului dvs. mai jos pentru evidențele dvs.",
+      "footerNote": "Un membru al echipei noastre vă va revizui solicitarea și vă va răspunde cât mai curând posibil. De obicei, răspundem în termen de o zi lucrătoare."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Aveți un mesaj nou",
+      "text": "Un membru al echipei a răspuns la solicitarea dvs. Puteți vizualiza mesajul și continua conversația în profilul magazinului dvs.",
+      "dateLabel": "Primit la data de:",
+      "button": "Vizualizați mesajul",
+      "footerNote": "Dacă aveți probleme cu autentificarea, vă rugăm să contactați echipa noastră de suport."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
+      "title": "Vă mulțumim pentru comandă!",
+      "text": "Am primit comanda dvs. și o pregătim. Veți primi un alt e-mail când comanda dvs. va fi expediată.",
+      "orderNumber": "Număr comandă:",
+      "date": "Data:",
+      "paymentMethod": "Metodă de plată:",
+      "product": "Produs",
+      "qty": "Cant.",
+      "price": "Preț",
       "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "shipping": "Livrare",
+      "vat": "TVA",
+      "total": "Total plătit",
+      "footerNote": "Puteți urmări starea comenzii dvs. în profilul contului dvs."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Comandă primită",
+      "bannerTitle": "Calculul expedierii în curs",
+      "bannerText": "Comanda dvs. a fost primită cu succes și plătită parțial. Datorită naturii sau dimensiunii comenzii dvs., în prezent calculăm cel mai precis cost de expediere pentru locația dvs.",
+      "text": "Vă vom notifica prin e-mail imediat ce prețul de expediere este stabilit. Odată confirmat, veți putea efectua plata finală în profilul magazinului dvs. pentru a finaliza comanda.",
+      "amountPaid": "Suma plătită (Produse):",
+      "shippingStatus": "Starea expedierii:",
+      "pending": "Calcul în așteptare",
+      "footerNote": "Vă mulțumim pentru răbdare și pentru că ați ales Tigo Energy SHOP."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Ați uitat ceva?",
+      "text": "Am observat că ați lăsat câteva articole în coș. Le-am salvat pentru dvs., astfel încât să puteți relua exact de unde ați rămas.",
+      "itemsTitle": "Articole în coșul dvs.:",
+      "button": "Finalizează achiziția",
+      "footerNote": "Aveți nevoie de ajutor cu comanda dvs.? Doar răspundeți la acest e-mail și echipa noastră va fi bucuroasă să vă ajute."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Actualizare interesantă de preț!",
+      "text": "Ne-am gândit că v-ar plăcea să știți că un produs pe care l-ați achiziționat anterior sau pentru care ați arătat interes are acum un preț nou.",
+      "footerNote": "Acesta este un moment excelent pentru a vă extinde instalația solară sau pentru a vă face stocuri de componente.",
+      "button": "Vizualizați produsul"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Livrat!",
+      "text": "Vești bune! Comanda dvs. #{{order_number}} a fost livrată cu succes. Sperăm că sunteți mulțumit de noile dvs. produse Tigo Energy.",
+      "attachmentNote": "Pentru evidențele dvs., am atașat următoarele documente la acest e-mail:",
+      "doc1": "Confirmare de livrare",
+      "doc2": "Factură oficială",
+      "footerNote": "Vă mulțumim că ați ales Initra Energija ca partener Tigo Energy. Dacă aveți întrebări despre instalare sau configurarea produsului, echipa noastră tehnică este aici pentru a vă ajuta."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES verificat",
+      "title": "Contul dvs. B2B este activ",
+      "helloWithCompany": "Bună ziua echipa {{company_name}},",
+      "text": "Suntem încântați să vă informăm că numărul dvs. de TVA (VIES) a fost verificat cu succes. Contul dvs. B2B este acum complet activ și vă puteți bucura de toate beneficiile programului nostru de parteneriat profesional.",
+      "benefit1": "0% TVA (Achiziție intracomunitară)",
+      "benefit2": "Prețuri profesionale B2B",
+      "benefit3": "Opțiuni de expediere prioritare",
+      "benefit4": "Suport tehnic direct",
+      "button": "Autentificați-vă în portalul dvs. B2B",
+      "footerNote": "Bine ați venit la bord! Așteptăm cu nerăbdare să vă sprijinim proiectele solare."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "Cerere B2B primită",
+      "bannerTitle": "Verificare în curs",
+      "bannerText": "Echipa noastră examinează în prezent documentația și informațiile companiei dvs. Acest proces durează de obicei până la 48 de ore.",
+      "text": "Odată ce informațiile dvs. sunt verificate, vă vom notifica prin e-mail și contul dvs. va fi complet operațional, cu acces la prețurile B2B și instrumentele profesionale.",
+      "footerNote": "Între timp, dacă aveți întrebări urgente, nu ezitați să răspundeți la acest e-mail."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Resetați-vă parola",
+      "text": "Am primit o solicitare de resetare a parolei pentru contul dvs. Tigo Energy SHOP. Vă rugăm să faceți clic pe butonul de mai jos pentru a alege o parolă nouă.",
+      "button": "Resetează parola",
+      "linkHelp": "Dacă butonul de mai sus nu funcționează, puteți copia și lipi următorul link în browserul dvs.:",
+      "expire": "Acest link va expira în o oră. Dacă nu ați solicitat resetarea parolei, vă rugăm să ignorați acest e-mail sau să contactați suportul dacă aveți nelămuriri."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Comanda dvs. este pe drum!",
+      "text": "Comanda dvs. #{{order_number}} a fost expediată și este acum în drum spre dvs.",
+      "carrier": "Transportator",
+      "tracking": "Număr de urmărire",
+      "button": "Urmăriți coletul",
+      "footerNote": "Vă rugăm să rețineți că poate dura până la 24 de ore pentru ca informațiile de urmărire să se actualizeze pe site-ul transportatorului."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Returnări și garanție",
+      "h14DayReturns": "14 zile termen de returnare",
+      "p14DayReturns": "Oferim returnări fără probleme în termen de 14 zile pentru clienții B2C pentru articolele nefolosite în ambalajul original.",
+      "hWarranty": "Garanție",
+      "pWarranty": "Produsele Tigo Energy vin cu garanții ale producătorului de top în industrie (până la 25 de ani pentru componentele MLPE)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Informații de expediere",
+      "pLead": "Livrăm soluții Tigo Energy în întreaga Uniune Europeană în timpul zilelor lucrătoare.",
+      "hDeliveryTimes": "Timp de livrare",
+      "pDeliveryTimes": "Timpul mediu de livrare este de 2-4 zile lucrătoare, în funcție de locația dvs.",
+      "hCarriers": "Transportatori",
+      "pCarriers": "Folosim în principal GLS și DPD pentru expedieri standard și transport de marfă specializat pentru comenzi mai mari."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Politica de confidențialitate",
+      "lastUpdated": "Ultima actualizare: 7 februarie 2026",
+      "intro": "Confidențialitatea dvs. este importantă pentru noi. Această Politică de confidențialitate explică modul în care colectăm, utilizăm și protejăm datele dvs. cu caracter personal atunci când utilizați Tigo Energy SHOP.",
+      "h1": "1. Informațiile pe care le colectăm",
+      "p1": "Colectăm informațiile pe care le furnizați în timpul înregistrării, cum ar fi numele, adresa de e-mail, numărul de telefon și adresa.",
+      "h2": "2. Cum utilizăm informațiile",
+      "p2": "Utilizăm informațiile dvs. pentru a procesa comenzile, pentru a oferi suport și pentru a ne îmbunătăți serviciile."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Termeni și condiții",
+      "lastUpdated": "Ultima actualizare: 7 februarie 2026",
+      "intro": "Prin accesarea și utilizarea Tigo Energy SHOP, sunteți de acord să respectați acești termeni.",
+      "h1": "1. Acceptarea termenilor",
+      "p1": "Acești termeni guvernează utilizarea site-ului nostru web și a serviciilor noastre.",
+      "h2": "2. Licența de utilizare",
+      "p2": "Se acordă permisiunea de a descărca temporar o copie a materialelor de pe site-ul Tigo Energy SHOP numai pentru vizualizare tranzitorie personală, necomercială."
     },
     "impressum": {
       "title": "Impressum",
-      "hCompany": "Company Information",
+      "hCompany": "Informații despre companie",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "Număr de TVA: SI62518313",
+      "registration": "Număr de înregistrare: 9624007000",
+      "hContact": "Informații de contact",
+      "emailLabel": "E-mail:",
+      "clickToReveal": "Faceți clic pentru a dezvălui",
+      "hAuthorized": "Distribuitor autorizat Tigo Energy",
+      "pAuthorized1": "Initra Energija d.o.o. este distribuitor autorizat al produselor Tigo Energy în Europa. Suntem specializați exclusiv în soluții Tigo Energy, asigurând cunoștințe de specialitate și produse autentice.",
+      "hResponsible": "Responsabil pentru conținut",
+      "pResponsible": "Initra Energija d.o.o. este responsabilă pentru tot conținutul publicat pe acest site web."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Politica de cookie-uri",
+      "lastUpdated": "Ultima actualizare: 7 februarie 2026",
+      "intro": "Această Politică de cookie-uri explică modul în care Tigo Energy SHOP utilizează cookie-urile și tehnologiile similare pentru a vă recunoaște atunci când vizitați site-ul nostru web.",
+      "h1": "1. Ce sunt cookie-urile?",
+      "p1": "Cookie-urile sunt mici fișiere de date care sunt plasate pe computerul sau dispozitivul dvs. mobil atunci când vizitați un site web.",
+      "h2": "2. Cum utilizăm cookie-urile",
+      "p2": "Utilizăm cookie-uri esențiale pentru funcționarea site-ului web și cookie-uri opționale pentru analize."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Întrebări frecvente",
+      "q1": "Cât de rapidă este expedierea?",
+      "a1": "Expedierea standard durează 2-4 zile lucrătoare.",
+      "q2": "Oferiți suport tehnic?",
+      "a2": "Da, experții noștri sunt disponibili să vă ajute cu selecția și configurarea produselor Tigo."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Contactați vânzările",
+      "intro": "Căutați prețuri pentru volume mari sau aveți întrebări despre instalația dvs. solară? Verificați-vă e-mailul de mai jos pentru a începe o conversație cu echipa noastră de vânzări.",
+      "prefillTitle": "Contactați vânzările Tigo"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Suport produs Tigo",
+      "intro": "Obțineți ajutor tehnic pentru produsele dvs. Tigo Energy prin intermediul Shop Messenger"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Suport magazin online"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bine ați revenit",
+      "subtitle": "Autentificați-vă pentru a vă accesa contul",
+      "email": "Adresă de e-mail",
+      "password": "Parolă",
+      "forgotPassword": "Ați uitat parola?",
+      "signIn": "Autentificare",
+      "signingIn": "Se autentifică...",
+      "noAccount": "Nu aveți un cont?",
+      "createAccount": "Creează cont"
+    },
+    "register": {
+      "title": "Alegeți tipul de cont",
+      "personalAccount": "Cont personal",
+      "personalDesc": "Pentru proprietarii de case care achiziționează echipamente Tigo.",
+      "businessAccount": "Cont de afaceri",
+      "businessDesc": "Pentru instalatori, distribuitori și revânzători.",
+      "createCustomer": "Creează cont de client",
+      "forHomeowners": "Pentru proprietari de case și cumpărători individuali",
+      "businessSwitch": "Sunteți o afacere? Creați cont B2B",
+      "personalSwitch": "Nu sunteți o afacere? Creați cont personal",
+      "b2bTitle": "Înregistrare afacere",
+      "b2bSubtitle": "Pentru instalatori, revânzători și distribuitori",
+      "steps": {
+        "email": "Verificare e-mail",
+        "phone": "Verificare mobil",
+        "personal": "Detalii personale",
+        "address": "Adresă",
+        "security": "Securitate cont",
+        "review": "Revizuire și politici",
+        "vat": "Verificare TVA",
+        "company": "Detalii companie",
+        "business": "Tip de afacere",
+        "contact": "Persoană de contact",
+        "finish": "Finalizare cerere"
+      },
+      "labels": {
+        "firstName": "Prenume",
+        "lastName": "Nume",
+        "dob": "Data nașterii",
+        "occupation": "Ocupație (Opțional)",
+        "address": "Adresa de domiciliu",
+        "address2": "Apartament, suită, etc. (Opțional)",
+        "city": "Oraș",
+        "zip": "Cod poștal",
+        "country": "Țară",
+        "username": "Nume utilizator (sugerat automat)",
+        "password": "Parolă",
+        "confirmPassword": "Confirmă parola",
+        "vatNumber": "Număr de TVA",
+        "companyName": "Nume companie",
+        "website": "Site web (Opțional)",
+        "employees": "Angajați",
+        "commercialAccess": "Locația mea de livrare are acces comercial?",
+        "jobTitle": "Funcție",
+        "businessType": "Tip de afacere",
+        "truckAccess": "Poate un camion/furgonetă mare să acceseze depozitul/biroul dvs. pentru livrarea paletului?"
+      },
+      "messages": {
+        "emailCheck": "Verificați-vă căsuța de e-mail pentru codul de 6 cifre",
+        "phoneCheck": "Verificați-vă telefonul pentru codul de 6 cifre",
+        "emailDone": "E-mail verificat cu succes",
+        "phoneDone": "Telefon verificat cu succes",
+        "dobNote": "Data nașterii este necesară pentru a confirma că îndepliniți cerința de vârstă minimă (18+) pentru acest serviciu.",
+        "addressNote": "Vă rugăm să vă verificați adresa cu Google făcând clic în fereastra de adresă și apoi pe o adresă sugerată de Google.",
+        "vatNote": "Introduceți numărul dvs. de TVA valid din UE pentru a vă verifica statutul de afacere prin VIES.",
+        "vatFormat": "Format: CC12345678 (de ex., RO12345678). Codul de țară este obligatoriu.",
+        "vatFallback": "* Verificarea are loc în timp real. Dacă VIES este offline, vom reveni la verificarea manuală.",
+        "commercialYes": "Da, acces standard pentru camioane",
+        "commercialNo": "Nu, acces limitat",
+        "nonEu": "Situat în afara Uniunii Europene?",
+        "nonEuNote": "Introduceți codul fiscal sau numărul de înregistrare TVA al companiei dvs. pentru verificare manuală.",
+        "euNote": "Introduceți numărul dvs. de TVA valid din UE pentru a vă verifica statutul de afacere prin VIES.",
+        "successTitle": "Înregistrare reușită!",
+        "successDesc": "Contul dvs. a fost creat. Un e-mail de bun venit a fost trimis la {email}.",
+        "goSignIn": "Mergeți la autentificare"
+      },
+      "agreements": {
+        "reviewInfo": "Revizuiți-vă informațiile",
+        "editDetails": "Editați detaliile",
+        "terms": "Sunt de acord cu Termenii și condițiile și Politica de utilizare acceptabilă.",
+        "privacy": "Confirm Politica de confidențialitate și înțeleg cum sunt procesate datele mele.",
+        "newsletter": "Abonați-vă la Newsletter pentru cele mai recente știri și actualizări.",
+        "marketing": "Sunt de acord să primesc prețuri promoționale și oferte speciale.",
+        "authorized": "Confirm că sunt autorizat de companie să mă înregistrez în numele acesteia.",
+        "legitimate": "Aceasta este o entitate comercială legitimă.",
+        "confirmCreate": "Confirmă și creează cont",
+        "creating": "Se creează contul..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Ați uitat parola?",
+      "subtitle": "Introduceți adresa de e-mail și vă vom trimite un link pentru resetarea parolei.",
+      "sendLink": "Trimite link de resetare",
+      "success": "Dacă există un cont pentru acest e-mail, veți primi în curând un link de resetare a parolei.",
+      "backToLogin": "Înapoi la autentificare"
+    },
+    "resetPassword": {
+      "title": "Setați o parolă nouă",
+      "subtitle": "Introduceți o parolă nouă securizată pentru contul dvs.",
+      "newPassword": "Parolă nouă",
+      "update": "Actualizează parola",
+      "updating": "Se actualizează...",
+      "success": "Parolă resetată cu succes! Se redirecționează...",
+      "errorTitle": "Eroare",
+      "requestNew": "Solicită un link nou",
+      "noToken": "Nu a fost găsit niciun token de resetare. Vă rugăm să utilizați linkul de resetare din e-mail.",
+      "expireNote": "Linkurile de resetare expiră după o oră sau pot fi utilizate o singură dată. Vă rugăm să solicitați un link nou.",
+      "pwdPlaceholder": "Minim 6 caractere"
     }
   }
 }

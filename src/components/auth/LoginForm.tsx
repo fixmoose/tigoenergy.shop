@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
+    const t = useTranslations('auth.login')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
@@ -44,12 +46,11 @@ export default function LoginForm() {
             setLoading(false)
         }
     }
-
     return (
         <div className="w-full max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
-                <p className="text-sm text-gray-500 mt-2">Sign in to access your account</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
+                <p className="text-sm text-gray-500 mt-2">{t('subtitle')}</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
@@ -61,34 +62,22 @@ export default function LoginForm() {
                 )}
 
                 <div>
-                    <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                     <input
                         id="login-email"
-                        name="email"
-                        autoComplete="email"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+                        // ... (lines 67-73)
                         placeholder="john@example.com"
                     />
                 </div>
 
                 <div>
                     <div className="flex items-center justify-between mb-1">
-                        <label htmlFor="login-pwd" className="block text-sm font-medium text-gray-700">Password</label>
-                        <Link href="/auth/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-medium">Forgot Password?</Link>
+                        <label htmlFor="login-pwd" className="block text-sm font-medium text-gray-700">{t('password')}</label>
+                        <Link href="/auth/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-medium">{t('forgotPassword')}</Link>
                     </div>
                     <input
                         id="login-pwd"
-                        name="password"
-                        autoComplete="current-password"
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+                        // ... (lines 86-92)
                         placeholder="••••••••"
                     />
                 </div>
@@ -104,14 +93,14 @@ export default function LoginForm() {
                 >
                     {loading ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : 'Sign In'}
+                    ) : t('signIn')}
                 </button>
             </form>
 
             <div className="mt-6 text-center text-sm text-gray-500">
-                Don&apos;t have an account?{' '}
+                {t('noAccount')}{' '}
                 <Link href="/auth/register" className="text-green-600 font-bold hover:underline">
-                    Create Account
+                    {t('createAccount')}
                 </Link>
             </div>
         </div>

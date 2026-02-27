@@ -4,8 +4,11 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { useTranslations } from 'next-intl'
 
 export default function ResetPasswordPage() {
+  const t = useTranslations('auth.resetPassword')
+  const commonT = useTranslations('auth.register.errors')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -19,11 +22,11 @@ export default function ResetPasswordPage() {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession()
       if (!data.session) {
-        setError('No reset token found. Please use the reset link from your email.')
+        setError(t('noToken'))
       }
     }
     checkSession()
-  }, [supabase.auth])
+  }, [supabase.auth, t])
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,7 +34,7 @@ export default function ResetPasswordPage() {
     setMessage('')
 
     if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError(commonT('passwordTooShort'))
       return
     }
 
@@ -42,13 +45,13 @@ export default function ResetPasswordPage() {
       if (err) {
         setError(err.message)
       } else {
-        setMessage('Password reset successfully! Redirecting...')
+        setMessage(t('success'))
         setTimeout(() => {
           router.push('/auth/login')
         }, 2000)
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.')
+      setError(err.message || commonT('general'))
       resetRecaptcha()
       console.error(err)
     } finally {
@@ -60,8 +63,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-[60vh] flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Set New Password</h2>
-          <p className="text-sm text-gray-500 mt-2">Enter a secure new password for your account.</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
+          <p className="text-sm text-gray-500 mt-2">{t('subtitle')}</p>
         </div>
 
         {error ? (
@@ -71,13 +74,13 @@ export default function ResetPasswordPage() {
             </div>
             <div className="space-y-4">
               <p className="text-sm text-gray-500">
-                Reset links expire after 1 hour or can only be used once. Please request a new link.
+                {t('expireNote')}
               </p>
               <Link
                 href="/auth/forgot-password"
                 className="w-full inline-block bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200"
               >
-                Request New Link
+                {t('requestNew')}
               </Link>
             </div>
           </div>
@@ -91,13 +94,13 @@ export default function ResetPasswordPage() {
 
             <form onSubmit={handleResetPassword} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('newPassword')}</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
+                  placeholder={t('pwdPlaceholder')}
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
                   disabled={loading}
                 />
@@ -114,7 +117,7 @@ export default function ResetPasswordPage() {
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : 'Update Password'}
+                ) : t('update')}
               </button>
             </form>
           </>

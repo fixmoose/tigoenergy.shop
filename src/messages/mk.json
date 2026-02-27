@@ -247,204 +247,315 @@
     "officialShopInvoice": "Официјална фактура на продавница"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Здраво,",
+    "bestRegards": "Со почит,",
+    "team": "Тимот на Tigo Energy SHOP",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "Потврдете ја вашата е-пошта",
+      "text": "Ви благодариме што се придруживте на Tigo Energy SHOP. За да ја завршите регистрацијата и да ја осигурате вашата сметка, ве молиме користете го следниов код за потврда:",
+      "expire": "Овој код ќе истече за 10 минути. Ако не сте го побарале ова, ве молиме игнорирајте ја оваа порака."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "Потврдете ја вашата е-пошта",
+      "helloWithName": "Здраво {{name}},",
+      "text": "Добредојдовте во Tigo Energy SHOP! Ве молиме кликнете на копчето подолу за да ја потврдите вашата е-пошта и да ја активирате вашата сметка.",
+      "button": "Потврди е-пошта",
+      "linkHelp": "Ако копчето над не работи, можете исто така да го копирате и залепите следниот линк во вашиот прелистувач:",
+      "ignore": "Ако не сте креирале сметка, не е потребно дополнително дејство."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Добредојдовте во семејството!",
+      "text": "Возбудени сме што сте во Tigo Energy SHOP. Сега сте поврзани со специјализираниот дистрибутер во Европа за соларни решенија на Tigo Energy.",
+      "feature1": "Експертска поддршка",
+      "feature1Desc": "Директен пристап до технички експерти кои ги познаваат производите на Tigo до детали.",
+      "feature2": "Директна дистрибуција",
+      "feature2Desc": "Оригинални производи по најдобри можни цени, испорачани директно низ Европа.",
+      "feature3": "Паметни соларни алатки",
+      "feature3Desc": "Управувајте со вашите нарачки, следење и B2B придобивки, сè од еден профил.",
+      "button": "Започни со истражување",
+      "footerNote": "Ако имате какви било прашања, нашиот тим за поддршка е на само една порака оддалеченост."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Пораката е успешно испратена",
+      "title": "Го примивме вашето барање",
+      "text": "Ви благодариме што не контактиравте. Вашата порака е успешно доставена до нашиот тим за поддршка. Вклучивме копија од вашата порака подолу за ваша евиденција.",
+      "footerNote": "Член на нашиот тим ќе го разгледа вашето барање и ќе ви одговори што е можно поскоро. Обично одговараме во рок од еден работен ден."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Имате нова порака",
+      "text": "Член на тимот одговори на вашето барање. Можете да ја погледнете пораката и да го продолжите разговорот во вашиот профил во продавницата.",
+      "dateLabel": "Примено на:",
+      "button": "Види порака",
+      "footerNote": "Ако имате проблеми со најавувањето, ве молиме контактирајте го нашиот тим за поддршка."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "title": "Ви благодариме за вашата нарачка!",
+      "text": "Ја примивме вашата нарачка и ја подготвуваме. Ќе добиете уште една е-пошта кога нарачката ќе биде испратена.",
+      "orderNumber": "Број на нарачка:",
+      "date": "Датум:",
+      "paymentMethod": "Метод на плаќање:",
+      "product": "Производ",
+      "qty": "Кол.",
+      "price": "Цена",
+      "subtotal": "Меѓузбир",
+      "shipping": "Испорака",
+      "vat": "ДДВ",
+      "total": "Вкупно платено",
+      "footerNote": "Можете да го следите статусот на вашата нарачка во вашиот Профил на сметка."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Нарачката е примена",
+      "bannerTitle": "Пресметката на испорака е во тек",
+      "bannerText": "Вашата нарачка е успешно примена и делумно платена. Поради природата или големината на вашата нарачка, во моментов ја пресметуваме најпрецизната цена за испорака за вашата локација.",
+      "text": "Ќе ве известиме преку е-пошта штом цената за испорака ќе биде одредена. Откако ќе се потврди, ќе можете да го извршите последното плаќање во вашиот профил во продавницата за да ја завршите нарачката.",
+      "amountPaid": "Платен износ (Производи):",
+      "shippingStatus": "Статус на испорака:",
+      "pending": "Пресметката е во тек",
+      "footerNote": "Ви благодариме за трпението и што го избравте Tigo Energy SHOP."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Заборавивте нешто?",
+      "text": "Забележавме дека оставивте некои ставки во вашата кошничка. Ги зачувавме за вас, за да можете да продолжите точно каде што застанавме.",
+      "itemsTitle": "Ставки во вашата кошничка:",
+      "button": "Заврши го купувањето",
+      "footerNote": "Ви треба помош со вашата нарачка? Само одговорете на оваа е-пошта и нашиот тим со задоволство ќе ви помогне."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Возбудлива промена на цената!",
+      "text": "Мислевме дека би сакале да знаете дека производ кој претходно сте го купиле или сте покажале интерес сега има нова цена.",
+      "footerNote": "Ова е одлично време да ја проширите вашата соларна инсталација или да се снабдите со компоненти.",
+      "button": "Види производ"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Доставено!",
+      "text": "Одлични вести! Вашата нарачка #{{order_number}} е успешно доставена. Се надеваме дека сте задоволни со вашите нови производи на Tigo Energy.",
+      "attachmentNote": "За ваша евиденција, во прилог на оваа е-пошта ги испраќаме следниве документи:",
+      "doc1": "Потврда за достава",
+      "doc2": "Официјална фактура",
+      "footerNote": "Ви благодариме што ја избравте Initra Energija како ваш партнер на Tigo Energy. Ако имате какви било прашања во врска со инсталацијата или поставувањето на производот, нашиот технички тим е тука да помогне."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES потврдено",
+      "title": "Вашата B2B сметка е активна",
+      "helloWithCompany": "Здраво тим на {{company_name}},",
+      "text": "Задоволство ни е да ве известиме дека вашиот ДДВ број (VIES) е успешно потврден. Вашата B2B сметка сега е целосно активна и можете да ги уживате сите придобивки од нашата професионална партнерска програма.",
+      "benefit1": "0% ДДВ (Внатрезаедница со набавка)",
+      "benefit2": "Професионални B2B цени",
+      "benefit3": "Приоритетни опции за испорака",
+      "benefit4": "Директна техничка поддршка",
+      "button": "Најавете се на вашиот B2B портал",
+      "footerNote": "Добредојдовте! Со нетрпение очекуваме да ги поддржиме вашите соларни проекти."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "Примена B2B апликација",
+      "bannerTitle": "Проверката е во тек",
+      "bannerText": "Нашиот тим во моментов ја прегледува вашата документација и информации за компанијата. Овој процес обично трае до 48 часа.",
+      "text": "Откако вашите информации ќе бидат потврдени, ќе ве известиме преку е-пошта и вашата сметка ќе биде целосно оперативна со пристап до B2B цени и професионални алатки.",
+      "footerNote": "Во меѓувреме, ако имате итни прашања, слободно одговорете на оваа е-пошта."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Ресетирајте ја вашата лозинка",
+      "text": "Примивме барање за ресетирање на вашата лозинка за вашата сметка на Tigo Energy SHOP. Ве молиме кликнете на копчето подолу за да изберете нова лозинка.",
+      "button": "Ресетирај лозинка",
+      "linkHelp": "Ако копчето над не работи, можете исто така да го копирате и залепите следниот линк во вашиот прелистувач:",
+      "expire": "Овој линк ќе истече за 1 час. Ако не сте побарале ресетирање на лозинката, ве молиме игнорирајте ја оваа е-пошта или контактирајте ја поддршката ако имате загриженост."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Вашата нарачка е на пат!",
+      "text": "Вашата нарачка #{{order_number}} е испратена и сега е на пат кон вас.",
+      "carrier": "Превозник",
+      "tracking": "Број за следење",
+      "button": "Следи го пакетот",
+      "footerNote": "Ве молиме имајте предвид дека може да бидат потребни до 24 часа за информациите за следење да се ажурираат на веб-страницата на превозникот."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Враќање и гаранција",
+      "h14DayReturns": "14 дена враќање",
+      "p14DayReturns": "Нудиме 14-дневна политика за лесно враќање за B2C клиенти за некористени ставки во оригиналното пакување.",
+      "hWarranty": "Гаранција",
+      "pWarranty": "Производите на Tigo Energy доаѓаат со водечки во индустријата гаранции од производителот (до 25 години за MLPE компоненти)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Информации за испорака",
+      "pLead": "Ние доставуваме решенија на Tigo Energy низ целата Европска Унија за време на работните денови.",
+      "hDeliveryTimes": "Време на испорака",
+      "pDeliveryTimes": "Просечното време на испорака е 2-4 работни дена во зависност од вашата локација.",
+      "hCarriers": "Превозници",
+      "pCarriers": "Ние првенствено ги користиме GLS и DPD за стандардни пратки, и специјализиран товар за поголеми нарачки."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Политика на приватност",
+      "lastUpdated": "Последно ажурирано: 7 февруари 2026",
+      "intro": "Вашата приватност е важна за нас. Оваа Политика на приватност објаснува како ги собираме, користиме и ги штитиме вашите лични податоци кога го користите Tigo Energy SHOP.",
+      "h1": "1. Информации што ги собираме",
+      "p1": "Ние собираме информации што ги давате при регистрацијата, како што се вашето име, е-пошта, телефонски број и адреса.",
+      "h2": "2. Како ги користиме информациите",
+      "p2": "Вашите информации ги користиме за обработка на нарачки, обезбедување поддршка и подобрување на нашите услуги."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Услови за користење",
+      "lastUpdated": "Последно ажурирано: 7 февруари 2026",
+      "intro": "Со пристап и користење на Tigo Energy SHOP, се согласувате да бидете обврзани со овие услови.",
+      "h1": "1. Прифаќање на условите",
+      "p1": "Овие услови го регулираат вашето користење на нашата веб-страница и услуги.",
+      "h2": "2. Користење на лиценца",
+      "p2": "Дозволено е привремено преземање на една копија од материјалите на веб-страницата на Tigo Energy SHOP само за лично, некомерцијално минливо гледање."
     },
     "impressum": {
       "title": "Impressum",
-      "hCompany": "Company Information",
+      "hCompany": "Информации за компанијата",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "ДДВ број: SI62518313",
+      "registration": "Матичен број: 9624007000",
+      "hContact": "Контакт информации",
+      "emailLabel": "Е-пошта:",
+      "clickToReveal": "Кликни за да откриеш",
+      "hAuthorized": "Овластен дистрибутер на Tigo Energy",
+      "pAuthorized1": "Initra Energija d.o.o. е овластен дистрибутер на производи на Tigo Energy во Европа. Ние сме специјализирани исклучиво за решенија на Tigo Energy, обезбедувајќи експертско знаење и автентични производи.",
+      "hResponsible": "Одговорен за содржината",
+      "pResponsible": "Initra Energija d.o.o. е одговорен за целата содржина објавена на оваа веб-страница."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Политика за колачиња",
+      "lastUpdated": "Последно ажурирано: 7 февруари 2026",
+      "intro": "Оваа Политика за колачиња објаснува како Tigo Energy SHOP користи колачиња и слични технологии за да ве препознае кога ја посетувате нашата веб-страница.",
+      "h1": "1. Што се колачиња?",
+      "p1": "Колачињата се мали датотеки со податоци кои се поставуваат на вашиот компјутер или мобилен уред кога посетувате веб-страница.",
+      "h2": "2. Како ги користиме колачињата",
+      "p2": "Ние користиме неопходни колачиња за функционирање на веб-страницата и изборни колачиња за аналитика."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Често поставувани прашања",
+      "q1": "Колку е брза испораката?",
+      "a1": "Стандардната испорака трае 2-4 работни дена.",
+      "q2": "Дали нудите техничка поддршка?",
+      "a2": "Да, нашите експерти се достапни да ви помогнат со изборот и конфигурацијата на производите на Tigo."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Контакт со продажба",
+      "intro": "Барате цени за големи количини или имате прашања во врска со вашата соларна инсталација? Потврдете ја вашата е-пошта подолу за да започнете разговор со нашиот продажен тим.",
+      "prefillTitle": "Контакт со Tigo продажба"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Tigo поддршка за производи",
+      "intro": "Добијте техничка помош со вашите производи на Tigo Energy преку Месинџер на продавницата"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Поддршка за онлајн продавница"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Добредојдовте назад",
+      "subtitle": "Најавете се за да пристапите до вашата сметка",
+      "email": "Е-пошта",
+      "password": "Лозинка",
+      "forgotPassword": "Ја заборавивте лозинката?",
+      "signIn": "Најави се",
+      "signingIn": "Најавување...",
+      "noAccount": "Немате сметка?",
+      "createAccount": "Креирај сметка"
+    },
+    "register": {
+      "title": "Изберете тип на сметка",
+      "personalAccount": "Лична сметка",
+      "personalDesc": "За сопственици на домови кои купуваат опрема на Tigo.",
+      "businessAccount": "Бизнис сметка",
+      "businessDesc": "За инсталатери, дистрибутери и препродавачи.",
+      "createCustomer": "Креирај корисничка сметка",
+      "forHomeowners": "За сопственици на домови и индивидуални купувачи",
+      "businessSwitch": "Дали сте бизнис? Креирајте B2B сметка",
+      "personalSwitch": "Не сте бизнис? Креирајте Лична сметка",
+      "b2bTitle": "Бизнис регистрација",
+      "b2bSubtitle": "За инсталатери, препродавачи и дистрибутери",
+      "steps": {
+        "email": "Потврда на е-пошта",
+        "phone": "Мобилна потврда",
+        "personal": "Лични детали",
+        "address": "Адреса",
+        "security": "Безбедност на сметка",
+        "review": "Преглед и политики",
+        "vat": "ДДВ потврда",
+        "company": "Детали за компанијата",
+        "business": "Тип на бизнис",
+        "contact": "Лице за контакт",
+        "finish": "Заврши апликација"
+      },
+      "labels": {
+        "firstName": "Име",
+        "lastName": "Презиме",
+        "dob": "Датум на раѓање",
+        "occupation": "Професија (Опционално)",
+        "address": "Адреса",
+        "address2": "Стан, број, итн. (Опционално)",
+        "city": "Град",
+        "zip": "Поштенски број",
+        "country": "Земја",
+        "username": "Корисничко име (Автоматски предложено)",
+        "password": "Лозинка",
+        "confirmPassword": "Потврди лозинка",
+        "vatNumber": "ДДВ број",
+        "companyName": "Име на компанија",
+        "website": "Веб-страница (Опционално)",
+        "employees": "Вработени",
+        "commercialAccess": "Дали мојата локација за испорака има комерцијален пристап?",
+        "jobTitle": "Работна позиција",
+        "businessType": "Тип на бизнис",
+        "truckAccess": "Дали голем камион/комбе може да пристапи до вашиот магацин/канцеларија за испорака на палети?"
+      },
+      "messages": {
+        "emailCheck": "Проверете го вашето сандаче за 6-цифрениот код",
+        "phoneCheck": "Проверете го вашиот телефон за 6-цифрениот код",
+        "emailDone": "Е-поштата е успешно потврдена",
+        "phoneDone": "Телефонот е успешно потврден",
+        "dobNote": "Вашиот датум на раѓање е потребен за да се потврди дека ја исполнувате минималната старосна граница (18+) за оваа услуга.",
+        "addressNote": "Ве молиме потврдете ја вашата адреса со Google со кликнување во прозорецот за адреса и потоа на предложената адреса од Google.",
+        "vatNote": "Внесете го вашиот важечки ЕУ ДДВ број за да го потврдите вашиот бизнис статус преку VIES.",
+        "vatFormat": "Формат: CC12345678 (на пр., DE12345678). Кодот на земјата е задолжителен.",
+        "vatFallback": "* Потврдата се случува во реално време. Ако VIES е исклучен, ќе се вратиме на мануелна потврда.",
+        "commercialYes": "Да, стандарден пристап за камиони",
+        "commercialNo": "Не, ограничен пристап",
+        "nonEu": "Се наоѓате надвор од Европската Унија?",
+        "nonEuNote": "Внесете го даночниот број на вашата компанија за мануелна потврда.",
+        "euNote": "Внесете го вашиот важечки ЕУ ДДВ број за да го потврдите вашиот бизнис статус преку VIES.",
+        "successTitle": "Регистрацијата е успешна!",
+        "successDesc": "Вашата сметка е креирана. Добредојдена е-пошта е испратена до {email}.",
+        "goSignIn": "Оди на најава"
+      },
+      "agreements": {
+        "reviewInfo": "Прегледајте ги вашите информации",
+        "editDetails": "Уреди детали",
+        "terms": "Се согласувам со Условите и одредбите и Политиката за прифатливо користење.",
+        "privacy": "Ја прифаќам Политиката на приватност и разбирам како се обработуваат моите податоци.",
+        "newsletter": "Претплатете се на нашиот билтен за најнови вести и ажурирања.",
+        "marketing": "Се согласувам да примам промотивни цени и специјални понуди.",
+        "authorized": "Потврдувам дека сум овластен од компанијата да регистрирам во нивно име.",
+        "legitimate": "Ова е легитимен деловен субјект.",
+        "confirmCreate": "Потврди и креирај сметка",
+        "creating": "Креирање сметка..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Ја заборавивте лозинката?",
+      "subtitle": "Внесете ја вашата е-пошта и ќе ви испратиме линк за ресетирање на вашата лозинка.",
+      "sendLink": "Испрати линк за ресетирање",
+      "success": "Ако постои сметка за оваа е-пошта, набрзо ќе добиете линк за ресетирање на лозинката.",
+      "backToLogin": "Назад на најава"
+    },
+    "resetPassword": {
+      "title": "Поставете нова лозинка",
+      "subtitle": "Внесете нова безбедна лозинка за вашата сметка.",
+      "newPassword": "Нова лозинка",
+      "update": "Ажурирај лозинка",
+      "updating": "Ажурирање...",
+      "success": "Лозинката е успешно ресетирана! Пренасочување...",
+      "errorTitle": "Грешка",
+      "requestNew": "Побарај нов линк",
+      "noToken": "Не е пронајден токен за ресетирање. Ве молиме користете го линкот за ресетирање од вашата е-пошта.",
+      "expireNote": "Линковите за ресетирање истекуваат по 1 час или можат да се користат само еднаш. Ве молиме побарајте нов линк.",
+      "pwdPlaceholder": "Мин 6 карактери"
     }
   }
 }

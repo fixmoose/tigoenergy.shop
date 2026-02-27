@@ -372,6 +372,118 @@
       "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
     }
   },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to access your account",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "signIn": "Sign In",
+      "signingIn": "Signing In...",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create Account"
+    },
+    "register": {
+      "title": "Choose Account Type",
+      "personalAccount": "Personal Account",
+      "personalDesc": "For homeowners purchasing Tigo equipment.",
+      "businessAccount": "Business Account",
+      "businessDesc": "For installers, distributors, and resellers.",
+      "createCustomer": "Create Customer Account",
+      "forHomeowners": "For homeowners and individual buyers",
+      "businessSwitch": "Are you a Business? Create B2B Account",
+      "personalSwitch": "Not a business? Create Personal Account",
+      "b2bTitle": "Business Registration",
+      "b2bSubtitle": "For Installers, Resellers & Distributors",
+      "steps": {
+        "email": "Email Verification",
+        "phone": "Mobile Verification",
+        "personal": "Personal Details",
+        "address": "Address",
+        "security": "Account Security",
+        "review": "Review & Policies",
+        "vat": "VAT Verification",
+        "company": "Company Details",
+        "business": "Business Type",
+        "contact": "Contact Person",
+        "finish": "Finish Application"
+      },
+      "labels": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "dob": "Date of Birth",
+        "occupation": "Occupation (Optional)",
+        "address": "Street Address",
+        "address2": "Suite, Apt, PO, etc. (Optional)",
+        "city": "City",
+        "zip": "ZIP",
+        "country": "Country",
+        "username": "Username (Auto-suggested)",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "vatNumber": "VAT Number",
+        "companyName": "Company Name",
+        "website": "Website (Optional)",
+        "employees": "Employees",
+        "commercialAccess": "My Delivery Location has Commercial Access?",
+        "jobTitle": "Job Title",
+        "businessType": "Type of Business",
+        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?"
+      },
+      "messages": {
+        "emailCheck": "Check your inbox for the 6-digit code",
+        "phoneCheck": "Check your phone for the 6-digit code",
+        "emailDone": "Email verified successfully",
+        "phoneDone": "Phone verified successfully",
+        "dobNote": "Your date of birth is required to confirm you meet the minimum age requirement (18+) for this service.",
+        "addressNote": "Please verify your address with Google by clicking in the address window and then on a Google suggested address.",
+        "vatNote": "Enter your valid EU VAT number to verify your business status via VIES.",
+        "vatFormat": "Format: CC12345678 (e.g., DE12345678). Country code is mandatory.",
+        "vatFallback": "* Verification happens in real-time. If VIES is offline, we will fallback to manual verification.",
+        "commercialYes": "Yes, Standard Truck Access",
+        "commercialNo": "No, Limited Access",
+        "nonEu": "Located outside of European Union?",
+        "nonEuNote": "Enter your company's Tax ID or VAT registration number for manual verification.",
+        "euNote": "Enter your valid EU VAT number to verify your business status via VIES.",
+        "successTitle": "Registration Successful!",
+        "successDesc": "Your account has been created. A welcome email has been sent to {email}.",
+        "goSignIn": "Go to Sign In"
+      },
+      "agreements": {
+        "reviewInfo": "Review Your Information",
+        "editDetails": "Edit Details",
+        "terms": "I agree to the Terms & Conditions and Acceptable Use Policy.",
+        "privacy": "I acknowledge the Privacy Policy and understand how my data is processed.",
+        "newsletter": "Subscribe to our Newsletter for latest news and updates.",
+        "marketing": "I agree to receive Promotional Pricing and special offers.",
+        "authorized": "I confirm that I am authorized by the company to register on their behalf.",
+        "legitimate": "This is a legitimate business entity.",
+        "confirmCreate": "Confirm & Create Account",
+        "creating": "Creating Account..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your email and we'll send you a link to reset your password.",
+      "sendLink": "Send Reset Link",
+      "success": "If an account exists for this email, you will receive a password reset link shortly.",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "Set New Password",
+      "subtitle": "Enter a secure new password for your account.",
+      "newPassword": "New Password",
+      "update": "Update Password",
+      "updating": "Updating...",
+      "success": "Password reset successfully! Redirecting...",
+      "errorTitle": "Error",
+      "requestNew": "Request New Link",
+      "noToken": "No reset token found. Please use the reset link from your email.",
+      "expireNote": "Reset links expire after 1 hour or can only be used once. Please request a new link.",
+      "pwdPlaceholder": "Min 6 characters"
+    }
+  },
   "staticPages": {
     "returns": {
       "title": "Returns & Warranty",
@@ -446,8 +558,7 @@
       "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Online Shop Support"
     }
   }
 }

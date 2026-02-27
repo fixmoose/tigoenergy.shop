@@ -35,8 +35,8 @@
     "createAccount": "Vytvoriť účet",
     "createB2BAccount": "Vytvoriť B2B účet",
     "signInRegister": "Prihlásiť sa / Registrovať",
-    "shopAll": "Všetko",
-    "shopAllProducts": "Všetky produkty",
+    "shopAll": "Všetky produkty",
+    "shopAllProducts": "Zobraziť všetky produkty",
     "support": "Podpora",
     "searchPlaceholder": "Hľadať optimizéry, meniče alebo príslušenstvo...",
     "searchProducts": "Hľadať produkty...",
@@ -180,7 +180,7 @@
     "Rapid Shutdown": "Rýchle vypnutie"
   },
   "home": {
-    "heroTitle": "Špecializovaný online obchod pre produkty Tigo Energy",
+    "heroTitle": "Špecializovaný online obchod s produktmi Tigo Energy",
     "heroSubtitle": "Žiadne prirážky. Žiadne prekvapenia. Len priamy prístup.",
     "heroServing": "Obsluhujeme celú solárnu komunitu: Inštalatérov, maloobchodníkov a majiteľov domov.",
     "shopNow": "Nakupovať teraz",
@@ -195,14 +195,14 @@
     "featuredProducts": "Odporúčané produkty",
     "featuredSubtitle": "Najpredávanejšie a nové prírastky",
     "viewAllProducts": "Zobraziť všetky produkty",
-    "exploreCatalog": "Preskúmajte náš kompletný katalóg",
+    "exploreCatalog": "Preskúmajte náš kompletní katalóg",
     "noProductsYet": "Žiadne produkty nie sú zatiaľ k dispozícii. Pridajte produkty v administrátorskom paneli.",
-    "goToAdmin": "Prejsť na administrátorský panel",
+    "goToAdmin": "Prejsť do administrácie",
     "shopByCategory": "Nakupovať podľa kategórie",
     "shopByCategorySubtitle": "Nájdite správne produkty pre váš solárny projekt",
     "globalReach": "Globálny dosah, lokálne zameranie",
-    "logisticsTitle": "Centrálne umiestnený v Slovinsku",
-    "logisticsHighlight": "Pre rýchlu EU distribúciu",
+    "logisticsTitle": "Centrálne umiestnené v Slovinsku",
+    "logisticsHighlight": "Pre rýchlu EU distribuciu",
     "logisticsP1": "Z nášho strategického centra v Slovinsku spojujeme výrobnú dokonalosť <strong>Thajska a Číny</strong> priamo k vašim dverám. Tovar prichádza cez prístav Koper—najkratšiu trasu z Ázie do strednej Európy.",
     "logisticsP2": "Táto logistická výhoda minimalizuje čas prepravy a eliminuje zbytočných sprostredkovateľov. Výsledok? Môžeme distribuovať produkty Tigo Energy kdekoľvek v EU za <strong>najnižšiu možnú cenu</strong>.",
     "deliveryDays": "2-4 dni",
@@ -218,7 +218,7 @@
     "enhancedSafety": "Zvýšená bezpečnosť",
     "enhancedSafetyDesc": "Súlad s rýchlym vypnutím a monitorovanie na úrovni modulu pre váš pokoj.",
     "smartMonitoring": "Inteligentné monitorovanie",
-    "smartMonitoringDesc": "Údaje o výkone v reálnom čase pre každý modul s platformou Tigo Energy Intelligence.",
+    "smartMonitoringDesc": "Údaje o výkone v reálnom čase pre každý modul s platformou Tigo Energy Intelligence platformu.",
     "ctaTitle": "Pripravení optimalizovať vašu solárnu inštaláciu?",
     "ctaSubtitle": "Pridajte sa k tisíckam inštalatérov a majiteľov domov, ktorí dôverujú Tigo pre svoje potreby solárnej optimalizácie.",
     "browseProducts": "Prehliadať produkty",
@@ -247,204 +247,315 @@
     "officialShopInvoice": "Oficiálna faktúra obchodu"
   },
   "email": {
-    "hello": "Hello,",
-    "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "hello": "Dobrý deň,",
+    "bestRegards": "S pozdravom,",
+    "team": "Tím Tigo Energy SHOP",
     "verificationCode": {
-      "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
-      "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
+      "title": "Overte svoju e-mailovú adresu",
+      "text": "Ďakujeme, že ste sa pripojili k Tigo Energy SHOP. Na dokončenie registrácie a zabezpečenie vášho účtu použite nasledujúci overovací kód:",
+      "expire": "Tento kód vyprší o 10 minút. Ak ste túto žiadosť neodoslali, ignorujte tento e-mail."
     },
     "verificationLink": {
-      "title": "Verify your email address",
-      "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
-      "button": "Verify Email Address",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "ignore": "If you did not create an account, no further action is required."
+      "title": "Overte svoju e-mailovú adresu",
+      "helloWithName": "Dobrý deň {{name}},",
+      "text": "Vitajte v Tigo Energy SHOP! Kliknutím na tlačidlo nižšie overte svoju e-mailovú adresu a aktivujte svoj účet.",
+      "button": "Overiť e-mailovú adresu",
+      "linkHelp": "Ak tlačidlo vyššie nefunguje, môžete tiež skopírovať a vložiť nasledujúci odkaz do svojho prehliadača:",
+      "ignore": "Ak ste si účet nevytvorili, nie je potrebná žiadna ďalšia akcia."
     },
     "welcome": {
-      "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
-      "feature1": "Expert Support",
-      "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
-      "feature2": "Direct Distribution",
-      "feature2Desc": "Genuine products at the best possible prices, shipped directly across Europe.",
-      "feature3": "Smart Solar Tools",
-      "feature3Desc": "Manage your orders, tracking, and B2B benefits all from one profile.",
-      "button": "Start Exploring",
-      "footerNote": "If you have any questions, our support team is just one message away."
+      "title": "Vitajte v rodine!",
+      "text": "Sme nadšení, že vás máme v Tigo Energy SHOP. Teraz ste spojení s úzko špecializovaným európskym distribútorom solárnych riešení Tigo Energy.",
+      "feature1": "Odborná podpora",
+      "feature1Desc": "Priamy prístup k technickým expertom, ktorí poznajú produkty Tigo do detailu.",
+      "feature2": "Priama distribúcia",
+      "feature2Desc": "Originálne produkty za najlepšie možné ceny, odosielané priamo po celej Európe.",
+      "feature3": "Inteligentné solárne nástroje",
+      "feature3Desc": "Spravujte svoje objednávky, sledovanie a B2B výhody z jedného profilu.",
+      "button": "Začnite objavovať",
+      "footerNote": "Ak máte akékoľvek otázky, náš tím podpory je vám k dispozícii."
     },
     "messageSent": {
-      "status": "Message Successfully Sent",
-      "title": "We've received your inquiry",
-      "text": "Thank you for reaching out to us. Your message has been successfully delivered to our support team. We've included a copy of your message below for your records.",
-      "footerNote": "A member of our team will review your inquiry and get back to you as soon as possible. We typically respond within one business day."
+      "status": "Správa úspešne odoslaná",
+      "title": "Prijali sme váš dopyt",
+      "text": "Ďakujeme, že ste nás kontaktovali. Vaša správa bola úspešne doručená nášmu tímu podpory. Nižšie uvádzame kópiu vašej správy pre vašu evidenciu.",
+      "footerNote": "Člen náho tímu váš dopyt skontroluje a ozve sa vám čo najskôr. Zvyčajne odpovedáme do jedného pracovného dňa."
     },
     "newMessage": {
-      "title": "You have a new message",
-      "text": "A team member has replied to your inquiry. You can view the message and continue the conversation in your store profile.",
-      "dateLabel": "Received on:",
-      "button": "View Message",
-      "footerNote": "If you have any trouble logging in, please contact our support team."
+      "title": "Máte novú správu",
+      "text": "Člen tímu odpovedal na váš dopyt. Správu si môžete zobraziť a pokračovať v konverzácii vo svojom profile v obchode.",
+      "dateLabel": "Prijaté dňa:",
+      "button": "Zobraziť správu",
+      "footerNote": "Ak máte problémy s prihlásením, kontaktujte náš tím podpory."
     },
     "orderConfirmation": {
-      "title": "Thanks for your order!",
-      "text": "We've received your order and we're getting it ready. You'll receive another email when your order has been shipped.",
-      "orderNumber": "Order Number:",
-      "date": "Date:",
-      "paymentMethod": "Payment Method:",
-      "product": "Product",
-      "qty": "Qty",
-      "price": "Price",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "vat": "VAT",
-      "total": "Total Paid",
-      "footerNote": "You can track your order status in your Account Profile."
+      "title": "Ďakujeme za vašu objednávku!",
+      "text": "Prijali sme vašu objednávku a pripravujeme ju. Hneď ako bude vaša objednávka odoslaná, dostanete ďalší e-mail.",
+      "orderNumber": "Číslo objednávky:",
+      "date": "Dátum:",
+      "paymentMethod": "Spôsob platby:",
+      "product": "Produkt",
+      "qty": "Množstvo",
+      "price": "Cena",
+      "subtotal": "Medzisúčet",
+      "shipping": "Doprava",
+      "vat": "DPH",
+      "total": "Celkom zaplatené",
+      "footerNote": "Stav svojej objednávky môžete sledovať vo svojom profile účtu."
     },
     "orderPartial": {
-      "title": "Order Received",
-      "bannerTitle": "Shipping Calculation in Progress",
-      "bannerText": "Your order has been successfully received and partially paid. Because of the nature or size of your order, we are currently calculating the most accurate shipping cost for your location.",
-      "text": "We will notify you via email as soon as the shipping price is set. Once confirmed, you will be able to fulfill the final payment in your store profile to complete the order.",
-      "amountPaid": "Amount Paid (Products):",
-      "shippingStatus": "Shipping Status:",
-      "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "title": "Objednávka prijatá",
+      "bannerTitle": "Prebieha výpočet dopravy",
+      "bannerText": "Vaša objednávka bola úspešne prijatá a čiastočne zaplatená. Vzhľadom na povahu alebo veľkosť vašej objednávky aktuálne vypočítavame najpresnejšie náklady na dopravu pre vašu lokalitu.",
+      "text": "Hneď ako bude cena dopravy stanovená, budeme vás informovať e-mailom. Po potvrdení budete môcť vykonať finálnu platbu vo svojom profile v obchode a dokončiť objednávku.",
+      "amountPaid": "Zaplatená suma (produkty):",
+      "shippingStatus": "Stav dopravy:",
+      "pending": "Čaká na výpočet",
+      "footerNote": "Ďakujeme za trpezlivosť a za to, že ste si vybrali Tigo Energy SHOP."
     },
     "cartAbandonment": {
-      "title": "Did you forget something?",
-      "text": "We noticed you left some items in your cart. We've saved them for you, so you can pick up exactly where you left off.",
-      "itemsTitle": "Items in your cart:",
-      "button": "Complete My Purchase",
-      "footerNote": "Need help with your order? Just reply to this email and our team will be happy to assist you."
+      "title": "Zabudli ste na niečo?",
+      "text": "Všimli sme si, že ste v košíku nechali nejaké položky. Uložili sme ich pre vás, aby ste mohli pokračovať presne tam, kde ste skončili.",
+      "itemsTitle": "Položky vo vašom košíku:",
+      "button": "Dokončiť nákup",
+      "footerNote": "Potrebujete pomôcť s objednávkou? Stačí odpovedať na tento e-mail a náš tím vám rád pomôže."
     },
     "priceChange": {
-      "title": "Exciting price update!",
-      "text": "We thought you'd like to know that a product you previously purchased or showed interest in now has a new price.",
-      "footerNote": "This is a great time to expand your solar installation or stock up on components.",
-      "button": "View Product"
+      "title": "Zaujímavá aktualizácia ceny!",
+      "text": "Mysleli sme si, že by vás mohlo zaujímať, že produkt, ktorý ste si predtým zakúpili alebo o ktorý ste prejavili záujem, má teraz novú cenu.",
+      "footerNote": "Toto je skvelý čas na rozšírenie vašej solárnej inštalácie alebo doplnenie zásob komponentov.",
+      "button": "Zobraziť produkt"
     },
     "delivered": {
-      "title": "Delivered!",
-      "text": "Great news! Your order #{{order_number}} has been successfully delivered. We hope you are happy with your new Tigo Energy products.",
-      "attachmentNote": "For your records, we have attached the following documents to this email:",
-      "doc1": "Delivery Confirmation",
-      "doc2": "Official Invoice",
-      "footerNote": "Thank you for choosing Initra Energija as your Tigo Energy partner. If you have any questions about installation or product setup, our technical team is here to help."
+      "title": "Doručené!",
+      "text": "Skvelá správa! Vaša objednávka #{{order_number}} bola úspešne doručená. Dúfame, že ste so svojimi novými produktmi Tigo Energy spokojní.",
+      "attachmentNote": "Pre vašu evidenciu sme k tomuto e-mailu priložili nasledujúce dokumenty:",
+      "doc1": "Potvrdenie o doručení",
+      "doc2": "Oficiálna faktúra",
+      "footerNote": "Ďakujeme, že ste si vybrali Initra Energija ako svojho partnera Tigo Energy. Ak máte akékoľvek otázky týkajúce sa inštalácie alebo nastavenia produktu, náš technický tím je tu, aby vám pomohol."
     },
     "b2bVerified": {
-      "status": "VIES Verified",
-      "title": "Your B2B Account is Active",
-      "helloWithCompany": "Hello {{company_name}} team,",
-      "text": "We are pleased to inform you that your VAT number (VIES) has been successfully verified. Your B2B account is now fully active, and you can enjoy all the benefits of our professional partner program.",
-      "benefit1": "0% VAT (Intra-Community Acquisition)",
-      "benefit2": "Professional B2B Pricing",
-      "benefit3": "Priority Shipping Options",
-      "benefit4": "Direct Technical Support",
-      "button": "Log In to Your B2B Portal",
-      "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
+      "status": "VIES Overené",
+      "title": "Váš B2B účet je aktívny",
+      "helloWithCompany": "Dobrý deň tímu {{company_name}},",
+      "text": "S potešením vám oznamujeme, že vaše DIČ (VIES) bolo úspešne overené. Váš B2B účet je teraz plne aktívny a môžete využívať všetky výhody nášho profesionálneho partnerského programu.",
+      "benefit1": "0 % DPH (Intrakomunitárne nadobudnutie)",
+      "benefit2": "Profesionálne B2B ceny",
+      "benefit3": "Prioritné možnosti dopravy",
+      "benefit4": "Priama technická podpora",
+      "button": "Prihlásiť sa do vášho B2B portálu",
+      "footerNote": "Vitajte na palube! Tešíme sa na podporu vašich solárnych projektov."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "Žiadosť o B2B účet prijatá",
+      "bannerTitle": "Prebieha overovanie",
+      "bannerText": "Náš tím aktuálne kontroluje vašu dokumentáciu a firemné informácie. Tento proces zvyčajne trvá do 48 hodín.",
+      "text": "Hneď ako budú vaše informácie overené, budeme vás informovať e-mailom a váš účet bude plne funkčný s prístupom k B2B cenám a profesionálnym nástrojom.",
+      "footerNote": "Medzitým, ak máte nejaké naliehavé otázky, neváhajte odpovedať na tento e-mail."
     },
     "passwordReset": {
-      "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
-      "button": "Reset Password",
-      "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
-      "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
+      "title": "Obnovenie hesla",
+      "text": "Dostali sme žiadosť o obnovenie hesla k vášmu účtu Tigo Energy SHOP. Kliknutím na tlačidlo nižšie si vyberte nové heslo.",
+      "button": "Obnoviť heslo",
+      "linkHelp": "Ak tlačidlo vyššie nefunguje, môžete tiež skopírovat a vložiť nasledujúci odkaz do svojho prehliadača:",
+      "expire": "Tento odkaz vyprší o 1 hodinu. Ak ste o obnovenie hesla nežiadali, tento e-mail prosím ignorujte alebo kontaktujte podporu, ak máte obavy."
     },
     "shippingUpdate": {
-      "title": "Your order is on the way!",
-      "text": "Your order #{{order_number}} has been shipped and is now on its way to you.",
-      "carrier": "Carrier",
-      "tracking": "Tracking Number",
-      "button": "Track Package",
-      "footerNote": "Please note that it may take up to 24 hours for the tracking information to update on the carrier's website."
+      "title": "Vaša objednávka je na ceste!",
+      "text": "Vaša objednávka #{{order_number}} bola odoslaná a je na ceste k vám.",
+      "carrier": "Prepravca",
+      "tracking": "Sledovacie číslo",
+      "button": "Sledovať zásielku",
+      "footerNote": "Vezmite prosím na vedomie, že môže trvať až 24 hodín, kým sa informácie o sledovaní aktualizujú na webových stránkach prepravcu."
     }
   },
   "staticPages": {
     "returns": {
-      "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
-      "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "title": "Vrátenie a záruka",
+      "h14DayReturns": "14-dňové vrátenie",
+      "p14DayReturns": "Pre B2C zákazníkov ponúkame bezproblémové 14-dňové vrátenie nepoužitého tovaru v pôvodnom obale.",
+      "hWarranty": "Záruka",
+      "pWarranty": "Produkty Tigo Energy sa dodávajú s prvotriednymi zárukami výrobcu (až 25 rokov pre komponenty MLPE)."
     },
     "shipping": {
-      "title": "Shipping Information",
-      "pLead": "We deliver Tigo Energy solutions across the European Union during business days.",
-      "hDeliveryTimes": "Delivery Times",
-      "pDeliveryTimes": "Average delivery time is 2-4 business days depending on your location.",
-      "hCarriers": "Carriers",
-      "pCarriers": "We primarily use GLS and DPD for standard shipments, and specialized freight for larger orders."
+      "title": "Informácie o doprave",
+      "pLead": "Riešenia Tigo Energy doručujeme po celej Európskej únii počas pracovných dní.",
+      "hDeliveryTimes": "Dodacie lehoty",
+      "pDeliveryTimes": "Priemerná doba dodania je 2-4 pracovné dni v závislosti od vašej lokality.",
+      "hCarriers": "Prepravcovia",
+      "pCarriers": "Pre štandardné zásielky využívame predovšetkým GLS a DPD, pri väčších objednávkach špecializovanú nákladnú dopravu."
     },
     "privacy": {
-      "title": "Privacy Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal data when you use Tigo Energy SHOP.",
-      "h1": "1. Information We Collect",
-      "p1": "We collect information you provide during registration, such as your name, email, phone number, and address.",
-      "h2": "2. How We Use Information",
-      "p2": "We use your information to process orders, provide support, and improve our services."
+      "title": "Zásady ochrany osobných údajov",
+      "lastUpdated": "Posledná aktualizácia: 7. februára 2026",
+      "intro": "Vaše súkromie je pre nás dôležité. Tieto Zásady ochrany osobných údajov vysvetľujú, ako zhromažďujeme, používame a chránime vaše osobné údaje, keď používate Tigo Energy SHOP.",
+      "h1": "1. Informácie, ktoré zhromažďujeme",
+      "p1": "Zhromažďujeme informácie, ktoré poskytnete pri registrácii, ako je vaše meno, e-mail, telefónne číslo a adresa.",
+      "h2": "2. Ako informácie používame",
+      "p2": "Vaše informácie používame na spracovanie objednávok, poskytovanie podpory a zlepšovanie našich služieb."
     },
     "terms": {
-      "title": "Terms of Service",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "By accessing and using Tigo Energy SHOP, you agree to be bound by these terms.",
-      "h1": "1. Acceptance of Terms",
-      "p1": "These terms govern your use of our website and services.",
-      "h2": "2. Use of License",
-      "p2": "Permission is granted to temporarily download one copy of the materials on Tigo Energy SHOP's website for personal, non-commercial transitory viewing only."
+      "title": "Obchodné podmienky",
+      "lastUpdated": "Posledná aktualizácia: 7. februára 2026",
+      "intro": "Prístupom k Tigo Energy SHOP a jeho používaním súhlasíte s tým, že budete viazaní týmito podmienkami.",
+      "h1": "1. Prijatie podmienok",
+      "p1": "Tieto podmienky upravujú vaše používanie našich webových stránok a služieb.",
+      "h2": "2. Licencia na používanie",
+      "p2": "Udeľuje sa povolenie na dočasné stiahnutie jednej kópie materiálov na webových stránkach Tigo Energy SHOP len na osobné, nekomerčné a prechodné prezeranie."
     },
     "impressum": {
       "title": "Impressum",
-      "hCompany": "Company Information",
+      "hCompany": "Informácie o spoločnosti",
       "companyName": "Initra Energija d.o.o.",
-      "vat": "VAT Number: SI62518313",
-      "registration": "Registration Number: 9624007000",
-      "hContact": "Contact Information",
-      "emailLabel": "Email:",
-      "clickToReveal": "Click to reveal",
-      "hAuthorized": "Authorized Tigo Energy Distributor",
-      "pAuthorized1": "Initra Energija d.o.o. is an authorized distributor of Tigo Energy products in Europe. We specialize exclusively in Tigo Energy solutions, ensuring expert knowledge and authentic products.",
-      "hResponsible": "Responsible for Content",
-      "pResponsible": "Initra Energija d.o.o. is responsible for all content published on this website."
+      "vat": "DIČ: SI62518313",
+      "registration": "Registračné číslo: 9624007000",
+      "hContact": "Kontaktné informácie",
+      "emailLabel": "E-mail:",
+      "clickToReveal": "Kliknutím zobrazíte",
+      "hAuthorized": "Autorizovaný distribútor Tigo Energy",
+      "pAuthorized1": "Initra Energija d.o.o. je autorizovaným distribútorom produktov Tigo Energy v Európe. Špecializujeme sa výhradne na riešenia Tigo Energy, čo zaisťuje odborné znalosti a autentické produkty.",
+      "hResponsible": "Zodpovednosť za obsah",
+      "pResponsible": "Spoločnosť Initra Energija d.o.o. je zodpovedná za všetok obsah publikovaný na týchto webových stránkach."
     },
     "cookies": {
-      "title": "Cookie Policy",
-      "lastUpdated": "Last updated: February 7, 2026",
-      "intro": "This Cookie Policy explains how Tigo Energy SHOP uses cookies and similar technologies to recognize you when you visit our website.",
-      "h1": "1. What are cookies?",
-      "p1": "Cookies are small data files that are placed on your computer or mobile device when you visit a website.",
-      "h2": "2. How we use cookies",
-      "p2": "We use essential cookies for the website to function and optional cookies for analytics."
+      "title": "Zásady používania cookies",
+      "lastUpdated": "Posledná aktualizácia: 7. februára 2026",
+      "intro": "Tieto Zásady používania cookies vysvetľujú, ako Tigo Energy SHOP používa súbory cookie a podobné technológie na vaše rozpoznanie pri návšteve našich webových stránok.",
+      "h1": "1. Čo sú cookies?",
+      "p1": "Cookies sú malé dátové súbory, ktoré sú umiestnené vo vašom počítači alebo mobilnom zariadení pri návšteve webovej stránky.",
+      "h2": "2. Ako cookies používame",
+      "p2": "Používame nevyhnutné cookies pre fungovanie webových stránok a voliteľné cookies pre analytiku."
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How fast is shipping?",
-      "a1": "Standard shipping takes 2-4 business days.",
-      "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "title": "Často kladené otázky",
+      "q1": "Ako rýchla je doprava?",
+      "a1": "Štandardná doprava trvá 2-4 pracovné dni.",
+      "q2": "Ponúkate technickú podporu?",
+      "a2": "Áno, naši odborníci sú vám k dispozícii, aby vám pomohli s výberom a konfiguráciou produktov Tigo."
     },
     "contact": {
-      "title": "Contact Sales",
-      "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "title": "Kontaktovať predaj",
+      "intro": "Hľadáte množstevné zľavy alebo máte otázky k vašej solárnej inštalácii? Overte nižšie svoj e-mail a zahájte konverzáciu s naším predajným tímom.",
+      "prefillTitle": "Kontaktovať Tigo Sales"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Podpora produktov Tigo",
+      "intro": "Získajte technickú pomoc pre svoje produkty Tigo Energy cez Shop Messenger"
     },
     "shopSupport": {
-      "title": "Online Shop Support",
-      "intro": "Get help with orders, shipping, and account issues via Shop Messenger"
+      "title": "Podpora internetového obchodu"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Vitajte späť",
+      "subtitle": "Prihláste sa pre prístup k svojmu účtu",
+      "email": "E-mailová adresa",
+      "password": "Heslo",
+      "forgotPassword": "Zabudli ste heslo?",
+      "signIn": "Prihlásiť sa",
+      "signingIn": "Prihlasovanie...",
+      "noAccount": "Nemáte účet?",
+      "createAccount": "Vytvoriť účet"
+    },
+    "register": {
+      "title": "Vyberte typ účtu",
+      "personalAccount": "Osobný účet",
+      "personalDesc": "Pre majiteľov domov nakupujúcich vybavenie Tigo.",
+      "businessAccount": "Firemný účet",
+      "businessDesc": "Pre inštalatérov, distribútorov a predajcov.",
+      "createCustomer": "Vytvoriť zákaznícky účet",
+      "forHomeowners": "Pre majiteľov domov a individuálnych kupujúcich",
+      "businessSwitch": "Ste firma? Vytvorte si B2B účet",
+      "personalSwitch": "Nie ste firma? Vytvorte si osobný účet",
+      "b2bTitle": "Firemná registrácia",
+      "b2bSubtitle": "Pre inštalatérov, predajcov a distribútorov",
+      "steps": {
+        "email": "Overenie e-mailu",
+        "phone": "Mobilné overenie",
+        "personal": "Osobné údaje",
+        "address": "Adresa",
+        "security": "Zabezpečenie účtu",
+        "review": "Kontrola a zásady",
+        "vat": "Overenie DIČ",
+        "company": "Firemné údaje",
+        "business": "Typ podnikania",
+        "contact": "Kontaktná osoba",
+        "finish": "Dokončiť žiadosť"
+      },
+      "labels": {
+        "firstName": "Meno",
+        "lastName": "Priezvisko",
+        "dob": "Dátum narodenia",
+        "occupation": "Povolanie (voliteľné)",
+        "address": "Ulica a číslo",
+        "address2": "Číslo bytu, p. o. box atď. (voliteľné)",
+        "city": "Mesto",
+        "zip": "PSČ",
+        "country": "Krajina",
+        "username": "Užívateľské meno (automatický návrh)",
+        "password": "Heslo",
+        "confirmPassword": "Potvrdiť heslo",
+        "vatNumber": "DIČ",
+        "companyName": "Názov spoločnosti",
+        "website": "Webové stránky (voliteľné)",
+        "employees": "Zamestnanci",
+        "commercialAccess": "Má miesto doručenia komerčný prístup?",
+        "jobTitle": "Pracovná pozícia",
+        "businessType": "Typ podnikania",
+        "truckAccess": "Môže k vášmu skladu/kancelárii prísť veľký nákladný automobil/dodávka pre doručenie paliet?"
+      },
+      "messages": {
+        "emailCheck": "Skontrolujte si doručenú poštu, poslali sme vám 6-miestny kód",
+        "phoneCheck": "Skontrolujte si telefón, poslali sme vám 6-miestny kód",
+        "emailDone": "E-mail bol úspešne overený",
+        "phoneDone": "Telefón bol úspešne overený",
+        "dobNote": "Dátum narodenia je vyžadovaný na potvrdenie, že spĺňate minimálnu vekovú hranicu (18+) pre túto službu.",
+        "addressNote": "Overte prosím svoju adresu pomocou Google kliknutím do okna adresy a následným výberom adresy navrhnutej Googlom.",
+        "vatNote": "Zadajte svoje platné DIČ v rámci EÚ na overenie štatútu vašej firmy prostredníctvom systému VIES.",
+        "vatFormat": "Formát: CC12345678 (napr. SK12345678). Kód krajiny je povinný.",
+        "vatFallback": "* Overenie prebieha v reálnom čase. Ak je systém VIES offline, prejdeme na ručné overenie.",
+        "commercialYes": "Áno, štandardný prístup pre nákladné automobily",
+        "commercialNo": "Nie, obmedzený prístup",
+        "nonEu": "Nachádzate sa mimo Európskej únie?",
+        "nonEuNote": "Zadajte daňové identifikačné číslo vašej spoločnosti alebo registračné číslo pre DPH pre ručné overenie.",
+        "euNote": "Zadajte svoje platné DIČ v rámci EÚ na overenie štatútu vašej firmy prostredníctvom systému VIES.",
+        "successTitle": "Registrácia prebehla úspešne!",
+        "successDesc": "Váš účet bol vytvorený. Na adresu {email} bol odoslaný uvítací e-mail.",
+        "goSignIn": "Prejsť k prihláseniu"
+      },
+      "agreements": {
+        "reviewInfo": "Skontrolujte svoje údaje",
+        "editDetails": "Upraviť údaje",
+        "terms": "Súhlasím s obchodnými podmienkami a zásadami prijateľného používania.",
+        "privacy": "Beriem na vedomie Zásady ochrany osobných údajov a chápem, ako sú moje údaje spracovávané.",
+        "newsletter": "Prihlásiť sa na odber nášho newslettera pre najnovšie správy a aktualizácie.",
+        "marketing": "Súhlasím so zasielaním akciových cien a špeciálnych ponúk.",
+        "authorized": "Potvrdzujem, že som spoločnosť autorizovala na registráciu v jej mene.",
+        "legitimate": "Jedná sa o legitimný podnikateľský subjekt.",
+        "confirmCreate": "Potvrdiť a vytvoriť účet",
+        "creating": "Vytváranie účtu..."
+      }
+    },
+    "forgotPassword": {
+      "title": "Zabudli ste heslo?",
+      "subtitle": "Zadajte svoj e-mail a my vám pošleme odkaz na obnovenie hesla.",
+      "sendLink": "Odoslať odkaz na obnovenie",
+      "success": "Ak k tomuto e-mailu existuje účet, čoskoro dostanete odkaz na obnovenie hesla.",
+      "backToLogin": "Späť na prihlásenie"
+    },
+    "resetPassword": {
+      "title": "Nastaviť nové heslo",
+      "subtitle": "Zadajte nové bezpečné heslo k vášmu účtu.",
+      "newPassword": "Nové heslo",
+      "update": "Aktualizovať heslo",
+      "updating": "Aktualizácia...",
+      "success": "Heslo bolo úspešne obnovené! Presmerovanie...",
+      "errorTitle": "Chyba",
+      "requestNew": "Vyžiadať nový odkaz",
+      "noToken": "Nenašiel sa žiadny token na obnovenie. Použite prosím odkaz na obnovenie z e-mailu.",
+      "expireNote": "Odkazy na obnovenie vypršia po 1 hodine alebo sa dajú použiť iba raz. Vyžiadajte si prosím nový odkaz.",
+      "pwdPlaceholder": "Min. 6 znakov"
     }
   }
 }
