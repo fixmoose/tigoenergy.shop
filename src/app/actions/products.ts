@@ -35,3 +35,17 @@ export async function updateProductFeatured(id: string, featured: boolean) {
     revalidatePath('/products')
 }
 
+
+export async function searchProductsAction(query: string) {
+    const supabase = await createClient()
+    
+    const { data, error } = await supabase
+        .from('products')
+        .select('id, name_en, sku, price_eur, b2b_price_eur, weight_kg, active')
+        .or(`name_en.ilike.%${query}%,sku.ilike.%${query}%`)
+        .eq('active', true)
+        .limit(20)
+
+    if (error) throw error
+    return data
+}

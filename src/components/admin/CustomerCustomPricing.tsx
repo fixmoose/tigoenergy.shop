@@ -95,7 +95,7 @@ export default function CustomerCustomPricing({
                                     <div className="font-bold text-green-900">{cp.product?.name_en || 'Unknown Product'}</div>
                                     <div className="text-[10px] font-black text-green-400 uppercase tracking-widest mt-0.5">
                                         {cp.pricing_type === 'simple'
-                                            ? `Fixed: ${cp.fixed_price_eur} EUR`
+                                            ? `Fixed: ${cp.price_eur} EUR`
                                             : `Tiered: ${cp.tier_prices?.length} scales`}
                                     </div>
                                     {cp.pricing_type === 'tiered' && cp.tier_prices && (

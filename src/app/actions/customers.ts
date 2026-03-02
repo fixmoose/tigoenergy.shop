@@ -106,3 +106,21 @@ export async function getB2BCustomers() {
     }
     return data || []
 }
+
+export async function searchCustomersAction(query: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+
+    const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,company_name.ilike.%${query}%`)
+        .limit(20)
+
+    if (error) {
+        console.error('Error searching customers:', error)
+        return []
+    }
+    return data || []
+}

@@ -32,7 +32,7 @@ export async function getCustomerPricingData(userId: string): Promise<CustomerPr
 
     // 2. Fetch Direct Custom Pricing (Overrides)
     const { data: customOverrides } = await supabase
-        .from('customer_custom_pricing')
+        .from('b2b_customer_prices')
         .select('*')
         .eq('customer_id', userId)
 
@@ -138,11 +138,11 @@ export function calculateEffectivePrice(product: Product, pricingData: CustomerP
     // 1. Check for Direct Custom Pricing Overrides FIRST (Highest priority)
     const override = pricingData.customOverrides?.find(o => o.product_id === product.id)
     if (override) {
-        if (override.pricing_type === 'simple' && override.fixed_price_eur != null) {
+        if (override.pricing_type === 'simple' && override.price_eur != null) {
             return {
                 originalPrice,
-                discountedPrice: Number(override.fixed_price_eur),
-                isDiscounted: Number(override.fixed_price_eur) < originalPrice,
+                discountedPrice: Number(override.price_eur),
+                isDiscounted: Number(override.price_eur) < originalPrice,
                 appliedSchemaName: 'Custom Quote'
             }
         } else if (override.pricing_type === 'tiered' && override.tier_prices) {

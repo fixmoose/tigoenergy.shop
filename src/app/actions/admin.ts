@@ -134,6 +134,9 @@ export async function adminCreateCustomerAction(formData: any) {
         last_name,
         phone,
         is_b2b: !!is_b2b,
+        company_name: formData.company_name,
+        vat_id: formData.vat_id,
+        vat_number: formData.vat_id, // Keep both in sync
         customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
         account_status: 'active'
     })
@@ -175,7 +178,7 @@ export async function adminUpdateCustomerAction(id: string, updates: any) {
         })
     }
 
-    revalidatePath('/admin/customers/${id}')
+    revalidatePath(`/admin/customers/${id}`)
     revalidatePath('/admin/customers')
     return { success: true }
 }
@@ -567,4 +570,172 @@ export async function adminSendBulkMarketingEmailAction(letterId: string, custom
     }
 
     return results
+}
+
+/**
+ * Admin creates a complete order from scratch, including customer creation and emails
+ */
+export async function adminCreateOrderWithCustomerAction(payload: {
+    customer: {
+        email: string;
+        first_name: string;
+        last_name: string;
+        company_name?: string;
+        vat_id?: string;
+        phone?: string;
+        is_b2b?: boolean;
+    };
+    order: {
+        market: string;
+        shipping_cost: number;
+        vat_rate: number;
+        items: any[];
+        payment_method?: string;
+    };
+}) {
+    if (!await checkIsAdmin()) throw new Error('Unauthorized');
+
+    const supabase = await createAdminClient();
+    const { customer, order } = payload;
+
+    // 1. Find or Create Customer
+    let customerId: string | null = null;
+    const { data: existingCustomer } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('email', customer.email)
+        .maybeSingle();
+
+    if (existingCustomer) {
+        customerId = existingCustomer.id;
+    } else {
+        // Create Auth User
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email: customer.email,
+            password: randomBytes(24).toString('base64url'),
+            email_confirm: true,
+            user_metadata: {
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                customer_type: customer.is_b2b ? 'b2b' : 'b2c'
+            }
+        });
+
+        if (authError) throw authError;
+        customerId = authData.user.id;
+
+        // Create Customer Profile
+        const { error: profileError } = await supabase.from('customers').insert({
+            id: customerId,
+            email: customer.email,
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            company_name: customer.company_name,
+            vat_id: customer.vat_id,
+            vat_number: customer.vat_id,
+            phone: customer.phone,
+            is_b2b: !!customer.is_b2b,
+            customer_type: customer.is_b2b ? 'b2b' : 'b2c',
+            account_status: 'active'
+        });
+
+        if (profileError) console.error('Profile creation error:', profileError);
+
+        // Send Password Setup Email
+        try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+            const { data: linkData } = await supabase.auth.admin.generateLink({
+                type: 'recovery',
+                email: customer.email,
+                options: { redirectTo: `${siteUrl}/auth/reset-password` }
+            });
+
+            if (linkData?.properties?.action_link) {
+                const welcomeHtml = await renderTemplate('admin-account-setup', {
+                    name: `${customer.first_name} ${customer.last_name}`,
+                    setup_link: linkData.properties.action_link
+                }, 'en');
+
+                await sendEmail({
+                    to: customer.email,
+                    subject: 'Activate Your Tigo Energy SHOP Account',
+                    html: welcomeHtml
+                });
+            }
+        } catch (emailErr) {
+            console.error('Failed to send password setup email:', emailErr);
+        }
+    }
+
+    // 2. Calculate Totals
+    const subtotal = order.items.reduce((acc: number, item: any) => acc + (item.unit_price * item.quantity), 0);
+    const vatAmount = (subtotal + order.shipping_cost) * (order.vat_rate / 100);
+    const total = subtotal + order.shipping_cost + vatAmount;
+
+    // 3. Create Order
+    const orderNumber = `MAN-${Date.now()}`;
+    const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+            customer_id: customerId,
+            customer_email: customer.email,
+            customer_phone: customer.phone,
+            company_name: customer.company_name,
+            vat_id: customer.vat_id,
+            order_number: orderNumber,
+            status: 'pending',
+            payment_status: 'unpaid',
+            total,
+            subtotal,
+            vat_rate: order.vat_rate,
+            vat_amount: vatAmount,
+            shipping_cost: order.shipping_cost,
+            market: order.market,
+            language: 'en',
+            payment_method: order.payment_method || 'IBAN',
+            created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    if (orderError) throw orderError;
+
+    // 4. Create Order Items
+    const itemsWithOrderId = order.items.map(i => ({
+        order_id: orderData.id,
+        product_id: i.product_id,
+        sku: i.sku,
+        product_name: i.product_name,
+        quantity: i.quantity,
+        unit_price: i.unit_price,
+        total_price: i.unit_price * i.quantity
+    }));
+
+    const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId);
+    if (itemsError) throw itemsError;
+
+    // 5. Send IBAN Payment Email
+    try {
+        const { generateItemsTableHtml } = await import('@/lib/document-service');
+        const itemsHtml = generateItemsTableHtml(itemsWithOrderId);
+        
+        const ibanHtml = await renderTemplate('order-iban-payment', {
+            name: `${customer.first_name} ${customer.last_name}`,
+            order_number: orderNumber,
+            order_date: new Date().toLocaleDateString('en-GB'),
+            total_amount: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(total),
+            order_items: itemsHtml
+        }, 'en');
+
+        await sendEmail({
+            to: customer.email,
+            subject: `Order #${orderNumber} Confirmation - Payment Required`,
+            html: ibanHtml
+        });
+    } catch (emailErr) {
+        console.error('Failed to send IBAN email:', emailErr);
+    }
+
+    revalidatePath('/admin/orders');
+    return { success: true, orderId: orderData.id };
 }

@@ -357,7 +357,7 @@ export interface CustomerCustomPricing {
   customer_id: string
   product_id: string
   pricing_type: 'simple' | 'tiered'
-  fixed_price_eur?: number | null
+  price_eur?: number | null
   tier_prices?: { min_qty: number; price: number }[] | null
   created_at?: string | null
   updated_at?: string | null

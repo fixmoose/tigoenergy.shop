@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import AdminManualOrderCreator from '@/components/admin/AdminManualOrderCreator'
 
 interface OrderListItem {
   id: string
@@ -61,14 +62,6 @@ export default function AdminOrdersPage() {
   const [bulkLoading, setBulkLoading] = useState(false)
   // Create Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [newOrder, setNewOrder] = useState({
-    customer_email: '',
-    order_number: '',
-    status: 'pending',
-    total: 0,
-    market: 'si',
-    transaction_type: 'domestic'
-  })
 
   async function fetchOrders() {
     const supabase = createClient()
@@ -459,119 +452,13 @@ export default function AdminOrdersPage() {
 
       {/* Create Order Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center text-slate-800">
-              <h3 className="text-lg font-bold">Create Manual Order</h3>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault()
-                setLoading(true)
-                try {
-                  const res = await fetch('/api/admin/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newOrder)
-                  })
-                  if (!res.ok) throw new Error('Failed to create order')
-                  setIsCreateModalOpen(false)
-                  fetchOrders()
-                } catch (err: any) {
-                  alert(err.message)
-                } finally {
-                  setLoading(false)
-                }
-              }}
-              className="p-6 space-y-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Customer Email</label>
-                  <input
-                    required
-                    type="email"
-                    value={newOrder.customer_email}
-                    onChange={e => setNewOrder({ ...newOrder, customer_email: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Order # (optional)</label>
-                  <input
-                    type="text"
-                    placeholder="Auto-generated if empty"
-                    value={newOrder.order_number}
-                    onChange={e => setNewOrder({ ...newOrder, order_number: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                  <select
-                    value={newOrder.status}
-                    onChange={e => setNewOrder({ ...newOrder, status: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg appearance-none bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Total Amount (€)</label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    value={newOrder.total}
-                    onChange={e => setNewOrder({ ...newOrder, total: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Market</label>
-                  <select
-                    value={newOrder.market}
-                    onChange={e => setNewOrder({ ...newOrder, market: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg appearance-none bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-                  >
-                    <option value="si">Slovenia</option>
-                    <option value="de">Germany</option>
-                    <option value="at">Austria</option>
-                    <option value="it">Italy</option>
-                    <option value="hr">Croatia</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
-                >
-                  {loading ? 'Creating...' : 'Create Order'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AdminManualOrderCreator
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreated={() => {
+            fetchOrders()
+            setIsCreateModalOpen(false)
+          }}
+        />
       )}
     </div>
   )
