@@ -133,8 +133,14 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
 
           {/* Available to Order Note */}
           {product.stock_status === 'available_to_order' && (
-            <div className="mt-2 text-sm text-amber-700 bg-amber-50 p-2 rounded border border-amber-100 italic">
-              ⚠️ {tc('availableToOrderNote')}
+            <div className="mt-2 text-sm text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-100 italic flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-500">
+              <span className="text-xl">⏳</span>
+              <div>
+                <p className="font-bold">{tc('availableToOrderNote')}</p>
+                {(product.lead_time_days ?? 0) > 0 && (
+                  <p className="text-xs mt-0.5 opacity-80">{tc('deliveryWait', { days: product.lead_time_days })}</p>
+                )}
+              </div>
             </div>
           )}
 

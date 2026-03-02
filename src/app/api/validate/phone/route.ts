@@ -1,9 +1,21 @@
+import { randomInt } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { sendSMS } from '@/lib/sms'
+import { verifyRecaptcha } from '@/lib/recaptcha'
 
 export async function POST(request: Request) {
     try {
-        const { phone } = await request.json()
+        const { phone, recaptchaToken } = await request.json()
+
+        // 1. Verify reCAPTCHA (optional to support smoother flow)
+        if (recaptchaToken) {
+            const recaptcha = await verifyRecaptcha(recaptchaToken, 'REGISTRATION')
+            if (!recaptcha.success) {
+                return NextResponse.json({
+                    error: `reCAPTCHA verification failed: ${recaptcha.error || 'Unknown error'}`
+                }, { status: 400 })
+            }
+        }
 
         // Basic validation
         if (!phone || phone.length < 8) {
@@ -11,7 +23,7 @@ export async function POST(request: Request) {
         }
 
         // 3. GENERATE CODE
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
+        const code = randomInt(100000, 999999).toString()
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 mins
 
         // 4. STORE IN DATABASE

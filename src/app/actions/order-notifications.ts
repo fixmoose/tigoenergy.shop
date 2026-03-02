@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
 
-const ADMIN_EMAIL = 'dejan@haywilson.com'
+const ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 
 /**
  * Sends a payment reminder to the customer

@@ -1,10 +1,12 @@
 'use server'
 
+import { randomInt } from 'node:crypto'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { verifyRecaptcha } from '@/lib/recaptcha'
 import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
+import { escapeHtml } from '@/lib/utils'
 
 export async function sendSupportOTP(email: string, recaptchaToken: string) {
     // 1. Verify reCAPTCHA
@@ -17,7 +19,7 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
     const adminSupabase = await createAdminClient()
 
     // 2. Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp = randomInt(100000, 999999).toString()
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 mins
 
     // 3. Save to DB (Use admin client to bypass RLS for guests)
@@ -154,7 +156,7 @@ export async function submitSupportRequestV2(formData: {
     try {
         const adminUsers = await adminSupabase.auth.admin.listUsers()
         const admins = (adminUsers.data.users || [])
-            .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === 'dejan@haywilson.com')
+            .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === process.env.MASTER_ADMIN_EMAIL)
             .map((u: any) => u.email)
             .filter((email: string | undefined): email is string => !!email)
 
@@ -176,10 +178,10 @@ export async function submitSupportRequestV2(formData: {
             const adminHtml = `
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #16a34a;">New Support Message</h2>
-                    <p><strong>From:</strong> ${userName} (${userEmail})</p>
+                    <p><strong>From:</strong> ${escapeHtml(userName || '')} (${escapeHtml(userEmail || '')})</p>
                     <p><strong>Type:</strong> ${formData.type === 'sales' ? 'Sales Inquiry' : (formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support')}</p>
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
-                        ${formData.message}
+                        ${escapeHtml(formData.message)}
                     </div>
                     <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/support/${request.id}" 
                           style="background: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">

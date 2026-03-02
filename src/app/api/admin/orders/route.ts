@@ -9,7 +9,7 @@ export async function POST(req: Request) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user?.user_metadata?.role !== 'admin') {
             // Master Admin check
-            if (user?.email !== 'dejan@haywilson.com') {
+            if (user?.email !== process.env.MASTER_ADMIN_EMAIL) {
                 return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
             }
         }

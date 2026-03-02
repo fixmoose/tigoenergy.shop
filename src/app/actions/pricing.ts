@@ -158,3 +158,36 @@ export async function deleteB2BCustomerPrice(id: string, productId: string) {
     if (error) throw new Error(error.message)
     revalidatePath(`/admin/products/${productId}`)
 }
+
+export async function saveCustomerCustomPrice(payload: {
+    customer_id: string
+    product_id: string
+    pricing_type: string
+    fixed_price_eur?: number | null
+    tier_prices?: any[] | null
+}) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('b2b_customer_prices')
+        .upsert({
+            customer_id: payload.customer_id,
+            product_id: payload.product_id,
+            pricing_type: payload.pricing_type,
+            price_eur: payload.fixed_price_eur ?? null,
+            tier_prices: payload.tier_prices ?? null,
+        })
+
+    if (error) throw new Error(error.message)
+    revalidatePath(`/admin/customers/${payload.customer_id}`)
+}
+
+export async function deleteCustomerCustomPrice(id: string, customerId: string) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('b2b_customer_prices')
+        .delete()
+        .eq('id', id)
+
+    if (error) throw new Error(error.message)
+    revalidatePath(`/admin/customers/${customerId}`)
+}

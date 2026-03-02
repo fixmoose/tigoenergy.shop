@@ -53,6 +53,7 @@ export interface Product {
   reserved_quantity?: number | null
   low_stock_threshold?: number | null
   stock_status?: 'in_stock' | 'out_of_stock' | 'coming_soon' | 'special_order' | 'available_to_order' | null
+  lead_time_days?: number | null
   units_per_box?: number | null
 
   // Shipping
@@ -349,4 +350,16 @@ export interface CustomerPricingSchema {
   schema_id: string
   priority: number
   created_at?: string | null
+}
+
+export interface CustomerCustomPricing {
+  id: string
+  customer_id: string
+  product_id: string
+  pricing_type: 'simple' | 'tiered'
+  fixed_price_eur?: number | null
+  tier_prices?: { min_qty: number; price: number }[] | null
+  created_at?: string | null
+  updated_at?: string | null
+  product?: Product // For joins
 }

@@ -36,7 +36,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
     const password = rawData.password as string
 
     // Basic Validation
-    if (!email || !email.includes('@')) return { error: 'Invalid email address' }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: 'Invalid email address' }
     if (cartItems.length === 0) return { error: 'Cart is empty' }
     if (createAccount && (!password || password.length < 6)) return { error: 'Password must be at least 6 characters' }
 
@@ -85,7 +85,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             const product = (products as any[]).find((p: any) => p.id === item.product_id)
             if (!product) continue
 
-            const pricing = await getEffectivePrice(product, customerId)
+            const pricing = await getEffectivePrice(product, customerId, item.quantity)
             const b2cPrice = pricing.originalPrice
             const unitPrice = pricing.discountedPrice
             const total = unitPrice * item.quantity

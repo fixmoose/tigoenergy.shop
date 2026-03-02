@@ -22,9 +22,11 @@ export async function GET(req: Request) {
     const supabase = await createClient()
 
     // Build search filter — always search English + localized columns
-    const filters = [`name_en.ilike.%${q}%,description_en.ilike.%${q}%,sku.ilike.%${q}%,category.ilike.%${q}%`]
+    // Escape special PostgREST/SQL LIKE characters to prevent injection
+    const safeQ = q.replace(/[%_\\]/g, '\\$&')
+    const filters = [`name_en.ilike.%${safeQ}%,description_en.ilike.%${safeQ}%,sku.ilike.%${safeQ}%,category.ilike.%${safeQ}%`]
     if (lang !== 'en') {
-        filters[0] += `,${nameCol}.ilike.%${q}%,${descCol}.ilike.%${q}%`
+        filters[0] += `,${nameCol}.ilike.%${safeQ}%,${descCol}.ilike.%${safeQ}%`
     }
 
     // Select both English and localized name columns

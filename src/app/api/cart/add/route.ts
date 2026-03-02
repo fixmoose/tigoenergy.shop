@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         httpOnly: true,
         path: '/',
         sameSite: 'lax',
-        // Omitting maxAge and expires makes it a session cookie
+        secure: process.env.NODE_ENV === 'production',
       })
     }
 

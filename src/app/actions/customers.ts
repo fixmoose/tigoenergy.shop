@@ -13,6 +13,8 @@ interface CreateCustomerParams {
 
 export async function createCustomer(params: CreateCustomerParams) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
 
     // 1. Try to fetch administrative rights if needed, but for now we'll assume logged-in admin can insert
     // Note: if 'customers' is linked to 'auth.users' via foreign key, this might fail unless we create an auth user first.
@@ -89,6 +91,9 @@ export async function getMarketingPreferences() {
 
 export async function getB2BCustomers() {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+
     const { data, error } = await supabase
         .from('customers')
         .select('id, company_name, email')

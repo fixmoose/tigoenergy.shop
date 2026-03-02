@@ -1,10 +1,11 @@
 'use server'
 
+import { randomBytes } from 'node:crypto'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
 
-const MASTER_ADMIN_EMAIL = 'dejan@haywilson.com'
+const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 
 /**
  * Checks if the current user is an admin
@@ -113,7 +114,7 @@ export async function adminCreateCustomerAction(formData: any) {
     // 1. Create Auth User
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
-        password: password || Math.random().toString(36).slice(-12), // random if not provided
+        password: password || randomBytes(16).toString('base64url'),
         email_confirm: true,
         user_metadata: {
             first_name,

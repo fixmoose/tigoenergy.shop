@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { verifyRecaptcha } from '@/lib/recaptcha'
+import { escapeHtml } from '@/lib/utils'
 
 export async function submitSupportRequest(formData: {
     type: 'shipping' | 'return' | 'general'
@@ -50,7 +51,7 @@ export async function submitSupportRequest(formData: {
     try {
         const adminUsers = await supabase.auth.admin.listUsers()
         const admins = (adminUsers.data.users || [])
-            .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === 'dejan@haywilson.com')
+            .filter((u: any) => u.user_metadata?.role === 'admin' || u.email === process.env.MASTER_ADMIN_EMAIL)
             .map((u: any) => u.email)
             .filter((email: string | undefined): email is string => !!email)
 
@@ -63,11 +64,11 @@ export async function submitSupportRequest(formData: {
             const adminHtml = `
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #16a34a;">New Support Inquiry (Order Related)</h2>
-                    <p><strong>From:</strong> ${userName} (${userEmail})</p>
+                    <p><strong>From:</strong> ${escapeHtml(userName)} (${escapeHtml(userEmail || '')})</p>
                     <p><strong>Type:</strong> ${formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support'}</p>
-                    <p><strong>Order ID:</strong> ${formData.orderId || 'N/A'}</p>
+                    <p><strong>Order ID:</strong> ${escapeHtml(formData.orderId || 'N/A')}</p>
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
-                        ${formData.message}
+                        ${escapeHtml(formData.message)}
                     </div>
                 </div>
             `

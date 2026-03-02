@@ -1,4 +1,5 @@
 
+import { randomInt } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
 import { verifyRecaptcha } from '@/lib/recaptcha'
@@ -22,12 +23,12 @@ export async function POST(request: Request) {
         }
 
         // 2. VALIDATION LOGIC
-        if (!email || !email.includes('@')) {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
         }
 
         // 3. GENERATE CODE
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
+        const code = randomInt(100000, 999999).toString()
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 mins
 
         // 4. STORE IN DATABASE
