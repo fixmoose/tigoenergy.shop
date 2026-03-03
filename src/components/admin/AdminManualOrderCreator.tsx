@@ -99,6 +99,19 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
         }
     }, [productSearch])
 
+    // Logic for automatic VAT adjustment
+    useEffect(() => {
+        if (selectedCustomer.is_b2b) {
+            setVatRate(0)
+        } else {
+            const currentMarketKey = market.toUpperCase()
+            const region = MARKETS[currentMarketKey]
+            if (region) {
+                setVatRate(region.vatRate * 100)
+            }
+        }
+    }, [selectedCustomer.is_b2b, market])
+
     const addItem = (p: ProductSnippet) => {
         const price = selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur
         setItems([...items, {
@@ -326,7 +339,11 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                             type="checkbox"
                                             id="is_b2b"
                                             checked={selectedCustomer.is_b2b}
-                                            onChange={e => setSelectedCustomer({ ...selectedCustomer, is_b2b: e.target.checked })}
+                                            onChange={e => {
+                                                const isB2b = e.target.checked
+                                                setSelectedCustomer({ ...selectedCustomer, is_b2b: isB2b })
+                                                if (isB2b) setVatRate(0)
+                                            }}
                                             className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                                         />
                                         <label htmlFor="is_b2b" className="text-xs font-bold text-slate-600 select-none cursor-pointer uppercase">B2B Mode</label>
@@ -389,7 +406,9 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                                 const region = allRegions.find(r => r.country === country)
                                                 if (region) {
                                                     setMarket(region.key.toLowerCase())
-                                                    setVatRate(region.vatRate * 100)
+                                                    if (!selectedCustomer.is_b2b) {
+                                                        setVatRate(region.vatRate * 100)
+                                                    }
                                                 }
                                             }}
                                             className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
@@ -598,7 +617,9 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                         const m = e.target.value
                                         setMarket(m)
                                         const region = MARKETS[m.toUpperCase()]
-                                        if (region) setVatRate(region.vatRate * 100)
+                                        if (region && !selectedCustomer.is_b2b) {
+                                            setVatRate(region.vatRate * 100)
+                                        }
                                     }}
                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm appearance-none outline-none focus:border-blue-500 shadow-sm"
                                 >
