@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { searchProductsAction } from '@/app/actions/products'
 import { searchCustomersAction } from '@/app/actions/customers'
 import { adminCreateOrderWithCustomerAction } from '@/app/actions/admin'
+import { MARKETS } from '@/lib/constants/markets'
 
 interface ProductSnippet {
     id: string
@@ -178,6 +179,11 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
     const subtotal = items.reduce((acc, item) => acc + (item.unit_price * item.quantity), 0)
     const vatAmount = (subtotal + shippingCost) * (vatRate / 100)
     const total = subtotal + shippingCost + vatAmount
+
+    // Get sorted countries from MARKETS
+    const allRegions = Object.values(MARKETS)
+        .filter(m => m.key !== 'SHOP' && m.key !== 'EU')
+        .sort((a, b) => a.countryName.localeCompare(b.countryName))
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
@@ -376,14 +382,22 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                     <div className="col-span-2">
                                         <select
                                             value={shippingAddress.country}
-                                            onChange={e => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                                            onChange={e => {
+                                                const country = e.target.value
+                                                setShippingAddress({ ...shippingAddress, country })
+                                                // Sync market context if not manually overridden or just for better defaults
+                                                const region = allRegions.find(r => r.country === country)
+                                                if (region) {
+                                                    setMarket(region.key.toLowerCase())
+                                                    setVatRate(region.vatRate * 100)
+                                                }
+                                            }}
                                             className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
                                         >
-                                            <option value="SI">Slovenia</option>
-                                            <option value="DE">Germany</option>
-                                            <option value="AT">Austria</option>
-                                            <option value="IT">Italy</option>
-                                            <option value="HR">Croatia</option>
+                                            <option value="">-- Select Country --</option>
+                                            {allRegions.map(r => (
+                                                <option key={r.country} value={r.country}>{r.countryName}</option>
+                                            ))}
                                         </select>
                                     </div>
 
@@ -436,11 +450,10 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                                     onChange={e => setBillingAddress({ ...billingAddress, country: e.target.value })}
                                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
                                                 >
-                                                    <option value="SI">Slovenia</option>
-                                                    <option value="DE">Germany</option>
-                                                    <option value="AT">Austria</option>
-                                                    <option value="IT">Italy</option>
-                                                    <option value="HR">Croatia</option>
+                                                    <option value="">-- Select Country --</option>
+                                                    {allRegions.map(r => (
+                                                        <option key={r.country} value={r.country}>{r.countryName}</option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -581,14 +594,18 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Market Context</label>
                                 <select
                                     value={market}
-                                    onChange={e => setMarket(e.target.value)}
+                                    onChange={e => {
+                                        const m = e.target.value
+                                        setMarket(m)
+                                        const region = MARKETS[m.toUpperCase()]
+                                        if (region) setVatRate(region.vatRate * 100)
+                                    }}
                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm appearance-none outline-none focus:border-blue-500 shadow-sm"
                                 >
-                                    <option value="si">Slovenia (SI)</option>
-                                    <option value="de">Germany (DE)</option>
-                                    <option value="at">Austria (AT)</option>
-                                    <option value="it">Italy (IT)</option>
-                                    <option value="hr">Croatia (HR)</option>
+                                    <option value="shop">International (SHOP)</option>
+                                    {allRegions.map(r => (
+                                        <option key={r.key} value={r.key.toLowerCase()}>{r.countryName} ({r.key})</option>
+                                    ))}
                                 </select>
                             </div>
 
