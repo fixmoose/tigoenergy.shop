@@ -12,66 +12,58 @@ interface CreateCustomerParams {
 }
 
 export async function createCustomer(params: CreateCustomerParams) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
 
-    // 1. Try to fetch administrative rights if needed, but for now we'll assume logged-in admin can insert
-    // Note: if 'customers' is linked to 'auth.users' via foreign key, this might fail unless we create an auth user first.
-    // We will try to insert directly into 'customers'. If it fails, it means we need to use Admin Auth API (which requires service key, often not exposed in client-side 'createClient').
+        const { data, error } = await supabase
+            .from('customers')
+            .insert({
+                email: params.email,
+                first_name: params.first_name,
+                last_name: params.last_name,
+                is_b2b: params.is_b2b || false,
+                customer_type: params.customer_type || 'regular',
+                created_at: new Date().toISOString()
+            })
+            .select()
+            .single()
 
-    // Strategy: Try Insert. 
-    // If 'Guest', we might generate a UUID if the table allows it.
-    // If the schema requires 'id' to be an existing auth.user id, this approach won't work for arbitrary emails without creating an auth user.
+        if (error) throw error
 
-    // Assumption: The 'customers' table allows manual inserts for "Guest" users (no auth login needed yet) 
-    // OR the system is configured to allow admins to create profiles.
-
-    // Let's generate a random UUID if it's a guest? Postgres usually handles 'default gen_random_uuid()' if ID is not provided.
-    // If ID matches auth.users, failing to provide one might error if it's NOT auto-gen.
-
-    // For now, let's try to insert.
-
-    const { data, error } = await supabase
-        .from('customers')
-        .insert({
-            email: params.email,
-            first_name: params.first_name,
-            last_name: params.last_name,
-            is_b2b: params.is_b2b || false,
-            customer_type: params.customer_type || 'regular',
-            created_at: new Date().toISOString()
-        })
-        .select()
-        .single()
-
-    if (error) {
-        console.error('Create Customer Error:', error)
-        throw new Error(error.message)
+        revalidatePath('/admin/customers')
+        return { success: true, data }
+    } catch (err: any) {
+        console.error('Error in createCustomer:', err)
+        return { success: false, error: err.message || 'Failed to create customer' }
     }
-
-    revalidatePath('/admin/customers')
-    return data
 }
 
 export async function updateMarketingPreferences(newsletter: boolean, marketing: boolean) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Not authenticated')
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error('Not authenticated')
 
-    const { error } = await supabase
-        .from('customers')
-        .update({
-            newsletter_subscribed: newsletter,
-            marketing_consent: marketing,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
+        const { error } = await supabase
+            .from('customers')
+            .update({
+                newsletter_subscribed: newsletter,
+                marketing_consent: marketing,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id)
 
-    if (error) throw error
-    revalidatePath('/dashboard')
-    revalidatePath('/profile')
-    return { success: true }
+        if (error) throw error
+
+        revalidatePath('/dashboard')
+        revalidatePath('/profile')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in updateMarketingPreferences:', err)
+        return { success: false, error: err.message || 'Failed to update marketing preferences' }
+    }
 }
 
 export async function getMarketingPreferences() {
@@ -90,37 +82,41 @@ export async function getMarketingPreferences() {
 }
 
 export async function getB2BCustomers() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
 
-    const { data, error } = await supabase
-        .from('customers')
-        .select('id, company_name, email')
-        .eq('is_b2b', true)
-        .order('company_name', { ascending: true })
+        const { data, error } = await supabase
+            .from('customers')
+            .select('id, company_name, email')
+            .eq('is_b2b', true)
+            .order('company_name', { ascending: true })
 
-    if (error) {
-        console.error('Error fetching B2B customers:', error)
-        return []
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        console.error('Error in getB2BCustomers:', err)
+        return { success: false, error: err.message || 'Failed to fetch B2B customers' }
     }
-    return data || []
 }
 
 export async function searchCustomersAction(query: string) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
 
-    const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,company_name.ilike.%${query}%`)
-        .limit(20)
+        const { data, error } = await supabase
+            .from('customers')
+            .select('*, addresses(*)')
+            .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,company_name.ilike.%${query}%`)
+            .limit(20)
 
-    if (error) {
-        console.error('Error searching customers:', error)
-        return []
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        console.error('Error in searchCustomersAction:', err)
+        return { success: false, error: err.message || 'Failed to search customers' }
     }
-    return data || []
 }

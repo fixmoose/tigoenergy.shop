@@ -7,15 +7,14 @@ import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
 
 export async function registerUserAction(formData: any) {
-    const supabase = await createAdminClient()
-    const { email, password, firstName, lastName, phone, dob, occupation, address, address2, city, postalCode, country, newsletter, marketing, username } = formData
-
     try {
-        // 1. Create user in Supabase (Marked as confirmed because they verified via code in form)
+        const supabase = await createAdminClient()
+        const { email, password, firstName, lastName, phone, dob, occupation, address, address2, city, postalCode, country, newsletter, marketing, username } = formData
+
         const { data: userData, error: signUpError } = await supabase.auth.admin.createUser({
             email,
             password,
-            email_confirm: true, // User already verified in font-end step
+            email_confirm: true,
             user_metadata: {
                 first_name: firstName,
                 last_name: lastName,
@@ -34,14 +33,11 @@ export async function registerUserAction(formData: any) {
             }
         })
 
-        if (signUpError) {
-            return { error: signUpError.message }
-        }
+        if (signUpError) throw signUpError
 
         const user = userData.user
-        if (!user) return { error: 'Failed to create user' }
+        if (!user) throw new Error('Failed to create user')
 
-        // 2. Send Welcome email via UniOne
         const headersList = await headers()
         const marketKey = headersList.get('x-market-key') || 'SHOP'
         const market = getMarketFromKey(marketKey)
@@ -53,25 +49,15 @@ export async function registerUserAction(formData: any) {
         try {
             const translations = await getEmailTranslations(locale)
             const subject = translations.email?.welcome?.title || 'Welcome to Tigo Energy SHOP'
-
-            const html = await renderTemplate('welcome', {
-                name: firstName,
-            }, locale)
-
-            await sendEmail({
-                to: email,
-                subject: subject,
-                html
-            })
+            const html = await renderTemplate('welcome', { name: firstName }, locale)
+            await sendEmail({ to: email, subject, html })
         } catch (emailError) {
             console.error('Failed to send welcome email:', emailError)
-            // Still return success since user is created
         }
 
         return { success: true }
-
     } catch (err: any) {
-        console.error('Registration error:', err)
-        return { error: err.message || 'An unexpected error occurred' }
+        console.error('Error in registerUserAction:', err)
+        return { success: false, error: err.message || 'An unexpected error occurred' }
     }
 }

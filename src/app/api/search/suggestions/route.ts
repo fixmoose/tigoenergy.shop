@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { getMarketFromKey } from '@/lib/constants/markets'
+import { debounce } from '@/lib/utils/optimization'
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)

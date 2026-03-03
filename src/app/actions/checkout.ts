@@ -23,7 +23,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
     const recaptchaToken = formData.get('recaptcha_token') as string
     const recaptcha = await verifyRecaptcha(recaptchaToken, 'CHECKOUT')
     if (!recaptcha.success) {
-        return { error: 'reCAPTCHA verification failed. Please try again.' }
+        return { success: false, error: 'reCAPTCHA verification failed. Please try again.' }
     }
 
     // 1. Extract Data
@@ -36,9 +36,9 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
     const password = rawData.password as string
 
     // Basic Validation
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: 'Invalid email address' }
-    if (cartItems.length === 0) return { error: 'Cart is empty' }
-    if (createAccount && (!password || password.length < 6)) return { error: 'Password must be at least 6 characters' }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { success: false, error: 'Invalid email address' }
+    if (cartItems.length === 0) return { success: false, error: 'Cart is empty' }
+    if (createAccount && (!password || password.length < 6)) return { success: false, error: 'Password must be at least 6 characters' }
 
     try {
         // 2. Auth / User Handling
@@ -63,7 +63,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                     }
                 }
             })
-            if (authError) return { error: authError.message }
+            if (authError) return { success: false, error: authError.message }
             if (authData.user) customerId = authData.user.id
         }
 
@@ -75,7 +75,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             .select('id, price_eur, weight_kg, is_electrical_equipment, trod_category_code, default_packaging_type, packaging_weight_per_unit_kg, cn_code')
             .in('id', productIds)
 
-        if (!products) return { error: 'Failed to fetch product data' }
+        if (!products) return { success: false, error: 'Failed to fetch product data' }
 
         let subtotal = 0
         let totalWeight = 0
@@ -128,7 +128,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
             if (rateError || !rateData) {
                 console.error('Error fetching shipping rate:', rateError)
-                return { error: 'Invalid shipping method selected' }
+                return { success: false, error: 'Invalid shipping method selected' }
             }
 
             shippingCost = rateData.rate_eur
@@ -327,6 +327,6 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
     } catch (err: any) {
         console.error('Checkout error:', err)
-        return { error: err.message || 'Failed to place order' }
+        return { success: false, error: err.message || 'Failed to place order' }
     }
 }

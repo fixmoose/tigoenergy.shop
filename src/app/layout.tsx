@@ -11,6 +11,8 @@ import { getMessages } from 'next-intl/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
+import { QueryProvider } from '@/components/providers/QueryProvider'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -75,19 +77,21 @@ export default async function RootLayout({
   return (
     <html lang={htmlLang} suppressHydrationWarning>
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
-          <MarketProvider initialMarket={market} initialLanguage={htmlLang}>
-            <CurrencyProvider>
-              <CartProvider>
-                <Header />
-                <main>
-                  {children}
-                </main>
-                <Footer />
-              </CartProvider>
-            </CurrencyProvider>
-          </MarketProvider>
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider messages={messages}>
+            <MarketProvider initialMarket={market} initialLanguage={htmlLang}>
+              <CurrencyProvider>
+                <CartProvider>
+                  <Header />
+                  <main>
+                    {children}
+                  </main>
+                  <Footer />
+                </CartProvider>
+              </CurrencyProvider>
+            </MarketProvider>
+          </NextIntlClientProvider>
+        </QueryProvider>
       </body>
     </html>
   )

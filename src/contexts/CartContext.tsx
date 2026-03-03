@@ -157,6 +157,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   async function addItem(item: CartItem) {
+    // Optimistic update
+    const next = [...state.items]
+    const idx = next.findIndex((i) => i.product_id === item.product_id || i.sku === item.sku)
+    if (idx === -1) next.push(item)
+    else next[idx] = { ...next[idx], quantity: (next[idx].quantity || 0) + item.quantity, total_price: (next[idx].unit_price || item.unit_price) * ((next[idx].quantity || 0) + item.quantity) }
+    setState({ ...state, items: next })
+    savePersistent(next)
+
     // Call API add
     try {
       const res = await fetch('/api/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item }) })
@@ -164,19 +172,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (res.ok && payload?.cart) {
         setState({ items: payload.cart.items ?? [], cartId: payload.cart.id })
         savePersistent(payload.cart.items ?? [])
-        return
+      } else {
+        // Revert optimistic update on failure
+        setState({ ...state, items: state.items })
+        savePersistent(state.items)
       }
     } catch (e) {
-      // ignore
+      // Revert optimistic update on error
+      setState({ ...state, items: state.items })
+      savePersistent(state.items)
     }
-
-    // fallback to local only (state)
-    const next = [...state.items]
-    const idx = next.findIndex((i) => i.product_id === item.product_id || i.sku === item.sku)
-    if (idx === -1) next.push(item)
-    else next[idx] = { ...next[idx], quantity: (next[idx].quantity || 0) + item.quantity, total_price: (next[idx].unit_price || item.unit_price) * ((next[idx].quantity || 0) + item.quantity) }
-    setState({ ...state, items: next })
-    savePersistent(next)
   }
 
   async function updateQuantity(productIdOrSku: string, qty: number) {

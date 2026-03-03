@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Customer } from '@/types/database'
 import { createCustomer } from '@/app/actions/customers'
-import { adminCreateCustomerAction, adminUpdateCustomerAction } from '@/app/actions/admin'
+import { adminCreateCustomerAction, adminUpdateCustomerAction, adminResetCustomerPasswordAction } from '@/app/actions/admin'
 import { createClient } from '@/lib/supabase/client'
 
 type Tab = 'guest' | 'b2c' | 'b2b'
@@ -123,6 +123,23 @@ export default function CustomerList({ customers }: CustomerListProps) {
         else {
             alert('User blocked.')
             window.location.reload()
+        }
+    }
+
+    const handleResetPassword = async (email: string) => {
+        if (!confirm(`Are you sure you want to send a password reset email to ${email}?`)) return
+        setLoading(true)
+        try {
+            const res = await adminResetCustomerPasswordAction(email)
+            if (res.success) {
+                alert('Password reset email sent.')
+            } else {
+                alert('Error: ' + res.error)
+            }
+        } catch (error) {
+            alert('Failed to send reset email.')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -371,6 +388,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                         Review
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={() => handleResetPassword(c.email)}
+                                                    className="text-orange-600 hover:text-orange-800 font-medium text-xs whitespace-nowrap"
+                                                    title="Send Password Reset Email"
+                                                >
+                                                    Reset Pass
+                                                </button>
                                                 <button
                                                     onClick={() => {
                                                         setEditData(c)
@@ -683,6 +707,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                     className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
                                 >
                                     Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleResetPassword(editModal.customer?.email || '')}
+                                    className="flex-1 px-4 py-2 border border-orange-300 text-orange-700 rounded-lg hover:bg-orange-50 font-medium"
+                                >
+                                    Reset Password
                                 </button>
                                 <button
                                     type="submit"

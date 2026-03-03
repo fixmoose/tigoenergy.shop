@@ -174,7 +174,7 @@ export default function CheckoutPage() {
 
     // Prefill State
     const [formData, setFormData] = useState(() => {
-        let initialCountry = 'DE'
+        let initialCountry = ''
         if (typeof window !== 'undefined') {
             const marketKey = getMarketKeyFromHostname(window.location.hostname)
             const market = MARKETS[marketKey]
@@ -207,7 +207,9 @@ export default function CheckoutPage() {
             password: '',
             confirm_password: '',
             commercial_access: false,
-            truck_access_notes: ''
+            truck_access_notes: '',
+            terms_agreement: false,
+            newsletter_subscribe: false,
         }
     })
 
@@ -234,12 +236,12 @@ export default function CheckoutPage() {
                         email: user.email || '',
                         shipping_first_name: customerData.first_name || user.user_metadata?.first_name || '',
                         shipping_last_name: customerData.last_name || user.user_metadata?.last_name || '',
-                        shipping_phone: customerData.phone || user.user_metadata?.phone || '',
+                        shipping_phone: (customerData.phone && customerData.phone.length > 4) ? customerData.phone : (user.user_metadata?.phone && user.user_metadata.phone.length > 4 ? user.user_metadata.phone : ''),
                         company_name: customerData.company_name || user.user_metadata?.company_name || '',
                         shipping_street: defaultShipping?.street || '',
                         shipping_city: defaultShipping?.city || '',
                         shipping_postal_code: defaultShipping?.postalCode || '',
-                        shipping_country: defaultShipping?.country || 'DE',
+                        shipping_country: defaultShipping?.country || '',
                         vat_id: customerData.vat_id || '',
                     }))
 
@@ -360,24 +362,81 @@ export default function CheckoutPage() {
         fetchRates()
     }, [formData.shipping_country, totalWeight])
 
-    // Auto-prefill phone prefix based on country
+    // No longer auto-filling prefix, using placeholder instead
+
+    // IP-based country detection and domain redirection
     useEffect(() => {
-        const country = formData.shipping_country
-        if (!country) return
+        const handleIPDetection = async () => {
+            try {
+                const res = await fetch('/api/geoip')
+                const data = await res.json()
 
-        const code = COUNTRY_PREFIXES[country]
-        if (!code) return
+                if (!data.country) return
 
-        setFormData(prev => {
-            const currentPhone = prev.shipping_phone.trim()
-            // If empty or just an old prefix, update it
-            const isPrefixOnly = Object.values(COUNTRY_PREFIXES).some(p => currentPhone === p)
-            if (!currentPhone || isPrefixOnly) {
-                return { ...prev, shipping_phone: code + ' ' }
+                // Check if we have a localized domain for this country
+                const localizedDomain = getLocalizedDomainForCountry(data.country)
+
+                if (localizedDomain) {
+                    // Redirect to localized domain
+                    const currentHostname = window.location.hostname
+                    if (currentHostname !== localizedDomain) {
+                        const protocol = window.location.protocol
+                        const path = window.location.pathname + window.location.search
+                        window.location.href = `${protocol}//${localizedDomain}${path}`
+                        return
+                    }
+                } else {
+                    // No localized domain, use IP for country selection
+                    setFormData(prev => ({
+                        ...prev,
+                        shipping_country: data.country,
+                        billing_country: data.country
+                    }))
+                }
+            } catch (err) {
+                console.warn('IP-based country detection failed:', err)
             }
-            return prev
-        })
-    }, [formData.shipping_country])
+        }
+
+        // Only run for .shop domain to avoid conflicts with market-specific domains
+        // SKIP if we are on localhost to prevent dev redirection loops
+        if (typeof window !== 'undefined') {
+            const hostname = window.location.hostname
+            if (hostname === 'tigoenergy.shop') {
+                handleIPDetection()
+            }
+        }
+    }, [])
+
+    // Helper function to get localized domain for country
+    const getLocalizedDomainForCountry = (countryCode: string): string | null => {
+        const domainMap: Record<string, string> = {
+            'SI': 'tigoenergy.si',
+            'DE': 'tigoenergy.de',
+            'AT': 'tigoenergy.at',
+            'CH': 'tigoenergy.ch',
+            'FR': 'tigoenergy.fr',
+            'IT': 'tigoenergy.it',
+            'ES': 'tigoenergy.es',
+            'NL': 'tigoenergy.nl',
+            'BE': 'tigoenergy.be',
+            'PL': 'tigoenergy.pl',
+            'CZ': 'tigoenergy.cz',
+            'SK': 'tigoenergy.sk',
+            'HR': 'tigoenergy.hr',
+            'SE': 'tigoenergy.se',
+            'DK': 'tigoenergy.dk',
+            'RO': 'tigoenergy.ro',
+            'RS': 'tigoenergy.rs',
+            'MK': 'tigoenergy.mk',
+            'ME': 'tigoenergy.me',
+            'GB': 'tigoenergy.co.uk'
+        }
+        return domainMap[countryCode] || null
+    }
+
+    // Auto-prefill phone placeholder based on country or IP
+    const phonePlaceholder = `${COUNTRY_PREFIXES[formData.shipping_country] || '+49'} ...`
 
     const handleVatValidate = async () => {
         console.log('Validating VAT:', formData.vat_id)
@@ -420,8 +479,12 @@ export default function CheckoutPage() {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target
+        const target = e.target as HTMLInputElement
+        const name = target.name
+        const value = target.type === 'checkbox' ? target.checked : target.value
+
         setFormData(prev => ({ ...prev, [name]: value }))
+
         if (invalidFields.includes(name)) {
             setInvalidFields(prev => prev.filter(f => f !== name))
         }
@@ -441,7 +504,7 @@ export default function CheckoutPage() {
     const validateForm = (): boolean => {
         const requiredFields = [
             'email', 'shipping_phone',
-            'shipping_street', 'shipping_city', 'shipping_postal_code'
+            'shipping_street', 'shipping_city', 'shipping_postal_code', 'shipping_country'
         ]
         if (user) {
             requiredFields.push('shipping_first_name', 'shipping_last_name')
@@ -449,7 +512,7 @@ export default function CheckoutPage() {
             requiredFields.push('company_name')
         }
         if (!billingSame) {
-            requiredFields.push('billing_first_name', 'billing_last_name', 'billing_street', 'billing_city', 'billing_postal_code')
+            requiredFields.push('billing_first_name', 'billing_last_name', 'billing_street', 'billing_city', 'billing_postal_code', 'billing_country')
         }
         if (!selectedShippingId && shippingRates.length > 0) {
             setError('Please select a shipping method.')
@@ -457,19 +520,51 @@ export default function CheckoutPage() {
         }
         const missing = requiredFields.filter(field => {
             const val = formData[field as keyof typeof formData]
+            if (typeof val === 'boolean') return !val
             if (typeof val === 'string') return !val.trim()
             return val === undefined || val === null
         })
+
+        // Special check for terms_agreement if not in requiredFields list
+        if (!formData.terms_agreement) {
+            if (!missing.includes('terms_agreement')) missing.push('terms_agreement')
+        }
+
         if (missing.length > 0) {
             setInvalidFields(missing)
-            setError('Please fill in all mandatory fields.')
-            window.scrollTo({ top: 0, behavior: 'smooth' })
+            setError('Missing mandatory information. Please check the highlighted fields below.')
+
+            // Scroll to the first missing field and highlight all
+            const firstMissingField = missing[0]
+            const firstMissingElement = document.querySelector(`[name="${firstMissingField}"]`) as HTMLElement
+
+            // Add a temporary overlay message to the first missing field for immediate feedback
+            if (firstMissingElement) {
+                // Focus and scroll
+                firstMissingElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                setTimeout(() => firstMissingElement.focus({ preventScroll: true }), 500)
+
+                // Add shake animation
+                firstMissingElement.classList.add('animate-shake')
+                setTimeout(() => firstMissingElement.classList.remove('animate-shake'), 1000)
+            }
             return false
         }
         if (!user && !emailVerified) {
             setError("Please verify your email address first")
             setInvalidFields(['email'])
-            window.scrollTo({ top: 0, behavior: 'smooth' })
+
+            // Flash email field and scroll to it
+            const emailElement = document.querySelector('[name="email"]') as HTMLElement
+            if (emailElement) {
+                emailElement.classList.add('animate-pulse', 'ring-2', 'ring-red-500', 'bg-red-50')
+                setTimeout(() => {
+                    emailElement.classList.remove('animate-pulse', 'ring-2', 'ring-red-500', 'bg-red-50')
+                }, 2000)
+
+                emailElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                emailElement.focus({ preventScroll: true })
+            }
             return false
         }
         return true
@@ -534,7 +629,10 @@ export default function CheckoutPage() {
 
     const getInputClass = (fieldName: string, baseClass: string = '') => {
         const isInvalid = invalidFields.includes(fieldName)
-        return `w-full border rounded-lg px-3 py-2 ${baseClass} ${isInvalid ? 'border-red-500 animate-pulse ring-2 ring-red-200' : 'border-gray-300'}`
+        return `w-full border rounded-lg px-3 py-2.5 transition-all duration-300 ${baseClass} ${isInvalid
+            ? 'border-red-500 bg-red-50/50 ring-4 ring-red-100 placeholder-red-300'
+            : 'border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100'
+            }`
     }
 
     const selectedShippingRate = shippingRates.find(r => r.id === selectedShippingId)
@@ -567,7 +665,7 @@ export default function CheckoutPage() {
         <div className="bg-gray-50 min-h-screen pb-12">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('secureCheckout')}</h1>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         {(invalidFields.length > 0 || error) && (
                             <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
@@ -648,7 +746,15 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('phoneNumber')} <span className="text-red-500">*</span></label>
-                                    <input type="tel" name="shipping_phone" required value={formData.shipping_phone} onChange={handleChange} className={getInputClass('shipping_phone')} placeholder={`${COUNTRY_PREFIXES[formData.shipping_country] || '+49'} ...`} />
+                                    <input
+                                        type="tel"
+                                        name="shipping_phone"
+                                        required
+                                        value={formData.shipping_phone}
+                                        onChange={handleChange}
+                                        className={getInputClass('shipping_phone')}
+                                        placeholder={phonePlaceholder}
+                                    />
                                 </div>
                             </div>
                             {!user && (
@@ -695,9 +801,9 @@ export default function CheckoutPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">
-                                        {!user ? "Name (First, Last and/or Company)" : t('companyName')}
+                                        {!user ? "Name (First, Last and/or Company)" : t('companyName')} <span className="text-red-500">*</span>
                                     </label>
-                                    <input type="text" name="company_name" required={!user} value={formData.company_name} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                                    <input type="text" name="company_name" required={!user} value={formData.company_name} onChange={handleChange} className={getInputClass('company_name')} />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">{t('vatId')}</label>
@@ -755,7 +861,8 @@ export default function CheckoutPage() {
                                 <input type="text" name="shipping_postal_code" required value={formData.shipping_postal_code} onChange={handleChange} className={getInputClass('shipping_postal_code')} placeholder={t('postalCode')} />
                                 <input type="text" name="shipping_city" required value={formData.shipping_city} onChange={handleChange} className={getInputClass('shipping_city')} placeholder={t('city')} />
                                 <div className="md:col-span-2">
-                                    <select name="shipping_country" value={formData.shipping_country} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white">
+                                    <select name="shipping_country" value={formData.shipping_country} onChange={handleChange} className={getInputClass('shipping_country', 'bg-white')}>
+                                        <option value="">-- Select Country --</option>
                                         {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
                                     </select>
                                     {effectiveIsB2B && (
@@ -858,7 +965,8 @@ export default function CheckoutPage() {
                                     <input type="text" name="billing_postal_code" required={!billingSame} value={formData.billing_postal_code} onChange={handleChange} className={getInputClass('billing_postal_code')} placeholder={t('postalCode')} />
                                     <input type="text" name="billing_city" required={!billingSame} value={formData.billing_city} onChange={handleChange} className={getInputClass('billing_city')} placeholder={t('city')} />
                                     <div className="md:col-span-2">
-                                        <select name="billing_country" value={formData.billing_country} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white">
+                                        <select name="billing_country" value={formData.billing_country} onChange={handleChange} className={getInputClass('billing_country', 'bg-white')}>
+                                            <option value="">-- Select Country --</option>
                                             {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
                                         </select>
                                     </div>
@@ -944,17 +1052,30 @@ export default function CheckoutPage() {
                             </div>
 
                             <div className="mt-4 space-y-3">
-                                <label className="flex items-start gap-2 cursor-pointer group">
-                                    <input type="checkbox" name="terms_agreement" required className="mt-1 rounded text-green-600 focus:ring-green-500" />
-                                    <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">
+                                <label className={`flex items-start gap-2 p-3 rounded-lg transition-all duration-300 cursor-pointer group ${invalidFields.includes('terms_agreement') ? 'bg-red-50 ring-4 ring-red-100 border border-red-500' : 'hover:bg-gray-50'}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="terms_agreement"
+                                        required
+                                        checked={formData.terms_agreement}
+                                        onChange={handleChange}
+                                        className="mt-1 rounded text-green-600 focus:ring-green-500"
+                                    />
+                                    <span className={`text-xs ${invalidFields.includes('terms_agreement') ? 'text-red-800 font-bold' : 'text-gray-500'} group-hover:text-gray-700 transition`}>
                                         {t('termsAgree')} <a href="/terms" target="_blank" className="text-green-600 hover:underline">{t('termsConditions')}</a> {t('privacyAcknowledge')} <a href="/privacy" target="_blank" className="text-green-600 hover:underline">{t('privacyPolicy')}</a>.
                                         {effectiveIsB2B
                                             ? " As a business customer, you acknowledge that all sales are final and common consumer return rights do not apply."
                                             : ` ${t('warrantyReturnInfo')}`}
                                     </span>
                                 </label>
-                                <label className="flex items-center gap-2 cursor-pointer group">
-                                    <input type="checkbox" name="newsletter_subscribe" className="rounded text-green-600 focus:ring-green-500" />
+                                <label className="flex items-center gap-2 p-3 cursor-pointer group hover:bg-gray-50 rounded-lg transition-all">
+                                    <input
+                                        type="checkbox"
+                                        name="newsletter_subscribe"
+                                        checked={formData.newsletter_subscribe}
+                                        onChange={handleChange}
+                                        className="rounded text-green-600 focus:ring-green-500"
+                                    />
                                     <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">
                                         {t('newsletterSubscribe')}
                                     </span>

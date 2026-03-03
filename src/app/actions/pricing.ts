@@ -5,158 +5,203 @@ import { revalidatePath } from 'next/cache'
 import type { PricingSchema, PricingSchemaRule } from '@/types/database'
 
 export async function getPricingSchemas() {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('pricing_schemas')
-        .select('*, rules:pricing_schema_rules(*)')
-        .order('created_at', { ascending: false })
+    try {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('pricing_schemas')
+            .select('*, rules:pricing_schema_rules(*)')
+            .order('created_at', { ascending: false })
 
-    if (error) {
-        console.error('Error fetching pricing schemas:', error)
-        return []
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        console.error('Error in getPricingSchemas:', err)
+        return { success: false, error: err.message || 'Failed to fetch pricing schemas' }
     }
-    return data || []
 }
 
 export async function createPricingSchema(name: string, description?: string) {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('pricing_schemas')
-        .insert({ name, description })
-        .select()
-        .single()
+    try {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('pricing_schemas')
+            .insert({ name, description })
+            .select()
+            .single()
 
-    if (error) throw new Error(error.message)
-    revalidatePath('/admin/pricing')
-    return data
+        if (error) throw error
+        revalidatePath('/admin/pricing')
+        return { success: true, data }
+    } catch (err: any) {
+        console.error('Error in createPricingSchema:', err)
+        return { success: false, error: err.message || 'Failed to create pricing schema' }
+    }
 }
 
 export async function deletePricingSchema(id: string) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('pricing_schemas')
-        .delete()
-        .eq('id', id)
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('pricing_schemas')
+            .delete()
+            .eq('id', id)
 
-    if (error) throw new Error(error.message)
-    revalidatePath('/admin/pricing')
+        if (error) throw error
+        revalidatePath('/admin/pricing')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in deletePricingSchema:', err)
+        return { success: false, error: err.message || 'Failed to delete pricing schema' }
+    }
 }
 
 import { validatePricingRule } from '@/lib/db/pricing'
 
 export async function addPricingRule(rule: Partial<PricingSchemaRule>) {
-    const validation = await validatePricingRule(rule)
-    if (!validation.valid) {
-        throw new Error(validation.message)
+    try {
+        const validation = await validatePricingRule(rule)
+        if (!validation.valid) throw new Error(validation.message)
+
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('pricing_schema_rules')
+            .insert(rule)
+            .select()
+            .single()
+
+        if (error) throw error
+        revalidatePath('/admin/pricing')
+        return { success: true, data }
+    } catch (err: any) {
+        console.error('Error in addPricingRule:', err)
+        return { success: false, error: err.message || 'Failed to add pricing rule' }
     }
-
-    const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('pricing_schema_rules')
-        .insert(rule)
-        .select()
-        .single()
-
-    if (error) throw new Error(error.message)
-    revalidatePath('/admin/pricing')
-    return data
 }
 
 export async function deletePricingRule(id: string) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('pricing_schema_rules')
-        .delete()
-        .eq('id', id)
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('pricing_schema_rules')
+            .delete()
+            .eq('id', id)
 
-    if (error) throw new Error(error.message)
-    revalidatePath('/admin/pricing')
+        if (error) throw error
+        revalidatePath('/admin/pricing')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in deletePricingRule:', err)
+        return { success: false, error: err.message || 'Failed to delete pricing rule' }
+    }
 }
 
 export async function getCustomerSchemas(customerId: string) {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('customer_pricing_schemas')
-        .select('*, schema:pricing_schemas(*)')
-        .eq('customer_id', customerId)
-        .order('priority', { ascending: false })
+    try {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('customer_pricing_schemas')
+            .select('*, schema:pricing_schemas(*)')
+            .eq('customer_id', customerId)
+            .order('priority', { ascending: false })
 
-    if (error) {
-        console.error('Error fetching customer schemas:', error)
-        return []
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        console.error('Error in getCustomerSchemas:', err)
+        return { success: false, error: err.message || 'Failed to fetch customer schemas' }
     }
-    return data || []
 }
 
 export async function assignSchemaToCustomer(customerId: string, schemaId: string, priority: number = 0) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('customer_pricing_schemas')
-        .upsert({ customer_id: customerId, schema_id: schemaId, priority })
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('customer_pricing_schemas')
+            .upsert({ customer_id: customerId, schema_id: schemaId, priority })
 
-    if (error) throw new Error(error.message)
-    revalidatePath(`/admin/customers/${customerId}`)
+        if (error) throw error
+        revalidatePath(`/admin/customers/${customerId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in assignSchemaToCustomer:', err)
+        return { success: false, error: err.message || 'Failed to assign schema' }
+    }
 }
 
 export async function unassignSchemaFromCustomer(customerId: string, schemaId: string) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('customer_pricing_schemas')
-        .delete()
-        .eq('customer_id', customerId)
-        .eq('schema_id', schemaId)
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('customer_pricing_schemas')
+            .delete()
+            .eq('customer_id', customerId)
+            .eq('schema_id', schemaId)
 
-    if (error) throw new Error(error.message)
-    revalidatePath(`/admin/customers/${customerId}`)
+        if (error) throw error
+        revalidatePath(`/admin/customers/${customerId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in unassignSchemaFromCustomer:', err)
+        return { success: false, error: err.message || 'Failed to unassign schema' }
+    }
 }
 
 export async function getB2BCustomerPrices(productId: string) {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-        .from('b2b_customer_prices')
-        .select('*, customer:customers(company_name, email)')
-        .eq('product_id', productId)
+    try {
+        const supabase = await createClient()
+        const { data, error } = await supabase
+            .from('b2b_customer_prices')
+            .select('*, customer:customers(company_name, email)')
+            .eq('product_id', productId)
 
-    if (error) {
-        console.error('Error fetching B2B customer prices:', error)
-        return []
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        console.error('Error in getB2BCustomerPrices:', err)
+        return { success: false, error: err.message || 'Failed to fetch B2B prices' }
     }
-    return data || []
 }
 
 export async function setB2BCustomerPrice(customerId: string, productId: string, price: number) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
+        const { data: product } = await supabase.from('products').select('sku').eq('id', productId).single()
+        const { data: customer } = await supabase.from('customers').select('internal_notes').eq('id', customerId).single()
 
-    // 1. Fetch SKU and current notes
-    const { data: product } = await supabase.from('products').select('sku').eq('id', productId).single()
-    const { data: customer } = await supabase.from('customers').select('internal_notes').eq('id', customerId).single()
+        const { error: priceError } = await supabase
+            .from('b2b_customer_prices')
+            .upsert({ customer_id: customerId, product_id: productId, price_eur: price })
 
-    // 2. Upsert the price
-    const { error: priceError } = await supabase
-        .from('b2b_customer_prices')
-        .upsert({ customer_id: customerId, product_id: productId, price_eur: price })
+        if (priceError) throw priceError
 
-    if (priceError) throw new Error(priceError.message)
+        const note = `[SYSTEM] Custom B2B price set for SKU: ${product?.sku || productId} (€${price.toFixed(2)}) on ${new Date().toLocaleDateString()}`
+        const updatedNotes = customer?.internal_notes ? `${customer.internal_notes}\n${note}` : note
+        await supabase.from('customers').update({ internal_notes: updatedNotes }).eq('id', customerId)
 
-    // 3. Append internal note
-    const note = `[SYSTEM] Custom B2B price set for SKU: ${product?.sku || productId} (€${price.toFixed(2)}) on ${new Date().toLocaleDateString()}`
-    const updatedNotes = customer?.internal_notes ? `${customer.internal_notes}\n${note}` : note
-
-    await supabase.from('customers').update({ internal_notes: updatedNotes }).eq('id', customerId)
-
-    revalidatePath(`/admin/products/${productId}`)
-    revalidatePath(`/admin/customers/${customerId}`)
+        revalidatePath(`/admin/products/${productId}`)
+        revalidatePath(`/admin/customers/${customerId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in setB2BCustomerPrice:', err)
+        return { success: false, error: err.message || 'Failed to set B2B customer price' }
+    }
 }
 
 export async function deleteB2BCustomerPrice(id: string, productId: string) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('b2b_customer_prices')
-        .delete()
-        .eq('id', id)
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('b2b_customer_prices')
+            .delete()
+            .eq('id', id)
 
-    if (error) throw new Error(error.message)
-    revalidatePath(`/admin/products/${productId}`)
+        if (error) throw error
+        revalidatePath(`/admin/products/${productId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in deleteB2BCustomerPrice:', err)
+        return { success: false, error: err.message || 'Failed to delete B2B price' }
+    }
 }
 
 export async function saveCustomerCustomPrice(payload: {
@@ -166,28 +211,40 @@ export async function saveCustomerCustomPrice(payload: {
     fixed_price_eur?: number | null
     tier_prices?: any[] | null
 }) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('b2b_customer_prices')
-        .upsert({
-            customer_id: payload.customer_id,
-            product_id: payload.product_id,
-            pricing_type: payload.pricing_type,
-            price_eur: payload.fixed_price_eur ?? null,
-            tier_prices: payload.tier_prices ?? null,
-        })
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('b2b_customer_prices')
+            .upsert({
+                customer_id: payload.customer_id,
+                product_id: payload.product_id,
+                pricing_type: payload.pricing_type,
+                price_eur: payload.fixed_price_eur ?? null,
+                tier_prices: payload.tier_prices ?? null,
+            })
 
-    if (error) throw new Error(error.message)
-    revalidatePath(`/admin/customers/${payload.customer_id}`)
+        if (error) throw error
+        revalidatePath(`/admin/customers/${payload.customer_id}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in saveCustomerCustomPrice:', err)
+        return { success: false, error: err.message || 'Failed to save custom price' }
+    }
 }
 
 export async function deleteCustomerCustomPrice(id: string, customerId: string) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('b2b_customer_prices')
-        .delete()
-        .eq('id', id)
+    try {
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('b2b_customer_prices')
+            .delete()
+            .eq('id', id)
 
-    if (error) throw new Error(error.message)
-    revalidatePath(`/admin/customers/${customerId}`)
+        if (error) throw error
+        revalidatePath(`/admin/customers/${customerId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in deleteCustomerCustomPrice:', err)
+        return { success: false, error: err.message || 'Failed to delete custom price' }
+    }
 }

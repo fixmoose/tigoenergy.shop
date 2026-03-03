@@ -29,24 +29,13 @@ async function checkIsMasterAdmin() {
  * Invite a new admin
  */
 export async function inviteAdminAction(email: string) {
-    console.log(`Starting invitation for: ${email}`)
     try {
-        if (!await checkIsAdmin()) {
-            console.error('Permission denied: User is not an admin.')
-            throw new Error('Unauthorized')
-        }
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-        console.log('Creating admin client...')
         const supabase = await createAdminClient()
-
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-        if (!siteUrl) {
-            console.error('NEXT_PUBLIC_SITE_URL is not defined in environment variables.')
-            throw new Error('Site configuration error')
-        }
+        if (!siteUrl) throw new Error('Site configuration error')
 
-        console.log(`Generating invitation link for ${email} with redirect to ${siteUrl}/admin/sign-in`)
-        // Create an invitation link using Supabase Auth
         const { data, error } = await supabase.auth.admin.generateLink({
             type: 'invite',
             email: email,
@@ -56,30 +45,23 @@ export async function inviteAdminAction(email: string) {
             }
         })
 
-        if (error) {
-            console.error('Supabase generateLink error:', error)
-            throw error
-        }
+        if (error) throw error
 
-        console.log('Invitation link generated. Rendering email template...')
-        // Send the custom email via UniOne
         const html = await renderTemplate('admin-invite', {
             invite_link: data.properties.action_link
         }, 'en')
 
-        console.log('Template rendered. Sending email via UniOne...')
         await sendEmail({
             to: email,
             subject: 'Invitation to Tigo Energy SHOP Admin Team',
             html
         })
 
-        console.log('Email sent successfully. Revalidating path...')
         revalidatePath('/admin/settings')
-        return { success: true }
+        return { success: true, data }
     } catch (err: any) {
         console.error('Error in inviteAdminAction:', err)
-        throw new Error(err.message || 'An unexpected error occurred during admin invitation')
+        return { success: false, error: err.message || 'Failed to invite admin' }
     }
 }
 
@@ -87,165 +69,179 @@ export async function inviteAdminAction(email: string) {
  * Delete an admin user (Only Master Admin)
  */
 export async function deleteAdminAction(userId: string) {
-    if (!await checkIsMasterAdmin()) throw new Error('Only Master Admin can delete other admins')
+    try {
+        if (!await checkIsMasterAdmin()) throw new Error('Only Master Admin can delete other admins')
 
-    const supabase = await createAdminClient()
+        const supabase = await createAdminClient()
 
-    // Check if target is not Master Admin itself
-    const { data: user } = await supabase.auth.admin.getUserById(userId)
-    if (user?.user?.email === MASTER_ADMIN_EMAIL) throw new Error('Cannot delete Master Admin')
+        // Check if target is not Master Admin itself
+        const { data: user } = await supabase.auth.admin.getUserById(userId)
+        if (user?.user?.email === MASTER_ADMIN_EMAIL) throw new Error('Cannot delete Master Admin')
 
-    const { error } = await supabase.auth.admin.deleteUser(userId)
-    if (error) throw error
+        const { error } = await supabase.auth.admin.deleteUser(userId)
+        if (error) throw error
 
-    revalidatePath('/admin/settings')
-    return { success: true }
+        revalidatePath('/admin/settings')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in deleteAdminAction:', err)
+        return { success: false, error: err.message || 'Failed to delete admin' }
+    }
 }
 
 /**
  * Admin creates a customer (Auth + Profile)
  */
 export async function adminCreateCustomerAction(formData: any) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
-    const { email, first_name, last_name, phone, is_b2b, customer_type, password } = formData
+        const supabase = await createAdminClient()
+        const { email, first_name, last_name, phone, is_b2b, customer_type, password } = formData
 
-    // 1. Create Auth User
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password: password || randomBytes(16).toString('base64url'),
-        email_confirm: true,
-        user_metadata: {
+        // 1. Create Auth User
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email,
+            password: password || randomBytes(16).toString('base64url'),
+            email_confirm: true,
+            user_metadata: {
+                first_name,
+                last_name,
+                phone,
+                customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c')
+            }
+        })
+
+        if (authError) throw authError
+
+        // 2. Create Customer Profile
+        const { error: profileError } = await supabase.from('customers').insert({
+            id: authData.user.id,
+            email,
             first_name,
             last_name,
             phone,
-            customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c')
+            is_b2b: !!is_b2b,
+            company_name: formData.company_name,
+            vat_id: formData.vat_id,
+            vat_number: formData.vat_id,
+            customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
+            account_status: 'active'
+        })
+
+        if (profileError && !profileError.message.includes('duplicate key')) {
+            console.warn('Profile creation error:', profileError.message)
         }
-    })
 
-    if (authError) throw authError
-
-    // Profile is usually created by DB trigger, but if not:
-    const { error: profileError } = await supabase.from('customers').insert({
-        id: authData.user.id,
-        email,
-        first_name,
-        last_name,
-        phone,
-        is_b2b: !!is_b2b,
-        company_name: formData.company_name,
-        vat_id: formData.vat_id,
-        vat_number: formData.vat_id, // Keep both in sync
-        customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
-        account_status: 'active'
-    })
-
-    // If it fails because of trigger, wrap in try/catch or ignore duplicate
-    if (profileError && !profileError.message.includes('duplicate key')) {
-        console.warn('Profile creation error (might be handled by trigger):', profileError.message)
+        revalidatePath('/admin/customers')
+        return { success: true, data: { userId: authData.user.id } }
+    } catch (err: any) {
+        console.error('Error in adminCreateCustomerAction:', err)
+        return { success: false, error: err.message || 'Failed to create customer' }
     }
-
-    revalidatePath('/admin/customers')
-    return { success: true, userId: authData.user.id }
 }
 
 /**
  * Admin updates customer info
  */
 export async function adminUpdateCustomerAction(id: string, updates: any) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
+        const supabase = await createAdminClient()
 
-    // Update Profile
-    const { error: profileError } = await supabase
-        .from('customers')
-        .update(updates)
-        .eq('id', id)
+        // Update Profile
+        const { error: profileError } = await supabase
+            .from('customers')
+            .update(updates)
+            .eq('id', id)
 
-    if (profileError) throw profileError
+        if (profileError) throw profileError
 
-    // Update Auth Metadata if relevant fields changed
-    if (updates.first_name || updates.last_name || updates.phone || updates.customer_type) {
-        await supabase.auth.admin.updateUserById(id, {
-            user_metadata: {
-                first_name: updates.first_name,
-                last_name: updates.last_name,
-                phone: updates.phone,
-                customer_type: updates.customer_type
-            }
-        })
+        // Update Auth Metadata if relevant fields changed
+        if (updates.first_name || updates.last_name || updates.phone || updates.customer_type) {
+            await supabase.auth.admin.updateUserById(id, {
+                user_metadata: {
+                    first_name: updates.first_name,
+                    last_name: updates.last_name,
+                    phone: updates.phone,
+                    customer_type: updates.customer_type
+                }
+            })
+        }
+
+        revalidatePath(`/admin/customers/${id}`)
+        revalidatePath('/admin/customers')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminUpdateCustomerAction:', err)
+        return { success: false, error: err.message || 'Failed to update customer' }
     }
-
-    revalidatePath(`/admin/customers/${id}`)
-    revalidatePath('/admin/customers')
-    return { success: true }
 }
 
 /**
  * Admin deletes a customer (and their auth account)
  */
 export async function adminDeleteCustomerAction(id: string) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
+        const supabase = await createAdminClient()
 
-    // 1. Delete from Supabase Auth
-    const { error: authError } = await supabase.auth.admin.deleteUser(id)
-    if (authError) {
-        console.error('Error deleting auth user:', authError)
-        // We continue anyway to try and clean up the database record
+        // 1. Delete from Supabase Auth
+        const { error: authError } = await supabase.auth.admin.deleteUser(id)
+        if (authError) {
+            console.error('Error deleting auth user:', authError)
+        }
+
+        // 2. Delete from customers table
+        const { error: dbError } = await supabase
+            .from('customers')
+            .delete()
+            .eq('id', id)
+
+        if (dbError) throw dbError
+
+        revalidatePath('/admin/customers')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminDeleteCustomerAction:', err)
+        return { success: false, error: err.message || 'Failed to delete customer' }
     }
-
-    // 2. Delete from customers table
-    const { error: dbError } = await supabase
-        .from('customers')
-        .delete()
-        .eq('id', id)
-
-    if (dbError) throw dbError
-
-    revalidatePath('/admin/customers')
-    return { success: true }
 }
 
 /**
  * Admin triggers a password reset for a customer
  */
-export async function adminResetCustomerPasswordAction(customerId: string) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
-
+export async function adminResetCustomerPasswordAction(identifier: string) {
     try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
         const supabase = await createAdminClient()
 
-        // 1. Get the customer email
+        // Find customer by ID or Email
         const { data: customer, error: fetchError } = await supabase
             .from('customers')
-            .select('email')
-            .eq('id', customerId)
-            .single()
+            .select('id, email')
+            .or(`id.eq."${identifier}",email.eq."${identifier}"`)
+            .maybeSingle()
 
         if (fetchError || !customer) throw new Error('Customer not found')
 
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
         if (!siteUrl) throw new Error('Site configuration error')
 
-        // 2. Generate the recovery link
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'recovery',
             email: customer.email,
-            options: {
-                redirectTo: `${siteUrl}/auth/reset-password`
-            }
+            options: { redirectTo: `${siteUrl}/auth/reset-password` }
         })
 
         if (linkError) throw linkError
 
-        // 3. Render and send the email
         const html = await renderTemplate('password-reset', {
             reset_link: linkData.properties.action_link
-        }, 'en') // Defaulting to en, could be expanded to use customer.language
+        }, 'en')
 
         await sendEmail({
             to: customer.email,
@@ -256,7 +252,7 @@ export async function adminResetCustomerPasswordAction(customerId: string) {
         return { success: true }
     } catch (err: any) {
         console.error('Error in adminResetCustomerPasswordAction:', err)
-        throw new Error(err.message || 'Failed to trigger password reset')
+        return { success: false, error: err.message || 'Failed to trigger password reset' }
     }
 }
 
@@ -264,79 +260,96 @@ export async function adminResetCustomerPasswordAction(customerId: string) {
  * Admin creates an order
  */
 export async function adminCreateOrderAction(payload: any) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
+        const supabase = await createAdminClient()
 
-    const { data: order, error } = await supabase
-        .from('orders')
-        .insert({
-            ...payload,
-            status: payload.status || 'pending',
-            created_at: payload.created_at || new Date().toISOString()
-        })
-        .select()
-        .single()
+        const { data: order, error } = await supabase
+            .from('orders')
+            .insert({
+                ...payload,
+                status: payload.status || 'pending',
+                created_at: payload.created_at || new Date().toISOString()
+            })
+            .select()
+            .single()
 
-    if (error) throw error
+        if (error) throw error
 
-    revalidatePath('/admin/orders')
-    return { success: true, orderId: order.id }
+        revalidatePath('/admin/orders')
+        return { success: true, data: { orderId: order.id } }
+    } catch (err: any) {
+        console.error('Error in adminCreateOrderAction:', err)
+        return { success: false, error: err.message || 'Failed to create order' }
+    }
 }
 
 /**
  * Get list of admins
  */
 export async function getAdminsAction() {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
-    const { data: { users }, error } = await supabase.auth.admin.listUsers()
+        const supabase = await createAdminClient()
+        const { data: { users }, error } = await supabase.auth.admin.listUsers()
 
-    if (error) throw error
+        if (error) throw error
 
-    return users
-        .filter(u => u.user_metadata?.role === 'admin' || u.email === MASTER_ADMIN_EMAIL)
-        .map(u => ({
-            id: u.id,
-            email: u.email,
-            role: u.email === MASTER_ADMIN_EMAIL ? 'Master Admin' : 'Admin',
-            created_at: u.created_at,
-            last_sign_in_at: u.last_sign_in_at
-        }))
+        const admins = users
+            .filter(u => u.user_metadata?.role === 'admin' || u.email === MASTER_ADMIN_EMAIL)
+            .map(u => ({
+                id: u.id,
+                email: u.email,
+                role: u.email === MASTER_ADMIN_EMAIL ? 'Master Admin' : 'Admin',
+                created_at: u.created_at,
+                last_sign_in_at: u.last_sign_in_at
+            }))
+
+        return { success: true, data: admins }
+    } catch (err: any) {
+        console.error('Error in getAdminsAction:', err)
+        return { success: false, error: err.message || 'Failed to fetch admins' }
+    }
 }
 
 /**
  * Admin creates an order with items
  */
 export async function adminCreateFullOrderAction(orderPayload: any, items: any[]) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
-    const supabase = await createAdminClient()
+        const supabase = await createAdminClient()
 
-    // 1. Create Order
-    const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-            ...orderPayload,
-            order_number: orderPayload.order_number || `MAN-${Date.now()}`,
-            status: orderPayload.status || 'pending',
-            created_at: orderPayload.created_at || new Date().toISOString()
-        })
-        .select()
-        .single()
+        // 1. Create Order
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .insert({
+                ...orderPayload,
+                order_number: orderPayload.order_number || `MAN-${Date.now()}`,
+                status: orderPayload.status || 'pending',
+                created_at: orderPayload.created_at || new Date().toISOString()
+            })
+            .select()
+            .single()
 
-    if (orderError) throw orderError
+        if (orderError) throw orderError
 
-    // 2. Create Items
-    if (items && items.length > 0) {
-        const itemsWithOrderId = items.map(i => ({ ...i, order_id: order.id }))
-        const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
-        if (itemsError) throw itemsError
+        // 2. Create Items
+        if (items && items.length > 0) {
+            const itemsWithOrderId = items.map(i => ({ ...i, order_id: order.id }))
+            const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
+            if (itemsError) throw itemsError
+        }
+
+        revalidatePath('/admin/orders')
+        return { success: true, data: { orderId: order.id } }
+    } catch (err: any) {
+        console.error('Error in adminCreateFullOrderAction:', err)
+        return { success: false, error: err.message || 'Failed to create full order' }
     }
-
-    revalidatePath('/admin/orders')
-    return { success: true, orderId: order.id }
 }
 
 /**
@@ -591,151 +604,184 @@ export async function adminCreateOrderWithCustomerAction(payload: {
         vat_rate: number;
         items: any[];
         payment_method?: string;
+        shipping_address: {
+            street: string;
+            city: string;
+            postal_code: string;
+            country: string;
+            street2?: string;
+        };
+        billing_address?: {
+            street: string;
+            city: string;
+            postal_code: string;
+            country: string;
+            street2?: string;
+        };
     };
 }) {
-    if (!await checkIsAdmin()) throw new Error('Unauthorized');
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized');
 
-    const supabase = await createAdminClient();
-    const { customer, order } = payload;
+        const supabase = await createAdminClient();
+        const { customer, order } = payload;
 
-    // 1. Find or Create Customer
-    let customerId: string | null = null;
-    const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', customer.email)
-        .maybeSingle();
+        // 1. Find or Create Customer
+        let customerId: string | null = null;
+        const { data: existingCustomer } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('email', customer.email)
+            .maybeSingle();
 
-    if (existingCustomer) {
-        customerId = existingCustomer.id;
-    } else {
-        // Create Auth User
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-            email: customer.email,
-            password: randomBytes(24).toString('base64url'),
-            email_confirm: true,
-            user_metadata: {
-                first_name: customer.first_name,
-                last_name: customer.last_name,
-                customer_type: customer.is_b2b ? 'b2b' : 'b2c'
-            }
-        });
-
-        if (authError) throw authError;
-        customerId = authData.user.id;
-
-        // Create Customer Profile
-        const { error: profileError } = await supabase.from('customers').insert({
-            id: customerId,
-            email: customer.email,
-            first_name: customer.first_name,
-            last_name: customer.last_name,
-            company_name: customer.company_name,
-            vat_id: customer.vat_id,
-            vat_number: customer.vat_id,
-            phone: customer.phone,
-            is_b2b: !!customer.is_b2b,
-            customer_type: customer.is_b2b ? 'b2b' : 'b2c',
-            account_status: 'active'
-        });
-
-        if (profileError) console.error('Profile creation error:', profileError);
-
-        // Send Password Setup Email
-        try {
-            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-            const { data: linkData } = await supabase.auth.admin.generateLink({
-                type: 'recovery',
+        if (existingCustomer) {
+            customerId = existingCustomer.id;
+        } else {
+            // Create Auth User
+            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
                 email: customer.email,
-                options: { redirectTo: `${siteUrl}/auth/reset-password` }
+                password: randomBytes(24).toString('base64url'),
+                email_confirm: true,
+                user_metadata: {
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    customer_type: customer.is_b2b ? 'b2b' : 'b2c'
+                }
             });
 
-            if (linkData?.properties?.action_link) {
-                const welcomeHtml = await renderTemplate('admin-account-setup', {
-                    name: `${customer.first_name} ${customer.last_name}`,
-                    setup_link: linkData.properties.action_link
-                }, 'en');
+            if (authError) throw authError;
+            customerId = authData.user.id;
 
-                await sendEmail({
-                    to: customer.email,
-                    subject: 'Activate Your Tigo Energy SHOP Account',
-                    html: welcomeHtml
+            // Create Customer Profile
+            const { error: profileError } = await supabase.from('customers').insert({
+                id: customerId,
+                email: customer.email,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                company_name: customer.company_name,
+                vat_id: customer.vat_id,
+                vat_number: customer.vat_id,
+                phone: customer.phone,
+                is_b2b: !!customer.is_b2b,
+                customer_type: customer.is_b2b ? 'b2b' : 'b2c',
+                account_status: 'active'
+            });
+
+            if (profileError) console.error('Profile creation error:', profileError);
+
+            // Send Password Setup Email
+            try {
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+                const { data: linkData } = await supabase.auth.admin.generateLink({
+                    type: 'recovery',
+                    email: customer.email,
+                    options: { redirectTo: `${siteUrl}/auth/reset-password` }
                 });
+
+                if (linkData?.properties?.action_link) {
+                    const welcomeHtml = await renderTemplate('admin-account-setup', {
+                        name: `${customer.first_name} ${customer.last_name}`,
+                        setup_link: linkData.properties.action_link
+                    }, 'en');
+
+                    await sendEmail({
+                        to: customer.email,
+                        subject: 'Activate Your Tigo Energy SHOP Account',
+                        html: welcomeHtml
+                    });
+                }
+            } catch (emailErr) {
+                console.error('Failed to send password setup email:', emailErr);
             }
-        } catch (emailErr) {
-            console.error('Failed to send password setup email:', emailErr);
         }
+
+        // 2. Calculate Totals
+        const subtotal = order.items.reduce((acc: number, item: any) => acc + (item.unit_price * item.quantity), 0);
+        const vatAmount = (subtotal + order.shipping_cost) * (order.vat_rate / 100);
+        const total = subtotal + order.shipping_cost + vatAmount;
+
+        // 3. Create Order
+        const orderNumber = `MAN-${Date.now()}`;
+        const { data: orderData, error: orderError } = await supabase
+            .from('orders')
+            .insert({
+                customer_id: customerId,
+                customer_email: customer.email,
+                customer_phone: customer.phone,
+                company_name: customer.company_name,
+                vat_id: customer.vat_id,
+                order_number: orderNumber,
+                status: 'pending',
+                payment_status: 'unpaid',
+                shipping_address: {
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    ...order.shipping_address
+                },
+                billing_address: order.billing_address ? {
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    ...order.billing_address
+                } : {
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    ...order.shipping_address
+                },
+                total,
+                subtotal,
+                vat_rate: order.vat_rate,
+                vat_amount: vatAmount,
+                shipping_cost: order.shipping_cost,
+                market: order.market,
+                language: 'en',
+                payment_method: order.payment_method || 'IBAN',
+                created_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+
+        if (orderError) throw orderError;
+
+        // 4. Create Order Items
+        const itemsWithOrderId = order.items.map(i => ({
+            order_id: orderData.id,
+            product_id: i.product_id,
+            sku: i.sku,
+            product_name: i.product_name,
+            quantity: i.quantity,
+            unit_price: i.unit_price,
+            total_price: i.unit_price * i.quantity
+        }));
+
+        const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId);
+        if (itemsError) throw itemsError;
+
+        // 5. Send IBAN Payment Email
+        try {
+            const { generateItemsTableHtml } = await import('@/lib/document-service');
+            const itemsHtml = generateItemsTableHtml(itemsWithOrderId);
+
+            const ibanHtml = await renderTemplate('order-iban-payment', {
+                name: `${customer.first_name} ${customer.last_name}`,
+                order_number: orderNumber,
+                order_date: new Date().toLocaleDateString('en-GB'),
+                total_amount: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(total),
+                order_items: itemsHtml
+            }, 'en');
+
+            await sendEmail({
+                to: customer.email,
+                subject: `Order #${orderNumber} Confirmation - Payment Required`,
+                html: ibanHtml
+            });
+        } catch (emailErr) {
+            console.error('Failed to send IBAN email:', emailErr);
+        }
+
+        revalidatePath('/admin/orders');
+        return { success: true, data: { orderId: orderData.id } };
+    } catch (err: any) {
+        console.error('Error in adminCreateOrderWithCustomerAction:', err)
+        return { success: false, error: err.message || 'Failed to create order with customer' }
     }
-
-    // 2. Calculate Totals
-    const subtotal = order.items.reduce((acc: number, item: any) => acc + (item.unit_price * item.quantity), 0);
-    const vatAmount = (subtotal + order.shipping_cost) * (order.vat_rate / 100);
-    const total = subtotal + order.shipping_cost + vatAmount;
-
-    // 3. Create Order
-    const orderNumber = `MAN-${Date.now()}`;
-    const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-            customer_id: customerId,
-            customer_email: customer.email,
-            customer_phone: customer.phone,
-            company_name: customer.company_name,
-            vat_id: customer.vat_id,
-            order_number: orderNumber,
-            status: 'pending',
-            payment_status: 'unpaid',
-            total,
-            subtotal,
-            vat_rate: order.vat_rate,
-            vat_amount: vatAmount,
-            shipping_cost: order.shipping_cost,
-            market: order.market,
-            language: 'en',
-            payment_method: order.payment_method || 'IBAN',
-            created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-    if (orderError) throw orderError;
-
-    // 4. Create Order Items
-    const itemsWithOrderId = order.items.map(i => ({
-        order_id: orderData.id,
-        product_id: i.product_id,
-        sku: i.sku,
-        product_name: i.product_name,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        total_price: i.unit_price * i.quantity
-    }));
-
-    const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId);
-    if (itemsError) throw itemsError;
-
-    // 5. Send IBAN Payment Email
-    try {
-        const { generateItemsTableHtml } = await import('@/lib/document-service');
-        const itemsHtml = generateItemsTableHtml(itemsWithOrderId);
-        
-        const ibanHtml = await renderTemplate('order-iban-payment', {
-            name: `${customer.first_name} ${customer.last_name}`,
-            order_number: orderNumber,
-            order_date: new Date().toLocaleDateString('en-GB'),
-            total_amount: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(total),
-            order_items: itemsHtml
-        }, 'en');
-
-        await sendEmail({
-            to: customer.email,
-            subject: `Order #${orderNumber} Confirmation - Payment Required`,
-            html: ibanHtml
-        });
-    } catch (emailErr) {
-        console.error('Failed to send IBAN email:', emailErr);
-    }
-
-    revalidatePath('/admin/orders');
-    return { success: true, orderId: orderData.id };
 }
