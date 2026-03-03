@@ -111,6 +111,16 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
         setProductResults([])
     }
 
+    const addCustomItem = () => {
+        setItems([...items, {
+            product_id: 'custom-' + Date.now(),
+            product_name: 'Custom Product',
+            sku: 'CUSTOM',
+            quantity: 1,
+            unit_price: 0
+        }])
+    }
+
     const removeItem = (index: number) => {
         setItems(items.filter((_, i) => i !== index))
     }
@@ -210,7 +220,16 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                                     type="button"
                                                     onClick={() => {
                                                         const customer = c as any
-                                                        setSelectedCustomer(customer)
+                                                        setSelectedCustomer({
+                                                            id: customer.id,
+                                                            email: customer.email || '',
+                                                            first_name: customer.first_name || '',
+                                                            last_name: customer.last_name || '',
+                                                            company_name: customer.company_name || '',
+                                                            vat_id: customer.vat_id || '',
+                                                            phone: customer.phone || '',
+                                                            is_b2b: !!customer.is_b2b
+                                                        })
                                                         // Pre-fill shipping address
                                                         const shipAddr = customer.addresses?.find((a: any) => a.type === 'shipping') || customer.addresses?.[0]
                                                         if (shipAddr) {
@@ -437,35 +456,42 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                 <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Add Products</h3>
                             </div>
 
-                            <div className="relative">
+                            <div className="flex gap-2">
                                 <input
                                     type="text"
                                     placeholder="Search products (SKU, name...)"
                                     value={productSearch}
                                     onChange={(e) => setProductSearch(e.target.value)}
-                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all pr-10 hover:border-slate-300"
+                                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all pr-10 hover:border-slate-300"
                                 />
-                                {productResults.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                        {productResults.map(p => (
-                                            <button
-                                                key={p.id}
-                                                type="button"
-                                                onClick={() => addItem(p)}
-                                                className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between border-b last:border-0 border-slate-100"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-slate-900">{p.name_en}</span>
-                                                    <span className="text-[10px] text-slate-400 uppercase tracking-tighter">{p.sku}</span>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="font-bold text-slate-900">€{selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur}</span>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                                <button
+                                    type="button"
+                                    onClick={addCustomItem}
+                                    className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-green-100 transition-colors border border-green-200 whitespace-nowrap"
+                                >
+                                    + Custom Item
+                                </button>
                             </div>
+                            {productResults.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                                    {productResults.map(p => (
+                                        <button
+                                            key={p.id}
+                                            type="button"
+                                            onClick={() => addItem(p)}
+                                            className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between border-b last:border-0 border-slate-100"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-slate-900">{p.name_en}</span>
+                                                <span className="text-[10px] text-slate-400 uppercase tracking-tighter">{p.sku}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="font-bold text-slate-900">€{selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             {items.length > 0 && (
                                 <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
@@ -483,8 +509,27 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                             {items.map((item, idx) => (
                                                 <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
                                                     <td className="py-3 px-4">
-                                                        <div className="font-medium text-slate-800">{item.product_name}</div>
-                                                        <div className="text-[10px] text-slate-400 uppercase">{item.sku}</div>
+                                                        {item.product_id?.startsWith('custom-') ? (
+                                                            <div className="flex flex-col gap-1">
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.product_name}
+                                                                    onChange={(e) => {
+                                                                        const newItems = [...items]
+                                                                        newItems[idx].product_name = e.target.value
+                                                                        setItems(newItems)
+                                                                    }}
+                                                                    className="w-full bg-white border border-slate-200 rounded px-2 py-1 text-sm font-medium focus:ring-1 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                                                                    placeholder="Product Name"
+                                                                />
+                                                                <span className="text-[10px] text-slate-400 uppercase font-black">Custom Item</span>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <div className="font-medium text-slate-800">{item.product_name}</div>
+                                                                <div className="text-[10px] text-slate-400 uppercase">{item.sku}</div>
+                                                            </>
+                                                        )}
                                                     </td>
                                                     <td className="py-3 px-4">
                                                         <input
@@ -495,8 +540,8 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                                         />
                                                     </td>
                                                     <td className="py-3 px-4">
-                                                        <div className="relative">
-                                                            <span className="absolute left-2 top-1.5 text-slate-400 text-sm">€</span>
+                                                        <div className="relative group/price">
+                                                            <span className="absolute left-2 top-1.5 text-slate-400 text-sm group-focus-within/price:text-blue-500 transition-colors">€</span>
                                                             <input
                                                                 type="number"
                                                                 step="0.01"
@@ -506,7 +551,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                                                     newItems[idx].unit_price = parseFloat(e.target.value) || 0
                                                                     setItems(newItems)
                                                                 }}
-                                                                className="w-full pl-6 pr-2 py-1 border border-slate-200 rounded-lg text-right font-medium bg-white focus:border-blue-500 outline-none"
+                                                                className="w-full pl-6 pr-2 py-1.5 border border-slate-300 rounded-lg text-right font-black bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                                                             />
                                                         </div>
                                                     </td>

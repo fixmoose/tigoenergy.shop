@@ -630,7 +630,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
         let customerId: string | null = null;
         const { data: existingCustomer } = await supabase
             .from('customers')
-            .select('id')
+            .select('id, first_name, last_name, company_name, vat_id, phone, is_b2b')
             .eq('email', customer.email)
             .maybeSingle();
 
@@ -652,16 +652,15 @@ export async function adminCreateOrderWithCustomerAction(payload: {
             if (authError) throw authError;
             customerId = authData.user.id;
 
-            // Create Customer Profile
             const { error: profileError } = await supabase.from('customers').insert({
                 id: customerId,
                 email: customer.email,
-                first_name: customer.first_name,
-                last_name: customer.last_name,
-                company_name: customer.company_name,
-                vat_id: customer.vat_id,
-                vat_number: customer.vat_id,
-                phone: customer.phone,
+                first_name: customer.first_name || '',
+                last_name: customer.last_name || '',
+                company_name: customer.company_name || null,
+                vat_id: customer.vat_id || null,
+                vat_number: customer.vat_id || null,
+                phone: customer.phone || '',
                 is_b2b: !!customer.is_b2b,
                 customer_type: customer.is_b2b ? 'b2b' : 'b2c',
                 account_status: 'active'
@@ -696,9 +695,17 @@ export async function adminCreateOrderWithCustomerAction(payload: {
         }
 
         // 2. Calculate Totals
-        const subtotal = order.items.reduce((acc: number, item: any) => acc + (item.unit_price * item.quantity), 0);
-        const vatAmount = (subtotal + order.shipping_cost) * (order.vat_rate / 100);
-        const total = subtotal + order.shipping_cost + vatAmount;
+        const subtotal = (order.items || []).reduce((acc: number, item: any) => {
+            const up = parseFloat(item.unit_price) || 0;
+            const q = parseInt(item.quantity) || 0;
+            return acc + (up * q);
+        }, 0);
+
+        const shipCost = parseFloat(order.shipping_cost as any) || 0;
+        const vRate = parseFloat(order.vat_rate as any) || 0;
+
+        const vatAmount = (subtotal + shipCost) * (vRate / 100);
+        const total = subtotal + shipCost + vatAmount;
 
         // 3. Create Order
         const orderNumber = `MAN-${Date.now()}`;
@@ -729,10 +736,10 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 },
                 total,
                 subtotal,
-                vat_rate: order.vat_rate,
+                vat_rate: vRate,
                 vat_amount: vatAmount,
-                shipping_cost: order.shipping_cost,
-                market: order.market,
+                shipping_cost: shipCost,
+                market: order.market || 'de',
                 language: 'en',
                 payment_method: order.payment_method || 'IBAN',
                 created_at: new Date().toISOString()
@@ -759,7 +766,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
         // 5. Send IBAN Payment Email
         try {
             const { generateItemsTableHtml } = await import('@/lib/document-service');
-            const itemsHtml = generateItemsTableHtml(itemsWithOrderId);
+            const itemsHtml = generateItemsTableHtml(itemsWithOrderId, '€', true);
 
             const ibanHtml = await renderTemplate('order-iban-payment', {
                 name: `${customer.first_name} ${customer.last_name}`,
@@ -778,10 +785,17 @@ export async function adminCreateOrderWithCustomerAction(payload: {
             console.error('Failed to send IBAN email:', emailErr);
         }
 
-        revalidatePath('/admin/orders');
-        return { success: true, data: { orderId: orderData.id } };
+        console.log(`[AdminOrder] Order #${orderNumber} created successfully for ${customer.email}`);
+
+        try {
+            revalidatePath('/admin/orders');
+        } catch (e) {
+            console.error('Revalidation failed:', e);
+        }
+
+        return { success: true, orderNumber, data: { orderId: orderData.id } };
     } catch (err: any) {
-        console.error('Error in adminCreateOrderWithCustomerAction:', err)
-        return { success: false, error: err.message || 'Failed to create order with customer' }
+        console.error('CRITICAL ERROR in adminCreateOrderWithCustomerAction:', err);
+        return { success: false, error: err.message || 'Failed to create order. Please check server logs.' }
     }
 }

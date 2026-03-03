@@ -81,18 +81,22 @@ export function replacePlaceholders(html: string, data: DocumentData) {
     return result
 }
 
-export function generateItemsTableHtml(items: any[], currency: string = '€') {
-    let html = `
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-        <thead>
-            <tr style="background-color: #f9fafb; border-bottom: 2px solid #eeeeee;">
-                <th style="padding: 12px; text-align: left; font-size: 10px; color: #666; text-transform: uppercase;">Product</th>
-                <th style="padding: 12px; text-align: center; font-size: 10px; color: #666; text-transform: uppercase;">Qty</th>
-                <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Price</th>
-                <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Total</th>
-            </tr>
-        </thead>
-        <tbody>`
+export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false) {
+    let html = '';
+
+    if (!rowsOnly) {
+        html += `
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="background-color: #f9fafb; border-bottom: 2px solid #eeeeee;">
+                    <th style="padding: 12px; text-align: left; font-size: 10px; color: #666; text-transform: uppercase;">Product</th>
+                    <th style="padding: 12px; text-align: center; font-size: 10px; color: #666; text-transform: uppercase;">Qty</th>
+                    <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Price</th>
+                    <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Total</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    }
 
     items.forEach(item => {
         const price = parseFloat(item.unit_price || 0).toFixed(2)
@@ -105,14 +109,16 @@ export function generateItemsTableHtml(items: any[], currency: string = '€') {
                     <div style="font-size: 10px; color: #999;">SKU: ${item.sku || 'N/A'}</div>
                 </td>
                 <td style="padding: 12px; text-align: center; color: #444;">${item.quantity}</td>
-                <td style="padding: 12px; text-align: right; color: #444;">${currency} ${price}</td>
+                ${!rowsOnly ? `<td style="padding: 12px; text-align: right; color: #444;">${currency} ${price}</td>` : ''}
                 <td style="padding: 12px; text-align: right; font-weight: bold; color: #111;">${currency} ${total}</td>
             </tr>`
     })
 
-    html += `
-        </tbody>
-    </table>`
+    if (!rowsOnly) {
+        html += `
+            </tbody>
+        </table>`;
+    }
 
     return html
 }
