@@ -57,6 +57,7 @@ export async function GET(
             customer_email: order.customer_email,
             customer_company: order.company_name,
             customer_vat: order.vat_id,
+            customer_phone: order.billing_address?.phone || order.shipping_address?.phone,
             billing_address: formatAddress(billing),
             shipping_address: formatAddress(shipping),
             subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
@@ -67,7 +68,12 @@ export async function GET(
             items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
             invoice_number: order.invoice_number || `INV-${order.order_number}`,
             invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString() : new Date().toLocaleDateString(),
-            due_date: order.invoice_created_at ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() : 'N/A'
+            due_date: order.invoice_created_at
+                ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+                : new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+            dispatch_date: order.shipped_at ? new Date(order.shipped_at).toLocaleDateString() : 'Upon payment',
+            reference: `00 2-${new Date().getFullYear().toString().slice(-2)}-${order.order_number.slice(-5)}`,
+            place_of_issue: 'Podsmreka'
         }
 
         // 5. Replace Placeholders

@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
+import { calculateTigoParcels } from '@/lib/shipping/dpd'
 
 import { MARKETS, getMarketKeyFromHostname } from '@/lib/constants/markets'
 
@@ -308,14 +309,14 @@ export default function CheckoutPage() {
                     // Large orders: Only InterEuropa or Personal Pick-up
                     filtered = filtered.filter(r =>
                         r.carrier === 'InterEuropa' ||
-                        r.carrier === 'Personal Pick-up'
+                        (r.carrier === 'Personal Pick-up' && formData.shipping_country === 'SI')
                     )
                 } else {
-                    // Normal orders: Show GLS and DPD, Hide InterEuropa
+                    // Normal orders: Show DPD. Hide InterEuropa and GLS.
+                    // Personal Pick-up only for SI.
                     filtered = filtered.filter(r =>
-                        r.carrier === 'GLS' ||
                         r.carrier === 'DPD' ||
-                        r.carrier === 'Personal Pick-up'
+                        (r.carrier === 'Personal Pick-up' && formData.shipping_country === 'SI')
                     )
                 }
 
@@ -909,18 +910,30 @@ export default function CheckoutPage() {
                                 <div className="space-y-3"><div className="h-16 bg-gray-50 animate-pulse rounded-xl" /><div className="h-16 bg-gray-50 animate-pulse rounded-xl" /></div>
                             ) : shippingRates.length > 0 ? (
                                 <div className="space-y-3">
-                                    {shippingRates.map((rate) => (
-                                        <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
-                                            <div className="flex items-center gap-3">
-                                                <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-green-600" />
-                                                <div>
-                                                    <div className="font-bold text-gray-900">{rate.carrier} {rate.service_type === 'pickup' ? '(Pickup)' : 'Standard'}</div>
-                                                    <div className="text-xs text-gray-500">{rate.service_type === 'pickup' ? 'Ready in 24h' : '3-5 business days'}</div>
+                                    {shippingRates.map((rate) => {
+                                        const parcels = calculateTigoParcels(items as any)
+                                        const boxCount = parcels.length
+
+                                        return (
+                                            <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-green-600" />
+                                                    <div>
+                                                        <div className="font-bold text-gray-900">
+                                                            {rate.carrier} {rate.service_type === 'pickup' ? '(Pickup)' : 'Standard'}
+                                                            {rate.carrier === 'DPD' && boxCount > 1 && (
+                                                                <span className="ml-2 text-xs font-normal text-green-600 bg-green-100 px-1.5 py-0.5 rounded">
+                                                                    ({boxCount} boxes)
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">{rate.service_type === 'pickup' ? 'Ready in 24h' : '3-5 business days'}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="font-bold text-gray-900">{rate.rate_eur === 0 ? 'FREE' : formatPriceGross(rate.rate_eur)}</div>
-                                        </label>
-                                    ))}
+                                                <div className="font-bold text-gray-900">{rate.rate_eur === 0 ? 'FREE' : formatPriceGross(rate.rate_eur)}</div>
+                                            </label>
+                                        )
+                                    })}
                                 </div>
                             ) : (
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">{t('noShippingMethods')}</div>

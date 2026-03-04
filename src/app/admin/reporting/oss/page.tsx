@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import type { OSSReportData } from '@/types/compliance'
 
 const quarters = [
@@ -19,6 +19,7 @@ export default function OSSPage() {
   const [report, setReport] = useState<OSSReportData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [expandedRow, setExpandedRow] = useState<string | null>(null)
 
   const fetchReport = async () => {
     setLoading(true)
@@ -164,16 +165,69 @@ export default function OSSPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {report.rows.map((row) => (
-                    <tr key={row.member_state} className="hover:bg-slate-50">
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-slate-800">{row.member_state}</span>
-                        <span className="text-slate-500 ml-2">{row.member_state_name}</span>
-                      </td>
-                      <td className="text-right px-4 py-3 text-slate-600">{row.vat_rate}%</td>
-                      <td className="text-right px-4 py-3 text-slate-800">{formatCurrency(row.taxable_amount)}</td>
-                      <td className="text-right px-4 py-3 text-blue-600 font-medium">{formatCurrency(row.vat_amount)}</td>
-                      <td className="text-right px-4 py-3 text-slate-600">{row.order_count}</td>
-                    </tr>
+                    <Fragment key={row.member_state}>
+                      <tr className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3">
+                          <span className="font-medium text-slate-800">{row.member_state}</span>
+                          <span className="text-slate-500 ml-2">{row.member_state_name}</span>
+                        </td>
+                        <td className="text-right px-4 py-3 text-slate-600">{row.vat_rate}%</td>
+                        <td className="text-right px-4 py-3 text-slate-800">{formatCurrency(row.taxable_amount)}</td>
+                        <td className="text-right px-4 py-3 text-blue-600 font-medium">{formatCurrency(row.vat_amount)}</td>
+                        <td className="text-right px-4 py-3">
+                          <button
+                            onClick={() => setExpandedRow(expandedRow === row.member_state ? null : row.member_state)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all font-medium text-xs group"
+                          >
+                            <span>{row.order_count} {row.order_count === 1 ? 'Order' : 'Orders'}</span>
+                            <svg
+                              className={`w-3.5 h-3.5 transition-transform duration-200 ${expandedRow === row.member_state ? 'rotate-180' : ''}`}
+                              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedRow === row.member_state && row.orders && (
+                        <tr className="bg-slate-50/50">
+                          <td colSpan={5} className="px-6 py-4">
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                              <table className="w-full text-xs">
+                                <thead className="bg-slate-50 border-b border-slate-100">
+                                  <tr>
+                                    <th className="text-left px-4 py-2.5 font-bold text-slate-500">Order #</th>
+                                    <th className="text-left px-4 py-2.5 font-bold text-slate-500">Customer</th>
+                                    <th className="text-left px-4 py-2.5 font-bold text-slate-500">Date</th>
+                                    <th className="text-right px-4 py-2.5 font-bold text-slate-500">Total</th>
+                                    <th className="text-right px-4 py-2.5 font-bold text-slate-500">Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                  {row.orders.map((order: any) => (
+                                    <tr key={order.id} className="hover:bg-blue-50/30">
+                                      <td className="px-4 py-2.5 font-bold text-blue-600">{order.order_number}</td>
+                                      <td className="px-4 py-2.5 text-slate-700">{order.customer_name}</td>
+                                      <td className="px-4 py-2.5 text-slate-500">{formatDate(order.placed_at)}</td>
+                                      <td className="text-right px-4 py-2.5 font-bold text-slate-900">{formatCurrency(order.total)}</td>
+                                      <td className="text-right px-4 py-2.5">
+                                        <a
+                                          href={`/admin/orders/${order.id}`}
+                                          className="text-blue-500 hover:underline font-medium"
+                                          target="_blank"
+                                        >
+                                          View Info
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   ))}
                 </tbody>
                 <tfoot className="bg-slate-50 border-t border-slate-200">

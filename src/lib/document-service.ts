@@ -5,8 +5,9 @@ export interface DocumentData {
     order_date: string
     customer_name: string
     customer_email: string
-    customer_company?: string
-    customer_vat?: string
+    customer_company?: string | null
+    customer_vat?: string | null
+    customer_phone?: string | null
     billing_address: string
     shipping_address: string
     subtotal_net: string
@@ -19,16 +20,21 @@ export interface DocumentData {
     invoice_number?: string
     invoice_date?: string
     due_date?: string
-    storno_number?: string
-    tax_exemption_clause?: string
-    reverse_charge_note?: string
-    // RMA specific
-    rma_number?: string
-    return_reason?: string
-    // Delivery specific
+    dispatch_date?: string
+    place_of_issue?: string
+    reference?: string
+    // Packing slip specific
     tracking_number?: string
-    package_weight?: string
     carrier_name?: string
+    // Company details (can be overridden)
+    company_name?: string
+    company_address?: string
+    company_vat?: string
+    company_email?: string
+    company_phone?: string
+    company_iban_be?: string
+    company_iban_si?: string
+    company_bic?: string
 }
 
 export async function getPinnedTemplate(type: string, language: string = 'en') {
@@ -59,20 +65,23 @@ export async function getPinnedTemplate(type: string, language: string = 'en') {
     return template
 }
 
+const DEFAULT_COMPANY_DATA = {
+    company_name: 'Initra Energija d.o.o.',
+    company_address: 'Podsmreka 59A, 1356 Dobrova, SI',
+    company_vat: 'SI 62518313',
+    company_email: 'info@tigoenergy.si',
+    company_phone: '+386 1 542 41 80',
+    company_iban_be: 'BE55 9052 7486 2944',
+    company_iban_si: 'SI56 0000 0000 0000 000',
+    company_bic: 'LJBASI2X',
+    place_of_issue: 'Podsmreka',
+    company_logo: `file://${process.cwd()}/public/initra-logo.png`
+}
+
 export function replacePlaceholders(html: string, data: DocumentData) {
     let result = html
+    const allData = { ...DEFAULT_COMPANY_DATA, ...data }
 
-    // Add Company Defaults if they don't exist in data
-    const companyData = {
-        company_name: 'Initra Energija d.o.o.',
-        company_address: 'Dolenjska cesta 242, 1000 Ljubljana, SI',
-        company_vat: 'SI 12345678', // This should probably come from env or settings later
-        company_bank: 'NLB d.d., IBAN: SI56 0000 0000 0000 000'
-    }
-
-    const allData = { ...companyData, ...data }
-
-    // Loop through all keys and replace {key}
     Object.entries(allData).forEach(([key, value]) => {
         const regex = new RegExp(`{${key}}`, 'g')
         result = result.replace(regex, value || '')
@@ -86,31 +95,39 @@ export function generateItemsTableHtml(items: any[], currency: string = '€', r
 
     if (!rowsOnly) {
         html += `
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 25px; font-size: 10px;">
             <thead>
-                <tr style="background-color: #f9fafb; border-bottom: 2px solid #eeeeee;">
-                    <th style="padding: 12px; text-align: left; font-size: 10px; color: #666; text-transform: uppercase;">Product</th>
-                    <th style="padding: 12px; text-align: center; font-size: 10px; color: #666; text-transform: uppercase;">Qty</th>
-                    <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Price</th>
-                    <th style="padding: 12px; text-align: right; font-size: 10px; color: #666; text-transform: uppercase;">Total</th>
+                <tr>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">No.</th>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Product Description</th>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Article / Code</th>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: center; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Qty</th>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Net Price</th>
+                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Amount</th>
                 </tr>
             </thead>
             <tbody>`;
     }
 
-    items.forEach(item => {
+    items.forEach((item, index) => {
         const price = parseFloat(item.unit_price || 0).toFixed(2)
         const total = (parseFloat(item.unit_price || 0) * item.quantity).toFixed(2)
+        const bgColor = index % 2 === 0 ? '#ffffff' : '#fafafa';
 
         html += `
-            <tr style="border-bottom: 1px solid #f3f4f6;">
-                <td style="padding: 12px; text-align: left;">
-                    <div style="font-weight: bold; color: #111;">${item.product_name}</div>
-                    <div style="font-size: 10px; color: #999;">SKU: ${item.sku || 'N/A'}</div>
+            <tr style="background: ${bgColor};">
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; color: #94a3b8; font-weight: 500;">${index + 1}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">
+                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">${item.product_name}</div>
+                    <div style="font-size: 8px; color: #64748b; font-style: italic;">Original Product Specification Applied</div>
                 </td>
-                <td style="padding: 12px; text-align: center; color: #444;">${item.quantity}</td>
-                ${!rowsOnly ? `<td style="padding: 12px; text-align: right; color: #444;">${currency} ${price}</td>` : ''}
-                <td style="padding: 12px; text-align: right; font-weight: bold; color: #111;">${currency} ${total}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 9px;">
+                    <div style="color: #475569; font-weight: 500;">${item.sku || 'N/A'}</div>
+                    <div style="font-size: 8px; color: #94a3b8;">CN Code: ${item.cn_code || '85414300'}</div>
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: 700; color: #0f172a;">${item.quantity}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #475569; font-weight: 500;">${currency} ${price}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 800; color: #0f172a;">${currency} ${total}</td>
             </tr>`
     })
 

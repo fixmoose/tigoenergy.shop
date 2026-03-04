@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import TemplateEditor from './TemplateEditor'
 
@@ -61,6 +61,29 @@ const PLACEHOLDERS = {
     ]
 }
 
+const IframePreview = ({ html }: { html: string }) => {
+    const iframeRef = useRef<HTMLIFrameElement>(null)
+
+    useEffect(() => {
+        if (iframeRef.current) {
+            const doc = iframeRef.current.contentDocument
+            if (doc) {
+                doc.open()
+                doc.write(html)
+                doc.close()
+            }
+        }
+    }, [html])
+
+    return (
+        <iframe
+            ref={iframeRef}
+            className="w-full h-full border-0 bg-white"
+            title="Template Preview"
+        />
+    )
+}
+
 export default function TemplateManager() {
     const [templates, setTemplates] = useState<any[]>([])
     const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
@@ -68,7 +91,7 @@ export default function TemplateManager() {
     const [saving, setSaving] = useState(false)
     const [view, setView] = useState<'edit' | 'preview'>('edit')
     const [translating, setTranslating] = useState(false)
-    const containerRef = React.useRef<HTMLDivElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     const supabase = createClient()
 
@@ -311,24 +334,65 @@ export default function TemplateManager() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex-1 overflow-y-auto bg-white p-12 shadow-inner border rounded">
-                                <div
-                                    className="prose prose-sm max-w-none preview-container"
-                                    dangerouslySetInnerHTML={{
-                                        __html: selectedTemplate.content_html
-                                            .replace(/\{company_name\}/g, 'Initra Energija d.o.o.')
-                                            .replace(/\{company_address\}/g, 'Dolenjska cesta 242, 1000 Ljubljana, SI')
-                                            .replace(/\{company_vat\}/g, 'SI 12345678')
-                                            .replace(/\{company_bank\}/g, 'NLB d.d., IBAN: SI56 0000 0000 0000 000')
-                                            .replace(/\{order_number\}/g, 'ORD-2026-X123')
-                                            .replace(/\{customer_name\}/g, 'John Smith')
-                                            .replace(/\{total_amount\}/g, '€ 1,234.56')
-                                            .replace(/\{items_table\}/g, '<table border="1" style="width:100%; border-collapse: collapse;"><tr><th style="background:#f9fafb; padding:8px;">Product</th><th style="background:#f9fafb; padding:8px;">Qty</th><th style="background:#f9fafb; padding:8px;">Price</th></tr><tr><td style="padding:8px;">Tigo Optimizer TS4-A-O</td><td style="padding:8px;">10</td><td style="padding:8px;">€ 450.00</td></tr></table>')
-                                    }}
+                            <div className="flex-1 overflow-hidden bg-white shadow-inner border rounded">
+                                <IframePreview
+                                    html={selectedTemplate.content_html
+                                        .replace(/\{company_logo\}/g, '/initra-logo.png')
+                                        .replace(/\{company_name\}/g, 'Initra Energija d.o.o.')
+                                        .replace(/\{company_address\}/g, 'Podsmreka 59A, 1356 Dobrova, SI')
+                                        .replace(/\{company_vat\}/g, 'SI 62518313')
+                                        .replace(/\{company_email\}/g, 'info@tigoenergy.si')
+                                        .replace(/\{company_phone\}/g, '+386 1 542 41 80')
+                                        .replace(/\{company_iban_be\}/g, 'BE55 9052 7486 2944')
+                                        .replace(/\{company_iban_si\}/g, 'SI56 0000 0000 0000 000')
+                                        .replace(/\{company_bic\}/g, 'LJBASI2X')
+                                        .replace(/\{place_of_issue\}/g, 'Podsmreka')
+                                        .replace(/\{order_number\}/g, 'ORD-2026-X123')
+                                        .replace(/\{invoice_number\}/g, 'INV-2026-0001')
+                                        .replace(/\{invoice_date\}/g, '2026-03-04')
+                                        .replace(/\{due_date\}/g, '2026-03-18')
+                                        .replace(/\{reference\}/g, 'SI00 2026-X123')
+                                        .replace(/\{customer_name\}/g, 'John Smith Sample')
+                                        .replace(/\{customer_company\}/g, 'Sample Solar Solutions')
+                                        .replace(/\{customer_vat\}/g, 'SI 99999999')
+                                        .replace(/\{billing_address\}/g, 'Dunajska cesta 156, 1000 Ljubljana, Slovenia')
+                                        .replace(/\{shipping_address\}/g, 'Verovškova ulica 55, 1000 Ljubljana, Slovenia')
+                                        .replace(/\{total_amount\}/g, '€ 1,234.56')
+                                        .replace(/\{subtotal_net\}/g, '€ 1,000.00')
+                                        .replace(/\{shipping_cost\}/g, '€ 11.93')
+                                        .replace(/\{vat_total\}/g, '€ 222.63')
+                                        .replace(/\{payment_method\}/g, 'Bank Transfer')
+                                        .replace(/\{items_table\}/g, `
+                                            <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 25px; font-size: 10px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">No.</th>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Product Description</th>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Article / Code</th>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: center; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Qty</th>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Net Price</th>
+                                                        <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr style="background: #ffffff;">
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; color: #94a3b8; font-weight: 500;">1</td>
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">
+                                                            <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">Tigo Optimizer TS4-A-O</div>
+                                                            <div style="font-size: 8px; color: #64748b; font-style: italic;">Original Product Specification Applied</div>
+                                                        </td>
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 9px;">
+                                                            <div style="color: #475569; font-weight: 500;">TS4-A-O</div>
+                                                            <div style="font-size: 8px; color: #94a3b8;">CN Code: 85414300</div>
+                                                        </td>
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: 700; color: #0f172a;">20</td>
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #475569; font-weight: 500;">€ 50.00</td>
+                                                        <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 800; color: #0f172a;">€ 1,000.00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        `)}
                                 />
-                                <div className="mt-12 pt-8 border-t border-dashed border-gray-200 text-center text-gray-300 pointer-events-none uppercase text-xs tracking-widest">
-                                    End of Document Preview
-                                </div>
                             </div>
                         )}
                     </div>
@@ -356,8 +420,6 @@ export default function TemplateManager() {
                                     <div className="space-y-2">
                                         {['en', 'sl'].map(langCode => {
                                             const pinned = templates.find(t => t.type === docType.value && t.language === langCode && t.is_default)
-                                            const langLabel = LANGUAGES.find(l => l.value === langCode)?.label || langCode
-
                                             return (
                                                 <div key={langCode} className="flex items-center justify-between group">
                                                     <span className="text-[10px] font-bold text-gray-500 uppercase">{langCode}</span>
@@ -386,7 +448,8 @@ export default function TemplateManager() {
                     </div>
                 </div>
             )}
-            {/* Template Gallery Footer */}
+
+            {/* Template Repository */}
             {!loading && templates.length > 0 && (
                 <div className="p-6 border-t bg-gray-50/50">
                     <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Existing Templates Repository</h4>

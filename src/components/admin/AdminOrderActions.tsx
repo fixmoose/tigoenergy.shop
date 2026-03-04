@@ -3,15 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { issueOrderInvoiceAction } from '@/app/actions/admin'
 
 interface AdminOrderActionsProps {
     orderId: string
     status: string | null
     createdAt: string | null
     confirmedAt: string | null
+    packingSlipUrl?: string | null
+    shippingLabelUrl?: string | null
 }
 
-export default function AdminOrderActions({ orderId, status, createdAt, confirmedAt }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -65,23 +68,30 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
     }
 
     const handleShipOrder = async (carrier: 'GLS' | 'DPD') => {
-        const trackingNumber = `${carrier === 'GLS' ? 'GLS' : 'DPD'}${Math.floor(Math.random() * 1000000000)}`
-        const trackingUrl = carrier === 'GLS'
-            ? `https://gls-group.eu/EU/en/track-trace?match=${trackingNumber}`
-            : `https://www.dpd.com/tracking?type=1&text=${trackingNumber}`
-
         setLoading(true)
         try {
+            // Only generate mock data for GLS for now
+            const mockTrackingNumber = carrier === 'GLS' ? `GLS${Math.floor(Math.random() * 1000000000)}` : ''
+            const mockTrackingUrl = carrier === 'GLS'
+                ? `https://gls-group.eu/EU/en/track-trace?match=${mockTrackingNumber}`
+                : ''
+
             const res = await fetch(`/api/admin/orders/${orderId}/ship`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ carrier, trackingNumber, trackingUrl })
+                body: JSON.stringify({
+                    carrier,
+                    trackingNumber: mockTrackingNumber,
+                    trackingUrl: mockTrackingUrl
+                })
             })
 
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to process shipping')
 
-            alert(`${carrier} Label Generated: ${trackingNumber}\nConfirmation email sent to customer.`)
+            // If DPD, the server returns the real tracking info in the order state or response
+            // For now, the API returns { ok: true }
+            alert(`${carrier} shipment processed successfully.\nConfirmation email sent to customer.`)
             router.refresh()
         } catch (err: any) {
             console.error('Error shipping order:', err)
@@ -138,6 +148,24 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
         }
     }
 
+    const handleIssueInvoice = async () => {
+        setLoading(true)
+        try {
+            const res = await issueOrderInvoiceAction(orderId)
+            if (res.success) {
+                alert(`Invoice ${res.invoiceNumber} generated!`)
+                router.refresh()
+            } else {
+                alert(res.error || 'Failed to issue invoice')
+            }
+        } catch (err: any) {
+            console.error('Error issuing invoice:', err)
+            alert('Failed to issue invoice')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     if (status === 'cancelled') return null
 
     return (
@@ -171,45 +199,41 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                     </div>
 
                     {(status === 'processing' || status === 'shipped') && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between pt-2">
-                                <span className="text-xs font-bold text-slate-500 uppercase">Documents</span>
-                                <a
-                                    href={`/api/orders/${orderId}/packing-slip`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs font-bold text-blue-600 hover:text-blue-700 underline"
-                                >
-                                    View Packing Slip
-                                </a>
-                                {status === 'processing' && (
-                                    <a
-                                        href={`/api/orders/${orderId}/delivery-note`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs font-bold text-amber-600 hover:text-amber-700 underline"
+                        <div className="space-y-6">
+                            {/* Step 2: Packing */}
+                            <div className={`p-4 rounded-xl border-2 transition-all ${!packingSlipUrl ? 'border-amber-200 bg-amber-50' : 'border-slate-100 bg-white opacity-60'}`}>
+                                <h4 className="text-xs font-black uppercase text-amber-700 mb-2 flex items-center gap-2">
+                                    <span>📦</span> Step 2: Packing
+                                </h4>
+                                <p className="text-[10px] text-amber-600 mb-3 font-medium">Generate the packing slip to start preparing the items in the warehouse.</p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
+                                        className="flex-1 py-2 bg-white border border-amber-300 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-100 transition"
                                     >
-                                        View Delivery Note
-                                    </a>
-                                )}
+                                        Generate & View Slip
+                                    </button>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <button
-                                    onClick={() => handleShipOrder('GLS')}
-                                    disabled={loading}
-                                    className="flex flex-col items-center justify-center p-3 border-2 border-slate-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition group"
-                                >
-                                    <span className="text-xl mb-1">📦</span>
-                                    <span className="text-xs font-bold text-slate-800 group-hover:text-blue-700 text-center">Process GLS Label</span>
-                                </button>
+
+                            {/* Step 3: Shipping */}
+                            <div className={`p-4 rounded-xl border-2 transition-all ${status === 'processing' ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white opacity-60'}`}>
+                                <h4 className="text-xs font-black uppercase text-blue-700 mb-2 flex items-center gap-2">
+                                    <span>🚚</span> Step 3: Shipping
+                                </h4>
+                                <p className="text-[10px] text-blue-600 mb-3 font-medium">Create the official DPD shipping label and notify the customer.</p>
                                 <button
                                     onClick={() => handleShipOrder('DPD')}
-                                    disabled={loading}
-                                    className="flex flex-col items-center justify-center p-3 border-2 border-slate-100 rounded-xl hover:border-red-500 hover:bg-red-50 transition group"
+                                    disabled={loading || status === 'shipped'}
+                                    className="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition disabled:opacity-50 shadow-lg shadow-red-100 flex items-center justify-center gap-2"
                                 >
-                                    <span className="text-xl mb-1">🚚</span>
-                                    <span className="text-xs font-bold text-slate-800 group-hover:text-red-700 text-center">Process DPD Label</span>
+                                    <span>🏷️</span> Process DPD Label
                                 </button>
+                                {shippingLabelUrl && (
+                                    <a href={shippingLabelUrl} target="_blank" className="block text-center mt-2 text-[10px] font-bold text-red-600 hover:underline">
+                                        View Generated Label PDF
+                                    </a>
+                                )}
                             </div>
                         </div>
                     )}
@@ -225,6 +249,18 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                                     <span>✉️</span> Re-email Label to Customer
                                 </button>
                             </div>
+                        </div>
+                    )}
+
+                    {(status === 'shipped' || status === 'delivered' || status === 'completed' || status === 'processing') && (
+                        <div className="pt-2">
+                            <button
+                                onClick={handleIssueInvoice}
+                                disabled={loading}
+                                className="w-full py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                <span>📄</span> {loading ? 'Wait...' : 'Issue Official Invoice'}
+                            </button>
                         </div>
                     )}
 

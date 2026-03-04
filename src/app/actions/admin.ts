@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
+import { MARKETS } from '@/lib/constants/markets'
 
 const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 
@@ -742,6 +743,11 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 market: order.market || 'de',
                 language: 'en',
                 payment_method: order.payment_method || 'IBAN',
+                is_b2b: customer.is_b2b || false,
+                delivery_country: order.shipping_address?.country || 'DE',
+                transaction_type: (order.shipping_address?.country === 'SI')
+                    ? 'domestic'
+                    : (Object.values(MARKETS).some(m => m.country === order.shipping_address?.country && m.isEU) ? 'eu' : 'export'),
                 created_at: new Date().toISOString()
             })
             .select()
@@ -797,5 +803,60 @@ export async function adminCreateOrderWithCustomerAction(payload: {
     } catch (err: any) {
         console.error('CRITICAL ERROR in adminCreateOrderWithCustomerAction:', err);
         return { success: false, error: err.message || 'Failed to create order. Please check server logs.' }
+    }
+}
+
+/**
+ * Issues an invoice for an existing order
+ */
+export async function issueOrderInvoiceAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized');
+
+        const supabase = await createClient();
+
+        // 1. Get current order to ensure it exists and doesn't have an invoice yet
+        const { data: order, error: fetchError } = await supabase
+            .from('orders')
+            .select('order_number, invoice_number, status')
+            .eq('id', orderId)
+            .single();
+
+        if (fetchError || !order) throw new Error('Order not found');
+        if (order.invoice_number) return { success: true, message: 'Invoice already exists' };
+
+        // 2. Generate Invoice Number (e.g. INV-2026-XXXX)
+        const year = new Date().getFullYear();
+        const { count } = await supabase
+            .from('orders')
+            .select('*', { count: 'exact', head: true })
+            .not('invoice_number', 'is', null)
+            .gte('invoice_created_at', `${year}-01-01`);
+
+        const nextNumber = (count || 0) + 1;
+        const invoiceNumber = `INV-${year}-${nextNumber.toString().padStart(4, '0')}`;
+
+        // 3. Update Order
+        const { error: updateError } = await supabase
+            .from('orders')
+            .update({
+                invoice_number: invoiceNumber,
+                invoice_created_at: new Date().toISOString(),
+                // Simulate a PDF URL for now - in production this would be a real signed URL
+                invoice_url: `/api/orders/${orderId}/invoice?download=1`,
+                status: order.status === 'pending' ? 'processing' : order.status
+            })
+            .eq('id', orderId);
+
+        if (updateError) throw updateError;
+
+        revalidatePath(`/admin/orders/${orderId}`);
+        revalidatePath('/admin/invoices');
+        revalidatePath('/admin/reporting/oss');
+
+        return { success: true, invoiceNumber };
+    } catch (err: any) {
+        console.error('Error in issueOrderInvoiceAction:', err);
+        return { success: false, error: err.message || 'Failed to issue invoice' };
     }
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
+import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'
 
 const TRANSACTION_TYPES: Record<string, { label: string; color: string }> = {
   domestic: { label: 'Domestic (SI)', color: 'bg-slate-100 text-slate-700' },
@@ -72,6 +73,10 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         <Link href="/admin/orders" className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
           Back to Orders
         </Link>
+      </div>
+
+      <div className="mb-8">
+        <OrderWorkflowTracker order={order} />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -313,6 +318,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             status={order.status || null}
             createdAt={order.created_at || null}
             confirmedAt={order.confirmed_at || null}
+            packingSlipUrl={order.packing_slip_url}
+            shippingLabelUrl={order.shipping_label_url}
           />
         </div>
       </div>

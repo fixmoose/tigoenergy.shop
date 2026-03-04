@@ -34,7 +34,9 @@ export async function generatePdfFromHtml(html: string) {
             </html>
         `
 
-        await page.setContent(fullHtml, { waitUntil: 'networkidle0' })
+        await page.setContent(fullHtml, {
+            waitUntil: 'networkidle0'
+        })
 
         const pdf = await page.pdf({
             format: 'A4',

@@ -45,10 +45,16 @@ export default function SettingsPage() {
     async function fetchAdmins() {
         setAdminsLoading(true)
         try {
-            const data = await getAdminsAction()
-            setAdmins(data)
+            const res = await getAdminsAction()
+            if (res.success && Array.isArray(res.data)) {
+                setAdmins(res.data)
+            } else {
+                console.error('Failed to fetch admins:', res.error)
+                setAdmins([])
+            }
         } catch (err) {
             console.error('Error fetching admins:', err)
+            setAdmins([])
         }
         setAdminsLoading(false)
     }

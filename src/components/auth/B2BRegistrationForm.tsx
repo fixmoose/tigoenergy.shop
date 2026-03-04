@@ -1,12 +1,12 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
-import { getMarketKeyFromHostname } from '@/lib/constants/markets'
+import { getMarketKeyFromHostname, getDomainForMarket } from '@/lib/constants/markets'
 import React, { useState, useEffect } from 'react'
 
 const MARKET_PHONE_CODES: Record<string, string> = {
@@ -32,6 +32,7 @@ const MARKET_PHONE_CODES: Record<string, string> = {
 export default function B2BRegistrationForm() {
     const t = useTranslations('auth.register')
     const router = useRouter()
+    const searchParams = useSearchParams()
     const supabase = createClient()
 
     const [step, setStep] = useState(1)
@@ -97,6 +98,14 @@ export default function B2BRegistrationForm() {
     const [emailCodeSent, setEmailCodeSent] = useState(false)
     const [phoneCodeSent, setPhoneCodeSent] = useState(false)
 
+    // Check for VAT in URL
+    useEffect(() => {
+        const vatParam = searchParams.get('vat')
+        if (vatParam && !formData.vatNumber) {
+            setFormData(prev => ({ ...prev, vatNumber: vatParam.toUpperCase() }))
+        }
+    }, [searchParams])
+
     // Auto-prefill phone code based on market or detected company country
     useEffect(() => {
         let targetCountry = formData.country
@@ -136,11 +145,36 @@ export default function B2BRegistrationForm() {
             setLoading(false)
 
             if (data.valid) {
+                // DOMAIN ENFORCEMENT
+                const currentMarket = getMarketKeyFromHostname(window.location.hostname)
+                const vatCountry = data.countryCode // "SI", "HR", "DE", etc.
+
+                // SI can only register on .si, HR only on .hr, etc.
+                // If it's a generic .shop, allow any? User said "reroute to .shop if we dont have that domain to match"
+                // Actually, if I'm on .si and enter DE VAT, I must be rerouted.
+
+                if (vatCountry !== currentMarket && currentMarket !== 'SHOP') {
+                    // Mismatch found. Find where this VAT belongs.
+                    const targetDomain = getDomainForMarket(vatCountry)
+                    const message = t('messages.vatMismatchRedirect', {
+                        market: vatCountry,
+                        domain: targetDomain
+                    }) || `This VAT number belongs to ${vatCountry}. Please register at ${targetDomain}. Redirect now?`
+
+                    if (confirm(message)) {
+                        window.location.href = `https://www.${targetDomain}/auth/register?type=b2b&vat=${formData.vatNumber.toUpperCase()}`
+                        return
+                    } else {
+                        setError(`VAT ${formData.vatNumber} is not allowed on this local domain (.${currentMarket.toLowerCase()}).`)
+                        return
+                    }
+                }
+
                 setVatVerified(true)
                 setFormData(prev => ({
                     ...prev,
                     companyName: data.name || prev.companyName,
-                    address: data.address || '', // Changed from companyAddress
+                    address: data.address || '',
                     country: data.countryCode || prev.country
                 }))
                 // Auto-advance

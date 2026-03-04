@@ -555,6 +555,46 @@ export function getMarketFromHostname(hostname: string): MarketConfig {
 }
 
 /**
+ * Get the primary domain for a given market key.
+ * Used for cross-domain redirects (e.g. VAT rerouting).
+ */
+export function getDomainForMarket(key: string): string {
+    // Reverse mapping for primary domains
+    const primaryDomains: Record<string, string> = {
+        SI: 'tigoenergy.si',
+        DE: 'tigoenergy.de',
+        FR: 'tigoenergy.fr',
+        IT: 'tigoenergy.it',
+        ES: 'tigoenergy.es',
+        AT: 'tigoenergy.at',
+        CH: 'tigoenergy.ch',
+        BE: 'tigoenergy.be',
+        NL: 'tigoenergy.nl',
+        PL: 'tigoenergy.pl',
+        CZ: 'tigoenergy.cz',
+        SK: 'tigoenergy.sk',
+        HR: 'tigoenergy.hr',
+        SE: 'tigoenergy.se',
+        DK: 'tigoenergy.dk',
+        RO: 'tigoenergy.ro',
+        RS: 'tigoenergy.rs',
+        MK: 'tigoenergy.mk',
+        ME: 'tigoenergy.me',
+        BG: 'tigoenergy.bg',
+        NO: 'tigoenergy.no',
+        HU: 'tigoenergy.hu',
+        PT: 'tigoenergy.pt',
+        LV: 'tigoenergy.lv',
+        LT: 'tigoenergy.lt',
+        EE: 'tigoenergy.ee',
+        GB: 'tigoenergy.uk',
+        SHOP: 'tigoenergy.shop'
+    }
+
+    return primaryDomains[key] || 'tigoenergy.shop'
+}
+
+/**
  * Validate that a VAT rate matches a known market.
  * Used server-side to prevent client tampering.
  */

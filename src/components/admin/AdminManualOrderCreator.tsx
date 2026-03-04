@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { searchProductsAction } from '@/app/actions/products'
 import { searchCustomersAction } from '@/app/actions/customers'
-import { adminCreateOrderWithCustomerAction } from '@/app/actions/admin'
+import { adminCreateOrderWithCustomerAction, issueOrderInvoiceAction } from '@/app/actions/admin'
 import { MARKETS } from '@/lib/constants/markets'
 
 interface ProductSnippet {
@@ -27,7 +27,7 @@ interface CustomerSnippet {
     addresses?: any[]
 }
 
-export default function AdminManualOrderCreator({ onClose, onCreated }: { onClose: () => void, onCreated: () => void }) {
+export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceMode = false }: { onClose: () => void, onCreated: () => void, isInvoiceMode?: boolean }) {
     const [loading, setLoading] = useState(false)
 
     // Customer Data
@@ -176,7 +176,13 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
             })
 
             if (res.success) {
-                alert('Order created successfully')
+                const orderId = res.data?.orderId
+
+                if (isInvoiceMode && orderId) {
+                    await issueOrderInvoiceAction(orderId)
+                }
+
+                alert(isInvoiceMode ? 'Order and Invoice created successfully' : 'Order created successfully')
                 onCreated()
                 onClose()
             } else {
@@ -204,8 +210,8 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                 {/* Header */}
                 <div className="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">Create Order from Scratch</h2>
-                        <p className="text-xs text-slate-500 mt-1">Select/Create customer, add addresses and products to generate a manual order.</p>
+                        <h2 className="text-xl font-bold text-slate-900">{isInvoiceMode ? 'Create One-Off Invoice' : 'Create Order from Scratch'}</h2>
+                        <p className="text-xs text-slate-500 mt-1">{isInvoiceMode ? 'Generate a manual document for a customer instantly.' : 'Select/Create customer, add addresses and products to generate a manual order.'}</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -699,7 +705,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated }: { onClos
                                         <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                         Processing...
                                     </>
-                                ) : 'Create & Send Email'}
+                                ) : isInvoiceMode ? 'Create & Issue Invoice' : 'Create & Send Email'}
                             </button>
                         </div>
                     </div>

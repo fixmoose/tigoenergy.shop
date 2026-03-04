@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email'
 import { buildShippingUpdateEmail } from '@/lib/emails/shipping-update'
+import { DPDService, splitStreetAndNumber, calculateTigoParcels } from '@/lib/shipping/dpd'
 
 export async function POST(
     req: NextRequest,
@@ -17,10 +18,9 @@ export async function POST(
     }
 
     // 2. Parse Body
-    const { carrier, trackingNumber, trackingUrl } = await req.json()
-    if (!carrier || !trackingNumber || !trackingUrl) {
-        return NextResponse.json({ error: 'Missing shipping details' }, { status: 400 })
-    }
+    const body = await req.json()
+    const { carrier } = body
+    let { trackingNumber, trackingUrl } = body
 
     try {
         // 3. Fetch Order (needed for customer info & language)
@@ -34,7 +34,77 @@ export async function POST(
             return NextResponse.json({ error: 'Order not found' }, { status: 404 })
         }
 
-        // 4. Update Order Status
+        // 4. If DPD, generate REAL label via API
+        if (carrier === 'DPD') {
+            const dpd = new DPDService()
+            const address = order.shipping_address || {}
+            const { street, number } = splitStreetAndNumber(address.street || '')
+
+            // Fetch order items for packaging logic
+            const { data: items } = await supabase
+                .from('order_items')
+                .select('*')
+                .eq('order_id', id)
+
+            const parcels = calculateTigoParcels(items || [])
+            const weights = parcels.map(p => p.weight)
+            const totalWeight = weights.reduce((a: number, b: number) => a + b, 0)
+
+            const shipmentRequest = {
+                name1: `${address.first_name || ''} ${address.last_name || ''}`.trim(),
+                name2: address.company_name || '',
+                street: street || 'Unknown',
+                rPropNum: number || '1',
+                city: address.city || '',
+                country: address.country || 'SI',
+                pcode: address.postal_code || '',
+                email: address.email || order.customer_email,
+                phone: address.phone || order.customer_phone || '',
+                weight: totalWeight, // Fallback, createShipment will use weights array
+                num_of_parcel: weights.length,
+                order_number: order.order_number,
+                parcel_type: order.is_b2b ? 'D' : 'D-B2C',
+                predict: order.is_b2b ? 0 : 1
+            }
+
+            const res = await dpd.createShipment(shipmentRequest, weights)
+
+            if (res.status === 'ok' && res.pl_number && res.pl_number.length > 0) {
+                trackingNumber = res.pl_number.join(', ') // Save all tracking numbers
+                trackingUrl = `https://www.dpd.group/si/sl/slajdovi/pracenje-posiljki/?parcelNr=${res.pl_number[0]}`
+
+                // Get Label PDF
+                try {
+                    const pdfBuffer = await dpd.getLabels(res.pl_number)
+                    const fileName = `shipping_label_${id}_${Date.now()}.pdf`
+                    const filePath = `orders/${id}/${fileName}`
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('invoices')
+                        .upload(filePath, pdfBuffer, {
+                            contentType: 'application/pdf',
+                            upsert: true
+                        })
+
+                    if (!uploadError) {
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('invoices')
+                            .getPublicUrl(filePath)
+
+                        await supabase
+                            .from('orders')
+                            .update({ shipping_label_url: publicUrl })
+                            .eq('id', id)
+                    }
+                } catch (labelErr) {
+                    console.error('Failed to get DPD label PDF:', labelErr)
+                }
+            } else {
+                throw new Error(res.errlog || 'DPD API denied shipment creation')
+            }
+        }
+
+        // 5. Update Order Status
         const { error: updateError } = await supabase
             .from('orders')
             .update({

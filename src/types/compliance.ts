@@ -12,6 +12,13 @@ export interface OSSReportRow {
   vat_amount: number
   order_count: number
   currency: string
+  orders?: {
+    id: string
+    order_number: string
+    total: number
+    placed_at: string
+    customer_name: string
+  }[]
 }
 
 export interface OSSSummary {

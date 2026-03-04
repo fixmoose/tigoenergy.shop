@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Potrditev naročila - Podatki za plačilo</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #00A651;">Naročilo #{{order_number}}</h1>
+            <p style="font-size: 18px; color: #666;">Hvala za vaše naročilo!</p>
+        </div>
+
+        <div style="background-color: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+            <p>Spoštovani {{name}},</p>
+            <p>Prejeli smo vaše naročilo z dne {{order_date}}. Za obdelavo naročila vas prosimo, da izvedete plačilo po
+                spodnjih navodilih.</p>
+
+            <div
+                style="background-color: #f0fdf4; border-left: 4px solid #00A651; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #166534; font-size: 16px;">Podatki za bančno nakazilo (IBAN)</h3>
+                <p style="margin: 0 0 10px 0; font-size: 14px; color: #166534;">Prosimo, navedite SKLIC:
+                    <strong>{{order_number}}</strong></p>
+                <p style="margin: 0 0 15px 0; font-size: 14px; color: #166534;">Znesek za plačilo:
+                    <strong>{{total_amount}}</strong></p>
+
+                <div style="margin-top: 15px;">
+                    <div style="margin-bottom: 15px;">
+                        <p
+                            style="margin: 0; font-size: 10px; text-transform: uppercase; color: #15803d; font-weight: bold;">
+                            NLB (Slovenski račun)</p>
+                        <p style="margin: 0; font-family: monospace; font-size: 14px; font-weight: bold;">SI56 0000 0000
+                            0000 000</p>
+                        <p style="margin: 0; font-size: 11px;">BIC/SWIFT: LJBASI2X</p>
+                    </div>
+                    <div>
+                        <p
+                            style="margin: 0; font-size: 10px; text-transform: uppercase; color: #15803d; font-weight: bold;">
+                            WISE (Belgijski račun)</p>
+                        <p style="margin: 0; font-family: monospace; font-size: 14px; font-weight: bold;">BE55 9052 7486
+                            2944</p>
+                        <p style="margin: 0; font-size: 11px;">BIC/SWIFT: LJBASI2X</p>
+                    </div>
+                </div>
+            </div>
+
+            <p>Naročeni izdelki:</p>
+            <div style="margin: 20px 0;">
+                {{order_items}}
+            </div>
+
+            <p style="font-size: 14px; color: #666; margin-top: 20px;">
+                Po prejemu plačila boste prejeli uradni račun, vaše naročilo pa bo odposlano.
+            </p>
+        </div>
+
+        <div style="text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
+            <p>Tigo Energy SHOP - Initra Energija d.o.o.</p>
+            <p>Podsmreka 59A, 1356 Dobrova, Slovenija</p>
+        </div>
+    </div>
+</body>
+
+</html>
