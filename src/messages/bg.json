@@ -15,7 +15,12 @@
     "noImage": "Няма изображение",
     "weight": "Тегло",
     "packaging": "Опаковка",
-    "unitsPerBox": "бройки в кутия"
+    "unitsPerBox": "бройки в кутия",
+    "vatIncluded": "Вкл. ДДС",
+    "vatExcluded": "Без ДДС",
+    "vatTerm": "ДДС",
+    "b2bPriceLabel": "B2B цена",
+    "retailPriceLabel": "Търговска цена"
   },
   "header": {
     "selectCurrency": "Избери валута",

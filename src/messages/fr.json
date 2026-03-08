@@ -15,7 +15,12 @@
     "noImage": "Pas d'image",
     "weight": "Poids",
     "packaging": "Emballage",
-    "unitsPerBox": "unités par boîte"
+    "unitsPerBox": "unités par boîte",
+    "vatIncluded": "TVA incluse",
+    "vatExcluded": "HT",
+    "vatTerm": "TVA",
+    "b2bPriceLabel": "Prix B2B",
+    "retailPriceLabel": "Prix public"
   },
   "header": {
     "selectCurrency": "Choisir la devise",

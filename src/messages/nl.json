@@ -15,7 +15,12 @@
     "noImage": "Geen afbeelding",
     "weight": "Gewicht",
     "packaging": "Verpakking",
-    "unitsPerBox": "eenheden per doos"
+    "unitsPerBox": "eenheden per doos",
+    "vatIncluded": "Incl. btw",
+    "vatExcluded": "Excl. btw",
+    "vatTerm": "btw",
+    "b2bPriceLabel": "B2B prijs",
+    "retailPriceLabel": "Consumentenprijs"
   },
   "header": {
     "selectCurrency": "Selecteer valuta",

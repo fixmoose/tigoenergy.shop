@@ -15,7 +15,12 @@
     "noImage": "Нема слика",
     "weight": "Тежина",
     "packaging": "Пакување",
-    "unitsPerBox": "единици по кутија"
+    "unitsPerBox": "единици по кутија",
+    "vatIncluded": "Со ДДВ",
+    "vatExcluded": "Без ДДВ",
+    "vatTerm": "ДДВ",
+    "b2bPriceLabel": "B2B цена",
+    "retailPriceLabel": "Малопродажна цена"
   },
   "header": {
     "selectCurrency": "Избери валута",

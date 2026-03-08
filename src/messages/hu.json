@@ -15,7 +15,12 @@
     "noImage": "Nincs kép",
     "weight": "Súly",
     "packaging": "Csomagolás",
-    "unitsPerBox": "darab dobozonként"
+    "unitsPerBox": "darab dobozonként",
+    "vatIncluded": "ÁFÁ-val",
+    "vatExcluded": "ÁFA nélkül",
+    "vatTerm": "ÁFA",
+    "b2bPriceLabel": "B2B ár",
+    "retailPriceLabel": "Kiskereskedelmi ár"
   },
   "header": {
     "selectCurrency": "Pénznem kiválasztása",

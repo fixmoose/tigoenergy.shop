@@ -15,7 +15,12 @@
     "noImage": "Sin imagen",
     "weight": "Peso",
     "packaging": "Embalaje",
-    "unitsPerBox": "unidades por caja"
+    "unitsPerBox": "unidades por caja",
+    "vatIncluded": "IVA incluido",
+    "vatExcluded": "Sin IVA",
+    "vatTerm": "IVA",
+    "b2bPriceLabel": "Precio B2B",
+    "retailPriceLabel": "Precio minorista"
   },
   "header": {
     "selectCurrency": "Seleccionar moneda",

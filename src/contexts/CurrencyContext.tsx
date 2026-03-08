@@ -9,6 +9,13 @@ type CustomerType = 'b2c' | 'b2b' | null
 
 const STORAGE_KEY = 'preferred_currency_v1'
 
+interface PriceBreakdown {
+    net: string
+    vatAmount: string
+    vatPercent: number
+    gross: string
+}
+
 interface CurrencyContextValue {
     currentCurrency: CurrencyMetadata
     setCurrency: (code: string) => void
@@ -16,6 +23,7 @@ interface CurrencyContextValue {
     formatPrice: (euroAmount: number, includeVat?: boolean) => string
     formatPriceNet: (euroAmount: number) => string
     formatPriceGross: (euroAmount: number) => string
+    formatPriceBreakdown: (euroNetAmount: number) => PriceBreakdown
     isLoading: boolean
     customerType: CustomerType
     isB2B: boolean
@@ -144,6 +152,23 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         }).format(converted)
     }
 
+    // Returns the net, VAT amount, and gross as formatted strings for tooltip display
+    const formatPriceBreakdown = (euroNetAmount: number): PriceBreakdown => {
+        const fmt = (amount: number) => new Intl.NumberFormat(market.locale, {
+            style: 'currency',
+            currency: currentCurrency.code,
+            currencyDisplay: 'symbol',
+        }).format(amount * (rates[currentCurrency.code] || 1))
+
+        const vatAmount = euroNetAmount * vatRate
+        return {
+            net: fmt(euroNetAmount),
+            vatAmount: fmt(vatAmount),
+            vatPercent: Math.round(vatRate * 100),
+            gross: fmt(euroNetAmount + vatAmount),
+        }
+    }
+
     const value: CurrencyContextValue = {
         currentCurrency,
         setCurrency,
@@ -151,6 +176,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         formatPrice,
         formatPriceNet,
         formatPriceGross,
+        formatPriceBreakdown,
         isLoading,
         customerType,
         isB2B,

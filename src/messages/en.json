@@ -19,7 +19,9 @@
     "unitsPerBox": "units per box",
     "vatIncluded": "Inc. VAT",
     "retailPriceLabel": "Retail Price",
-    "b2bPriceLabel": "B2B Price"
+    "b2bPriceLabel": "B2B Price",
+    "vatExcluded": "Excl. VAT",
+    "vatTerm": "VAT"
   },
   "header": {
     "selectCurrency": "Select Currency",

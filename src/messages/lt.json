@@ -15,7 +15,12 @@
     "noImage": "Nėra nuotraukos",
     "weight": "Svoris",
     "packaging": "Pakuotė",
-    "unitsPerBox": "vienetai dėžėje"
+    "unitsPerBox": "vienetai dėžėje",
+    "vatIncluded": "Su PVM",
+    "vatExcluded": "Be PVM",
+    "vatTerm": "PVM",
+    "b2bPriceLabel": "B2B kaina",
+    "retailPriceLabel": "Mažmeninė kaina"
   },
   "header": {
     "selectCurrency": "Pasirinkti valiutą",

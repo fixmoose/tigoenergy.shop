@@ -15,7 +15,12 @@
     "noImage": "Нема слике",
     "weight": "Тежина",
     "packaging": "Паковање",
-    "unitsPerBox": "комада по кутији"
+    "unitsPerBox": "комада по кутији",
+    "vatIncluded": "Са ПДВ-ом",
+    "vatExcluded": "Без ПДВ-а",
+    "vatTerm": "ПДВ",
+    "b2bPriceLabel": "Б2Б цена",
+    "retailPriceLabel": "Малопродајна цена"
   },
   "header": {
     "selectCurrency": "Изабери валуту",

@@ -15,7 +15,12 @@
     "noImage": "Pilt puudub",
     "weight": "Kaal",
     "packaging": "Pakend",
-    "unitsPerBox": "ühikut karbi kohta"
+    "unitsPerBox": "ühikut karbi kohta",
+    "vatIncluded": "Koos KM",
+    "vatExcluded": "Ilma KM",
+    "vatTerm": "KM",
+    "b2bPriceLabel": "B2B hind",
+    "retailPriceLabel": "Jaehind"
   },
   "header": {
     "selectCurrency": "Vali valuuta",

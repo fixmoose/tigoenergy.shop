@@ -15,7 +15,12 @@
     "noImage": "Ingen bilde",
     "weight": "Vekt",
     "packaging": "Emballasje",
-    "unitsPerBox": "enheter per eske"
+    "unitsPerBox": "enheter per eske",
+    "vatIncluded": "Inkl. mva",
+    "vatExcluded": "Ekskl. mva",
+    "vatTerm": "mva",
+    "b2bPriceLabel": "B2B pris",
+    "retailPriceLabel": "Utsalgspris"
   },
   "header": {
     "selectCurrency": "Velg valuta",

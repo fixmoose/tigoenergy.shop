@@ -15,7 +15,12 @@
     "noImage": "Brak obrazu",
     "weight": "Waga",
     "packaging": "Opakowanie",
-    "unitsPerBox": "sztuk na pudełko"
+    "unitsPerBox": "sztuk na pudełko",
+    "vatIncluded": "Z VAT",
+    "vatExcluded": "Bez VAT",
+    "vatTerm": "VAT",
+    "b2bPriceLabel": "Cena B2B",
+    "retailPriceLabel": "Cena detaliczna"
   },
   "header": {
     "selectCurrency": "Wybierz walutę",

@@ -15,7 +15,12 @@
     "noImage": "Fără imagine",
     "weight": "Greutate",
     "packaging": "Ambalare",
-    "unitsPerBox": "unități per cutie"
+    "unitsPerBox": "unități per cutie",
+    "vatIncluded": "Cu TVA",
+    "vatExcluded": "Fără TVA",
+    "vatTerm": "TVA",
+    "b2bPriceLabel": "Preț B2B",
+    "retailPriceLabel": "Preț cu amănuntul"
   },
   "header": {
     "selectCurrency": "Selectează moneda",

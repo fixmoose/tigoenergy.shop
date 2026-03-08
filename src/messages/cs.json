@@ -15,7 +15,12 @@
     "noImage": "Bez obrázku",
     "weight": "Hmotnost",
     "packaging": "Balení",
-    "unitsPerBox": "kusů na krabici"
+    "unitsPerBox": "kusů na krabici",
+    "vatIncluded": "Včetně DPH",
+    "vatExcluded": "Bez DPH",
+    "vatTerm": "DPH",
+    "b2bPriceLabel": "Cena B2B",
+    "retailPriceLabel": "Maloobchodní cena"
   },
   "header": {
     "selectCurrency": "Vybrat měnu",

@@ -7,12 +7,13 @@ import { useTranslations } from 'next-intl'
 import { useMarket } from '@/contexts/MarketContext'
 import { getLocalizedName } from '@/lib/utils/localization'
 import type { EffectivePrice } from '@/lib/db/pricing'
+import PriceWithTooltip from '@/components/ui/PriceWithTooltip'
 
 export default function ProductCard({ product, pricing }: { product: Product; pricing?: EffectivePrice }) {
   const t = useTranslations()
   const { market } = useMarket()
   const { addItem } = useCart()
-  const { formatPrice } = useCurrency()
+  const { formatPrice, isB2B } = useCurrency()
   const { currentLanguage } = useMarket()
   const tc = useTranslations('common')
   const productName = getLocalizedName(product, currentLanguage.code) || ''
@@ -126,34 +127,32 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
               ) : pricing?.isDiscounted ? (
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xl font-bold text-green-600">{formatPrice(pricing.discountedPrice)}</span>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <PriceWithTooltip
+                      netEur={pricing.discountedPrice}
+                      displayPrice={formatPrice(pricing.discountedPrice)}
+                      className="text-xl font-bold text-green-600"
+                    />
                     {pricing?.appliedSchemaName && (
                       <span className="text-[8px] bg-green-50 text-green-700 px-1 py-0.5 rounded font-black uppercase border border-green-100">
                         {pricing.appliedSchemaName.split(' ')[0]}
                       </span>
                     )}
-                    <span className="text-[8px] text-gray-400 font-medium ml-1">
-                      {pricing?.appliedSchemaName ? t('common.b2bPriceLabel') : t('common.retailPriceLabel')}
-                    </span>
-                    {market.key === 'SI' && (
-                      <span className="text-[8px] text-gray-400 font-medium">{t('common.vatIncluded')}</span>
-                    )}
                   </div>
+                  <span className="text-[10px] text-gray-400 font-medium leading-none mt-0.5">
+                    {isB2B ? tc('vatExcluded') : tc('vatIncluded')}
+                  </span>
                 </div>
               ) : (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-gray-900 leading-tight">
-                    {formatPrice(product.price_eur)}
-                    <span className="text-[10px] text-gray-400 font-medium ml-1">
-                      {t('common.retailPriceLabel')}
-                    </span>
+                  <PriceWithTooltip
+                    netEur={product.price_eur}
+                    displayPrice={formatPrice(product.price_eur)}
+                    className="text-xl font-bold text-gray-900 leading-tight"
+                  />
+                  <span className="text-[10px] text-gray-400 font-medium leading-none mt-0.5">
+                    {tc('retailPriceLabel')} · {isB2B ? tc('vatExcluded') : tc('vatIncluded')}
                   </span>
-                  {market.key === 'SI' && (
-                    <span className="text-[10px] text-gray-400 font-medium leading-none">
-                      {t('common.vatIncluded')}
-                    </span>
-                  )}
                 </div>
               )}
             </div>

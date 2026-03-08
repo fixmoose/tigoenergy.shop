@@ -15,7 +15,12 @@
     "noImage": "Nav attēla",
     "weight": "Svars",
     "packaging": "Iepakojums",
-    "unitsPerBox": "vienības vienā kastē"
+    "unitsPerBox": "vienības vienā kastē",
+    "vatIncluded": "Ar PVN",
+    "vatExcluded": "Bez PVN",
+    "vatTerm": "PVN",
+    "b2bPriceLabel": "B2B cena",
+    "retailPriceLabel": "Mazumtirdzniecības cena"
   },
   "header": {
     "selectCurrency": "Izvēlēties valūtu",

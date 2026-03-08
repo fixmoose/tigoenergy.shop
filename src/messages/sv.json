@@ -15,7 +15,12 @@
     "noImage": "Ingen bild",
     "weight": "Vikt",
     "packaging": "Förpackning",
-    "unitsPerBox": "enheter per låda"
+    "unitsPerBox": "enheter per låda",
+    "vatIncluded": "Inkl. moms",
+    "vatExcluded": "Exkl. moms",
+    "vatTerm": "moms",
+    "b2bPriceLabel": "B2B-pris",
+    "retailPriceLabel": "Detaljhandelspris"
   },
   "header": {
     "selectCurrency": "Välj valuta",

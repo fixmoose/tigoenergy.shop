@@ -15,7 +15,12 @@
     "noImage": "Intet billede",
     "weight": "Vægt",
     "packaging": "Emballage",
-    "unitsPerBox": "enheder pr. kasse"
+    "unitsPerBox": "enheder pr. kasse",
+    "vatIncluded": "Inkl. moms",
+    "vatExcluded": "Excl. moms",
+    "vatTerm": "moms",
+    "b2bPriceLabel": "B2B pris",
+    "retailPriceLabel": "Detailpris"
   },
   "header": {
     "selectCurrency": "Vælg valuta",

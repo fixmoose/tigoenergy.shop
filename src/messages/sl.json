@@ -19,7 +19,9 @@
     "unitsPerBox": "enot na škatlo",
     "vatIncluded": "DDV vključen",
     "retailPriceLabel": "MPC",
-    "b2bPriceLabel": "B2B cena"
+    "b2bPriceLabel": "B2B cena",
+    "vatExcluded": "Brez DDV",
+    "vatTerm": "DDV"
   },
   "header": {
     "selectCurrency": "Izberi valuto",

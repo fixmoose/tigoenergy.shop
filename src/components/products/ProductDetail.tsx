@@ -8,9 +8,10 @@ import { useMarket } from '@/contexts/MarketContext'
 import { getLocalizedDescription, getLocalizedName } from '@/lib/utils/localization'
 import { useTranslations } from 'next-intl'
 import { EffectivePrice } from '@/lib/db/pricing'
+import PriceWithTooltip from '@/components/ui/PriceWithTooltip'
 
 export default function ProductDetail({ product, userId, reviews, pricing }: { product: Product; userId?: string | null; reviews: Review[]; pricing?: EffectivePrice }) {
-  const { formatPrice } = useCurrency()
+  const { formatPrice, isB2B } = useCurrency()
   const { currentLanguage, market } = useMarket()
   const tc = useTranslations('common')
   const tp = useTranslations('products')
@@ -149,36 +150,33 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
               {product.stock_status === 'out_of_stock' ? (
                 <span className="text-xl font-bold text-gray-400 uppercase tracking-widest">{tc('outOfStock')}</span>
               ) : pricing?.isDiscounted ? (
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-1">
                   <span className="text-sm text-gray-400 line-through font-normal">{formatPrice(pricing.originalPrice)}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600">{formatPrice(pricing.discountedPrice)}</span>
-                    <span className="text-xs text-gray-400 font-medium ml-1">
-                      {pricing?.appliedSchemaName ? tc('b2bPriceLabel') : tc('retailPriceLabel')}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <PriceWithTooltip
+                      netEur={pricing.discountedPrice}
+                      displayPrice={formatPrice(pricing.discountedPrice)}
+                      className="text-green-600"
+                    />
                     {pricing?.appliedSchemaName && (
                       <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-100">
                         {pricing.appliedSchemaName}
                       </span>
                     )}
-                    {market.key === 'SI' && (
-                      <span className="text-xs text-gray-400 font-medium ml-2">{tc('vatIncluded')}</span>
-                    )}
                   </div>
+                  <span className="text-sm text-gray-400 font-medium">
+                    {tc('b2bPriceLabel')} · {isB2B ? tc('vatExcluded') : tc('vatIncluded')}
+                  </span>
                 </div>
               ) : (
-                <div className="flex flex-col">
-                  <span>
-                    {formatPrice(product.price_eur)}
-                    <span className="text-sm text-gray-400 font-medium ml-2">
-                      {tc('retailPriceLabel')}
-                    </span>
+                <div className="flex flex-col gap-1">
+                  <PriceWithTooltip
+                    netEur={product.price_eur}
+                    displayPrice={formatPrice(product.price_eur)}
+                  />
+                  <span className="text-sm text-gray-400 font-medium">
+                    {tc('retailPriceLabel')} · {isB2B ? tc('vatExcluded') : tc('vatIncluded')}
                   </span>
-                  {market.key === 'SI' && (
-                    <span className="text-sm text-gray-400 font-medium -mt-1">
-                      {tc('vatIncluded')}
-                    </span>
-                  )}
                 </div>
               )}
             </div>

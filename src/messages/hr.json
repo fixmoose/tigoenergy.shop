@@ -18,7 +18,9 @@
     "unitsPerBox": "jedinica po kutiji",
     "vatIncluded": "PDV uključen",
     "retailPriceLabel": "MPC",
-    "b2bPriceLabel": "B2B cijena"
+    "b2bPriceLabel": "B2B cijena",
+    "vatExcluded": "Bez PDV-a",
+    "vatTerm": "PDV"
   },
   "header": {
     "selectCurrency": "Odaberi valutu",

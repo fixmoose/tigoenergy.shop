@@ -15,7 +15,12 @@
     "noImage": "Kein Bild",
     "weight": "Gewicht",
     "packaging": "Verpackung",
-    "unitsPerBox": "Einheiten pro Karton"
+    "unitsPerBox": "Einheiten pro Karton",
+    "vatIncluded": "Inkl. MwSt.",
+    "vatExcluded": "Zzgl. MwSt.",
+    "vatTerm": "MwSt.",
+    "b2bPriceLabel": "B2B-Preis",
+    "retailPriceLabel": "Listenpreis"
   },
   "header": {
     "selectCurrency": "Währung wählen",
