@@ -72,8 +72,9 @@ const DEFAULT_COMPANY_DATA = {
     company_email: 'info@tigoenergy.si',
     company_phone: '+386 1 542 41 80',
     company_iban_be: 'BE55 9052 7486 2944',
-    company_iban_si: 'SI56 0000 0000 0000 000',
-    company_bic: 'LJBASI2X',
+    company_iban_si: 'SI56 6100 0002 8944 371',
+    company_bic_be: 'TRWIBEB1XXX',
+    company_bic_si: 'HDELSI22',
     place_of_issue: 'Podsmreka',
     company_logo: `file://${process.cwd()}/public/initra-logo.png`
 }
