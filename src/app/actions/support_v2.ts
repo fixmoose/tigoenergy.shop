@@ -190,8 +190,8 @@ export async function submitSupportRequestV2(formData: {
                 </div>
             `
 
-            // Send to all admins
-            await Promise.all(admins.map((adminEmail: string) =>
+            // Send to all admins — use allSettled so one failure doesn't block others
+            await Promise.allSettled(admins.map((adminEmail: string) =>
                 sendEmail({
                     to: adminEmail,
                     subject: `${subjectPrefix} - Request #${request.id.slice(0, 8)}`,

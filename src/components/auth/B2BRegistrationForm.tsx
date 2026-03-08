@@ -3,8 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { registerB2BUserAction } from '@/app/actions/auth'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { getMarketKeyFromHostname, getDomainForMarket } from '@/lib/constants/markets'
 import React, { useState, useEffect } from 'react'
@@ -33,7 +33,6 @@ export default function B2BRegistrationForm() {
     const t = useTranslations('auth.register')
     const router = useRouter()
     const searchParams = useSearchParams()
-    const supabase = createClient()
 
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
@@ -261,43 +260,14 @@ export default function B2BRegistrationForm() {
         setError('')
 
         try {
-            const { data, error: authError } = await supabase.auth.signUp({
-                email: formData.email,
-                password: formData.password,
-                options: {
-                    data: {
-                        first_name: formData.firstName,
-                        last_name: formData.lastName,
-                        company_name: formData.companyName,
-                        vat_id: formData.vatNumber,
-                        company_address: formData.address, // Changed from companyAddress
-                        company_address2: formData.companyAddress2,
-                        city: formData.city,
-                        postal_code: formData.postalCode,
-                        country: formData.country,
-                        customer_type: 'b2b',
-                        phone: formData.phone,
-                        commercial_access: formData.commercialAccess,
-                        business_type: formData.businessType,
-                        website: formData.website,
-                        job_title: formData.jobTitle, // Added
-                        newsletter: formData.newsletter, // Added
-                        marketing: formData.marketing // Added
-                    }
-                }
-            })
-
-            if (authError) throw authError
-
-            // If we have a user, also create the profile entry if trigger doesn't exist?
-            // User requested mock to real signUp, usually profile is auto-created.
-
-            setLoading(false)
+            const result = await registerB2BUserAction(formData)
+            if (!result.success) throw new Error(result.error)
             alert(t('messages.registrationSuccess'))
-            router.push('/checkout') // Redirect to checkout or dashboard
+            router.push('/checkout')
         } catch (err: any) {
-            setLoading(false)
             setError(err.message || t('errors.registrationFailed'))
+        } finally {
+            setLoading(false)
         }
     }
 

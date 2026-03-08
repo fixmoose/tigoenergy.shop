@@ -93,7 +93,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     const fetchB2BPrices = async () => {
       setB2BPricesLoading(true)
       const data = await getB2BCustomerPrices(product.id!)
-      setB2BPrices(data)
+      setB2BPrices((data as any).data ?? data)
       setB2BPricesLoading(false)
     }
     fetchB2BPrices()
@@ -101,7 +101,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     // Fetch All B2B Customers
     const fetchB2BCustomers = async () => {
       const data = await getB2BCustomers()
-      setAllB2BCustomers(data)
+      setAllB2BCustomers((data as any).data ?? data)
     }
     fetchB2BCustomers()
   }, [product.id])
@@ -223,7 +223,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     try {
       await setB2BCustomerPrice(selectedCustomerId, product.id, newB2BPrice)
       const updated = await getB2BCustomerPrices(product.id)
-      setB2BPrices(updated)
+      setB2BPrices((updated as any).data ?? updated)
       setSelectedCustomerId('')
       setNewB2BPrice(0)
     } catch (err) {

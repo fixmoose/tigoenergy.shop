@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction } from '@/app/actions/admin'
 
 interface AdminOrderActionsProps {
     orderId: string
@@ -166,6 +166,23 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
         }
     }
 
+    const handleMarkDelivered = async () => {
+        if (!confirm('Mark this order as delivered and notify the customer?')) return
+        setLoading(true)
+        try {
+            const res = await adminMarkDeliveredAction(orderId)
+            if (res.success) {
+                router.refresh()
+            } else {
+                alert(res.error || 'Failed to mark as delivered')
+            }
+        } catch (err: any) {
+            alert('Failed to mark as delivered')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     if (status === 'cancelled') return null
 
     return (
@@ -253,7 +270,7 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                     )}
 
                     {(status === 'shipped' || status === 'delivered' || status === 'completed' || status === 'processing') && (
-                        <div className="pt-2">
+                        <div className="pt-2 space-y-2">
                             <button
                                 onClick={handleIssueInvoice}
                                 disabled={loading}
@@ -261,6 +278,15 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                             >
                                 <span>📄</span> {loading ? 'Wait...' : 'Issue Official Invoice'}
                             </button>
+                            {status === 'shipped' && (
+                                <button
+                                    onClick={handleMarkDelivered}
+                                    disabled={loading}
+                                    className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    <span>✅</span> {loading ? 'Wait...' : 'Mark as Delivered & Notify Customer'}
+                                </button>
+                            )}
                         </div>
                     )}
 

@@ -24,7 +24,7 @@ export default function PricingManager({ initialSchemas, products, categories, s
         setLoading(true)
         try {
             const result = await createPricingSchema(newSchemaName, newSchemaDesc)
-            setSchemas([result, ...schemas])
+            setSchemas([(result as any).data ?? result, ...schemas])
             setIsModalOpen(false)
             setNewSchemaName('')
             setNewSchemaDesc('')
@@ -194,7 +194,7 @@ function RulesTable({ schema, products, categories, subcategories, onUpdate }: {
             const result = await addPricingRule({ ...newRule, schema_id: schema.id })
             onUpdate({
                 ...schema,
-                rules: [...rules, result]
+                rules: [...rules, (result as any).data ?? result]
             })
             setIsAdding(false)
             setNewRule({

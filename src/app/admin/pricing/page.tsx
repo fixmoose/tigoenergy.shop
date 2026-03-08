@@ -24,7 +24,7 @@ export default async function AdminPricingPage() {
     return (
         <div className="p-6">
             <PricingManager
-                initialSchemas={schemas}
+                initialSchemas={(schemas as any).data ?? schemas}
                 products={products || []}
                 categories={categories}
                 subcategories={subcategories}

@@ -18,6 +18,7 @@ export interface DocumentData {
     items_table: string
     // Invoice specific
     invoice_number?: string
+    storno_number?: string
     invoice_date?: string
     due_date?: string
     dispatch_date?: string

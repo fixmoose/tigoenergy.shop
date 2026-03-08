@@ -143,6 +143,93 @@ export async function adminCreateCustomerAction(formData: any) {
 }
 
 /**
+ * Admin verifies B2B customer (marks as VIES-verified and notifies them)
+ */
+export async function adminVerifyB2BCustomerAction(customerId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        const { data: customer, error: fetchError } = await supabase
+            .from('customers')
+            .select('email, first_name, last_name, company_name, preferred_language')
+            .eq('id', customerId)
+            .single()
+
+        if (fetchError || !customer) throw new Error('Customer not found')
+
+        await supabase.from('customers').update({ is_b2b: true, account_status: 'active' }).eq('id', customerId)
+        await supabase.auth.admin.updateUserById(customerId, {
+            user_metadata: { customer_type: 'b2b', b2b_verified: true }
+        })
+
+        const locale = customer.preferred_language || 'en'
+        const html = await renderTemplate('b2b-vies-verified', {}, locale)
+        const subjectMap: Record<string, string> = {
+            sl: 'Vaš B2B račun je potrjen — Tigo Energy SHOP',
+            de: 'Ihr B2B-Konto wurde verifiziert — Tigo Energy SHOP',
+            it: 'Il tuo account B2B è stato verificato — Tigo Energy SHOP',
+            fr: 'Votre compte B2B a été vérifié — Tigo Energy SHOP',
+        }
+        const subject = subjectMap[locale] || 'Your B2B Account is Verified — Tigo Energy SHOP'
+        await sendEmail({ to: customer.email, subject, html, skipUnsubscribe: true })
+
+        revalidatePath(`/admin/customers/${customerId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminVerifyB2BCustomerAction:', err)
+        return { success: false, error: err.message }
+    }
+}
+
+/**
+ * Admin marks order as delivered and notifies the customer
+ */
+export async function adminMarkDeliveredAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        const { data: order, error } = await supabase
+            .from('orders')
+            .update({ status: 'delivered', delivered_at: new Date().toISOString() })
+            .eq('id', orderId)
+            .select('*, order_items(*)')
+            .single()
+
+        if (error || !order) throw new Error('Order not found')
+
+        const locale = order.language || 'en'
+        const customerName = (order.shipping_address as any)?.first_name || order.customer_email
+
+        try {
+            const html = await renderTemplate('delivered', {
+                name: customerName,
+                order_number: String(order.order_number),
+            }, locale)
+            const subjectMap: Record<string, string> = {
+                sl: `Vaše naročilo #${order.order_number} je dostavljeno`,
+                de: `Ihre Bestellung #${order.order_number} wurde geliefert`,
+                it: `Il tuo ordine #${order.order_number} è stato consegnato`,
+                fr: `Votre commande #${order.order_number} a été livrée`,
+            }
+            const subject = subjectMap[locale] || `Your Order #${order.order_number} Has Been Delivered`
+            await sendEmail({ to: order.customer_email, subject, html, skipUnsubscribe: true })
+        } catch (emailErr) {
+            console.error('Failed to send delivered email:', emailErr)
+        }
+
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminMarkDeliveredAction:', err)
+        return { success: false, error: err.message }
+    }
+}
+
+/**
  * Admin updates customer info
  */
 export async function adminUpdateCustomerAction(id: string, updates: any) {
@@ -223,7 +310,7 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         // Find customer by ID or Email
         const { data: customer, error: fetchError } = await supabase
             .from('customers')
-            .select('id, email')
+            .select('id, email, preferred_language')
             .or(`id.eq."${identifier}",email.eq."${identifier}"`)
             .maybeSingle()
 
@@ -240,13 +327,20 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
 
         if (linkError) throw linkError
 
+        const locale = customer.preferred_language || 'en'
         const html = await renderTemplate('password-reset', {
             reset_link: linkData.properties.action_link
-        }, 'en')
+        }, locale)
 
+        const subjectMap: Record<string, string> = {
+            sl: 'Zahteva za ponastavitev gesla',
+            de: 'Anforderung zum Zurücksetzen des Passworts',
+            it: 'Richiesta di reimpostazione della password',
+            fr: 'Demande de réinitialisation du mot de passe',
+        }
         await sendEmail({
             to: customer.email,
-            subject: 'Password Reset Request',
+            subject: subjectMap[locale] || 'Password Reset Request',
             html
         })
 
@@ -601,6 +695,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
     };
     order: {
         market: string;
+        language?: string;
         shipping_cost: number;
         vat_rate: number;
         items: any[];
@@ -679,14 +774,21 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 });
 
                 if (linkData?.properties?.action_link) {
+                    const setupLocale = order.language || 'en';
                     const welcomeHtml = await renderTemplate('admin-account-setup', {
                         name: `${customer.first_name} ${customer.last_name}`,
                         setup_link: linkData.properties.action_link
-                    }, 'en');
+                    }, setupLocale);
 
+                    const setupSubjectMap: Record<string, string> = {
+                        sl: 'Aktivirajte svoj račun Tigo Energy SHOP',
+                        de: 'Aktivieren Sie Ihr Tigo Energy SHOP-Konto',
+                        it: 'Attiva il tuo account Tigo Energy SHOP',
+                        fr: 'Activez votre compte Tigo Energy SHOP',
+                    };
                     await sendEmail({
                         to: customer.email,
-                        subject: 'Activate Your Tigo Energy SHOP Account',
+                        subject: setupSubjectMap[setupLocale] || 'Activate Your Tigo Energy SHOP Account',
                         html: welcomeHtml
                     });
                 }
@@ -774,17 +876,24 @@ export async function adminCreateOrderWithCustomerAction(payload: {
             const { generateItemsTableHtml } = await import('@/lib/document-service');
             const itemsHtml = generateItemsTableHtml(itemsWithOrderId, '€', true);
 
+            const ibanLocale = order.language || 'en';
             const ibanHtml = await renderTemplate('order-iban-payment', {
                 name: `${customer.first_name} ${customer.last_name}`,
                 order_number: orderNumber,
                 order_date: new Date().toLocaleDateString('en-GB'),
                 total_amount: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(total),
                 order_items: itemsHtml
-            }, 'en');
+            }, ibanLocale);
 
+            const ibanSubjectMap: Record<string, string> = {
+                sl: `Naročilo #${orderNumber} — plačilo potrebno`,
+                de: `Bestellung #${orderNumber} Bestätigung — Zahlung erforderlich`,
+                it: `Ordine #${orderNumber} Conferma — Pagamento richiesto`,
+                fr: `Commande #${orderNumber} Confirmation — Paiement requis`,
+            };
             await sendEmail({
                 to: customer.email,
-                subject: `Order #${orderNumber} Confirmation - Payment Required`,
+                subject: ibanSubjectMap[ibanLocale] || `Order #${orderNumber} Confirmation - Payment Required`,
                 html: ibanHtml
             });
         } catch (emailErr) {

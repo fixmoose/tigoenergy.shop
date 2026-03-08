@@ -6,7 +6,7 @@ export default async function AdminSuppliersPage() {
 
     return (
         <div className="p-6">
-            <SupplierList suppliers={suppliers} />
+            <SupplierList suppliers={(suppliers as any).data ?? suppliers} />
         </div>
     )
 }

@@ -6,6 +6,7 @@ import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignm
 import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
 import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
+import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -63,6 +64,13 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <p className="text-sm font-medium text-gray-500 mt-1">{customer.email}</p>
           </div>
           <div className="flex gap-3">
+            {customer.is_b2b && !customer.user_metadata?.b2b_verified && (
+              <form action={async () => { 'use server'; await adminVerifyB2BCustomerAction(id) }}>
+                <button type="submit" className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">
+                  Verify B2B & Notify
+                </button>
+              </form>
+            )}
             <Link href="/admin/customers" className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm">
               Back to List
             </Link>
@@ -155,7 +163,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             {/* Pricing Assignment Section */}
             <CustomerPricingAssignment
               customerId={id}
-              allSchemas={allSchemas}
+              allSchemas={(allSchemas as any).data ?? allSchemas}
               currentSchemas={currentSchemas as any}
             />
 
