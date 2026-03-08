@@ -13,12 +13,21 @@ interface ProductSnippet {
 
 export default function SharedCartCreator() {
     const [loading, setLoading] = useState(false)
-    const [items, setItems] = useState<{ product_id: string, product_name: string, sku: string, quantity: number, unit_price: number }[]>([])
+    const [items, setItems] = useState<{
+        product_id: string,
+        product_name: string,
+        sku: string,
+        quantity: number,
+        unit_price: number,
+        price_eur: number,
+        b2b_price_eur?: number | null
+    }[]>([])
 
     // Product Search
     const [productSearch, setProductSearch] = useState('')
     const [productResults, setProductResults] = useState<ProductSnippet[]>([])
     const [sharedLink, setSharedLink] = useState<string | null>(null)
+    const [isB2b, setIsB2b] = useState(false)
 
     useEffect(() => {
         if (productSearch.length > 2) {
@@ -35,12 +44,15 @@ export default function SharedCartCreator() {
     }, [productSearch])
 
     const addItem = (p: ProductSnippet) => {
+        const price = isB2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur
         setItems([...items, {
             product_id: p.id,
             product_name: p.name_en,
             sku: p.sku,
             quantity: 1,
-            unit_price: p.price_eur || 0
+            unit_price: price || 0,
+            price_eur: p.price_eur,
+            b2b_price_eur: p.b2b_price_eur
         }])
         setProductSearch('')
         setProductResults([])
@@ -56,6 +68,15 @@ export default function SharedCartCreator() {
         setItems(newItems)
     }
 
+    const toggleB2b = (val: boolean) => {
+        setIsB2b(val)
+        const updated = items.map(item => {
+            const price = val && item.b2b_price_eur ? item.b2b_price_eur : item.price_eur
+            return { ...item, unit_price: price || 0 }
+        })
+        setItems(updated)
+    }
+
     const generateLink = async () => {
         if (items.length === 0) return
         setLoading(true)
@@ -64,7 +85,7 @@ export default function SharedCartCreator() {
             const res = await fetch('/api/admin/shared-carts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items })
+                body: JSON.stringify({ items, is_b2b: isB2b })
             })
             const data = await res.json()
             if (data.success) {
@@ -97,40 +118,60 @@ export default function SharedCartCreator() {
 
             <div className="p-8 space-y-8">
                 {/* Search */}
-                <div className="relative">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Search Products</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="SKU or Product Name..."
-                            value={productSearch}
-                            onChange={(e) => setProductSearch(e.target.value)}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all pr-12"
-                        />
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Search Products</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="SKU or Product Name..."
+                                value={productSearch}
+                                onChange={(e) => setProductSearch(e.target.value)}
+                                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all pr-12"
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </div>
                         </div>
+
+                        {productResults.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                                {productResults.map(p => (
+                                    <button
+                                        key={p.id}
+                                        onClick={() => addItem(p)}
+                                        className="w-full text-left p-4 hover:bg-slate-50 flex items-center justify-between border-b last:border-0 border-slate-50 group transition-colors"
+                                    >
+                                        <div>
+                                            <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{p.name_en}</div>
+                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{p.sku}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="font-black text-slate-900">€{(isB2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur).toFixed(2)}</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {productResults.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
-                            {productResults.map(p => (
-                                <button
-                                    key={p.id}
-                                    onClick={() => addItem(p)}
-                                    className="w-full text-left p-4 hover:bg-slate-50 flex items-center justify-between border-b last:border-0 border-slate-50 group transition-colors"
-                                >
-                                    <div>
-                                        <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{p.name_en}</div>
-                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{p.sku}</div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="font-black text-slate-900">€{p.price_eur.toFixed(2)}</div>
-                                    </div>
-                                </button>
-                            ))}
+                    <div className="flex flex-col justify-end">
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-widest">Pricing Mode</label>
+                        <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 w-fit">
+                            <button
+                                onClick={() => toggleB2b(false)}
+                                className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${!isB2b ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                B2C
+                            </button>
+                            <button
+                                onClick={() => toggleB2b(true)}
+                                className={`px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${isB2b ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                            >
+                                B2B
+                            </button>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Items Table */}

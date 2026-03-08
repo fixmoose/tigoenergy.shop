@@ -121,7 +121,8 @@
     "b2bPricing": "B2B Pricing:",
     "b2bPricingDesc": "Prices shown exclude VAT. VAT will be calculated at checkout based on your business location and VAT ID.",
     "priceIncludesVat": "Price includes VAT:",
-    "priceIncludesVatDesc": "All prices shown include {rate}% VAT. Shipping costs will be added at checkout."
+    "priceIncludesVatDesc": "All prices shown include {rate}% VAT. Shipping costs will be added at checkout.",
+    "b2bOnlyNotice": "Prices for B2B only, must register or login as B2B in order to continue with this order."
   },
   "checkout": {
     "secureCheckout": "Secure Checkout",

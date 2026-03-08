@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
         if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
 
-        const { items } = await request.json()
+        const { items, is_b2b = false } = await request.json()
         if (!items || !Array.isArray(items)) {
             return NextResponse.json({ error: 'Invalid items' }, { status: 400 })
         }
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
             .from('carts')
             .insert({
                 items,
+                is_b2b,
                 // We don't attach a user_id yet, the link recipient will "claim" it
             })
             .select('id')

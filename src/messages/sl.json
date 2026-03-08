@@ -122,7 +122,8 @@
     "b2bPricing": "B2B cene:",
     "b2bPricingDesc": "Prikazane cene so brez DDV. DDV bo izračunan na blagajni glede na vašo lokacij in ID za DDV.",
     "priceIncludesVat": "Cena z DDV:",
-    "priceIncludesVatDesc": "Vse prikazane cene vključujejo {rate}% DDV. Stroški dostave bodo dodani na blagajni."
+    "priceIncludesVatDesc": "Vse prikazane cene vključujejo {rate}% DDV. Stroški dostave bodo dodani na blagajni.",
+    "b2bOnlyNotice": "Cene veljajo samo za B2B. Za nadaljevanje se morate registrirati ali prijaviti kot B2B podjetje."
   },
   "checkout": {
     "secureCheckout": "Varna blagajna",

@@ -118,7 +118,8 @@
     "b2bPricing": "B2B-Preise:",
     "b2bPricingDesc": "Angezeigte Preise verstehen sich ohne MwSt. Die MwSt. wird an der Kasse basierend auf Ihrem Standort und Ihrer USt-IdNr. berechnet.",
     "priceIncludesVat": "Preis inkl. MwSt.:",
-    "priceIncludesVatDesc": "Alle angezeigten Preise enthalten {rate}% MwSt. Versandkosten werden an der Kasse hinzugefuegt."
+    "priceIncludesVatDesc": "Alle angezeigten Preise enthalten {rate}% MwSt. Versandkosten werden an der Kasse hinzugefuegt.",
+    "b2bOnlyNotice": "Preise nur für B2B. Sie müssen sich als B2B-Kunde registrieren oder anmelden, um fortzufahren."
   },
   "checkout": {
     "secureCheckout": "Sichere Kasse",

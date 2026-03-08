@@ -9,11 +9,13 @@ type CartItem = DBCartItem
 interface CartState {
   items: CartItem[]
   cartId?: string | null
+  isB2B?: boolean
 }
 
 interface CartContextValue {
   items: CartItem[]
   cartId?: string | null
+  isB2B: boolean
   count: number
   subtotal: number
   addItem: (item: CartItem) => Promise<void>
@@ -37,7 +39,7 @@ export function useCart() {
 const LOCAL_KEY = 'cart_local_v1'
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<CartState>({ items: [], cartId: null })
+  const [state, setState] = useState<CartState>({ items: [], cartId: null, isB2B: false })
   const [open, setOpen] = useState(false)
 
   const [showRestorePrompt, setShowRestorePrompt] = useState(false)
@@ -89,16 +91,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const serverCart: DBCart | null = await fetchServerCart()
         if (!mounted) return
         if (serverCart) {
-          setState({ items: serverCart.items ?? [], cartId: serverCart.id })
+          setState({ items: serverCart.items ?? [], cartId: serverCart.id, isB2B: serverCart.is_b2b || false })
         } else {
           // If no server cart, check if we have local storage (but only if user is logged in)
           const supabase = createClient()
           const { data: { user } } = await supabase.auth.getUser()
           if (user) {
             const local = loadLocal()
-            setState({ items: local, cartId: null })
+            setState({ items: local, cartId: null, isB2B: false })
           } else {
-            setState({ items: [], cartId: null })
+            setState({ items: [], cartId: null, isB2B: false })
           }
         }
       })()
@@ -115,7 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const serverCart = await fetchServerCart()
         if (serverCart && (serverCart.items?.length || 0) > 0) {
           // Items exist in server cart from last time
-          setState({ items: serverCart.items ?? [], cartId: serverCart.id })
+          setState({ items: serverCart.items ?? [], cartId: serverCart.id, isB2B: serverCart.is_b2b || false })
           setShowRestorePrompt(true)
         } else {
           // Fresh login or empty server cart
@@ -146,7 +148,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
       } else if (event === 'SIGNED_OUT') {
         // Clear all state and local storage on logout
-        setState({ items: [], cartId: null })
+        setState({ items: [], cartId: null, isB2B: false })
         localStorage.removeItem(LOCAL_KEY)
       }
     })
@@ -170,7 +172,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item }) })
       const payload = await res.json()
       if (res.ok && payload?.cart) {
-        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id })
+        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id, isB2B: payload.cart.is_b2b || false })
         savePersistent(payload.cart.items ?? [])
       } else {
         // Revert optimistic update on failure
@@ -189,7 +191,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'update', productIdOrSku, updates: { quantity: qty } }) })
       const payload = await res.json()
       if (res.ok && payload?.cart) {
-        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id })
+        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id, isB2B: payload.cart.is_b2b || false })
         savePersistent(payload.cart.items ?? [])
         return
       }
@@ -208,7 +210,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/cart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'remove', productIdOrSku }) })
       const payload = await res.json()
       if (res.ok && payload?.cart) {
-        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id })
+        setState({ items: payload.cart.items ?? [], cartId: payload.cart.id, isB2B: payload.cart.is_b2b || false })
         savePersistent(payload.cart.items ?? [])
         return
       }
@@ -228,17 +230,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'clear' }),
       })
-      setState({ items: [], cartId: state.cartId })
+      setState({ items: [], cartId: state.cartId, isB2B: state.isB2B })
       savePersistent([])
     } catch (e) {
-      setState({ items: [], cartId: state.cartId })
+      setState({ items: [], cartId: state.cartId, isB2B: state.isB2B })
       savePersistent([])
     }
   }
 
   async function refresh() {
     const serverCart = await fetchServerCart()
-    if (serverCart) setState({ items: serverCart.items ?? [], cartId: serverCart.id })
+    if (serverCart) setState({ items: serverCart.items ?? [], cartId: serverCart.id, isB2B: serverCart.is_b2b || false })
   }
 
   const { count, subtotal } = compute(state.items)
@@ -246,6 +248,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value: CartContextValue = {
     items: state.items,
     cartId: state.cartId,
+    isB2B: state.isB2B || false,
     count,
     subtotal,
     addItem,

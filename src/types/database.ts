@@ -268,6 +268,7 @@ export interface Cart {
   id: string
   user_id?: string | null
   items: CartItem[]
+  is_b2b?: boolean
   updated_at?: string | null
   created_at?: string | null
 }

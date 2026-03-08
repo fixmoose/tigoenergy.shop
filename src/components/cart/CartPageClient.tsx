@@ -58,6 +58,24 @@ export default function CartPageClient() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Left: Items */}
         <div className="lg:col-span-2">
+          {/* B2B Notice */}
+          {useCart().isB2B && !isB2B && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8 flex items-start gap-4">
+              <div className="text-2xl pt-0.5">⚠️</div>
+              <div className="flex-1">
+                <h3 className="font-bold text-amber-900 mb-1">{t('b2bOnlyNotice')}</h3>
+                <div className="flex gap-4 mt-3">
+                  <Link href="/auth/login?redirect=/cart" className="text-sm bg-amber-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-amber-800 transition-colors">
+                    {tc('signIn')}
+                  </Link>
+                  <Link href="/auth/register?type=b2b" className="text-sm border border-amber-900 text-amber-900 px-4 py-2 rounded-lg font-bold hover:bg-amber-50 transition-colors">
+                    {tc('createB2BAccount')}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           {items.length === 0 ? (
             <div className="bg-gray-50 rounded-lg p-12 text-center border border-gray-100">
               <div className="text-6xl mb-4">🛒</div>
