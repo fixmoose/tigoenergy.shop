@@ -273,7 +273,6 @@ export default function Header() {
               <div className="flex flex-col leading-tight">
                 <span className="text-green-100 text-xs font-medium tracking-wider">TIGO AUTHORIZED</span>
                 <span className="text-green-100 text-xs font-medium tracking-wider">DIRECT ONLINE SHOP</span>
-                <span className="bg-orange-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm mt-1 w-fit uppercase tracking-tighter shadow-sm">BETA eStore</span>
               </div>
             </Link>
 
@@ -357,12 +356,7 @@ export default function Header() {
               {/* Account / Sign In */}
               {/* Account Dropdown */}
               <div className="flex flex-col items-center group relative cursor-pointer">
-                {/* prominent BETA Badge */}
-                <div className="absolute -top-3 -right-6 pointer-events-none z-10">
-                  <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border-2 border-green-600 transform rotate-12 scale-125 inline-block">
-                    BETA
-                  </span>
-                </div>
+
                 <Link href={mounted && user ? (isAdmin || user.email?.endsWith('@tigoenergy.com') ? "/admin/products" : "/dashboard") : "/auth/login"} className="flex flex-col items-center">
                   {mounted && user && !isAdmin ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-50 group-hover:border-white transition shadow-sm">
@@ -622,7 +616,7 @@ export default function Header() {
               <div className="p-5 bg-green-600 text-white flex justify-between items-center shadow-md border-b border-green-700">
                 <div className="flex flex-col">
                   <span className="font-bold text-xl">{t('menu')}</span>
-                  <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded mt-1 w-fit uppercase">BETA eStore</span>
+                  <span className="text-green-200 text-[10px] font-medium mt-1 w-fit uppercase tracking-wider">eStore</span>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-1 hover:bg-green-700 rounded-full transition">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>

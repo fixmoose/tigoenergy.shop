@@ -150,7 +150,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         // 5. Create Order
         const orderPayload = {
-            order_number: `ORD-${Date.now()}`, // Simple ID generation
+            order_number: `ETRG-ORD-${Date.now()}`,
             customer_id: customerId,
             customer_email: email,
             customer_phone: rawData.shipping_phone,

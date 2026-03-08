@@ -423,7 +423,7 @@ export async function adminCreateFullOrderAction(orderPayload: any, items: any[]
             .from('orders')
             .insert({
                 ...orderPayload,
-                order_number: orderPayload.order_number || `MAN-${Date.now()}`,
+                order_number: orderPayload.order_number || `ETRG-MAN-${Date.now()}`,
                 status: orderPayload.status || 'pending',
                 created_at: orderPayload.created_at || new Date().toISOString()
             })
@@ -535,7 +535,7 @@ export async function adminApproveReturnAction(returnId: string) {
     if (updateError) throw updateError
 
     // 3. Prepare Storno Metadata
-    const stornoNumber = `STORNO-${order.invoice_number}`
+    const stornoNumber = `ETRG-STORNO-${order.invoice_number}`
 
     // In a real system, we might save this to a 'storno_invoices' table or update the order
     // But per instructions, we just need the template and logic to be ready.
@@ -943,7 +943,7 @@ export async function issueOrderInvoiceAction(orderId: string) {
             .gte('invoice_created_at', `${year}-01-01`);
 
         const nextNumber = (count || 0) + 1;
-        const invoiceNumber = `INV-${year}-${nextNumber.toString().padStart(4, '0')}`;
+        const invoiceNumber = `ETRG-INV-${year}-${nextNumber.toString().padStart(4, '0')}`;
 
         // 3. Update Order
         const { error: updateError } = await supabase

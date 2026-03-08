@@ -50,7 +50,7 @@ export async function GET(
             return `${addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
         }
 
-        const originalInvoiceNumber = order.invoice_number || `INV-${order.order_number}`
+        const originalInvoiceNumber = order.invoice_number || `ETRG-INV-${order.order_number}`
 
         const documentData: DocumentData = {
             order_number: order.order_number,
@@ -68,7 +68,7 @@ export async function GET(
             payment_method: order.payment_method || 'Bank Transfer',
             items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
             invoice_number: originalInvoiceNumber,
-            storno_number: `STORNO-${originalInvoiceNumber}`,
+            storno_number: `ETRG-STORNO-${originalInvoiceNumber}`,
             invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString() : new Date().toLocaleDateString(),
             due_date: 'N/A'
         }

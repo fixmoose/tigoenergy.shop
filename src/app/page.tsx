@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { getProducts } from '@/lib/db/products'
 import ProductCard from '@/components/products/ProductCard'
-import BetaNotification from '@/components/BetaNotification'
 import { PRODUCT_CATEGORIES } from '@/lib/constants/categories'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
@@ -282,7 +281,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <BetaNotification />
     </>
   )
 }

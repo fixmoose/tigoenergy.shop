@@ -66,7 +66,7 @@ export async function GET(
             total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
             payment_method: order.payment_method || 'Bank Transfer',
             items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
-            invoice_number: order.invoice_number || `INV-${order.order_number}`,
+            invoice_number: order.invoice_number || `ETRG-INV-${order.order_number}`,
             invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString() : new Date().toLocaleDateString(),
             due_date: order.invoice_created_at
                 ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
