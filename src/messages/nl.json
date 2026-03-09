@@ -562,5 +562,29 @@
       "expireNote": "Reset-links verlopen na 1 uur of kunnen slechts één keer worden gebruikt. Vraag een nieuwe link aan.",
       "pwdPlaceholder": "Min. 6 tekens"
     }
+  },
+  "cookieConsent": {
+    "title": "Wij gebruiken cookies",
+    "description": "Wij gebruiken essentiële cookies om onze shop te laten werken. Met uw toestemming kunnen wij ook analyse- en marketingcookies gebruiken. Lees ons",
+    "cookiePolicy": "Cookiebeleid",
+    "and": "en",
+    "privacyPolicy": "Privacybeleid",
+    "essentialTitle": "Essentiële cookies",
+    "essentialDesc": "Vereist voor het functioneren van de winkel: sessie, winkelwagen, taalvoorkeur. Kan niet worden uitgeschakeld.",
+    "alwaysOn": "Altijd actief",
+    "analyticsTitle": "Analytische cookies",
+    "analyticsDesc": "Helpen ons begrijpen hoe bezoekers de site gebruiken zodat we deze kunnen verbeteren.",
+    "marketingTitle": "Marketingcookies",
+    "marketingDesc": "Stellen ons in staat relevante advertenties te tonen en campagne-effectiviteit te meten.",
+    "acceptAll": "Alles accepteren",
+    "essentialOnly": "Alleen essentieel",
+    "savePreferences": "Voorkeuren opslaan",
+    "managePreferences": "Voorkeuren beheren",
+    "hidePreferences": "Voorkeuren verbergen"
+  },
+  "gdpr": {
+    "title": "Uw gegevensrechten (AVG)",
+    "description": "Op grond van de AVG heeft u het recht om uw persoonsgegevens te allen tijde in te zien, te exporteren en te verwijderen.",
+    "downloadData": "Mijn gegevens downloaden (JSON)"
   }
 }

@@ -562,5 +562,29 @@
       "expireNote": "Odkazy na obnovenie vypršia po 1 hodine alebo sa dajú použiť iba raz. Vyžiadajte si prosím nový odkaz.",
       "pwdPlaceholder": "Min. 6 znakov"
     }
+  },
+  "cookieConsent": {
+    "title": "Používame súbory cookie",
+    "description": "Používame nevyhnutné súbory cookie na prevádzku obchodu. S vaším súhlasom môžeme tiež používať analytické a marketingové cookies. Prečítajte si naše",
+    "cookiePolicy": "Zásady cookies",
+    "and": "a",
+    "privacyPolicy": "Zásady ochrany osobných údajov",
+    "essentialTitle": "Nevyhnutné cookies",
+    "essentialDesc": "Potrebné pre fungovanie obchodu: relácia, košík, jazykové predvoľby. Nedá sa vypnúť.",
+    "alwaysOn": "Vždy zapnuté",
+    "analyticsTitle": "Analytické cookies",
+    "analyticsDesc": "Pomáhajú nám pochopiť, ako návštevníci používajú web, aby sme ho mohli zlepšiť.",
+    "marketingTitle": "Marketingové cookies",
+    "marketingDesc": "Umožňujú nám zobrazovať relevantné reklamy a merať efektivitu kampaní.",
+    "acceptAll": "Prijať všetko",
+    "essentialOnly": "Len nevyhnutné",
+    "savePreferences": "Uložiť predvoľby",
+    "managePreferences": "Spravovať predvoľby",
+    "hidePreferences": "Skryť predvoľby"
+  },
+  "gdpr": {
+    "title": "Vaše práva na údaje (GDPR)",
+    "description": "Podľa GDPR máte právo kedykoľvek pristupovať k svojim osobným údajom, exportovať ich a mazať.",
+    "downloadData": "Stiahnuť moje údaje (JSON)"
   }
 }

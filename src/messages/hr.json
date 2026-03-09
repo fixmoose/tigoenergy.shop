@@ -563,5 +563,29 @@
       "title": "Podrška za online trgovinu",
       "intro": "Dobijte pomoć oko narudžbi, dostavi i računa putem Shop Messengera"
     }
+  },
+  "cookieConsent": {
+    "title": "Koristimo kolačiće",
+    "description": "Koristimo neophodne kolačiće za rad trgovine. Uz vaš pristanak, možemo koristiti i analitičke i marketinške kolačiće. Pročitajte naše",
+    "cookiePolicy": "Pravila o kolačićima",
+    "and": "i",
+    "privacyPolicy": "Pravila privatnosti",
+    "essentialTitle": "Neophodni kolačići",
+    "essentialDesc": "Potrebni za rad trgovine: sesija, košarica, jezična preferencija. Ne mogu se onemogućiti.",
+    "alwaysOn": "Uvijek uključeno",
+    "analyticsTitle": "Analitički kolačići",
+    "analyticsDesc": "Pomažu nam razumjeti kako posjetitelji koriste stranicu kako bismo je poboljšali.",
+    "marketingTitle": "Marketinški kolačići",
+    "marketingDesc": "Omogućuju nam prikazivanje relevantnih oglasa i mjerenje učinkovitosti kampanja.",
+    "acceptAll": "Prihvati sve",
+    "essentialOnly": "Samo neophodni",
+    "savePreferences": "Spremi postavke",
+    "managePreferences": "Upravljaj postavkama",
+    "hidePreferences": "Sakrij postavke"
+  },
+  "gdpr": {
+    "title": "Vaša prava na podatke (GDPR)",
+    "description": "Prema GDPR-u imate pravo pristupiti, izvesti i izbrisati svoje osobne podatke u bilo kojem trenutku.",
+    "downloadData": "Preuzmi moje podatke (JSON)"
   }
 }

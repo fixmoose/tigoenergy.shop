@@ -65,7 +65,12 @@ export default function LoginForm() {
                     <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                     <input
                         id="login-email"
-                        // ... (lines 67-73)
+                        type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        autoComplete="email"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="john@example.com"
                     />
                 </div>
@@ -77,7 +82,12 @@ export default function LoginForm() {
                     </div>
                     <input
                         id="login-pwd"
-                        // ... (lines 86-92)
+                        type="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                        autoComplete="current-password"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="••••••••"
                     />
                 </div>

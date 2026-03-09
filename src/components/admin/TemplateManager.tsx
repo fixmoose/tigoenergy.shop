@@ -432,9 +432,20 @@ const IframePreview = ({ html }: { html: string }) => {
     const ref = useRef<HTMLIFrameElement>(null)
     useEffect(() => {
         const doc = ref.current?.contentDocument
-        if (doc) { doc.open(); doc.write(applyPreview(html)); doc.close() }
+        if (!doc) return
+        doc.open()
+        doc.write(applyPreview(html))
+        doc.close()
+        // Resize iframe to match rendered document height
+        const resize = () => {
+            if (ref.current && doc.documentElement) {
+                const h = doc.documentElement.scrollHeight || doc.body?.scrollHeight || 900
+                ref.current.style.height = Math.max(h, 900) + 'px'
+            }
+        }
+        setTimeout(resize, 80)
     }, [html])
-    return <iframe ref={ref} className="w-full h-full border-0 bg-white" title="Preview" />
+    return <iframe ref={ref} className="w-full border-0 bg-white block" style={{ minHeight: 900 }} title="Preview" />
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -447,6 +458,7 @@ export default function TemplateManager() {
     const [saving, setSaving] = useState(false)
     const [view, setView] = useState<'edit' | 'preview'>('edit')
     const [translating, setTranslating] = useState(false)
+    const [syncing, setSyncing] = useState(false)
     const supabase = createClient()
 
     useEffect(() => { fetchTemplates() }, [])
@@ -519,6 +531,22 @@ export default function TemplateManager() {
         setTranslating(false)
     }
 
+    async function handleSyncToAll() {
+        if (!editing?.id || editing.language !== 'en') {
+            alert('Sync must be initiated from an English (master) template.')
+            return
+        }
+        if (!confirm('This will overwrite all saved language variants with the current English structure (re-translated). Continue?')) return
+        setSyncing(true)
+        try {
+            const { syncTemplateToAllLanguagesAction } = await import('@/app/actions/admin')
+            const result = await syncTemplateToAllLanguagesAction(editing.id)
+            await fetchTemplates()
+            alert(`Synced to ${result.synced.length} language(s): ${result.synced.join(', ')}`)
+        } catch (e: any) { alert('Sync failed: ' + e.message) }
+        setSyncing(false)
+    }
+
     const templateExists = !!(templates.find(t => t.type === selectedType && t.language === language))
 
     return (
@@ -555,27 +583,38 @@ export default function TemplateManager() {
                                 Apply Professional Default
                             </button>
                             {language === 'en' && editing.id && (
-                                <div className="relative group">
+                                <>
+                                    <div className="relative group">
+                                        <button
+                                            disabled={translating}
+                                            className="text-xs px-3 py-1.5 border border-purple-200 rounded font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 disabled:opacity-50"
+                                        >
+                                            {translating ? 'Translating…' : 'Create Variant ▾'}
+                                        </button>
+                                        {!translating && (
+                                            <div className="absolute right-0 top-full mt-1 bg-white border rounded shadow-lg z-50 hidden group-hover:block min-w-[160px]">
+                                                <div className="px-3 py-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-widest border-b">Translate & save as</div>
+                                                {LANGUAGES.filter(l => l.value !== 'en').map(l => (
+                                                    <button
+                                                        key={l.value}
+                                                        onClick={() => handleTranslate(l.value)}
+                                                        className="block w-full text-left px-4 py-2 text-xs hover:bg-gray-50"
+                                                    >
+                                                        {l.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <button
-                                        disabled={translating}
-                                        className="text-xs px-3 py-1.5 border border-purple-200 rounded font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 disabled:opacity-50"
+                                        onClick={handleSyncToAll}
+                                        disabled={syncing}
+                                        className="text-xs px-3 py-1.5 border border-green-200 rounded font-medium text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-50"
+                                        title="Re-translate this master template to all saved language variants"
                                     >
-                                        {translating ? 'Translating…' : 'Auto-Translate ▾'}
+                                        {syncing ? 'Syncing…' : 'Sync to All Languages'}
                                     </button>
-                                    {!translating && (
-                                        <div className="absolute right-0 top-full mt-1 bg-white border rounded shadow-lg z-50 hidden group-hover:block">
-                                            {LANGUAGES.filter(l => l.value !== 'en').map(l => (
-                                                <button
-                                                    key={l.value}
-                                                    onClick={() => handleTranslate(l.value)}
-                                                    className="block w-full text-left px-4 py-2 text-xs hover:bg-gray-50"
-                                                >
-                                                    {l.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                                </>
                             )}
                             <button
                                 onClick={handleSave}
@@ -672,7 +711,7 @@ export default function TemplateManager() {
                                 onChange={html => setEditing({ ...editing, content_html: html })}
                             />
                         ) : (
-                            <div className="flex-1 bg-white border rounded shadow-inner overflow-hidden">
+                            <div className="flex-1 bg-white border rounded shadow-inner overflow-y-auto">
                                 <IframePreview html={editing.content_html} />
                             </div>
                         )}

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 type ConsentState = {
     essential: true
@@ -30,6 +31,7 @@ function writeConsent(consent: ConsentState) {
 }
 
 export default function CookieConsent() {
+    const t = useTranslations('cookieConsent')
     const [visible, setVisible] = useState(false)
     const [expanded, setExpanded] = useState(false)
     const [prefs, setPrefs] = useState({ analytics: false, marketing: false })
@@ -52,13 +54,12 @@ export default function CookieConsent() {
                 <div className="p-5 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-gray-900 mb-1">We use cookies</p>
+                            <p className="text-sm font-bold text-gray-900 mb-1">{t('title')}</p>
                             <p className="text-xs text-gray-500 leading-relaxed">
-                                We use essential cookies to make our shop work. With your consent, we may also use analytics and marketing cookies.
-                                Read our{' '}
-                                <Link href="/cookies" className="underline hover:text-gray-700">Cookie Policy</Link>
-                                {' '}and{' '}
-                                <Link href="/privacy" className="underline hover:text-gray-700">Privacy Policy</Link>.
+                                {t('description')}{' '}
+                                <Link href="/cookies" className="underline hover:text-gray-700">{t('cookiePolicy')}</Link>
+                                {' '}{t('and')}{' '}
+                                <Link href="/privacy" className="underline hover:text-gray-700">{t('privacyPolicy')}</Link>.
                             </p>
 
                             {expanded && (
@@ -66,17 +67,17 @@ export default function CookieConsent() {
                                     {/* Essential — always on */}
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-900">Essential cookies</p>
-                                            <p className="text-[11px] text-gray-500 mt-0.5">Required for the shop to function: session, cart, language preference. Cannot be disabled.</p>
+                                            <p className="text-xs font-bold text-gray-900">{t('essentialTitle')}</p>
+                                            <p className="text-[11px] text-gray-500 mt-0.5">{t('essentialDesc')}</p>
                                         </div>
-                                        <span className="flex-shrink-0 text-[10px] font-black text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full uppercase tracking-wide mt-0.5">Always on</span>
+                                        <span className="flex-shrink-0 text-[10px] font-black text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full uppercase tracking-wide mt-0.5">{t('alwaysOn')}</span>
                                     </div>
 
                                     {/* Analytics */}
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-900">Analytics cookies</p>
-                                            <p className="text-[11px] text-gray-500 mt-0.5">Help us understand how visitors use the site so we can improve it.</p>
+                                            <p className="text-xs font-bold text-gray-900">{t('analyticsTitle')}</p>
+                                            <p className="text-[11px] text-gray-500 mt-0.5">{t('analyticsDesc')}</p>
                                         </div>
                                         <button
                                             onClick={() => setPrefs(p => ({ ...p, analytics: !p.analytics }))}
@@ -90,8 +91,8 @@ export default function CookieConsent() {
                                     {/* Marketing */}
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-900">Marketing cookies</p>
-                                            <p className="text-[11px] text-gray-500 mt-0.5">Allow us to show you relevant advertising and measure campaign effectiveness.</p>
+                                            <p className="text-xs font-bold text-gray-900">{t('marketingTitle')}</p>
+                                            <p className="text-[11px] text-gray-500 mt-0.5">{t('marketingDesc')}</p>
                                         </div>
                                         <button
                                             onClick={() => setPrefs(p => ({ ...p, marketing: !p.marketing }))}
@@ -110,28 +111,28 @@ export default function CookieConsent() {
                                 onClick={() => accept(true, true)}
                                 className="w-full px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition"
                             >
-                                Accept All
+                                {t('acceptAll')}
                             </button>
                             {expanded ? (
                                 <button
                                     onClick={() => accept(prefs.analytics, prefs.marketing)}
                                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition"
                                 >
-                                    Save Preferences
+                                    {t('savePreferences')}
                                 </button>
                             ) : (
                                 <button
                                     onClick={() => accept(false, false)}
                                     className="w-full px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition"
                                 >
-                                    Essential Only
+                                    {t('essentialOnly')}
                                 </button>
                             )}
                             <button
                                 onClick={() => setExpanded(e => !e)}
                                 className="w-full px-4 py-2 text-gray-400 rounded-xl text-xs hover:text-gray-600 transition text-center"
                             >
-                                {expanded ? 'Hide preferences' : 'Manage preferences'}
+                                {expanded ? t('hidePreferences') : t('managePreferences')}
                             </button>
                         </div>
                     </div>

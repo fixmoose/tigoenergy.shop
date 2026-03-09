@@ -562,5 +562,29 @@
       "expireNote": "Reset links expire after 1 hour or can only be used once. Please request a new link.",
       "pwdPlaceholder": "Min 6 characters"
     }
+  },
+  "cookieConsent": {
+    "title": "Vi använder cookies",
+    "description": "Vi använder nödvändiga cookies för att butiken ska fungera. Med ditt samtycke kan vi också använda analys- och marknadsföringscookies. Läs vår",
+    "cookiePolicy": "Cookiepolicy",
+    "and": "och",
+    "privacyPolicy": "Integritetspolicy",
+    "essentialTitle": "Nödvändiga cookies",
+    "essentialDesc": "Krävs för butikens funktion: session, kundvagn, språkinställning. Kan inte inaktiveras.",
+    "alwaysOn": "Alltid aktiv",
+    "analyticsTitle": "Analytiska cookies",
+    "analyticsDesc": "Hjälper oss förstå hur besökare använder webbplatsen för att förbättra den.",
+    "marketingTitle": "Marknadsföringscookies",
+    "marketingDesc": "Tillåter oss att visa dig relevanta annonser och mäta kampanjers effektivitet.",
+    "acceptAll": "Acceptera alla",
+    "essentialOnly": "Endast nödvändiga",
+    "savePreferences": "Spara inställningar",
+    "managePreferences": "Hantera inställningar",
+    "hidePreferences": "Dölj inställningar"
+  },
+  "gdpr": {
+    "title": "Dina datarättigheter (GDPR)",
+    "description": "Enligt GDPR har du rätt att när som helst komma åt, exportera och radera dina personuppgifter.",
+    "downloadData": "Ladda ner mina data (JSON)"
   }
 }

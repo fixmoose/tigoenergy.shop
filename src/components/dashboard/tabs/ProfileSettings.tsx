@@ -10,6 +10,7 @@ import { getCustomerContacts, setDefaultContact, removeContact } from '@/app/act
 import { CheckCircleIcon, PlusIcon, TrashIcon, StarIcon } from '@heroicons/react/24/solid'
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { useTranslations } from 'next-intl'
 
 interface Contact {
     id: string
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function ProfileSettings({ customer }: Props) {
+    const tGdpr = useTranslations('gdpr')
     const supabase = createClient()
     const { currentCurrency, setCurrency } = useCurrency()
     const { market, currentLanguage, setLanguage } = useMarket()
@@ -429,9 +431,9 @@ export default function ProfileSettings({ customer }: Props) {
                     </div>
 
                     <div className="mt-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                        <p className="text-xs font-bold text-gray-700 mb-1">Your Data Rights (GDPR)</p>
+                        <p className="text-xs font-bold text-gray-700 mb-1">{tGdpr('title')}</p>
                         <p className="text-[11px] text-gray-500 mb-3">
-                            Under GDPR, you have the right to access, export, and delete your personal data at any time.
+                            {tGdpr('description')}
                         </p>
                         <div className="flex flex-wrap gap-3">
                             <a
@@ -439,7 +441,7 @@ export default function ProfileSettings({ customer }: Props) {
                                 download
                                 className="text-xs font-bold px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition shadow-sm"
                             >
-                                Download My Data (JSON)
+                                {tGdpr('downloadData')}
                             </a>
                         </div>
                     </div>

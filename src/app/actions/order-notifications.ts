@@ -84,23 +84,61 @@ export async function sendPaymentReminderAction(orderId: string) {
 
     const { data: order, error } = await supabase
         .from('orders')
-        .select('*')
+        .select('*, order_items(*)')
         .eq('id', orderId)
         .single()
 
     if (error || !order) throw new Error('Order not found')
     if (order.payment_status === 'paid') throw new Error('Order already paid')
 
-    const html = await renderTemplate('payment-reminder', {
-        order_number: order.order_number,
-        total_amount: `${order.currency || '€'} ${order.total?.toFixed(2)}`,
-        pay_link: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id=${order.payment_intent_id}` // Simulating a link or direct them to order page
-    }, order.language || 'en')
+    const billingCountry = ((order.billing_address as any)?.country || '').toUpperCase()
+    const isSlovenia = billingCountry === 'SI'
+    const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
+    const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
+    const primaryBank = isSlovenia ? 'NLB d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
+
+    const itemsHtml = generateItemsTableHtml(order.order_items || [], order.currency || '€')
+    const orderLink = `${SITE_URL}/orders/${order.id}`
+    const totalFormatted = `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+body{font-family:Arial,sans-serif;color:#1a1a1a;background:#f9f9f9;margin:0;padding:0}
+.wrap{max-width:640px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5}
+.hdr{background:#92400e;padding:32px;color:#fff}.hdr h1{margin:0;font-size:22px;font-weight:900}
+.hdr p{margin:6px 0 0;color:#fde68a;font-size:13px}.bd{padding:32px}
+.lbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#6b7280;margin-bottom:6px}
+.bank{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:12px}
+.bank h3{margin:0 0 14px;font-size:13px;font-weight:900;color:#15803d;text-transform:uppercase;letter-spacing:.08em}
+.row{display:flex;gap:8px;margin-bottom:6px}.rl{font-size:11px;font-weight:700;color:#6b7280;min-width:80px}
+.rv{font-family:monospace;font-size:13px;font-weight:700;color:#111}
+.ref{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;margin-top:12px}
+.cta{display:inline-block;background:#111827;color:#fff;padding:14px 28px;border-radius:10px;font-weight:900;font-size:14px;text-decoration:none}
+.tot{display:flex;justify-content:space-between;padding:14px 0;border-top:2px solid #111;font-size:18px;font-weight:900}
+.notice{background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:12px;color:#92400e;}
+</style></head><body><div class="wrap">
+<div class="hdr"><h1>Friendly Payment Reminder — Order #${order.order_number}</h1><p>This is a gentle reminder that your payment is still pending.</p></div>
+<div class="bd">
+<div class="notice">We noticed that payment for order <strong>#${order.order_number}</strong> has not yet been received. Please complete your bank transfer at your earliest convenience to avoid any delays in processing your order.</div>
+<div style="margin-bottom:28px">${itemsHtml}<div class="tot"><span>Total Due</span><span>${totalFormatted}</span></div></div>
+<div style="margin-bottom:28px"><div class="lbl">Bank Transfer Details</div>
+<div class="bank"><h3>${primaryBank}</h3>
+<div class="row"><span class="rl">IBAN</span><span class="rv">${primaryIban}</span></div>
+<div class="row"><span class="rl">BIC/SWIFT</span><span class="rv">${primaryBic}</span></div>
+<div class="row"><span class="rl">Amount</span><span class="rv">${totalFormatted}</span></div></div>
+<div class="ref"><div class="row"><span class="rl" style="color:#2563eb">Reference</span><span class="rv" style="color:#1d4ed8;font-size:15px">${order.order_number}</span></div>
+<p style="font-size:11px;color:#3b82f6;margin:6px 0 0">Always include the order number as payment reference so we can match your payment.</p></div></div>
+<div style="margin-bottom:28px"><div class="lbl">Your Order</div>
+<p style="font-size:13px;color:#4b5563;margin:4px 0 12px">View your full order details and payment status in your account:</p>
+<a href="${orderLink}" class="cta">View Order in My Account</a></div>
+<div style="padding-top:20px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af">
+<p>Questions? Contact us at <a href="mailto:info@tigoenergy.shop" style="color:#4b5563">info@tigoenergy.shop</a></p>
+</div></div></div></body></html>`
 
     await sendEmail({
         to: order.customer_email,
-        subject: `Payment Reminder: Order #${order.order_number}`,
-        html
+        subject: `Payment Reminder — Order #${order.order_number} (${totalFormatted})`,
+        html,
+        skipUnsubscribe: true,
     })
 
     return { success: true }

@@ -562,5 +562,29 @@
       "expireNote": "Atiestatīšanas saites ir derīgas 1 stundu vai tās var izmantot tikai vienreiz. Lūdzu, pieprasiet jaunu saiti.",
       "pwdPlaceholder": "Minimāli 6 rakstzīmes"
     }
+  },
+  "cookieConsent": {
+    "title": "Mēs izmantojam sīkdatnes",
+    "description": "Mēs izmantojam būtiskas sīkdatnes, lai veikals darbotos. Ar jūsu piekrišanu mēs varam izmantot arī analītiskās un mārketinga sīkdatnes. Izlasiet mūsu",
+    "cookiePolicy": "Sīkdatņu politiku",
+    "and": "un",
+    "privacyPolicy": "Privātuma politiku",
+    "essentialTitle": "Būtiskās sīkdatnes",
+    "essentialDesc": "Nepieciešamas veikala darbībai: sesija, grozs, valodas iestatījumi. Nevar atspējot.",
+    "alwaysOn": "Vienmēr ieslēgts",
+    "analyticsTitle": "Analītiskās sīkdatnes",
+    "analyticsDesc": "Palīdz mums saprast, kā apmeklētāji izmanto vietni, lai mēs to varētu uzlabot.",
+    "marketingTitle": "Mārketinga sīkdatnes",
+    "marketingDesc": "Ļauj mums rādīt atbilstošas reklāmas un mērīt kampaņu efektivitāti.",
+    "acceptAll": "Pieņemt visas",
+    "essentialOnly": "Tikai būtiskās",
+    "savePreferences": "Saglabāt preferences",
+    "managePreferences": "Pārvaldīt preferences",
+    "hidePreferences": "Paslēpt preferences"
+  },
+  "gdpr": {
+    "title": "Jūsu datu tiesības (VDAR)",
+    "description": "Saskaņā ar VDAR jums ir tiesības jebkurā laikā piekļūt saviem personas datiem, tos eksportēt un dzēst.",
+    "downloadData": "Lejupielādēt manus datus (JSON)"
   }
 }

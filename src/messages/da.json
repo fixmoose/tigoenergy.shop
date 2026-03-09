@@ -562,5 +562,29 @@
       "expireNote": "Reset links expire after 1 hour or can only be used once. Please request a new link.",
       "pwdPlaceholder": "Min 6 characters"
     }
+  },
+  "cookieConsent": {
+    "title": "Vi bruger cookies",
+    "description": "Vi bruger essentielle cookies til at drive vores butik. Med dit samtykke kan vi også bruge analyse- og marketingcookies. Læs vores",
+    "cookiePolicy": "Cookiepolitik",
+    "and": "og",
+    "privacyPolicy": "Privatlivspolitik",
+    "essentialTitle": "Essentielle cookies",
+    "essentialDesc": "Nødvendige for butikkens funktion: session, indkøbskurv, sprogpræference. Kan ikke deaktiveres.",
+    "alwaysOn": "Altid aktiv",
+    "analyticsTitle": "Analytiske cookies",
+    "analyticsDesc": "Hjælper os med at forstå, hvordan besøgende bruger siden, så vi kan forbedre den.",
+    "marketingTitle": "Marketingcookies",
+    "marketingDesc": "Giver os mulighed for at vise dig relevante annoncer og måle kampagneeffektivitet.",
+    "acceptAll": "Accepter alle",
+    "essentialOnly": "Kun essentielle",
+    "savePreferences": "Gem præferencer",
+    "managePreferences": "Administrer præferencer",
+    "hidePreferences": "Skjul præferencer"
+  },
+  "gdpr": {
+    "title": "Dine datarettigheder (GDPR)",
+    "description": "I henhold til GDPR har du ret til at få adgang til, eksportere og slette dine personlige data til enhver tid.",
+    "downloadData": "Download mine data (JSON)"
   }
 }

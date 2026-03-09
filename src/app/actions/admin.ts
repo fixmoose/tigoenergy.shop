@@ -449,6 +449,130 @@ export async function adminCreateFullOrderAction(orderPayload: any, items: any[]
     }
 }
 
+// Shared word-replacement map used by translation helpers
+const TRANSLATION_MAP: Record<string, Record<string, string>> = {
+    de: {
+        'Invoice': 'Rechnung', 'Proforma Invoice': 'Proformarechnung', 'Credit Note': 'Gutschrift',
+        'Order Confirmation': 'Auftragsbestätigung', 'Packing Slip': 'Lieferschein',
+        'Delivery Note': 'Lieferschein', 'Return Authorization': 'Rückgabegenehmigung',
+        'Bill To': 'Rechnungsadresse', 'Ship To': 'Lieferadresse', 'Deliver To': 'Liefern an',
+        'Shipped From': 'Versand von', 'Delivered To': 'Geliefert an', 'Issued To': 'Ausgestellt für',
+        'Return Address': 'Rücksendeadresse', 'Customer': 'Kunde',
+        'Invoice No\\.': 'Rechnungsnr.', 'Proforma No\\.': 'Proformanr.',
+        'Credit Note No\\.': 'Gutschriftnr.', 'Order No\\.': 'Auftragsnr.',
+        'Date': 'Datum', 'Due Date': 'Fälligkeitsdatum', 'Valid Until': 'Gültig bis',
+        'Dispatch Date': 'Versanddatum', 'Est\\. Dispatch': 'Vsl. Versand',
+        'Order Ref\\.': 'Bestellreferenz', 'Original Invoice': 'Originalrechnung',
+        'Original Order': 'Originalbestellung', 'RMA Number': 'RMA-Nummer',
+        'Subtotal \\(net\\)': 'Netto-Zwischensumme', 'Shipping': 'Versand', 'VAT': 'MwSt.',
+        'TOTAL DUE': 'GESAMTBETRAG', 'AMOUNT CREDITED': 'GUTSCHRIFTBETRAG',
+        'Thank you for your order': 'Vielen Dank für Ihre Bestellung',
+        'Bank Transfer Details': 'Bankverbindung', 'Return Instructions': 'Rücksendeanweisung',
+        'Return Reason': 'Rückgabegrund', 'Place of issue': 'Ausstellungsort',
+        'Payment': 'Zahlung', 'Tracking No\\.': 'Sendungsnr.', 'Carrier': 'Spediteur',
+        'Please verify all items': 'Bitte alle Artikel prüfen',
+        'Please inspect all items': 'Bitte alle Artikel prüfen',
+    },
+    sl: {
+        'Invoice': 'Račun', 'Proforma Invoice': 'Predračun', 'Credit Note': 'Dobropis',
+        'Order Confirmation': 'Potrditev naročila', 'Packing Slip': 'Dobavnica',
+        'Delivery Note': 'Dobavnica', 'Return Authorization': 'Dovoljenje za vračilo',
+        'Bill To': 'Račun za', 'Ship To': 'Dostava na', 'Deliver To': 'Dostavi na',
+        'Shipped From': 'Pošiljatelj', 'Delivered To': 'Dostavljeno', 'Issued To': 'Izdano za',
+        'Return Address': 'Naslov za vračilo', 'Customer': 'Stranka',
+        'Invoice No\\.': 'Račun št.', 'Proforma No\\.': 'Predračun št.',
+        'Credit Note No\\.': 'Dobropis št.', 'Order No\\.': 'Naročilo št.',
+        'Date': 'Datum', 'Due Date': 'Rok plačila', 'Valid Until': 'Veljavno do',
+        'Dispatch Date': 'Datum odpreme', 'Est\\. Dispatch': 'Predv. odprema',
+        'Order Ref\\.': 'Ref. naročila', 'Original Invoice': 'Originalni račun',
+        'Original Order': 'Originalno naročilo', 'RMA Number': 'RMA številka',
+        'Subtotal \\(net\\)': 'Vmesni seštevek (brez DDV)', 'Shipping': 'Dostava', 'VAT': 'DDV',
+        'TOTAL DUE': 'SKUPAJ ZA PLAČILO', 'AMOUNT CREDITED': 'DOBROPISAN ZNESEK',
+        'Thank you for your order': 'Hvala za vaše naročilo',
+        'Bank Transfer Details': 'Podatki za bančno nakazilo', 'Return Instructions': 'Navodila za vračilo',
+        'Return Reason': 'Razlog vračila', 'Place of issue': 'Kraj izdaje',
+        'Payment': 'Plačilo', 'Tracking No\\.': 'Številka sledenja', 'Carrier': 'Prevoznik',
+        'Please verify all items': 'Preverite vse artikle',
+        'Please inspect all items': 'Preverite vse artikle ob prejemu',
+    },
+    fr: {
+        'Invoice': 'Facture', 'Proforma Invoice': 'Facture Proforma', 'Credit Note': 'Avoir',
+        'Order Confirmation': 'Confirmation de commande', 'Packing Slip': 'Bon de livraison',
+        'Delivery Note': 'Bon de livraison', 'Return Authorization': 'Autorisation de retour',
+        'Bill To': 'Facturer à', 'Ship To': 'Livrer à', 'Deliver To': 'Livrer à',
+        'Shipped From': 'Expédié depuis', 'Delivered To': 'Livré à', 'Issued To': 'Établi à',
+        'Return Address': 'Adresse de retour', 'Customer': 'Client',
+        'Invoice No\\.': 'N° Facture', 'Proforma No\\.': 'N° Proforma',
+        'Credit Note No\\.': 'N° Avoir', 'Order No\\.': 'N° Commande',
+        'Date': 'Date', 'Due Date': 'Date d\'échéance', 'Valid Until': 'Valable jusqu\'au',
+        'Dispatch Date': 'Date d\'expédition', 'Est\\. Dispatch': 'Exp. prévue',
+        'Order Ref\\.': 'Réf. commande', 'Original Invoice': 'Facture originale',
+        'Original Order': 'Commande originale', 'RMA Number': 'Numéro RMA',
+        'Subtotal \\(net\\)': 'Sous-total HT', 'Shipping': 'Livraison', 'VAT': 'TVA',
+        'TOTAL DUE': 'TOTAL À PAYER', 'AMOUNT CREDITED': 'MONTANT CRÉDITÉ',
+        'Thank you for your order': 'Merci pour votre commande',
+        'Bank Transfer Details': 'Coordonnées bancaires', 'Return Instructions': 'Instructions de retour',
+        'Return Reason': 'Motif de retour', 'Place of issue': 'Lieu d\'émission',
+        'Payment': 'Paiement', 'Tracking No\\.': 'N° de suivi', 'Carrier': 'Transporteur',
+        'Please verify all items': 'Veuillez vérifier tous les articles',
+        'Please inspect all items': 'Veuillez inspecter tous les articles',
+    },
+    it: {
+        'Invoice': 'Fattura', 'Proforma Invoice': 'Fattura Proforma', 'Credit Note': 'Nota di credito',
+        'Order Confirmation': 'Conferma d\'ordine', 'Packing Slip': 'Bolla di consegna',
+        'Delivery Note': 'Bolla di consegna', 'Return Authorization': 'Autorizzazione al reso',
+        'Bill To': 'Fatturare a', 'Ship To': 'Spedire a', 'Deliver To': 'Consegnare a',
+        'Shipped From': 'Spedito da', 'Delivered To': 'Consegnato a', 'Issued To': 'Emesso a',
+        'Return Address': 'Indirizzo di reso', 'Customer': 'Cliente',
+        'Invoice No\\.': 'N° Fattura', 'Proforma No\\.': 'N° Proforma',
+        'Credit Note No\\.': 'N° Nota credito', 'Order No\\.': 'N° Ordine',
+        'Date': 'Data', 'Due Date': 'Scadenza', 'Valid Until': 'Valido fino al',
+        'Dispatch Date': 'Data spedizione', 'Est\\. Dispatch': 'Spedizione prevista',
+        'Order Ref\\.': 'Rif. ordine', 'Original Invoice': 'Fattura originale',
+        'Original Order': 'Ordine originale', 'RMA Number': 'Numero RMA',
+        'Subtotal \\(net\\)': 'Subtotale (netto)', 'Shipping': 'Spedizione', 'VAT': 'IVA',
+        'TOTAL DUE': 'TOTALE DA PAGARE', 'AMOUNT CREDITED': 'IMPORTO ACCREDITATO',
+        'Thank you for your order': 'Grazie per il suo ordine',
+        'Bank Transfer Details': 'Dati bancari', 'Return Instructions': 'Istruzioni per il reso',
+        'Return Reason': 'Motivo del reso', 'Place of issue': 'Luogo di emissione',
+        'Payment': 'Pagamento', 'Tracking No\\.': 'N° tracking', 'Carrier': 'Corriere',
+        'Please verify all items': 'Verificare tutti gli articoli',
+        'Please inspect all items': 'Verificare tutti gli articoli al ricevimento',
+    },
+    es: {
+        'Invoice': 'Factura', 'Proforma Invoice': 'Factura Proforma', 'Credit Note': 'Nota de crédito',
+        'Order Confirmation': 'Confirmación de pedido', 'Packing Slip': 'Albarán',
+        'Delivery Note': 'Albarán de entrega', 'Return Authorization': 'Autorización de devolución',
+        'Bill To': 'Facturar a', 'Ship To': 'Enviar a', 'Deliver To': 'Entregar a',
+        'Shipped From': 'Enviado desde', 'Delivered To': 'Entregado a', 'Issued To': 'Emitido a',
+        'Return Address': 'Dirección de devolución', 'Customer': 'Cliente',
+        'Invoice No\\.': 'N° Factura', 'Proforma No\\.': 'N° Proforma',
+        'Credit Note No\\.': 'N° Nota crédito', 'Order No\\.': 'N° Pedido',
+        'Date': 'Fecha', 'Due Date': 'Fecha de vencimiento', 'Valid Until': 'Válido hasta',
+        'Dispatch Date': 'Fecha de envío', 'Est\\. Dispatch': 'Envío estimado',
+        'Order Ref\\.': 'Ref. pedido', 'Original Invoice': 'Factura original',
+        'Original Order': 'Pedido original', 'RMA Number': 'Número RMA',
+        'Subtotal \\(net\\)': 'Subtotal (neto)', 'Shipping': 'Envío', 'VAT': 'IVA',
+        'TOTAL DUE': 'TOTAL A PAGAR', 'AMOUNT CREDITED': 'IMPORTE ABONADO',
+        'Thank you for your order': 'Gracias por su pedido',
+        'Bank Transfer Details': 'Datos bancarios', 'Return Instructions': 'Instrucciones de devolución',
+        'Return Reason': 'Motivo de devolución', 'Place of issue': 'Lugar de emisión',
+        'Payment': 'Pago', 'Tracking No\\.': 'N° de seguimiento', 'Carrier': 'Transportista',
+        'Please verify all items': 'Verifique todos los artículos',
+        'Please inspect all items': 'Inspeccione todos los artículos al recibir',
+    },
+}
+
+function applyTranslation(html: string, targetLang: string): string {
+    const map = TRANSLATION_MAP[targetLang]
+    if (!map) return html
+    let result = html
+    for (const [pattern, replacement] of Object.entries(map)) {
+        result = result.replace(new RegExp(pattern, 'g'), replacement)
+    }
+    return result
+}
+
 /**
  * Auto-translates a template from English to a target language
  */
@@ -457,7 +581,6 @@ export async function translateTemplateAction(sourceTemplateId: string, targetLa
 
     const supabase = await createAdminClient()
 
-    // 1. Get source template
     const { data: source, error: fetchError } = await supabase
         .from('document_templates')
         .select('*')
@@ -466,44 +589,72 @@ export async function translateTemplateAction(sourceTemplateId: string, targetLa
 
     if (fetchError || !source) throw new Error('Source template not found')
 
-    // 2. Perform translation (Simple replacement of common terms for now)
-    // In a real app, this would call GPT/DeepL API
-    let translatedHtml = source.content_html
-    const name = `${source.type.replace('_', ' ').toUpperCase()} (${targetLang.toUpperCase()})`
+    const translatedHtml = applyTranslation(source.content_html, targetLang)
+    const name = `${source.name?.replace(/\s*\([A-Z]{2}\)\s*$/, '')} (${targetLang.toUpperCase()})`
 
-    // Simple translation map for demo
-    const translations: any = {
-        de: { 'Invoice': 'Rechnung', 'Order': 'Bestellung', 'Price': 'Preis', 'Total': 'Gesamt', 'Date': 'Datum', 'Confirmation': 'Bestätigung', 'Official': 'Offizielle' },
-        sl: { 'Invoice': 'Račun', 'Order': 'Naročilo', 'Price': 'Cena', 'Total': 'Skupaj', 'Date': 'Datum', 'Confirmation': 'Potrditev', 'Official': 'Uradni' },
-        fr: { 'Invoice': 'Facture', 'Order': 'Commande', 'Price': 'Prix', 'Total': 'Total', 'Date': 'Date', 'Confirmation': 'Confirmation', 'Official': 'Officielle' },
-        it: { 'Invoice': 'Fattura', 'Order': 'Ordine', 'Price': 'Prezzo', 'Total': 'Totale', 'Date': 'Data', 'Confirmation': 'Conferma', 'Official': 'Ufficiale' },
-        es: { 'Invoice': 'Factura', 'Order': 'Pedido', 'Price': 'Precio', 'Total': 'Total', 'Date': 'Fecha', 'Confirmation': 'Confirmación', 'Official': 'Oficial' }
-    }
-
-    if (translations[targetLang]) {
-        Object.entries(translations[targetLang]).forEach(([en, target]) => {
-            const regex = new RegExp(en, 'gi')
-            translatedHtml = translatedHtml.replace(regex, target as string)
-        })
-    }
-
-    // 3. Save as new template
-    const { data: newTemplate, error: insertError } = await supabase
+    // Upsert: update existing or insert new
+    const { data: existing } = await supabase
         .from('document_templates')
-        .insert({
-            type: source.type,
-            language: targetLang,
-            name: name,
-            content_html: translatedHtml,
-            is_active: true,
-            is_default: false
-        })
-        .select()
+        .select('id')
+        .eq('type', source.type)
+        .eq('language', targetLang)
+        .limit(1)
         .single()
 
-    if (insertError) throw insertError
+    let result
+    if (existing) {
+        const { data, error } = await supabase
+            .from('document_templates')
+            .update({ content_html: translatedHtml, name })
+            .eq('id', existing.id)
+            .select()
+            .single()
+        if (error) throw error
+        result = data
+    } else {
+        const { data, error } = await supabase
+            .from('document_templates')
+            .insert({ type: source.type, language: targetLang, name, content_html: translatedHtml, is_active: true, is_default: true })
+            .select()
+            .single()
+        if (error) throw error
+        result = data
+    }
 
-    return { success: true, template: newTemplate }
+    return { success: true, template: result }
+}
+
+/**
+ * Syncs the English master template structure to all other saved language variants
+ */
+export async function syncTemplateToAllLanguagesAction(masterTemplateId: string) {
+    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+    const supabase = await createAdminClient()
+
+    const { data: master, error } = await supabase
+        .from('document_templates')
+        .select('*')
+        .eq('id', masterTemplateId)
+        .single()
+
+    if (error || !master) throw new Error('Master template not found')
+    if (master.language !== 'en') throw new Error('Sync must be initiated from an English template')
+
+    // Fetch all saved non-English variants of the same type
+    const { data: variants } = await supabase
+        .from('document_templates')
+        .select('id, language')
+        .eq('type', master.type)
+        .neq('language', 'en')
+
+    const langs = variants && variants.length > 0
+        ? [...new Set(variants.map((v: any) => v.language))]
+        : Object.keys(TRANSLATION_MAP)
+
+    const results = await Promise.all(langs.map(lang => translateTemplateAction(masterTemplateId, lang)))
+
+    return { success: true, synced: langs, results }
 }
 
 /**

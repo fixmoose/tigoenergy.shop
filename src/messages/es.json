@@ -562,5 +562,29 @@
       "expireNote": "Los enlaces de restablecimiento caducan después de 1 hora o solo se pueden usar una vez. Solicite un nuevo enlace.",
       "pwdPlaceholder": "Mín. 6 caracteres"
     }
+  },
+  "cookieConsent": {
+    "title": "Usamos cookies",
+    "description": "Usamos cookies esenciales para el funcionamiento de la tienda. Con tu consentimiento, también podemos usar cookies analíticas y de marketing. Lee nuestra",
+    "cookiePolicy": "Política de cookies",
+    "and": "y",
+    "privacyPolicy": "Política de privacidad",
+    "essentialTitle": "Cookies esenciales",
+    "essentialDesc": "Necesarias para el funcionamiento de la tienda: sesión, carrito, preferencia de idioma. No se pueden desactivar.",
+    "alwaysOn": "Siempre activo",
+    "analyticsTitle": "Cookies analíticas",
+    "analyticsDesc": "Nos ayudan a entender cómo los visitantes usan el sitio para mejorarlo.",
+    "marketingTitle": "Cookies de marketing",
+    "marketingDesc": "Nos permiten mostrarte publicidad relevante y medir la efectividad de las campañas.",
+    "acceptAll": "Aceptar todo",
+    "essentialOnly": "Solo esenciales",
+    "savePreferences": "Guardar preferencias",
+    "managePreferences": "Administrar preferencias",
+    "hidePreferences": "Ocultar preferencias"
+  },
+  "gdpr": {
+    "title": "Tus derechos sobre los datos (RGPD)",
+    "description": "Según el RGPD, tienes derecho a acceder, exportar y eliminar tus datos personales en cualquier momento.",
+    "downloadData": "Descargar mis datos (JSON)"
   }
 }

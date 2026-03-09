@@ -562,5 +562,29 @@
       "expireNote": "Tilbakestillingslenker utløper etter 1 time eller kan bare brukes én gang. Vennligst be om en ny lenke.",
       "pwdPlaceholder": "Min. 6 tegn"
     }
+  },
+  "cookieConsent": {
+    "title": "Vi bruker informasjonskapsler",
+    "description": "Vi bruker nødvendige informasjonskapsler for at butikken skal fungere. Med ditt samtykke kan vi også bruke analyse- og markedsføringskapsler. Les vår",
+    "cookiePolicy": "Informasjonskapsel-policy",
+    "and": "og",
+    "privacyPolicy": "Personvernpolicy",
+    "essentialTitle": "Nødvendige informasjonskapsler",
+    "essentialDesc": "Nødvendig for butikkens funksjon: økt, handlekurv, språkpreferanse. Kan ikke deaktiveres.",
+    "alwaysOn": "Alltid aktiv",
+    "analyticsTitle": "Analytiske informasjonskapsler",
+    "analyticsDesc": "Hjelper oss å forstå hvordan besøkende bruker nettstedet slik at vi kan forbedre det.",
+    "marketingTitle": "Markedsføringskapsler",
+    "marketingDesc": "Lar oss vise deg relevante annonser og måle kampanjeeffektivitet.",
+    "acceptAll": "Godta alle",
+    "essentialOnly": "Kun nødvendige",
+    "savePreferences": "Lagre preferanser",
+    "managePreferences": "Administrer preferanser",
+    "hidePreferences": "Skjul preferanser"
+  },
+  "gdpr": {
+    "title": "Dine datarettigheter (GDPR)",
+    "description": "I henhold til GDPR har du rett til å få tilgang til, eksportere og slette dine personopplysninger når som helst.",
+    "downloadData": "Last ned mine data (JSON)"
   }
 }

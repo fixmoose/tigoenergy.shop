@@ -1,16 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
-import fs from 'fs'
-import path from 'path'
-
-function readLogoAsDataUrl(): string {
-    try {
-        const logoPath = path.join(process.cwd(), 'public', 'initra-logo.png')
-        const logoBuffer = fs.readFileSync(logoPath)
-        return `data:image/png;base64,${logoBuffer.toString('base64')}`
-    } catch {
-        return ''
-    }
-}
+import { INITRA_LOGO_B64 } from '@/lib/logo-base64'
 
 export interface DocumentData {
     order_number: string
@@ -89,7 +78,7 @@ const DEFAULT_COMPANY_DATA = {
     company_bic_be: 'TRWIBEB1XXX',
     company_bic_si: 'HDELSI22',
     place_of_issue: 'Podsmreka',
-    get company_logo() { return readLogoAsDataUrl() },
+    company_logo: INITRA_LOGO_B64,
 }
 
 export function replacePlaceholders(html: string, data: DocumentData) {

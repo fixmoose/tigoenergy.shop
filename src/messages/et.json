@@ -562,5 +562,29 @@
       "expireNote": "Lähtestamise lingid aeguvad 1 tunni pärast või neid saab kasutada ainult üks kord. Palun taotlege uut linki.",
       "pwdPlaceholder": "Vähemalt 6 märki"
     }
+  },
+  "cookieConsent": {
+    "title": "Kasutame küpsiseid",
+    "description": "Kasutame poe toimimiseks hädavajalikke küpsiseid. Teie nõusolekul võime kasutada ka analüütika- ja turundusküpsiseid. Lugege meie",
+    "cookiePolicy": "Küpsiste põhimõtteid",
+    "and": "ja",
+    "privacyPolicy": "Privaatsuspoliitikat",
+    "essentialTitle": "Hädavajalikud küpsised",
+    "essentialDesc": "Vajalikud poe toimimiseks: sessioon, ostukorv, keele-eelistus. Ei saa keelata.",
+    "alwaysOn": "Alati sees",
+    "analyticsTitle": "Analüütikaküpsised",
+    "analyticsDesc": "Aitavad meil mõista, kuidas külastajad saiti kasutavad, et seda parandada.",
+    "marketingTitle": "Turundusküpsised",
+    "marketingDesc": "Võimaldavad meil näidata asjakohaseid reklaame ja mõõta kampaaniate tõhusust.",
+    "acceptAll": "Nõustu kõigiga",
+    "essentialOnly": "Ainult hädavajalikud",
+    "savePreferences": "Salvesta eelistused",
+    "managePreferences": "Halda eelistusi",
+    "hidePreferences": "Peida eelistused"
+  },
+  "gdpr": {
+    "title": "Teie andmeõigused (GDPR)",
+    "description": "GDPR alusel on teil õigus igal ajal oma isikuandmetele juurde pääseda, neid eksportida ja kustutada.",
+    "downloadData": "Laadi alla minu andmed (JSON)"
   }
 }

@@ -562,5 +562,29 @@
       "expireNote": "Nustatymo nuorodos galioja 1 valandą arba gali būti panaudotos tik vieną kartą. Prašykite naujos nuorodos.",
       "pwdPlaceholder": "Bent 6 simboliai"
     }
+  },
+  "cookieConsent": {
+    "title": "Naudojame slapukus",
+    "description": "Naudojame būtinus slapukus, kad parduotuvė veiktų. Jums sutikus, galime naudoti ir analitinius bei rinkodaros slapukus. Skaitykite mūsų",
+    "cookiePolicy": "Slapukų politiką",
+    "and": "ir",
+    "privacyPolicy": "Privatumo politiką",
+    "essentialTitle": "Būtinieji slapukai",
+    "essentialDesc": "Reikalingi parduotuvės veikimui: sesija, krepšelis, kalbos nuostatos. Negalima išjungti.",
+    "alwaysOn": "Visada įjungta",
+    "analyticsTitle": "Analitiniai slapukai",
+    "analyticsDesc": "Padeda mums suprasti, kaip lankytojai naudoja svetainę, kad galėtume ją tobulinti.",
+    "marketingTitle": "Rinkodaros slapukai",
+    "marketingDesc": "Leidžia mums rodyti tinkamas reklamas ir matuoti kampanijų efektyvumą.",
+    "acceptAll": "Priimti visus",
+    "essentialOnly": "Tik būtinieji",
+    "savePreferences": "Išsaugoti nuostatas",
+    "managePreferences": "Tvarkyti nuostatas",
+    "hidePreferences": "Slėpti nuostatas"
+  },
+  "gdpr": {
+    "title": "Jūsų duomenų teisės (BDAR)",
+    "description": "Pagal BDAR turite teisę bet kada pasiekti, eksportuoti ir ištrinti savo asmens duomenis.",
+    "downloadData": "Atsisiųsti mano duomenis (JSON)"
   }
 }

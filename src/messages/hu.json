@@ -562,5 +562,29 @@
       "expireNote": "A visszaállító linkek 1 óra után lejárnak, vagy csak egyszer használhatók fel. Kérjük, kérjen új linket.",
       "pwdPlaceholder": "Min. 6 karakter"
     }
+  },
+  "cookieConsent": {
+    "title": "Sütiket használunk",
+    "description": "Alapvető sütiket használunk az áruház működéséhez. Az Ön hozzájárulásával analitikai és marketing sütiket is használhatunk. Olvassa el a",
+    "cookiePolicy": "Sütiszabályzatunkat",
+    "and": "és a",
+    "privacyPolicy": "Adatvédelmi irányelveinket",
+    "essentialTitle": "Alapvető sütik",
+    "essentialDesc": "Az áruház működéséhez szükséges: munkamenet, kosár, nyelvi beállítás. Nem tiltható le.",
+    "alwaysOn": "Mindig bekapcsolt",
+    "analyticsTitle": "Analitikai sütik",
+    "analyticsDesc": "Segítenek megérteni, hogyan használják a látogatók az oldalt, hogy javíthassuk.",
+    "marketingTitle": "Marketing sütik",
+    "marketingDesc": "Lehetővé teszik számunkra, hogy releváns hirdetéseket mutassunk és mérjük a kampányok hatékonyságát.",
+    "acceptAll": "Összes elfogadása",
+    "essentialOnly": "Csak alapvető",
+    "savePreferences": "Beállítások mentése",
+    "managePreferences": "Beállítások kezelése",
+    "hidePreferences": "Beállítások elrejtése"
+  },
+  "gdpr": {
+    "title": "Az Ön adatjogai (GDPR)",
+    "description": "A GDPR értelmében Önnek joga van bármikor hozzáférni, exportálni és törölni személyes adatait.",
+    "downloadData": "Adataim letöltése (JSON)"
   }
 }

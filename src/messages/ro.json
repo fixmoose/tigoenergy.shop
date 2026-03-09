@@ -562,5 +562,29 @@
       "expireNote": "Linkurile de resetare expiră după o oră sau pot fi utilizate o singură dată. Vă rugăm să solicitați un link nou.",
       "pwdPlaceholder": "Minim 6 caractere"
     }
+  },
+  "cookieConsent": {
+    "title": "Folosim cookie-uri",
+    "description": "Folosim cookie-uri esențiale pentru funcționarea magazinului. Cu acordul dvs., putem folosi și cookie-uri analitice și de marketing. Citiți",
+    "cookiePolicy": "Politica noastră de cookie-uri",
+    "and": "și",
+    "privacyPolicy": "Politica de confidențialitate",
+    "essentialTitle": "Cookie-uri esențiale",
+    "essentialDesc": "Necesare pentru funcționarea magazinului: sesiune, coș, preferință de limbă. Nu pot fi dezactivate.",
+    "alwaysOn": "Întotdeauna activ",
+    "analyticsTitle": "Cookie-uri analitice",
+    "analyticsDesc": "Ne ajută să înțelegem cum folosesc vizitatorii site-ul pentru a-l îmbunătăți.",
+    "marketingTitle": "Cookie-uri de marketing",
+    "marketingDesc": "Ne permit să vă afișăm reclame relevante și să măsurăm eficiența campaniilor.",
+    "acceptAll": "Acceptă toate",
+    "essentialOnly": "Doar esențiale",
+    "savePreferences": "Salvează preferințele",
+    "managePreferences": "Gestionează preferințele",
+    "hidePreferences": "Ascunde preferințele"
+  },
+  "gdpr": {
+    "title": "Drepturile dvs. privind datele (GDPR)",
+    "description": "Conform GDPR, aveți dreptul de a accesa, exporta și șterge datele dvs. personale în orice moment.",
+    "downloadData": "Descarcă datele mele (JSON)"
   }
 }
