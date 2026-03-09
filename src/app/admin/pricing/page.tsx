@@ -1,6 +1,6 @@
 import { getPricingSchemas } from '@/app/actions/pricing'
 import PricingManager from '@/components/admin/PricingManager'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Product } from '@/types/database'
 
 export default async function AdminPricingPage() {

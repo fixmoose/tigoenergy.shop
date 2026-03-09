@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Product, Review } from '@/types/database'
 import { getAllReviews } from '@/app/actions/reviews'
 import AdminReviewsList from '@/components/admin/AdminReviewsList'

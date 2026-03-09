@@ -1,10 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import type { Cart } from '@/types/database'
 
 export default async function AdminCartsPage() {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
   const { data: carts, error } = await supabase.from('carts').select('*').order('updated_at', { ascending: false }).limit(50)
 
   if (error) {
@@ -27,9 +27,15 @@ export default async function AdminCartsPage() {
         {(carts ?? []).map((c: any) => (
           <div key={c.id} className="p-4 border rounded-md flex justify-between items-center">
             <div>
-              <div className="font-medium">Cart: {c.id}</div>
+              <div className="font-medium">Cart: {c.id.slice(0, 8)}…</div>
               <div className="text-sm text-muted-foreground">Items: {c.items?.length ?? 0}</div>
               <div className="text-sm text-muted-foreground">User: {c.user_id ?? 'guest'}</div>
+              <div className="text-xs text-gray-400 mt-1">
+                Updated: {c.updated_at ? new Date(c.updated_at).toLocaleString() : '—'}
+                {c.created_at && c.created_at !== c.updated_at && (
+                  <span className="ml-2">· Created: {new Date(c.created_at).toLocaleString()}</span>
+                )}
+              </div>
             </div>
             <div className="flex gap-2">
               {c.user_id ? (

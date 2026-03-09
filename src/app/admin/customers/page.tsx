@@ -1,5 +1,5 @@
 import React from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Customer } from '@/types/database'
 import CustomerList from '@/components/admin/CustomerList'
 

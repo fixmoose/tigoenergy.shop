@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Customer } from '@/types/database'
 import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignment'
 import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
@@ -164,7 +164,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <CustomerPricingAssignment
               customerId={id}
               allSchemas={(allSchemas as any).data ?? allSchemas}
-              currentSchemas={currentSchemas as any}
+              currentSchemas={(currentSchemas as any).data ?? currentSchemas}
             />
 
             {/* Support Messages Section */}

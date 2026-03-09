@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
 import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'

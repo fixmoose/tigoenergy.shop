@@ -20,11 +20,18 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
     optimizeCss: true,
+    outputFileTracingIncludes: {
+      '/**': [
+        './src/lib/email/templates/**/*',
+        './src/messages/**/*',
+      ],
+    },
   },
   compress: true,
   poweredByHeader: false,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Only remove console.log, keep console.error and console.warn for debugging
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   modularizeImports: {
     '@heroicons/react': {
