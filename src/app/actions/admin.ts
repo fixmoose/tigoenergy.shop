@@ -2,6 +2,7 @@
 
 import { randomBytes } from 'node:crypto'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
 import { MARKETS } from '@/lib/constants/markets'
@@ -9,19 +10,20 @@ import { MARKETS } from '@/lib/constants/markets'
 const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 
 /**
- * Checks if the current user is an admin
+ * Checks if the current user is an admin (cookie-based)
  */
 async function checkIsAdmin() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    return user?.user_metadata?.role === 'admin'
+    const cookieStore = await cookies()
+    return cookieStore.get('tigo-admin')?.value === '1'
 }
 
 /**
- * Checks if the current user is the Master Admin
+ * Checks if the current user is the Master Admin (cookie-based + email match)
  */
 async function checkIsMasterAdmin() {
-    const supabase = await createClient()
+    const cookieStore = await cookies()
+    if (cookieStore.get('tigo-admin')?.value !== '1') return false
+    const supabase = await createAdminClient()
     const { data: { user } } = await supabase.auth.getUser()
     return user?.email === MASTER_ADMIN_EMAIL
 }

@@ -10,6 +10,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CookieConsent from '@/components/CookieConsent'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 
@@ -87,6 +88,7 @@ export default async function RootLayout({
                     {children}
                   </main>
                   <Footer />
+                  <CookieConsent />
                 </CartProvider>
               </CurrencyProvider>
             </MarketProvider>

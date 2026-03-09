@@ -427,6 +427,22 @@ export default function ProfileSettings({ customer }: Props) {
                             Delete Account
                         </button>
                     </div>
+
+                    <div className="mt-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                        <p className="text-xs font-bold text-gray-700 mb-1">Your Data Rights (GDPR)</p>
+                        <p className="text-[11px] text-gray-500 mb-3">
+                            Under GDPR, you have the right to access, export, and delete your personal data at any time.
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                            <a
+                                href="/api/gdpr/export"
+                                download
+                                className="text-xs font-bold px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 transition shadow-sm"
+                            >
+                                Download My Data (JSON)
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="pt-4 flex items-center gap-4">

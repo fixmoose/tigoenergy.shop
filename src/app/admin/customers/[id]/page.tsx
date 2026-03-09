@@ -5,6 +5,7 @@ import type { Customer } from '@/types/database'
 import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignment'
 import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
 import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
+import AdminAddressEditor from '@/components/admin/AdminAddressEditor'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
 
@@ -64,7 +65,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <p className="text-sm font-medium text-gray-500 mt-1">{customer.email}</p>
           </div>
           <div className="flex gap-3">
-            {customer.is_b2b && !customer.user_metadata?.b2b_verified && (
+            {customer.is_b2b && customer.account_status !== 'active' && (
               <form action={async () => { 'use server'; await adminVerifyB2BCustomerAction(id) }}>
                 <button type="submit" className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">
                   Verify B2B & Notify
@@ -384,16 +385,10 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             </aside>
 
             {/* Address Book */}
-            <aside className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/50">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Addresses</h3>
-              </div>
-              <div className="p-8">
-                <pre className="whitespace-pre-wrap text-[11px] font-mono text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  {JSON.stringify(customer.addresses ?? [], null, 2)}
-                </pre>
-              </div>
-            </aside>
+            <AdminAddressEditor
+              customerId={id}
+              addresses={customer.addresses ?? []}
+            />
           </div>
         </div>
       </div>

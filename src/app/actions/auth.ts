@@ -114,6 +114,29 @@ export async function registerB2BUserAction(formData: any) {
         const user = userData.user
         if (!user) throw new Error('Failed to create user')
 
+        // Save address to customers.addresses (the trigger creates the row, give it a moment)
+        if (address || city) {
+            const addressEntry = {
+                id: Math.random().toString(36).substr(2, 9),
+                street: address || '',
+                street2: companyAddress2 || '',
+                city: city || '',
+                postalCode: postalCode || '',
+                country: country || '',
+                isDefaultShipping: true,
+                isDefaultBilling: true,
+            }
+            // Retry up to 3 times in case the trigger hasn't created the row yet
+            for (let attempt = 0; attempt < 3; attempt++) {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 500))
+                const { error: addrErr } = await supabase
+                    .from('customers')
+                    .update({ addresses: [addressEntry] })
+                    .eq('id', user.id)
+                if (!addrErr) break
+            }
+        }
+
         const headersList = await headers()
         const marketKey = headersList.get('x-market-key') || 'SHOP'
         const market = getMarketFromKey(marketKey)

@@ -1,6 +1,7 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
 interface CreateCustomerParams {
@@ -103,13 +104,13 @@ export async function getB2BCustomers() {
 
 export async function searchCustomersAction(query: string) {
     try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user || user.user_metadata?.role !== 'admin') throw new Error('Unauthorized')
+        const cookieStore = await cookies()
+        if (cookieStore.get('tigo-admin')?.value !== '1') throw new Error('Unauthorized')
 
+        const supabase = await createAdminClient()
         const { data, error } = await supabase
             .from('customers')
-            .select('*, addresses(*)')
+            .select('*')
             .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,company_name.ilike.%${query}%`)
             .limit(20)
 
