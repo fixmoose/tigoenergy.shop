@@ -1,4 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import fs from 'fs'
+import path from 'path'
+
+function readLogoAsDataUrl(): string {
+    try {
+        const logoPath = path.join(process.cwd(), 'public', 'initra-logo.png')
+        const logoBuffer = fs.readFileSync(logoPath)
+        return `data:image/png;base64,${logoBuffer.toString('base64')}`
+    } catch {
+        return ''
+    }
+}
 
 export interface DocumentData {
     order_number: string
@@ -39,7 +51,7 @@ export interface DocumentData {
 }
 
 export async function getPinnedTemplate(type: string, language: string = 'en') {
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
 
     // Try to find the pinned (is_default = true) template for this type and language
     const { data: template, error } = await supabase
@@ -77,7 +89,7 @@ const DEFAULT_COMPANY_DATA = {
     company_bic_be: 'TRWIBEB1XXX',
     company_bic_si: 'HDELSI22',
     place_of_issue: 'Podsmreka',
-    company_logo: `file://${process.cwd()}/public/initra-logo.png`
+    get company_logo() { return readLogoAsDataUrl() },
 }
 
 export function replacePlaceholders(html: string, data: DocumentData) {

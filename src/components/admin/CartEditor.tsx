@@ -29,6 +29,23 @@ export default function CartEditor({ cart }: { cart: Cart | null }) {
     alert('Saved')
   }
 
+  async function deleteCart() {
+    if (!localCart) return
+    if (!confirm('Delete this cart permanently?')) return
+    setSaving(true)
+    const res = await fetch(`/api/admin/customers/${localCart.user_id ?? localCart.id}/carts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', cartId: localCart.id }),
+    })
+    setSaving(false)
+    if (res.ok) {
+      window.location.href = '/admin/carts'
+    } else {
+      alert('Failed to delete cart')
+    }
+  }
+
   async function convert() {
     if (!localCart) return
     setSaving(true)
@@ -68,6 +85,7 @@ export default function CartEditor({ cart }: { cart: Cart | null }) {
       <div className="mt-4 flex gap-2">
         <button onClick={save} disabled={saving} className="btn btn-primary">Save</button>
         <button onClick={convert} disabled={saving} className="btn btn-secondary">Convert to Order</button>
+        <button onClick={deleteCart} disabled={saving} className="btn btn-danger bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Delete Cart</button>
       </div>
     </div>
   )

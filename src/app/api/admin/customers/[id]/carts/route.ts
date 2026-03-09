@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 import type { Cart, CartItem } from '@/types/database'
 
+async function requireAdmin() {
+  const cookieStore = await cookies()
+  return cookieStore.get('tigo-admin')?.value === '1'
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
   const { id: customerId } = await params
 
-  // Require authenticated user
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data, error } = await supabase
     .from('carts')
@@ -23,12 +27,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
+  const supabase = await createAdminClient()
   const { id: customerId } = await params
 
-  // Require authenticated user
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json().catch(() => ({})) as any
   const action = body.action || 'convert'

@@ -24,6 +24,9 @@ const nextConfig = {
       '/**': [
         './src/lib/email/templates/**/*',
         './src/messages/**/*',
+        './public/initra-logo.png',
+        './public/initra-logo.jpg',
+        './public/initralogo.jpg',
       ],
     },
   },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '../../../../../lib/supabase/server'
+import { createClient, createAdminClient } from '../../../../../lib/supabase/server'
+import { cookies } from 'next/headers'
 import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
 
@@ -8,7 +9,12 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params
-    const supabase = await createClient()
+
+    // Check if admin cookie is set
+    const cookieStore = await cookies()
+    const isAdminCookie = cookieStore.get('tigo-admin')?.value === '1'
+
+    const supabase = isAdminCookie ? await createAdminClient() : await createClient()
 
     // 1. Fetch Order with Items
     const { data: order, error: orderError } = await supabase
@@ -22,15 +28,16 @@ export async function GET(
     }
 
     // 2. Security Check (Only owner or admin)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (order.customer_email !== user.email) {
-        const isAdmin = user.email?.endsWith('@tigoenergy.com') || user.user_metadata?.role === 'admin'
-        if (!isAdmin) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!isAdminCookie) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        if (order.customer_email !== user.email) {
+            const isAdmin = user.email?.endsWith('@tigoenergy.com') || user.user_metadata?.role === 'admin'
+            if (!isAdmin) {
+                return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+            }
         }
     }
 
