@@ -316,6 +316,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           <AdminOrderActions
             orderId={order.id}
             status={order.status || null}
+            paymentStatus={order.payment_status || null}
             createdAt={order.created_at || null}
             confirmedAt={order.confirmed_at || null}
             packingSlipUrl={order.packing_slip_url}

@@ -265,6 +265,62 @@ export default function OrderDetailsPage() {
                     {/* Left Column: Details */}
                     <div className="lg:col-span-2 space-y-8">
 
+                        {/* Payment Instructions — shown for unpaid orders */}
+                        {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' && (
+                            <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 shadow-sm">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl">💳</div>
+                                    <div>
+                                        <h3 className="font-black text-gray-900 text-lg">Payment Required</h3>
+                                        <p className="text-sm text-amber-700 font-medium">Transfer the exact amount using the details below.</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                                    {/* NLB — Slovenia */}
+                                    <div className="bg-white rounded-xl p-4 border border-amber-100">
+                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-3">NLB d.d. — Slovenia</p>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase">IBAN</p>
+                                                <p className="font-mono text-sm font-bold text-gray-900">SI56 6100 0002 8944 371</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase">BIC/SWIFT</p>
+                                                <p className="font-mono text-sm font-bold text-gray-900">HDELSI22</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* Wise — International */}
+                                    <div className="bg-white rounded-xl p-4 border border-amber-100">
+                                        <p className="text-[10px] font-black text-blue-700 uppercase tracking-widest mb-3">Wise — International</p>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase">IBAN</p>
+                                                <p className="font-mono text-sm font-bold text-gray-900">BE55 9052 7486 2944</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[9px] font-bold text-gray-400 uppercase">BIC/SWIFT</p>
+                                                <p className="font-mono text-sm font-bold text-gray-900">TRWIBEB1XXX</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Payment Reference (required)</p>
+                                        <p className="font-mono text-xl font-black text-blue-900">{order.order_number}</p>
+                                        <p className="text-[10px] text-blue-600 mt-1">Always include this reference so we can match your payment.</p>
+                                    </div>
+                                    <div className="text-right flex-shrink-0">
+                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Amount to Pay</p>
+                                        <p className="text-2xl font-black text-gray-900">{order.currency} {order.total.toFixed(2)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Unified Action Card */}
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-visible">
                             <div className="flex flex-col gap-1">

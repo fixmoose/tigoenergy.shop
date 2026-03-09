@@ -4,17 +4,19 @@ import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { issueOrderInvoiceAction, adminMarkDeliveredAction } from '@/app/actions/admin'
+import { adminSendOrderForPaymentAction } from '@/app/actions/order-notifications'
 
 interface AdminOrderActionsProps {
     orderId: string
     status: string | null
+    paymentStatus?: string | null
     createdAt: string | null
     confirmedAt: string | null
     packingSlipUrl?: string | null
     shippingLabelUrl?: string | null
 }
 
-export default function AdminOrderActions({ orderId, status, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -287,6 +289,30 @@ export default function AdminOrderActions({ orderId, status, createdAt, confirme
                                     <span>✅</span> {loading ? 'Wait...' : 'Mark as Delivered & Notify Customer'}
                                 </button>
                             )}
+                        </div>
+                    )}
+
+                    {paymentStatus !== 'paid' && (
+                        <div className="pt-4 border-t">
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Payment</p>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Send a payment request email to the customer with order details and IBAN instructions?')) return
+                                    setLoading(true)
+                                    try {
+                                        await adminSendOrderForPaymentAction(orderId)
+                                        alert('Payment request sent to customer.')
+                                    } catch (err: any) {
+                                        alert('Failed: ' + err.message)
+                                    } finally {
+                                        setLoading(false)
+                                    }
+                                }}
+                                disabled={loading}
+                                className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                <span>💳</span> {loading ? 'Sending...' : 'Send Payment Request to Customer'}
+                            </button>
                         </div>
                     )}
 

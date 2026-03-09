@@ -54,12 +54,17 @@ export default function MyOrders({ user, customer }: Props) {
                                     <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                 </div>
                                 <div>
-                                    <div className="flex items-center gap-3 mb-1">
+                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
                                         <span className="font-bold text-lg text-gray-900">Order #{order.order_number}</span>
-                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${order.status === 'completed' || order.status === 'paid' ? 'bg-green-100 text-green-700' :
+                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' ? 'bg-green-100 text-green-700' :
                                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                                 'bg-blue-100 text-blue-700'
                                             }`}>{order.status || 'Pending'}</span>
+                                        {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' && (
+                                            <span className="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-amber-100 text-amber-700 animate-pulse">
+                                                Awaiting Payment
+                                            </span>
+                                        )}
                                     </div>
                                     <p className="text-sm text-gray-500 font-medium">
                                         Placed on {new Date(order.created_at!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -72,12 +77,21 @@ export default function MyOrders({ user, customer }: Props) {
                                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">Total Amount</p>
                                     <p className="text-lg font-bold text-gray-900">{order.currency} {order.total.toFixed(2)}</p>
                                 </div>
-                                <Link
-                                    href={`/orders/${order.id}`}
-                                    className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
-                                >
-                                    View Details
-                                </Link>
+                                {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' ? (
+                                    <Link
+                                        href={`/orders/${order.id}`}
+                                        className="bg-amber-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-amber-600 transition-all shadow-sm hover:shadow-md"
+                                    >
+                                        Pay Now
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={`/orders/${order.id}`}
+                                        className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
+                                    >
+                                        View Details
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     ))}
