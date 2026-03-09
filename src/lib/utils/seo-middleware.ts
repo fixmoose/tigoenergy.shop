@@ -29,12 +29,19 @@ export function seoMiddleware(request: NextRequest) {
     const market = getMarketFromKey(marketKey)
 
     // Set market key in headers for downstream components
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-market-key', marketKey)
+    requestHeaders.set('x-market-country', market.country)
+    requestHeaders.set('x-market-currency', market.currency)
+    requestHeaders.set('x-market-locale', market.locale)
+
     const response = NextResponse.next({
         request: {
-            headers: new Headers(request.headers),
+            headers: requestHeaders,
         },
     })
 
+    // Also set these on the response for client-side visibility/cache keying
     response.headers.set('x-market-key', marketKey)
     response.headers.set('x-market-country', market.country)
     response.headers.set('x-market-currency', market.currency)
