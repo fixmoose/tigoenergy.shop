@@ -13,6 +13,7 @@ import Footer from '@/components/Footer'
 import CookieConsent from '@/components/CookieConsent'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 import { QueryProvider } from '@/components/providers/QueryProvider'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 
 export const dynamic = 'force-dynamic'
@@ -89,6 +90,7 @@ export default async function RootLayout({
                   </main>
                   <Footer />
                   <CookieConsent />
+                  <SpeedInsights />
                 </CartProvider>
               </CurrencyProvider>
             </MarketProvider>

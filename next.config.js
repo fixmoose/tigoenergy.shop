@@ -20,15 +20,12 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
     optimizeCss: true,
-    outputFileTracingIncludes: {
-      '/**': [
-        './src/lib/email/templates/**/*',
-        './src/messages/**/*',
-        './public/initra-logo.png',
-        './public/initra-logo.jpg',
-        './public/initralogo.jpg',
-      ],
-    },
+  },
+  outputFileTracingIncludes: {
+    '/**': [
+      './src/lib/email/templates/**/*',
+      './src/messages/**/*',
+    ],
   },
   compress: true,
   poweredByHeader: false,
