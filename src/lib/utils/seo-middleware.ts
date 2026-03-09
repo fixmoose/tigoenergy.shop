@@ -47,12 +47,14 @@ export function seoMiddleware(request: NextRequest) {
     response.headers.set('x-market-currency', market.currency)
     response.headers.set('x-market-locale', market.locale)
 
-    // Handle www redirect
+    // Handle www redirect (Vercel usually handles this, so we disable it here to avoid duplication)
+    /*
     if (host.startsWith('www.')) {
         const newUrl = new URL(url)
         newUrl.host = host.replace('www.', '')
         return NextResponse.redirect(newUrl, 301)
     }
+    */
 
 
 
