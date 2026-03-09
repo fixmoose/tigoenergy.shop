@@ -40,7 +40,7 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
     )
 
     const items: any[] = localCart.items ?? []
-    const subtotal = items.reduce((sum, it) => sum + Number(it.total_price ?? (it.unit_price * it.quantity) ?? 0), 0)
+    const subtotal = items.reduce((sum, it) => sum + Number((it.total_price ?? (it.unit_price * it.quantity)) || 0), 0)
     const country = getCustomerCountry(customer)
     const flag = country ? countryToFlag(country) : ''
 
@@ -168,7 +168,7 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {items.map((it: any, i: number) => {
-                                    const lineTotal = Number(it.total_price ?? (it.unit_price * it.quantity) ?? 0)
+                                    const lineTotal = Number((it.total_price ?? (it.unit_price * it.quantity)) || 0)
                                     const unitPrice = Number(it.unit_price ?? 0)
                                     const name = it.product_name || it.name || it.sku || 'Unknown Product'
                                     return (
