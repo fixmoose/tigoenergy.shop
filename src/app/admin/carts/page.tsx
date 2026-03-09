@@ -32,7 +32,7 @@ export default async function AdminCartsPage() {
 
     function cartValue(cart: any): number {
         return (cart.items ?? []).reduce((sum: number, it: any) => {
-            return sum + Number(it.total_price ?? (it.unit_price * it.quantity) ?? 0)
+            return sum + Number(it.total_price ?? (it.unit_price * it.quantity) || 0)
         }, 0)
     }
 
