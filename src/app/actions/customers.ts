@@ -121,3 +121,23 @@ export async function searchCustomersAction(query: string) {
         return { success: false, error: err.message || 'Failed to search customers' }
     }
 }
+
+export async function getCustomerLatestOrderAction(customerId: string) {
+    try {
+        const cookieStore = await cookies()
+        if (cookieStore.get('tigo-admin')?.value !== '1') throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+        const { data } = await supabase
+            .from('orders')
+            .select('shipping_address, billing_address')
+            .eq('customer_id', customerId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+        return { success: true, data }
+    } catch (err: any) {
+        return { success: false, error: err.message || 'Failed to fetch order address' }
+    }
+}

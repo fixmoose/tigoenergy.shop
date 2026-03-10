@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { searchProductsAction } from '@/app/actions/products'
-import { searchCustomersAction } from '@/app/actions/customers'
+import { searchCustomersAction, getCustomerLatestOrderAction } from '@/app/actions/customers'
 import { adminCreateOrderWithCustomerAction, issueOrderInvoiceAction } from '@/app/actions/admin'
 import { MARKETS } from '@/lib/constants/markets'
 
@@ -269,7 +269,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                 <button
                                                     key={c.id}
                                                     type="button"
-                                                    onClick={() => {
+                                                    onClick={async () => {
                                                         const customer = c as any
                                                         setSelectedCustomer({
                                                             id: customer.id,
@@ -281,33 +281,46 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                             phone: customer.phone || '',
                                                             is_b2b: !!customer.is_b2b
                                                         })
-                                                        // Pre-fill shipping address (uses isDefaultShipping flag)
-                                                        const shipAddr = customer.addresses?.find((a: any) => a.isDefaultShipping) || customer.addresses?.[0]
-                                                        if (shipAddr) {
-                                                            setShippingAddress({
-                                                                street: shipAddr.street || '',
-                                                                street2: shipAddr.street2 || '',
-                                                                city: shipAddr.city || '',
-                                                                postal_code: shipAddr.postalCode || shipAddr.postal_code || '',
-                                                                country: shipAddr.country?.toUpperCase() || 'SI'
-                                                            })
-                                                        }
-                                                        // Pre-fill billing address if different from shipping
-                                                        const billAddr = customer.addresses?.find((a: any) => a.isDefaultBilling && !a.isDefaultShipping)
-                                                        if (billAddr) {
-                                                            setBillingAddress({
-                                                                street: billAddr.street || '',
-                                                                street2: billAddr.street2 || '',
-                                                                city: billAddr.city || '',
-                                                                postal_code: billAddr.postalCode || billAddr.postal_code || '',
-                                                                country: billAddr.country?.toUpperCase() || 'SI'
-                                                            })
-                                                            setBillingSame(false)
-                                                        } else {
-                                                            setBillingSame(true)
-                                                        }
                                                         setCustomerSearch('')
                                                         setCustomerResults([])
+
+                                                        // Normalize address fields (customer addresses use postalCode, orders use postal_code)
+                                                        const normalizeAddr = (a: any) => ({
+                                                            street: a.street || '',
+                                                            street2: a.street2 || '',
+                                                            city: a.city || '',
+                                                            postal_code: a.postalCode || a.postal_code || '',
+                                                            country: (a.country || 'SI').toUpperCase()
+                                                        })
+
+                                                        // Try saved customer addresses first
+                                                        const shipAddr = customer.addresses?.find((a: any) => a.isDefaultShipping) || customer.addresses?.[0]
+                                                        if (shipAddr) {
+                                                            setShippingAddress(normalizeAddr(shipAddr))
+                                                            const billAddr = customer.addresses?.find((a: any) => a.isDefaultBilling && !a.isDefaultShipping)
+                                                            if (billAddr) {
+                                                                setBillingAddress(normalizeAddr(billAddr))
+                                                                setBillingSame(false)
+                                                            } else {
+                                                                setBillingSame(true)
+                                                            }
+                                                        } else {
+                                                            // Fallback: use latest order's shipping address
+                                                            const res = await getCustomerLatestOrderAction(customer.id)
+                                                            if (res.success && res.data?.shipping_address) {
+                                                                setShippingAddress(normalizeAddr(res.data.shipping_address))
+                                                            }
+                                                            if (res.success && res.data?.billing_address) {
+                                                                const bill = res.data.billing_address as any
+                                                                const ship = res.data.shipping_address as any
+                                                                if (bill.street !== ship?.street || bill.city !== ship?.city) {
+                                                                    setBillingAddress(normalizeAddr(bill))
+                                                                    setBillingSame(false)
+                                                                } else {
+                                                                    setBillingSame(true)
+                                                                }
+                                                            }
+                                                        }
                                                     }}
                                                     className="w-full text-left p-3 hover:bg-slate-50 flex flex-col border-b last:border-0 border-slate-100"
                                                 >
