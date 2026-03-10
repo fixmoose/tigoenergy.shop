@@ -111,11 +111,13 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
 
     // Logic for automatic VAT adjustment
     useEffect(() => {
-        if (selectedCustomer.is_b2b) {
+        const currentMarketKey = market.toUpperCase()
+        const region = MARKETS[currentMarketKey]
+        if (selectedCustomer.is_b2b && market !== 'si') {
+            // EU B2B reverse charge: no VAT for cross-border B2B
             setVatRate(0)
         } else {
-            const currentMarketKey = market.toUpperCase()
-            const region = MARKETS[currentMarketKey]
+            // B2C always charges VAT; B2B in Slovenia (same country as seller) also charges VAT
             if (region) {
                 setVatRate(region.vatRate * 100)
             }
@@ -471,9 +473,6 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                 const region = allRegions.find(r => r.country === country)
                                                 if (region) {
                                                     setMarket(region.key.toLowerCase())
-                                                    if (!selectedCustomer.is_b2b) {
-                                                        setVatRate(region.vatRate * 100)
-                                                    }
                                                 }
                                             }}
                                             className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
@@ -723,10 +722,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                     onChange={e => {
                                         const m = e.target.value
                                         setMarket(m)
-                                        const region = MARKETS[m.toUpperCase()]
-                                        if (region && !selectedCustomer.is_b2b) {
-                                            setVatRate(region.vatRate * 100)
-                                        }
+                                        // VAT rate is handled by the useEffect watching market + is_b2b
                                     }}
                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm appearance-none outline-none focus:border-blue-500 shadow-sm"
                                 >
