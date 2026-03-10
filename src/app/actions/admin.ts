@@ -341,16 +341,22 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
             // Email passed directly — no DB lookup needed
             emailToReset = identifier
         } else {
-            // UUID passed — look up in customers table
-            const { data: customer, error: fetchError } = await supabase
+            // UUID passed — try customers table first, fall back to Supabase Auth
+            const { data: customer } = await supabase
                 .from('customers')
                 .select('id, email, preferred_language')
                 .eq('id', identifier)
                 .maybeSingle()
 
-            if (fetchError || !customer) throw new Error('Customer not found')
-            emailToReset = customer.email
-            locale = customer.preferred_language || 'en'
+            if (customer) {
+                emailToReset = customer.email
+                locale = customer.preferred_language || 'en'
+            } else {
+                // Not in customers table — look up directly in Supabase Auth
+                const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(identifier)
+                if (authError || !authUser?.user?.email) throw new Error('Customer not found in auth system')
+                emailToReset = authUser.user.email
+            }
         }
 
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
