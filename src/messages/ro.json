@@ -508,7 +508,10 @@
         "commercialAccess": "Locația mea de livrare are acces comercial?",
         "jobTitle": "Funcție",
         "businessType": "Tip de afacere",
-        "truckAccess": "Poate un camion/furgonetă mare să acceseze depozitul/biroul dvs. pentru livrarea paletului?"
+        "truckAccess": "Poate un camion/furgonetă mare să acceseze depozitul/biroul dvs. pentru livrarea paletului?",
+        "email": "Email",
+        "mobilePhone": "Telefon mobil",
+        "code": "Cod de verificare"
       },
       "messages": {
         "emailCheck": "Verificați-vă căsuța de e-mail pentru codul de 6 cifre",
@@ -527,7 +530,12 @@
         "euNote": "Introduceți numărul dvs. de TVA valid din UE pentru a vă verifica statutul de afacere prin VIES.",
         "successTitle": "Înregistrare reușită!",
         "successDesc": "Contul dvs. a fost creat. Un e-mail de bun venit a fost trimis la {email}.",
-        "goSignIn": "Mergeți la autentificare"
+        "goSignIn": "Mergeți la autentificare",
+        "checkEmailCode": "Verificați emailul pentru codul de 6 cifre",
+        "checkPhoneCode": "Verificați telefonul pentru codul de 6 cifre",
+        "emailVerified": "Email verificat cu succes",
+        "phoneVerified": "Telefon verificat cu succes",
+        "registrationSuccess": "Înregistrare reușită! Bun venit la Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Revizuiți-vă informațiile",
@@ -540,7 +548,41 @@
         "legitimate": "Aceasta este o entitate comercială legitimă.",
         "confirmCreate": "Confirmă și creează cont",
         "creating": "Se creează contul..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Numărul TVA nu este valid. Vă rugăm verificați și încercați din nou.",
+        "connectionError": "Eroare de conexiune. Vă rugăm încercați din nou.",
+        "invalidCode": "Cod invalid. Vă rugăm încercați din nou.",
+        "registrationFailed": "Înregistrare eșuată. Vă rugăm încercați din nou.",
+        "verificationFailed": "Verificare eșuată. Vă rugăm încercați din nou."
+      },
+      "buttons": {
+        "back": "Înapoi",
+        "continue": "Continuați",
+        "nextStep": "Pasul următor",
+        "continueToFinalStep": "Continuați la ultimul pas",
+        "continueToReview": "Continuați la revizuire",
+        "backToBusinessType": "Înapoi la tipul de afacere",
+        "backToContactPerson": "Înapoi la persoana de contact",
+        "verifyVat": "Verificați TVA",
+        "sending": "Se trimite...",
+        "sendCode": "Trimiteți codul",
+        "resendEmail": "Retrimiteți emailul",
+        "verifyEmail": "Verificați emailul",
+        "sendSms": "Trimiteți SMS",
+        "resendSms": "Retrimiteți SMS",
+        "verifyPhone": "Verificați telefonul"
+      },
+      "placeholders": {
+        "email": "dvs@companie.ro",
+        "password": "Min. 8 caractere",
+        "confirmPassword": "Repetați parola",
+        "mobilePhone": "+40 721 234 567",
+        "vat": "ex. RO12345678",
+        "taxId": "CUI / nr. înregistrare",
+        "select": "Selectați..."
+      },
+      "vat": "Cod TVA"
     },
     "forgotPassword": {
       "title": "Ați uitat parola?",

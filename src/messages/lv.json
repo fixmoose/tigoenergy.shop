@@ -508,7 +508,10 @@
         "commercialAccess": "Vai piegādes vietai ir komerciāla piekļuve?",
         "jobTitle": "Amats",
         "businessType": "Biznesa veids",
-        "truckAccess": "Vai liela kravas automašīna var piekļūt jūsu noliktavai/birojam palešu piegādei?"
+        "truckAccess": "Vai liela kravas automašīna var piekļūt jūsu noliktavai/birojam palešu piegādei?",
+        "email": "E-pasts",
+        "mobilePhone": "Mobilais tālrunis",
+        "code": "Verifikācijas kods"
       },
       "messages": {
         "emailCheck": "Pārbaudiet savu e-pastu, lai saņemtu 6 ciparu kodu",
@@ -527,7 +530,12 @@
         "euNote": "Ievadiet savu derīgo ES PVN numuru, lai pārbaudītu uzņēmuma statusu, izmantojot VIES.",
         "successTitle": "Reģistrācija veiksmīga!",
         "successDesc": "Jūsu konts ir izveidots. Sveiciena e-pasts ir nosūtīts uz {email}.",
-        "goSignIn": "Doties uz pieteikšanos"
+        "goSignIn": "Doties uz pieteikšanos",
+        "checkEmailCode": "Pārbaudiet e-pastu 6 ciparu kodam",
+        "checkPhoneCode": "Pārbaudiet tālruni 6 ciparu kodam",
+        "emailVerified": "E-pasts veiksmīgi apstiprināts",
+        "phoneVerified": "Tālrunis veiksmīgi apstiprināts",
+        "registrationSuccess": "Reģistrācija veiksmīga! Laipni lūdzam Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Pārskatiet savu informāciju",
@@ -540,7 +548,41 @@
         "legitimate": "Šī ir likumīga uzņēmējdarbības vienība.",
         "confirmCreate": "Apstiprināt un izveidot kontu",
         "creating": "Izveido kontu..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "PVN numurs nav derīgs. Lūdzu pārbaudiet un mēģiniet vēlreiz.",
+        "connectionError": "Savienojuma kļūda. Lūdzu mēģiniet vēlreiz.",
+        "invalidCode": "Nepareizs kods. Lūdzu mēģiniet vēlreiz.",
+        "registrationFailed": "Reģistrācija neizdevās. Lūdzu mēģiniet vēlreiz.",
+        "verificationFailed": "Verifikācija neizdevās. Lūdzu mēģiniet vēlreiz."
+      },
+      "buttons": {
+        "back": "Atpakaļ",
+        "continue": "Turpināt",
+        "nextStep": "Nākamais solis",
+        "continueToFinalStep": "Turpināt uz pēdējo soli",
+        "continueToReview": "Turpināt uz pārskatu",
+        "backToBusinessType": "Atpakaļ uz uzņēmuma veidu",
+        "backToContactPerson": "Atpakaļ uz kontaktpersonu",
+        "verifyVat": "Pārbaudīt PVN",
+        "sending": "Sūta...",
+        "sendCode": "Nosūtīt kodu",
+        "resendEmail": "Nosūtīt e-pastu atkārtoti",
+        "verifyEmail": "Apstiprināt e-pastu",
+        "sendSms": "Nosūtīt SMS",
+        "resendSms": "Nosūtīt SMS atkārtoti",
+        "verifyPhone": "Apstiprināt tālruni"
+      },
+      "placeholders": {
+        "email": "jūs@uzņēmums.lv",
+        "password": "Vismaz 8 rakstzīmes",
+        "confirmPassword": "Atkārtojiet paroli",
+        "mobilePhone": "+371 2123 4567",
+        "vat": "piem. LV12345678901",
+        "taxId": "PVN / reģ. nr.",
+        "select": "Izvēlēties..."
+      },
+      "vat": "PVN numurs"
     },
     "forgotPassword": {
       "title": "Aizmirsu paroli?",

@@ -508,7 +508,10 @@
         "commercialAccess": "A szállítási helyem rendelkezik kereskedelmi hozzáféréssel?",
         "jobTitle": "Beosztás",
         "businessType": "Üzleti típus",
-        "truckAccess": "Egy nagy teherautó/furgon be tud hajtani raktárába/irodájába raklapos szállításhoz?"
+        "truckAccess": "Egy nagy teherautó/furgon be tud hajtani raktárába/irodájába raklapos szállításhoz?",
+        "email": "Email",
+        "mobilePhone": "Mobiltelefon",
+        "code": "Ellenőrző kód"
       },
       "messages": {
         "emailCheck": "Ellenőrizze az e-mail postaládáját a 6 számjegyű kódért",
@@ -527,7 +530,12 @@
         "euNote": "Adja meg érvényes EU-s ÁFA számát vállalkozása állapotának VIES rendszeren keresztüli ellenőrzéséhez.",
         "successTitle": "Regisztráció sikeres!",
         "successDesc": "Fiókja létrejött. Egy üdvözlő e-mailt küldtünk a következő címre: {email}.",
-        "goSignIn": "Tovább a bejelentkezéshez"
+        "goSignIn": "Tovább a bejelentkezéshez",
+        "checkEmailCode": "Ellenőrizze emailjét a 6 jegyű kódért",
+        "checkPhoneCode": "Ellenőrizze telefonját a 6 jegyű kódért",
+        "emailVerified": "Email sikeresen ellenőrizve",
+        "phoneVerified": "Telefon sikeresen ellenőrizve",
+        "registrationSuccess": "Sikeres regisztráció! Üdvözöljük a Tigo Energy-nél."
       },
       "agreements": {
         "reviewInfo": "Információk áttekintése",
@@ -540,7 +548,41 @@
         "legitimate": "Ez egy legitim gazdasági egység.",
         "confirmCreate": "Megerősítés és fiók létrehozása",
         "creating": "Fiók létrehozása..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Az adószám érvénytelen. Kérjük ellenőrizze és próbálja újra.",
+        "connectionError": "Kapcsolódási hiba. Kérjük próbálja újra.",
+        "invalidCode": "Érvénytelen kód. Próbálja újra.",
+        "registrationFailed": "A regisztráció sikertelen. Próbálja újra.",
+        "verificationFailed": "Az ellenőrzés sikertelen. Próbálja újra."
+      },
+      "buttons": {
+        "back": "Vissza",
+        "continue": "Folytatás",
+        "nextStep": "Következő lépés",
+        "continueToFinalStep": "Folytatás az utolsó lépéshez",
+        "continueToReview": "Folytatás az áttekintéshez",
+        "backToBusinessType": "Vissza a vállalkozás típusához",
+        "backToContactPerson": "Vissza a kapcsolattartóhoz",
+        "verifyVat": "ÁFA ellenőrzése",
+        "sending": "Küldés...",
+        "sendCode": "Kód küldése",
+        "resendEmail": "Email újraküldése",
+        "verifyEmail": "Email ellenőrzése",
+        "sendSms": "SMS küldése",
+        "resendSms": "SMS újraküldése",
+        "verifyPhone": "Telefon ellenőrzése"
+      },
+      "placeholders": {
+        "email": "on@ceg.hu",
+        "password": "Min. 8 karakter",
+        "confirmPassword": "Jelszó ismétlése",
+        "mobilePhone": "+36 20 123 4567",
+        "vat": "pl. HU12345678",
+        "taxId": "Adószám / cégj. sz.",
+        "select": "Kiválasztás..."
+      },
+      "vat": "ÁFA szám"
     },
     "forgotPassword": {
       "title": "Elfelejtette jelszavát?",

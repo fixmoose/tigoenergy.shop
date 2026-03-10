@@ -508,7 +508,10 @@
         "commercialAccess": "Ar pristatymo vieta turi komercinę prieigą?",
         "jobTitle": "Pareigų pavadinimas",
         "businessType": "Verslo tipas",
-        "truckAccess": "Ar didelis sunkvežimis / furgonas gali privažiuoti prie jūsų sandėlio / biuro padėklams pristatyti?"
+        "truckAccess": "Ar didelis sunkvežimis / furgonas gali privažiuoti prie jūsų sandėlio / biuro padėklams pristatyti?",
+        "email": "El. paštas",
+        "mobilePhone": "Mobilusis telefonas",
+        "code": "Patvirtinimo kodas"
       },
       "messages": {
         "emailCheck": "Savo el. pašte ieškokite 6 skaitmenų kodo",
@@ -527,7 +530,12 @@
         "euNote": "Įveskite galiojantį ES PVM mokėtojo kodą, kad patvirtintumėte savo verslo statusą per VIES sistemą.",
         "successTitle": "Registracija sėkminga!",
         "successDesc": "Jūsų paskyra sukurta. Sveikinimo el. laiškas išsiųstas adresu {email}.",
-        "goSignIn": "Eiti į prisijungimą"
+        "goSignIn": "Eiti į prisijungimą",
+        "checkEmailCode": "Patikrinkite el. paštą 6 skaitmenų kodui",
+        "checkPhoneCode": "Patikrinkite telefoną 6 skaitmenų kodui",
+        "emailVerified": "El. paštas sėkmingai patvirtintas",
+        "phoneVerified": "Telefonas sėkmingai patvirtintas",
+        "registrationSuccess": "Registracija sėkminga! Sveiki atvykę į Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Peržiūrėkite savo informaciją",
@@ -540,7 +548,41 @@
         "legitimate": "Tai yra teisėtas verslo subjektas.",
         "confirmCreate": "Patvirtinti ir sukurti paskyrą",
         "creating": "Kuriama paskyra..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "PVM mokėtojo kodas neteisingas. Patikrinkite ir bandykite dar kartą.",
+        "connectionError": "Ryšio klaida. Bandykite dar kartą.",
+        "invalidCode": "Neteisingas kodas. Bandykite dar kartą.",
+        "registrationFailed": "Registracija nepavyko. Bandykite dar kartą.",
+        "verificationFailed": "Patvirtinimas nepavyko. Bandykite dar kartą."
+      },
+      "buttons": {
+        "back": "Atgal",
+        "continue": "Tęsti",
+        "nextStep": "Kitas žingsnis",
+        "continueToFinalStep": "Tęsti iki paskutinio žingsnio",
+        "continueToReview": "Tęsti iki peržiūros",
+        "backToBusinessType": "Atgal į verslo tipą",
+        "backToContactPerson": "Atgal į kontaktinį asmenį",
+        "verifyVat": "Patikrinti PVM",
+        "sending": "Siunčiama...",
+        "sendCode": "Siųsti kodą",
+        "resendEmail": "Siųsti el. paštą iš naujo",
+        "verifyEmail": "Patvirtinti el. paštą",
+        "sendSms": "Siųsti SMS",
+        "resendSms": "Siųsti SMS iš naujo",
+        "verifyPhone": "Patvirtinti telefoną"
+      },
+      "placeholders": {
+        "email": "jūs@įmonė.lt",
+        "password": "Min. 8 simboliai",
+        "confirmPassword": "Pakartokite slaptažodį",
+        "mobilePhone": "+370 612 34567",
+        "vat": "pvz. LT123456789",
+        "taxId": "PVM / reg. nr.",
+        "select": "Pasirinkti..."
+      },
+      "vat": "PVM kodas"
     },
     "forgotPassword": {
       "title": "Pamiršote slaptažodį?",

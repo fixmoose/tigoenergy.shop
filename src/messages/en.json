@@ -433,7 +433,10 @@
         "commercialAccess": "My Delivery Location has Commercial Access?",
         "jobTitle": "Job Title",
         "businessType": "Type of Business",
-        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?"
+        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?",
+        "email": "Email",
+        "mobilePhone": "Mobile Phone",
+        "code": "Verification Code"
       },
       "messages": {
         "emailCheck": "Check your inbox for the 6-digit code",
@@ -452,7 +455,12 @@
         "euNote": "Enter your valid EU VAT number to verify your business status via VIES.",
         "successTitle": "Registration Successful!",
         "successDesc": "Your account has been created. A welcome email has been sent to {email}.",
-        "goSignIn": "Go to Sign In"
+        "goSignIn": "Go to Sign In",
+        "checkEmailCode": "Check your inbox for the 6-digit code",
+        "checkPhoneCode": "Check your phone for the 6-digit code",
+        "emailVerified": "Email verified successfully",
+        "phoneVerified": "Phone verified successfully",
+        "registrationSuccess": "Registration successful! Welcome to Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Review Your Information",
@@ -465,7 +473,41 @@
         "legitimate": "This is a legitimate business entity.",
         "confirmCreate": "Confirm & Create Account",
         "creating": "Creating Account..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "VAT number is not valid. Please check and try again.",
+        "connectionError": "Connection error. Please try again.",
+        "invalidCode": "Invalid code. Please try again.",
+        "registrationFailed": "Registration failed. Please try again.",
+        "verificationFailed": "Verification failed. Please try again."
+      },
+      "buttons": {
+        "back": "Back",
+        "continue": "Continue",
+        "nextStep": "Next Step",
+        "continueToFinalStep": "Continue to Final Step",
+        "continueToReview": "Continue to Review",
+        "backToBusinessType": "Back to Business Type",
+        "backToContactPerson": "Back to Contact Person",
+        "verifyVat": "Verify VAT",
+        "sending": "Sending...",
+        "sendCode": "Send Code",
+        "resendEmail": "Resend Email",
+        "verifyEmail": "Verify Email",
+        "sendSms": "Send SMS",
+        "resendSms": "Resend SMS",
+        "verifyPhone": "Verify Phone"
+      },
+      "placeholders": {
+        "email": "you@company.com",
+        "password": "Min. 8 characters",
+        "confirmPassword": "Repeat password",
+        "mobilePhone": "+1 234 567 8900",
+        "vat": "e.g. DE123456789",
+        "taxId": "Tax ID / Registration No.",
+        "select": "Select..."
+      },
+      "vat": "VAT Number"
     },
     "forgotPassword": {
       "title": "Forgot Password?",

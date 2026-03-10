@@ -508,7 +508,10 @@
         "commercialAccess": "Má místo doručení komerční přístup?",
         "jobTitle": "Pracovní pozice",
         "businessType": "Typ podnikání",
-        "truckAccess": "Může k vašemu skladu/kanceláři přijet velký nákladní automobil/dodávka pro doručení palet?"
+        "truckAccess": "Může k vašemu skladu/kanceláři přijet velký nákladní automobil/dodávka pro doručení palet?",
+        "email": "Email",
+        "mobilePhone": "Mobilní telefon",
+        "code": "Ověřovací kód"
       },
       "messages": {
         "emailCheck": "Zkontrolujte si doručenou poštu, poslali jsme vám 6místný kód",
@@ -527,7 +530,12 @@
         "euNote": "Zadejte své platné DIČ v rámci EU pro ověření statutu vaší firmy prostřednictvím systému VIES.",
         "successTitle": "Registrace proběhla úspěšně!",
         "successDesc": "Váš účet byl vytvořen. Na adresu {email} byl odeslán uvítací e-mail.",
-        "goSignIn": "Přejít k přihlášení"
+        "goSignIn": "Přejít k přihlášení",
+        "checkEmailCode": "Zkontrolujte email pro 6místný kód",
+        "checkPhoneCode": "Zkontrolujte telefon pro 6místný kód",
+        "emailVerified": "Email úspěšně ověřen",
+        "phoneVerified": "Telefon úspěšně ověřen",
+        "registrationSuccess": "Registrace úspěšná! Vítejte v Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Zkontrolujte své údaje",
@@ -540,7 +548,41 @@
         "legitimate": "Jedná se o legitimní podnikatelský subjekt.",
         "confirmCreate": "Potvrdit a vytvořit účet",
         "creating": "Vytváření účtu..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "DIČ není platné. Zkontrolujte prosím a zkuste to znovu.",
+        "connectionError": "Chyba připojení. Zkuste to znovu.",
+        "invalidCode": "Neplatný kód. Zkuste to znovu.",
+        "registrationFailed": "Registrace selhala. Zkuste to znovu.",
+        "verificationFailed": "Ověření selhalo. Zkuste to znovu."
+      },
+      "buttons": {
+        "back": "Zpět",
+        "continue": "Pokračovat",
+        "nextStep": "Další krok",
+        "continueToFinalStep": "Pokračovat na poslední krok",
+        "continueToReview": "Pokračovat k přehledu",
+        "backToBusinessType": "Zpět na typ firmy",
+        "backToContactPerson": "Zpět na kontaktní osobu",
+        "verifyVat": "Ověřit DIČ",
+        "sending": "Odesílání...",
+        "sendCode": "Odeslat kód",
+        "resendEmail": "Znovu odeslat email",
+        "verifyEmail": "Ověřit email",
+        "sendSms": "Odeslat SMS",
+        "resendSms": "Znovu odeslat SMS",
+        "verifyPhone": "Ověřit telefon"
+      },
+      "placeholders": {
+        "email": "vy@firma.cz",
+        "password": "Min. 8 znaků",
+        "confirmPassword": "Zopakujte heslo",
+        "mobilePhone": "+420 601 234 567",
+        "vat": "např. CZ12345678",
+        "taxId": "DIČ / reg. č.",
+        "select": "Vyberte..."
+      },
+      "vat": "DIČ"
     },
     "forgotPassword": {
       "title": "Zapomněli jste heslo?",

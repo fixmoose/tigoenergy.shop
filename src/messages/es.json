@@ -508,7 +508,10 @@
         "commercialAccess": "¿El lugar de entrega tiene acceso comercial?",
         "jobTitle": "Cargo",
         "businessType": "Tipo de Negocio",
-        "truckAccess": "¿Puede un camión/furgoneta grande acceder a su almacén/oficina para la entrega de palets?"
+        "truckAccess": "¿Puede un camión/furgoneta grande acceder a su almacén/oficina para la entrega de palets?",
+        "email": "Email",
+        "mobilePhone": "Teléfono móvil",
+        "code": "Código de verificación"
       },
       "messages": {
         "emailCheck": "Revise su bandeja de entrada para el código de 6 dígitos",
@@ -527,7 +530,12 @@
         "euNote": "Ingrese su número de IVA de la UE válido para verificar el estado de su empresa a través de VIES.",
         "successTitle": "¡Registro exitoso!",
         "successDesc": "Su cuenta ha sido creada. Se ha enviado un email de bienvenida a {email}.",
-        "goSignIn": "Ir a Iniciar sesión"
+        "goSignIn": "Ir a Iniciar sesión",
+        "checkEmailCode": "Revise su email para el código de 6 dígitos",
+        "checkPhoneCode": "Revise su teléfono para el código de 6 dígitos",
+        "emailVerified": "Email verificado con éxito",
+        "phoneVerified": "Teléfono verificado con éxito",
+        "registrationSuccess": "Registro exitoso! Bienvenido a Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Revise su información",
@@ -540,7 +548,41 @@
         "legitimate": "Esta es una entidad comercial legítima.",
         "confirmCreate": "Confirmar y crear cuenta",
         "creating": "Creando cuenta..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Número de IVA no válido. Por favor verifique e intente de nuevo.",
+        "connectionError": "Error de conexión. Inténtelo de nuevo.",
+        "invalidCode": "Código no válido. Inténtelo de nuevo.",
+        "registrationFailed": "Registro fallido. Inténtelo de nuevo.",
+        "verificationFailed": "Verificación fallida. Inténtelo de nuevo."
+      },
+      "buttons": {
+        "back": "Atrás",
+        "continue": "Continuar",
+        "nextStep": "Siguiente paso",
+        "continueToFinalStep": "Continuar al último paso",
+        "continueToReview": "Continuar a revisión",
+        "backToBusinessType": "Volver al tipo de empresa",
+        "backToContactPerson": "Volver al contacto",
+        "verifyVat": "Verificar IVA",
+        "sending": "Enviando...",
+        "sendCode": "Enviar código",
+        "resendEmail": "Reenviar email",
+        "verifyEmail": "Verificar email",
+        "sendSms": "Enviar SMS",
+        "resendSms": "Reenviar SMS",
+        "verifyPhone": "Verificar teléfono"
+      },
+      "placeholders": {
+        "email": "usted@empresa.es",
+        "password": "Mín. 8 caracteres",
+        "confirmPassword": "Repetir contraseña",
+        "mobilePhone": "+34 612 345 678",
+        "vat": "ej. ES12345678A",
+        "taxId": "NIF / N° de registro",
+        "select": "Seleccionar..."
+      },
+      "vat": "Número IVA"
     },
     "forgotPassword": {
       "title": "¿Olvidó su contraseña?",

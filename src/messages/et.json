@@ -508,7 +508,10 @@
         "commercialAccess": "Kas tarnekohas on juurdepääs veokitele?",
         "jobTitle": "Ametinimetus",
         "businessType": "Ettevõtte tüüp",
-        "truckAccess": "Kas suur veok/kaubik pääseb teie laole/kontorile palettide tarnimiseks juurde?"
+        "truckAccess": "Kas suur veok/kaubik pääseb teie laole/kontorile palettide tarnimiseks juurde?",
+        "email": "Email",
+        "mobilePhone": "Mobiiltelefon",
+        "code": "Kinnituskood"
       },
       "messages": {
         "emailCheck": "Vaadake oma postkasti 6-kohalise koodi saamiseks",
@@ -527,7 +530,12 @@
         "euNote": "Sisestage kehtiv EL KMKR number, et kontrollida oma ettevõtte staatust VIES-i kaudu.",
         "successTitle": "Registreerimine edukas!",
         "successDesc": "Teie konto on loodud. Tervitusmeil saadeti aadressile {email}.",
-        "goSignIn": "Mine sisselogimislehele"
+        "goSignIn": "Mine sisselogimislehele",
+        "checkEmailCode": "Kontrollige oma emaili 6-kohalise koodi jaoks",
+        "checkPhoneCode": "Kontrollige oma telefoni 6-kohalise koodi jaoks",
+        "emailVerified": "Email edukalt kinnitatud",
+        "phoneVerified": "Telefon edukalt kinnitatud",
+        "registrationSuccess": "Registreerimine õnnestus! Tere tulemast Tigo Energy juurde."
       },
       "agreements": {
         "reviewInfo": "Vaadake oma andmed üle",
@@ -540,7 +548,41 @@
         "legitimate": "Tegemist on seadusliku äriüksusega.",
         "confirmCreate": "Kinnita ja loo konto",
         "creating": "Konto loomine..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "KM-registreerimisnumber ei kehti. Kontrollige ja proovige uuesti.",
+        "connectionError": "Ühenduse viga. Proovige uuesti.",
+        "invalidCode": "Vigane kood. Proovige uuesti.",
+        "registrationFailed": "Registreerimine ebaõnnestus. Proovige uuesti.",
+        "verificationFailed": "Kinnitamine ebaõnnestus. Proovige uuesti."
+      },
+      "buttons": {
+        "back": "Tagasi",
+        "continue": "Jätka",
+        "nextStep": "Järgmine samm",
+        "continueToFinalStep": "Jätka viimase sammuni",
+        "continueToReview": "Jätka ülevaatuseni",
+        "backToBusinessType": "Tagasi ettevõtte tüübi juurde",
+        "backToContactPerson": "Tagasi kontaktisiku juurde",
+        "verifyVat": "Kontrolli KM-numbrit",
+        "sending": "Saatmine...",
+        "sendCode": "Saada kood",
+        "resendEmail": "Saada email uuesti",
+        "verifyEmail": "Kinnita email",
+        "sendSms": "Saada SMS",
+        "resendSms": "Saada SMS uuesti",
+        "verifyPhone": "Kinnita telefon"
+      },
+      "placeholders": {
+        "email": "sina@ettevõte.ee",
+        "password": "Min. 8 tähemärki",
+        "confirmPassword": "Korda parooli",
+        "mobilePhone": "+372 5123 4567",
+        "vat": "nt. EE123456789",
+        "taxId": "KM-number / reg.nr.",
+        "select": "Vali..."
+      },
+      "vat": "KM-number"
     },
     "forgotPassword": {
       "title": "Unustasite parooli?",

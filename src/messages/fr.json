@@ -508,7 +508,10 @@
         "commercialAccess": "Mon lieu de livraison a-t-il un accès commercial ?",
         "jobTitle": "Poste",
         "businessType": "Type de Business",
-        "truckAccess": "Un gros camion/fourgon peut-il accéder à votre entrepôt/bureau pour la livraison de palettes ?"
+        "truckAccess": "Un gros camion/fourgon peut-il accéder à votre entrepôt/bureau pour la livraison de palettes ?",
+        "email": "Email",
+        "mobilePhone": "Téléphone mobile",
+        "code": "Code de vérification"
       },
       "messages": {
         "emailCheck": "Consultez votre boîte de réception pour le code à 6 chiffres",
@@ -527,7 +530,12 @@
         "euNote": "Saisissez votre numéro de TVA UE valide pour vérifier le statut de votre entreprise via VIES.",
         "successTitle": "Inscription réussie !",
         "successDesc": "Votre compte a été créé. Un e-mail de bienvenue a été envoyé à {email}.",
-        "goSignIn": "Aller à la connexion"
+        "goSignIn": "Aller à la connexion",
+        "checkEmailCode": "Vérifiez votre boîte pour le code à 6 chiffres",
+        "checkPhoneCode": "Vérifiez votre téléphone pour le code à 6 chiffres",
+        "emailVerified": "Email vérifié avec succès",
+        "phoneVerified": "Téléphone vérifié avec succès",
+        "registrationSuccess": "Inscription réussie! Bienvenue chez Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Révisez vos informations",
@@ -540,7 +548,41 @@
         "legitimate": "Il s'agit d'une entité commerciale légitime.",
         "confirmCreate": "Confirmer et créer le compte",
         "creating": "Création du compte..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Numéro de TVA invalide. Veuillez vérifier et réessayer.",
+        "connectionError": "Erreur de connexion. Veuillez réessayer.",
+        "invalidCode": "Code invalide. Veuillez réessayer.",
+        "registrationFailed": "Échec de l'inscription. Veuillez réessayer.",
+        "verificationFailed": "Échec de la vérification. Veuillez réessayer."
+      },
+      "buttons": {
+        "back": "Retour",
+        "continue": "Continuer",
+        "nextStep": "Étape suivante",
+        "continueToFinalStep": "Continuer à la dernière étape",
+        "continueToReview": "Continuer vers la révision",
+        "backToBusinessType": "Retour au type d'entreprise",
+        "backToContactPerson": "Retour au contact",
+        "verifyVat": "Vérifier TVA",
+        "sending": "Envoi...",
+        "sendCode": "Envoyer le code",
+        "resendEmail": "Renvoyer l'e-mail",
+        "verifyEmail": "Vérifier l'e-mail",
+        "sendSms": "Envoyer SMS",
+        "resendSms": "Renvoyer SMS",
+        "verifyPhone": "Vérifier le téléphone"
+      },
+      "placeholders": {
+        "email": "vous@entreprise.fr",
+        "password": "Min. 8 caractères",
+        "confirmPassword": "Répéter le mot de passe",
+        "mobilePhone": "+33 6 12 34 56 78",
+        "vat": "ex. FR12345678901",
+        "taxId": "N° fiscal / d'enregistrement",
+        "select": "Sélectionner..."
+      },
+      "vat": "Numéro TVA"
     },
     "forgotPassword": {
       "title": "Mot de passe oublié ?",

@@ -509,7 +509,10 @@
         "commercialAccess": "Hat mein Lieferort gewerblichen Zugang?",
         "jobTitle": "Berufsbezeichnung",
         "businessType": "Art des Geschäfts",
-        "truckAccess": "Kann ein großer LKW/Transporter Ihr Lager/Büro für Palettenlieferungen anfahren?"
+        "truckAccess": "Kann ein großer LKW/Transporter Ihr Lager/Büro für Palettenlieferungen anfahren?",
+        "email": "E-Mail",
+        "mobilePhone": "Mobiltelefon",
+        "code": "Verifizierungscode"
       },
       "messages": {
         "emailCheck": "Prüfen Sie Ihren Posteingang für den 6-stelligen Code",
@@ -528,7 +531,12 @@
         "euNote": "Geben Sie Ihre gültige EU-USt-IdNr. ein, um Ihren Geschäftsstatus über VIES zu prüfen.",
         "successTitle": "Registrierung erfolgreich!",
         "successDesc": "Ihr Konto wurde erstellt. Eine Willkommens-E-Mail wurde an {email} gesendet.",
-        "goSignIn": "Zur Anmeldung"
+        "goSignIn": "Zur Anmeldung",
+        "checkEmailCode": "Prüfen Sie Ihren Posteingang auf den 6-stelligen Code",
+        "checkPhoneCode": "Prüfen Sie Ihr Telefon auf den 6-stelligen Code",
+        "emailVerified": "E-Mail erfolgreich verifiziert",
+        "phoneVerified": "Telefon erfolgreich verifiziert",
+        "registrationSuccess": "Registrierung erfolgreich! Willkommen bei Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Informationen prüfen",
@@ -541,7 +549,41 @@
         "legitimate": "Dies ist eine rechtmäßige Geschäftseinheit.",
         "confirmCreate": "Bestätigen & Konto erstellen",
         "creating": "Konto wird erstellt..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "USt-IdNr. ist ungültig. Bitte überprüfen und erneut versuchen.",
+        "connectionError": "Verbindungsfehler. Bitte versuchen Sie es erneut.",
+        "invalidCode": "Ungültiger Code. Bitte erneut versuchen.",
+        "registrationFailed": "Registrierung fehlgeschlagen. Bitte erneut versuchen.",
+        "verificationFailed": "Verifizierung fehlgeschlagen. Bitte erneut versuchen."
+      },
+      "buttons": {
+        "back": "Zurück",
+        "continue": "Weiter",
+        "nextStep": "Nächster Schritt",
+        "continueToFinalStep": "Zum letzten Schritt",
+        "continueToReview": "Zur Überprüfung",
+        "backToBusinessType": "Zurück zur Unternehmensart",
+        "backToContactPerson": "Zurück zur Kontaktperson",
+        "verifyVat": "USt-IdNr. prüfen",
+        "sending": "Wird gesendet...",
+        "sendCode": "Code senden",
+        "resendEmail": "E-Mail erneut senden",
+        "verifyEmail": "E-Mail verifizieren",
+        "sendSms": "SMS senden",
+        "resendSms": "SMS erneut senden",
+        "verifyPhone": "Telefon verifizieren"
+      },
+      "placeholders": {
+        "email": "sie@unternehmen.de",
+        "password": "Mind. 8 Zeichen",
+        "confirmPassword": "Passwort wiederholen",
+        "mobilePhone": "+49 151 12345678",
+        "vat": "z.B. DE123456789",
+        "taxId": "Steuer-/Registrierungsnr.",
+        "select": "Auswählen..."
+      },
+      "vat": "USt-IdNr."
     },
     "forgotPassword": {
       "title": "Passwort vergessen?",

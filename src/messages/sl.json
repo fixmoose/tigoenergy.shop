@@ -433,7 +433,10 @@
         "commercialAccess": "Ali ima lokacija dostave dostop za tovorna vozila?",
         "jobTitle": "Delovno mesto",
         "businessType": "Vrsta podjetja",
-        "truckAccess": "Ali lahko velik tovornjak/kombi dostopi do vašega skladišča/pisarne za dostavo palet?"
+        "truckAccess": "Ali lahko velik tovornjak/kombi dostopi do vašega skladišča/pisarne za dostavo palet?",
+        "email": "E-pošta",
+        "mobilePhone": "Mobilni telefon",
+        "code": "Koda za preverjanje"
       },
       "messages": {
         "emailCheck": "V mapi s prejeto pošto poiščite 6-mestno kodo",
@@ -452,7 +455,12 @@
         "euNote": "Vnesite veljavno EU ID številko za DDV za preverjanje statusa podjetja prek sistema VIES.",
         "successTitle": "Registracija uspešna!",
         "successDesc": "Vaš račun je bil ustvarjen. Pozdravno e-poštno sporočilo je bilo poslano na {email}.",
-        "goSignIn": "Pojdi na prijavo"
+        "goSignIn": "Pojdi na prijavo",
+        "checkEmailCode": "Preverite svojo e-pošto za 6-mestno kodo",
+        "checkPhoneCode": "Preverite svoj telefon za 6-mestno kodo",
+        "emailVerified": "E-pošta uspešno potrjena",
+        "phoneVerified": "Telefon uspešno potrjen",
+        "registrationSuccess": "Registracija uspešna! Dobrodošli v Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Pregled vaših podatkov",
@@ -465,7 +473,41 @@
         "legitimate": "To je zakonit poslovni subjekt.",
         "confirmCreate": "Potrdi in ustvari račun",
         "creating": "Ustvarjanje računa..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Številka DDV ni veljavna. Prosimo preverite in poskusite znova.",
+        "connectionError": "Napaka povezave. Prosimo poskusite znova.",
+        "invalidCode": "Napačna koda. Prosimo poskusite znova.",
+        "registrationFailed": "Registracija ni uspela. Prosimo poskusite znova.",
+        "verificationFailed": "Preverjanje ni uspelo. Prosimo poskusite znova."
+      },
+      "buttons": {
+        "back": "Nazaj",
+        "continue": "Nadaljuj",
+        "nextStep": "Naslednji korak",
+        "continueToFinalStep": "Nadaljuj na zadnji korak",
+        "continueToReview": "Nadaljuj na pregled",
+        "backToBusinessType": "Nazaj na vrsto podjetja",
+        "backToContactPerson": "Nazaj na kontaktno osebo",
+        "verifyVat": "Preveri DDV",
+        "sending": "Pošiljanje...",
+        "sendCode": "Pošlji kodo",
+        "resendEmail": "Ponovno pošlji e-pošto",
+        "verifyEmail": "Preveri e-pošto",
+        "sendSms": "Pošlji SMS",
+        "resendSms": "Ponovno pošlji SMS",
+        "verifyPhone": "Preveri telefon"
+      },
+      "placeholders": {
+        "email": "vi@podjetje.si",
+        "password": "Min. 8 znakov",
+        "confirmPassword": "Ponovite geslo",
+        "mobilePhone": "+386 41 123 456",
+        "vat": "npr. SI12345678",
+        "taxId": "Davčna / registrska št.",
+        "select": "Izberite..."
+      },
+      "vat": "Številka DDV"
     },
     "forgotPassword": {
       "title": "Pozabljeno geslo?",

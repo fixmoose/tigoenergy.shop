@@ -508,7 +508,10 @@
         "commercialAccess": "My Delivery Location has Commercial Access?",
         "jobTitle": "Job Title",
         "businessType": "Type of Business",
-        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?"
+        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?",
+        "email": "Email",
+        "mobilePhone": "Mobiltelefon",
+        "code": "Verifikationskode"
       },
       "messages": {
         "emailCheck": "Check your inbox for the 6-digit code",
@@ -527,7 +530,12 @@
         "euNote": "Enter your valid EU VAT number to verify your business status via VIES.",
         "successTitle": "Registration Successful!",
         "successDesc": "Your account has been created. A welcome email has been sent to {email}.",
-        "goSignIn": "Go to Sign In"
+        "goSignIn": "Go to Sign In",
+        "checkEmailCode": "Tjek din email for den 6-cifrede kode",
+        "checkPhoneCode": "Tjek din telefon for den 6-cifrede kode",
+        "emailVerified": "Email verificeret",
+        "phoneVerified": "Telefon verificeret",
+        "registrationSuccess": "Registrering gennemført! Velkommen til Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Review Your Information",
@@ -540,7 +548,41 @@
         "legitimate": "This is a legitimate business entity.",
         "confirmCreate": "Confirm & Create Account",
         "creating": "Creating Account..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Momsnummer er ugyldigt. Tjek venligst og prøv igen.",
+        "connectionError": "Forbindelsesfejl. Prøv venligst igen.",
+        "invalidCode": "Ugyldig kode. Prøv venligst igen.",
+        "registrationFailed": "Registrering mislykkedes. Prøv igen.",
+        "verificationFailed": "Verifikation mislykkedes. Prøv igen."
+      },
+      "buttons": {
+        "back": "Tilbage",
+        "continue": "Fortsæt",
+        "nextStep": "Næste trin",
+        "continueToFinalStep": "Fortsæt til det sidste trin",
+        "continueToReview": "Fortsæt til gennemgang",
+        "backToBusinessType": "Tilbage til virksomhedstype",
+        "backToContactPerson": "Tilbage til kontaktperson",
+        "verifyVat": "Bekræft moms",
+        "sending": "Sender...",
+        "sendCode": "Send kode",
+        "resendEmail": "Send email igen",
+        "verifyEmail": "Bekræft email",
+        "sendSms": "Send SMS",
+        "resendSms": "Send SMS igen",
+        "verifyPhone": "Bekræft telefon"
+      },
+      "placeholders": {
+        "email": "dig@virksomhed.dk",
+        "password": "Min. 8 tegn",
+        "confirmPassword": "Gentag adgangskode",
+        "mobilePhone": "+45 20 12 34 56",
+        "vat": "f.eks. DK12345678",
+        "taxId": "CVR / reg.nr.",
+        "select": "Vælg..."
+      },
+      "vat": "Momsnummer"
     },
     "forgotPassword": {
       "title": "Forgot Password?",

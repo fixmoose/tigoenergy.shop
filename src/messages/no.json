@@ -508,7 +508,10 @@
         "commercialAccess": "Har leveringsstedet kommersiell tilgang?",
         "jobTitle": "Stillingstittel",
         "businessType": "Type bedrift",
-        "truckAccess": "Kan en stor lastebil/varebil få tilgang til lageret/kontoret ditt for pallelevering?"
+        "truckAccess": "Kan en stor lastebil/varebil få tilgang til lageret/kontoret ditt for pallelevering?",
+        "email": "E-post",
+        "mobilePhone": "Mobiltelefon",
+        "code": "Bekreftelseskode"
       },
       "messages": {
         "emailCheck": "Sjekk innboksen din for den 6-sifrede koden",
@@ -527,7 +530,12 @@
         "euNote": "Skriv inn ditt gyldige EU MVA-nummer for å verifisere bedriftsstatusen din via VIES.",
         "successTitle": "Registrering fullført!",
         "successDesc": "Kontoen din er opprettet. En velkomst-e-post er sendt til {email}.",
-        "goSignIn": "Gå til Logg inn"
+        "goSignIn": "Gå til Logg inn",
+        "checkEmailCode": "Sjekk e-posten din for den 6-sifrede koden",
+        "checkPhoneCode": "Sjekk telefonen din for den 6-sifrede koden",
+        "emailVerified": "E-post verifisert",
+        "phoneVerified": "Telefon verifisert",
+        "registrationSuccess": "Registrering vellykket! Velkommen til Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Se over informasjonen din",
@@ -540,7 +548,41 @@
         "legitimate": "Dette er en legitim forretningsenhet.",
         "confirmCreate": "Bekreft og opprett konto",
         "creating": "Oppretter konto..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "MVA-nummeret er ugyldig. Vennligst sjekk og prøv igjen.",
+        "connectionError": "Tilkoblingsfeil. Vennligst prøv igjen.",
+        "invalidCode": "Ugyldig kode. Vennligst prøv igjen.",
+        "registrationFailed": "Registrering mislyktes. Prøv igjen.",
+        "verificationFailed": "Verifisering mislyktes. Prøv igjen."
+      },
+      "buttons": {
+        "back": "Tilbake",
+        "continue": "Fortsett",
+        "nextStep": "Neste trinn",
+        "continueToFinalStep": "Fortsett til siste trinn",
+        "continueToReview": "Fortsett til gjennomgang",
+        "backToBusinessType": "Tilbake til bedriftstype",
+        "backToContactPerson": "Tilbake til kontaktperson",
+        "verifyVat": "Bekreft MVA",
+        "sending": "Sender...",
+        "sendCode": "Send kode",
+        "resendEmail": "Send email på nytt",
+        "verifyEmail": "Bekreft email",
+        "sendSms": "Send SMS",
+        "resendSms": "Send SMS på nytt",
+        "verifyPhone": "Bekreft telefon"
+      },
+      "placeholders": {
+        "email": "deg@selskap.no",
+        "password": "Min. 8 tegn",
+        "confirmPassword": "Gjenta passord",
+        "mobilePhone": "+47 400 12 345",
+        "vat": "f.eks. NO123456789MVA",
+        "taxId": "Org.nr / reg.nr.",
+        "select": "Velg..."
+      },
+      "vat": "MVA-nummer"
     },
     "forgotPassword": {
       "title": "Glemt passord?",

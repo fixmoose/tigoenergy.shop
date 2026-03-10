@@ -431,7 +431,10 @@
         "commercialAccess": "Ima li lokacija isporuke pristup za kamione?",
         "jobTitle": "Radno mjesto",
         "businessType": "Vrsta tvrtke",
-        "truckAccess": "Može li veliki kamion/kombi pristupiti vašem skladištu/uredu za dostavu paleta?"
+        "truckAccess": "Može li veliki kamion/kombi pristupiti vašem skladištu/uredu za dostavu paleta?",
+        "email": "Email",
+        "mobilePhone": "Mobitel",
+        "code": "Kod za provjeru"
       },
       "messages": {
         "emailCheck": "Provjerite svoju pristiglu poštu za 6-znamenkasti kod",
@@ -450,7 +453,12 @@
         "euNote": "Unesite važeći EU PDV ID broj za provjeru statusa tvrtke putem VIES sustava.",
         "successTitle": "Registracija uspješna!",
         "successDesc": "Vaš račun je kreiran. E-mail dobrodošlice poslan je na {email}.",
-        "goSignIn": "Idi na prijavu"
+        "goSignIn": "Idi na prijavu",
+        "checkEmailCode": "Provjerite email za 6-znamenkasti kod",
+        "checkPhoneCode": "Provjerite telefon za 6-znamenkasti kod",
+        "emailVerified": "Email uspješno potvrđen",
+        "phoneVerified": "Telefon uspješno potvrđen",
+        "registrationSuccess": "Registracija uspješna! Dobrodošli u Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Pregledajte svoje podatke",
@@ -463,7 +471,41 @@
         "legitimate": "Ovo je legitiman poslovni subjekt.",
         "confirmCreate": "Potvrdi i kreiraj račun",
         "creating": "Kreiranje računa..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "OIB/PDV broj nije valjan. Provjerite i pokušajte ponovo.",
+        "connectionError": "Greška veze. Pokušajte ponovo.",
+        "invalidCode": "Nevažeći kod. Pokušajte ponovo.",
+        "registrationFailed": "Registracija nije uspjela. Pokušajte ponovo.",
+        "verificationFailed": "Provjera nije uspjela. Pokušajte ponovo."
+      },
+      "buttons": {
+        "back": "Natrag",
+        "continue": "Nastavi",
+        "nextStep": "Sljedeći korak",
+        "continueToFinalStep": "Nastavi na zadnji korak",
+        "continueToReview": "Nastavi na pregled",
+        "backToBusinessType": "Natrag na vrstu poslovanja",
+        "backToContactPerson": "Natrag na kontakt osobu",
+        "verifyVat": "Provjeri PDV",
+        "sending": "Slanje...",
+        "sendCode": "Pošalji kod",
+        "resendEmail": "Ponovno pošalji email",
+        "verifyEmail": "Potvrdi email",
+        "sendSms": "Pošalji SMS",
+        "resendSms": "Ponovno pošalji SMS",
+        "verifyPhone": "Potvrdi telefon"
+      },
+      "placeholders": {
+        "email": "vi@tvrtka.hr",
+        "password": "Min. 8 znakova",
+        "confirmPassword": "Ponovite lozinku",
+        "mobilePhone": "+385 91 123 4567",
+        "vat": "npr. HR12345678901",
+        "taxId": "OIB / registracijski br.",
+        "select": "Odaberite..."
+      },
+      "vat": "PDV broj"
     },
     "forgotPassword": {
       "title": "Zaboravljena lozinka?",

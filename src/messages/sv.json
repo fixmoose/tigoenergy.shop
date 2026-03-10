@@ -508,7 +508,10 @@
         "commercialAccess": "My Delivery Location has Commercial Access?",
         "jobTitle": "Job Title",
         "businessType": "Type of Business",
-        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?"
+        "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?",
+        "email": "Email",
+        "mobilePhone": "Mobiltelefon",
+        "code": "Verifieringskod"
       },
       "messages": {
         "emailCheck": "Check your inbox for the 6-digit code",
@@ -527,7 +530,12 @@
         "euNote": "Enter your valid EU VAT number to verify your business status via VIES.",
         "successTitle": "Registration Successful!",
         "successDesc": "Your account has been created. A welcome email has been sent to {email}.",
-        "goSignIn": "Go to Sign In"
+        "goSignIn": "Go to Sign In",
+        "checkEmailCode": "Kontrollera din email för den 6-siffriga koden",
+        "checkPhoneCode": "Kontrollera din telefon för den 6-siffriga koden",
+        "emailVerified": "Email verifierad",
+        "phoneVerified": "Telefon verifierad",
+        "registrationSuccess": "Registrering klar! Välkommen till Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Review Your Information",
@@ -540,7 +548,41 @@
         "legitimate": "This is a legitimate business entity.",
         "confirmCreate": "Confirm & Create Account",
         "creating": "Creating Account..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "Momsnumret är ogiltigt. Kontrollera och försök igen.",
+        "connectionError": "Anslutningsfel. Försök igen.",
+        "invalidCode": "Ogiltig kod. Försök igen.",
+        "registrationFailed": "Registrering misslyckades. Försök igen.",
+        "verificationFailed": "Verifiering misslyckades. Försök igen."
+      },
+      "buttons": {
+        "back": "Tillbaka",
+        "continue": "Fortsätt",
+        "nextStep": "Nästa steg",
+        "continueToFinalStep": "Fortsätt till sista steget",
+        "continueToReview": "Fortsätt till granskning",
+        "backToBusinessType": "Tillbaka till företagstyp",
+        "backToContactPerson": "Tillbaka till kontaktperson",
+        "verifyVat": "Verifiera moms",
+        "sending": "Skickar...",
+        "sendCode": "Skicka kod",
+        "resendEmail": "Skicka email igen",
+        "verifyEmail": "Verifiera email",
+        "sendSms": "Skicka SMS",
+        "resendSms": "Skicka SMS igen",
+        "verifyPhone": "Verifiera telefon"
+      },
+      "placeholders": {
+        "email": "du@foretag.se",
+        "password": "Min. 8 tecken",
+        "confirmPassword": "Upprepa lösenord",
+        "mobilePhone": "+46 70 123 45 67",
+        "vat": "t.ex. SE123456789001",
+        "taxId": "Org.nr / reg.nr.",
+        "select": "Välj..."
+      },
+      "vat": "Momsnummer"
     },
     "forgotPassword": {
       "title": "Forgot Password?",

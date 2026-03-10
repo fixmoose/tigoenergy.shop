@@ -508,7 +508,10 @@
         "commercialAccess": "Heeft mijn leveringslocatie commerciële toegang?",
         "jobTitle": "Functietitel",
         "businessType": "Type bedrijf",
-        "truckAccess": "Kan een grote vrachtwagen/bus uw magazijn/kantoor bereiken voor palletlevering?"
+        "truckAccess": "Kan een grote vrachtwagen/bus uw magazijn/kantoor bereiken voor palletlevering?",
+        "email": "Email",
+        "mobilePhone": "Mobiele telefoon",
+        "code": "Verificatiecode"
       },
       "messages": {
         "emailCheck": "Controleer uw inbox voor de 6-cijferige code",
@@ -527,7 +530,12 @@
         "euNote": "Voer uw geldige EU BTW-nummer in om uw zakelijke status te verifiëren via VIES.",
         "successTitle": "Registratie geslaagd!",
         "successDesc": "Uw account is aangemaakt. Er is een welkomstmail gestuurd naar {email}.",
-        "goSignIn": "Ga naar inloggen"
+        "goSignIn": "Ga naar inloggen",
+        "checkEmailCode": "Controleer uw email voor de 6-cijferige code",
+        "checkPhoneCode": "Controleer uw telefoon voor de 6-cijferige code",
+        "emailVerified": "Email succesvol geverifieerd",
+        "phoneVerified": "Telefoon succesvol geverifieerd",
+        "registrationSuccess": "Registratie geslaagd! Welkom bij Tigo Energy."
       },
       "agreements": {
         "reviewInfo": "Controleer uw gegevens",
@@ -540,7 +548,41 @@
         "legitimate": "Dit is een legitieme zakelijke entiteit.",
         "confirmCreate": "Bevestigen & Account aanmaken",
         "creating": "Account aanmaken..."
-      }
+      },
+      "errors": {
+        "vatValidationFailed": "BTW-nummer is ongeldig. Controleer en probeer opnieuw.",
+        "connectionError": "Verbindingsfout. Probeer het opnieuw.",
+        "invalidCode": "Ongeldige code. Probeer opnieuw.",
+        "registrationFailed": "Registratie mislukt. Probeer opnieuw.",
+        "verificationFailed": "Verificatie mislukt. Probeer opnieuw."
+      },
+      "buttons": {
+        "back": "Terug",
+        "continue": "Doorgaan",
+        "nextStep": "Volgende stap",
+        "continueToFinalStep": "Naar laatste stap",
+        "continueToReview": "Naar beoordeling",
+        "backToBusinessType": "Terug naar bedrijfstype",
+        "backToContactPerson": "Terug naar contactpersoon",
+        "verifyVat": "BTW controleren",
+        "sending": "Verzenden...",
+        "sendCode": "Code verzenden",
+        "resendEmail": "Email opnieuw verzenden",
+        "verifyEmail": "Email verifiëren",
+        "sendSms": "SMS verzenden",
+        "resendSms": "SMS opnieuw verzenden",
+        "verifyPhone": "Telefoon verifiëren"
+      },
+      "placeholders": {
+        "email": "u@bedrijf.nl",
+        "password": "Min. 8 tekens",
+        "confirmPassword": "Herhaal wachtwoord",
+        "mobilePhone": "+31 6 12345678",
+        "vat": "bijv. NL123456789B01",
+        "taxId": "BTW-nr. / registratienr.",
+        "select": "Selecteren..."
+      },
+      "vat": "BTW-nummer"
     },
     "forgotPassword": {
       "title": "Wachtwoord vergeten?",
