@@ -45,7 +45,15 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
     })
 
     // Order Data
-    const [items, setItems] = useState<{ product_id: string, product_name: string, sku: string, quantity: number, unit_price: number }[]>([])
+    const [items, setItems] = useState<{
+        product_id: string
+        product_name: string
+        sku: string
+        quantity: number
+        unit_price: number
+        b2c_price?: number
+        b2b_price?: number | null
+    }[]>([])
     const [vatRate, setVatRate] = useState(22)
     const [shippingCost, setShippingCost] = useState(0)
     const [market, setMarket] = useState('si')
@@ -114,17 +122,30 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
         }
     }, [selectedCustomer.is_b2b, market])
 
+    // Reprice existing items when B2B mode changes
+    useEffect(() => {
+        setItems(prev => prev.map(item => {
+            if (item.product_id?.startsWith('custom-') || item.b2c_price === undefined) return item
+            const newPrice = selectedCustomer.is_b2b && item.b2b_price
+                ? item.b2b_price
+                : (item.b2c_price ?? item.unit_price)
+            return { ...item, unit_price: newPrice }
+        }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCustomer.is_b2b])
+
     const addItem = (p: ProductSnippet) => {
         const price = selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur
-        setItems([...items, {
+        setItems(prev => [...prev, {
             product_id: p.id,
             product_name: p.name_en,
             sku: p.sku,
             quantity: 1,
-            unit_price: price || 0
+            unit_price: price || 0,
+            b2c_price: p.price_eur,
+            b2b_price: p.b2b_price_eur ?? null,
         }])
         setProductSearch('')
-        setProductResults([])
     }
 
     const addCustomItem = () => {
@@ -551,7 +572,9 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                         {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
                                         {productSearch ? ` matching "${productSearch}"` : ''}
                                     </span>
-                                    <span className="text-[10px] text-slate-400">Click to add</span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${selectedCustomer.is_b2b ? 'bg-blue-100 text-blue-700' : 'text-slate-400'}`}>
+                                        {selectedCustomer.is_b2b ? 'B2B prices' : 'B2C prices'}
+                                    </span>
                                 </div>
                                 <div className="max-h-64 overflow-y-auto divide-y divide-slate-50">
                                     {filteredProducts.length === 0 ? (
@@ -580,7 +603,14 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                     <span className={`text-xs font-bold px-2 py-0.5 rounded ${inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-500'}`}>
                                                         {inStock ? `${stock} in stock` : '0'}
                                                     </span>
-                                                    <span className="font-bold text-slate-900 text-sm">€{price.toFixed(2)}</span>
+                                                    <div className="text-right">
+                                                        {selectedCustomer.is_b2b && p.b2b_price_eur && p.b2b_price_eur !== p.price_eur && (
+                                                            <div className="text-[10px] text-slate-400 line-through">€{p.price_eur.toFixed(2)}</div>
+                                                        )}
+                                                        <span className={`font-bold text-sm ${selectedCustomer.is_b2b && p.b2b_price_eur ? 'text-blue-700' : 'text-slate-900'}`}>
+                                                            €{price.toFixed(2)}
+                                                        </span>
+                                                    </div>
                                                     <svg className="w-4 h-4 text-slate-300 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                                                 </div>
                                             </button>
