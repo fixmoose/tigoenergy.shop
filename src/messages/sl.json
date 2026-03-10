@@ -194,7 +194,10 @@
     "guestName": "Ime, priimek in/ali podjetje",
     "sameAsCompanyAddress": "Enak naslovu podjetja",
     "lockedByVat": "Zaklenjeno z DDV",
-    "selectCountry": "Izberite državo"
+    "selectCountry": "Izberite državo",
+    "poNumber": "Naročilnica (P.O.)",
+    "poNumberOptional": "neobvezno",
+    "poNumberPlaceholder": "npr. PO-2024-001 ali ime posla"
   },
   "subcategories": {
     "Optimization": "Optimizacija",

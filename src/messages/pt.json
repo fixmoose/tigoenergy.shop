@@ -192,7 +192,10 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "poNumber": "Ordem de compra (P.O.)",
+    "poNumberOptional": "opcional",
+    "poNumberPlaceholder": "ex. PO-2024-001 ou nome do projeto"
   },
   "subcategories": {
     "Optimization": "Otimização",

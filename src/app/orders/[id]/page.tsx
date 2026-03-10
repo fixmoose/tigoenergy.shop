@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useCart } from '@/contexts/CartContext'
 import { Order, OrderItem } from '@/types/database'
 import ContactSupportModal from '@/components/orders/ContactSupportModal'
+import { submitSupportRequest } from '@/app/actions/support'
 
 export default function OrderDetailsPage() {
     const params = useParams()
@@ -25,6 +26,7 @@ export default function OrderDetailsPage() {
         isOpen: false,
         type: 'general'
     })
+    const [tigoSupport, setTigoSupport] = useState({ open: false, siteId: '', message: '', submitting: false, done: false, error: '' })
 
     useEffect(() => {
         if (!orderId) return
@@ -256,7 +258,12 @@ export default function OrderDetailsPage() {
                             <Link href="/dashboard" className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-200 transition shadow-sm group">
                                 <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                             </Link>
-                            <h1 className="text-3xl font-black text-gray-900">Order #{order.order_number}</h1>
+                            <div>
+                                <h1 className="text-3xl font-black text-gray-900">Order #{order.order_number}</h1>
+                                {(order as any).po_number && (
+                                    <p className="text-sm text-gray-500 mt-0.5">P.O.: <span className="font-semibold text-gray-700">{(order as any).po_number}</span></p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -604,6 +611,90 @@ export default function OrderDetailsPage() {
                                     </div>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Tigo Product Support */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <button
+                                onClick={() => setTigoSupport(s => ({ ...s, open: !s.open }))}
+                                className="w-full p-5 flex items-center justify-between text-left hover:bg-gray-50 transition"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900">Need product support?</p>
+                                        <p className="text-xs text-gray-500">Notify Tigo Energy directly about your issue</p>
+                                    </div>
+                                </div>
+                                <svg className={`w-4 h-4 text-gray-400 transition-transform ${tigoSupport.open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+                            {tigoSupport.open && (
+                                <div className="px-5 pb-5 border-t border-gray-50">
+                                    {tigoSupport.done ? (
+                                        <div className="pt-4 text-center">
+                                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                            <p className="text-sm font-bold text-gray-900">Request sent!</p>
+                                            <p className="text-xs text-gray-500 mt-1">Tigo Energy has been notified. You'll hear back shortly.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="pt-4 space-y-3">
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-700 mb-1">Site ID <span className="text-red-500">*</span></label>
+                                                <input
+                                                    type="text"
+                                                    value={tigoSupport.siteId}
+                                                    onChange={e => setTigoSupport(s => ({ ...s, siteId: e.target.value }))}
+                                                    placeholder="e.g. 12345678"
+                                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                                />
+                                                <p className="text-[10px] text-gray-400 mt-1">Your Tigo monitoring system site ID</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-700 mb-1">Describe the issue</label>
+                                                <textarea
+                                                    value={tigoSupport.message}
+                                                    onChange={e => setTigoSupport(s => ({ ...s, message: e.target.value }))}
+                                                    placeholder="Describe the product issue..."
+                                                    rows={3}
+                                                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                                />
+                                            </div>
+                                            {tigoSupport.error && <p className="text-xs text-red-600">{tigoSupport.error}</p>}
+                                            <button
+                                                disabled={!tigoSupport.siteId.trim() || tigoSupport.submitting}
+                                                onClick={async () => {
+                                                    setTigoSupport(s => ({ ...s, submitting: true, error: '' }))
+                                                    const itemsList = items.map(i => `${i.product_name} (${i.sku}) x${i.quantity}`).join(', ')
+                                                    const result = await submitSupportRequest({
+                                                        type: 'tigo_product',
+                                                        subject: `Product Support Request — Order #${order.order_number} — Site ID: ${tigoSupport.siteId}`,
+                                                        message: tigoSupport.message || '(no description provided)',
+                                                        orderId: order.id,
+                                                        metadata: {
+                                                            orderNumber: order.order_number,
+                                                            siteId: tigoSupport.siteId,
+                                                            items: itemsList,
+                                                            customerName: `${(order.shipping_address as any)?.first_name || ''} ${(order.shipping_address as any)?.last_name || ''}`.trim(),
+                                                        }
+                                                    })
+                                                    if (result.success) {
+                                                        setTigoSupport(s => ({ ...s, submitting: false, done: true }))
+                                                    } else {
+                                                        setTigoSupport(s => ({ ...s, submitting: false, error: result.error || 'Failed to send. Please try again.' }))
+                                                    }
+                                                }}
+                                                className="w-full bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition disabled:opacity-40"
+                                            >
+                                                {tigoSupport.submitting ? 'Sending…' : 'Notify Tigo Energy'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Quick Links */}

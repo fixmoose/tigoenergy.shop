@@ -8,6 +8,7 @@ import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
 import AdminAddressEditor from '@/components/admin/AdminAddressEditor'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
+import DeleteCustomerButton from '@/components/admin/DeleteCustomerButton'
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -64,7 +65,8 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">Customer Detail</h1>
             <p className="text-sm font-medium text-gray-500 mt-1">{customer.email}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            <DeleteCustomerButton customerId={id} customerName={`${customer.first_name} ${customer.last_name}`} />
             {customer.is_b2b && customer.account_status !== 'active' && (
               <form action={async () => { 'use server'; await adminVerifyB2BCustomerAction(id) }}>
                 <button type="submit" className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">

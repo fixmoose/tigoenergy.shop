@@ -6,17 +6,19 @@ import { verifyRecaptcha } from '@/lib/recaptcha'
 import { escapeHtml } from '@/lib/utils'
 
 export async function submitSupportRequest(formData: {
-    type: 'shipping' | 'return' | 'general'
+    type: 'shipping' | 'return' | 'general' | 'tigo_product'
     subject: string
     message: string
     orderId?: string
     metadata?: any
     recaptchaToken?: string
 }) {
-    // Verify reCAPTCHA
-    const recaptcha = await verifyRecaptcha(formData.recaptchaToken || null)
-    if (!recaptcha.success) {
-        return { error: 'reCAPTCHA verification failed. Please try again.' }
+    // Verify reCAPTCHA (skip for tigo_product — user is already authenticated)
+    if (formData.type !== 'tigo_product') {
+        const recaptcha = await verifyRecaptcha(formData.recaptchaToken || null)
+        if (!recaptcha.success) {
+            return { error: 'reCAPTCHA verification failed. Please try again.' }
+        }
     }
 
     const supabase = await createClient()
@@ -57,16 +59,22 @@ export async function submitSupportRequest(formData: {
 
         if (admins.length > 0) {
             const isShopHelp = formData.type === 'shipping' || formData.type === 'return'
-            const subjectPrefix = isShopHelp ? 'Tigo Energy SHOP> Shopping help' : 'Tigo Energy SHOP> Tigo Support'
+            const isTigoProduct = formData.type === 'tigo_product'
+            const subjectPrefix = isShopHelp ? 'Tigo Energy SHOP> Shopping help' : isTigoProduct ? 'Tigo Energy SHOP> Tigo Product Support' : 'Tigo Energy SHOP> Tigo Support'
             const userEmail = user.email
             const userName = `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || userEmail
 
+            const siteIdRow = formData.metadata?.site_id
+                ? `<p><strong>Site ID:</strong> ${escapeHtml(formData.metadata.site_id)}</p>`
+                : ''
             const adminHtml = `
                 <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
                     <h2 style="color: #16a34a;">New Support Inquiry (Order Related)</h2>
                     <p><strong>From:</strong> ${escapeHtml(userName)} (${escapeHtml(userEmail || '')})</p>
-                    <p><strong>Type:</strong> ${formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support'}</p>
-                    <p><strong>Order ID:</strong> ${escapeHtml(formData.orderId || 'N/A')}</p>
+                    <p><strong>Type:</strong> ${isTigoProduct ? 'Tigo Product Support' : formData.type === 'general' ? 'Tigo Product Support' : 'Online Shop Support'}</p>
+                    <p><strong>Order:</strong> #${escapeHtml(formData.metadata?.orderNumber || formData.orderId || 'N/A')}</p>
+                    ${siteIdRow}
+                    ${formData.metadata?.items ? `<p><strong>Products:</strong> ${escapeHtml(formData.metadata.items)}</p>` : ''}
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
                         ${escapeHtml(formData.message)}
                     </div>

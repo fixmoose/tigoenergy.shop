@@ -192,7 +192,10 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "poNumber": "Inköpsorder (P.O.)",
+    "poNumberOptional": "valfritt",
+    "poNumberPlaceholder": "ex. PO-2024-001 eller projektnamn"
   },
   "subcategories": {
     "Optimization": "Optimering",

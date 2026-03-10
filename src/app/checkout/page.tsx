@@ -207,6 +207,7 @@ export default function CheckoutPage() {
             billing_country: initialCountry,
             password: '',
             confirm_password: '',
+            po_number: '',
             commercial_access: false,
             truck_access_notes: '',
             terms_agreement: false,
@@ -840,6 +841,12 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
                                 </div>
+                                {effectiveIsB2B && (
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium mb-1">{t('poNumber')} <span className="text-xs text-gray-400">({t('poNumberOptional')})</span></label>
+                                        <input type="text" name="po_number" value={formData.po_number} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder={t('poNumberPlaceholder')} />
+                                    </div>
+                                )}
                                 <div className="md:col-span-2">
                                     {hasShippingError ? (
                                         <p className="text-[11px] text-amber-600 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-100 mb-2">

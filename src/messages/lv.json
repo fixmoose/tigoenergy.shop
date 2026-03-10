@@ -192,7 +192,10 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "poNumber": "Pirkuma pasūtījums (P.O.)",
+    "poNumberOptional": "neobligāts",
+    "poNumberPlaceholder": "piem. PO-2024-001 vai projekta nosaukums"
   },
   "subcategories": {
     "Optimization": "Optimizācija",

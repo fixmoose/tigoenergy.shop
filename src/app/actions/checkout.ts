@@ -200,6 +200,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             payment_method: rawData.payment_method,
 
             total_weight_kg: totalWeight,
+            po_number: (rawData.po_number as string) || null,
             commercial_access: rawData.commercial_access === 'on' || rawData.commercial_access === 'true' || !!rawData.commercial_access,
             truck_access_notes: (rawData.truck_access_notes as string) || null,
 

@@ -192,7 +192,10 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "poNumber": "Номер на поръчка (P.O.)",
+    "poNumberOptional": "незадължително",
+    "poNumberPlaceholder": "напр. PO-2024-001 или ime na proekt"
   },
   "subcategories": {
     "Optimization": "Оптимизация",

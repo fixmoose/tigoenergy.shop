@@ -568,16 +568,16 @@ export default function Header() {
                     href="/support/product"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition"
                   >
-                    <div className="font-medium">Tigo Product Support</div>
-                    <div className="text-xs text-gray-500">Technical help with Tigo products</div>
+                    <div className="font-medium">{t('tigoProductSupport')}</div>
+                    <div className="text-xs text-gray-500">{t('tigoProductSupportDesc')}</div>
                   </Link>
                   <div className="border-t border-gray-100 my-1"></div>
                   <Link
                     href="/support/shop"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 transition"
                   >
-                    <div className="font-medium">Online Shop Support</div>
-                    <div className="text-xs text-gray-500">Help with orders and shipping</div>
+                    <div className="font-medium">{t('onlineShopSupport')}</div>
+                    <div className="text-xs text-gray-500">{t('onlineShopSupportDesc')}</div>
                   </Link>
                 </div>
               </div>
