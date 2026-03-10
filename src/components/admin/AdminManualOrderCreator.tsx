@@ -231,8 +231,8 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
         .sort((a, b) => a.countryName.localeCompare(b.countryName))
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl min-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 my-4" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
                 {/* Header */}
                 <div className="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
