@@ -260,7 +260,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                     vies_address: data.address || '',
                     vies_country: data.countryCode || ''
                 })
-                alert('VAT Verified! Company name auto-filled and type set to B2B.')
+                // alert replaced by inline address display
             } else {
                 alert(data.error || 'Invalid VAT number')
             }
@@ -596,6 +596,14 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                         onChange={e => setFormData({ ...formData, company_name: e.target.value })}
                                         className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
+                                </div>
+                            )}
+
+                            {formData.vies_address && (
+                                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm">
+                                    <p className="text-[10px] font-bold text-emerald-600 uppercase mb-1">VIES Registered Address</p>
+                                    <p className="text-slate-700">{formData.vies_address}</p>
+                                    {formData.vies_country && <p className="text-xs text-slate-500 mt-0.5">{formData.vies_country}</p>}
                                 </div>
                             )}
 
