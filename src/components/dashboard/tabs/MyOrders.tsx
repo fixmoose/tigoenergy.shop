@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { Customer, Order } from '@/types/database'
+import SavedCartsList from '@/components/cart/SavedCartsList'
 
 interface Props {
     user: User
@@ -30,13 +31,14 @@ export default function MyOrders({ user, customer }: Props) {
     }, [user.id])
 
     return (
+        <>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-100 text-green-700 rounded-lg flex items-center justify-center">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                     </div>
-                    <h3 className="font-bold text-lg text-gray-900">Order History</h3>
+                    <h3 className="font-bold text-lg text-gray-900">Zgodovina naročil</h3>
                 </div>
             </div>
 
@@ -101,13 +103,15 @@ export default function MyOrders({ user, customer }: Props) {
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
-                    <p className="text-gray-500 mb-8 max-w-xs mx-auto">You haven't placed any orders yet. Start shopping to find your orders here.</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Ni naročil</h3>
+                    <p className="text-gray-500 mb-8 max-w-xs mx-auto">Še niste oddali nobenega naročila.</p>
                     <Link href="/products" className="inline-block bg-green-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-green-200 hover:bg-green-700 transition-all">
-                        Start Shopping
+                        Začni nakupovati
                     </Link>
                 </div>
             )}
         </div>
+        <SavedCartsList />
+        </>
     )
 }

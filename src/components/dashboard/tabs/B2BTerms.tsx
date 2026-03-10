@@ -1,4 +1,5 @@
 'use client'
+import { useState } from 'react'
 import { Customer } from '@/types/database'
 
 interface Props {
@@ -6,24 +7,36 @@ interface Props {
 }
 
 export default function B2BTerms({ customer }: Props) {
+    const [expanded, setExpanded] = useState(false)
+
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+            <button
+                type="button"
+                onClick={() => setExpanded(e => !e)}
+                className="w-full p-6 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center hover:bg-gray-100/50 transition-colors"
+            >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     </div>
-                    <h3 className="font-bold text-lg text-gray-900">Commercial Terms & Conditions</h3>
+                    <h3 className="font-bold text-lg text-gray-900">Komercialni splošni pogoji / Commercial Terms & Conditions</h3>
                 </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">{expanded ? 'Zapri' : 'Odpri'}</span>
+                    <svg className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+            </button>
+
+            {expanded && <><div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex justify-end">
                 <button
                     onClick={() => window.print()}
                     className="text-xs font-bold text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                    Print PDF
+                    Natisni PDF
                 </button>
             </div>
-
             <div className="p-8 max-h-[800px] overflow-y-auto custom-scrollbar prose prose-sm max-w-none text-gray-600">
                 <div className="mb-8 p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 text-xs leading-relaxed">
                     <p className="font-bold mb-1">Agreement Notice:</p>
@@ -116,6 +129,7 @@ export default function B2BTerms({ customer }: Props) {
                     <p className="text-xs text-gray-500 mt-2">Authenticated on: {new Date().toLocaleDateString()}</p>
                 </div>
             </div>
+            </>}
         </div>
     )
 }

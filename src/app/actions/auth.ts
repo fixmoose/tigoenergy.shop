@@ -2,7 +2,7 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/server'
-import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
+import { sendEmail, renderTemplate, getEmailTranslations, notifyAdmins } from '@/lib/email'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
 
@@ -55,23 +55,18 @@ export async function registerUserAction(formData: any) {
             console.error('Failed to send welcome email:', emailError)
         }
 
-        // Notify admin of new registration
-        const adminEmail = process.env.MASTER_ADMIN_EMAIL
-        if (adminEmail) {
-            sendEmail({
-                to: adminEmail,
-                subject: `[NEW REGISTRATION] ${firstName} ${lastName} (${email})`,
-                html: `
-                    <h3>New Customer Registered</h3>
-                    <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Country:</strong> ${country || '—'}</p>
-                    <p><strong>Type:</strong> B2C</p>
-                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View Customer in Admin</a></p>
-                `,
-                skipUnsubscribe: true,
-            }).catch(err => console.error('Failed to send admin registration notification:', err))
-        }
+        // Notify all admins of new registration
+        notifyAdmins({
+            subject: `[NEW REGISTRATION] ${firstName} ${lastName} (${email})`,
+            html: `
+                <h3>New Customer Registered</h3>
+                <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Country:</strong> ${country || '—'}</p>
+                <p><strong>Type:</strong> B2C</p>
+                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View Customer in Admin</a></p>
+            `,
+        }).catch(err => console.error('Failed to send admin registration notification:', err))
 
         return { success: true }
     } catch (err: any) {
@@ -155,16 +150,25 @@ export async function registerB2BUserAction(formData: any) {
             })
         }
 
-        if (addresses.length > 0) {
-            // Retry up to 3 times in case the trigger hasn't created the row yet
-            for (let attempt = 0; attempt < 3; attempt++) {
-                if (attempt > 0) await new Promise(r => setTimeout(r, 500))
-                const { error: addrErr } = await supabase
-                    .from('customers')
-                    .update({ addresses })
-                    .eq('id', user.id)
-                if (!addrErr) break
+        // Update customers table: core B2B fields + addresses
+        // Retry up to 3 times in case the trigger hasn't created the row yet
+        for (let attempt = 0; attempt < 3; attempt++) {
+            if (attempt > 0) await new Promise(r => setTimeout(r, 500))
+            const updatePayload: any = {
+                company_name: companyName || null,
+                vat_id: vatNumber || null,
+                customer_type: 'b2b',
+                is_b2b: true,
+                first_name: firstName || null,
+                last_name: lastName || null,
+                phone: phone || null,
             }
+            if (addresses.length > 0) updatePayload.addresses = addresses
+            const { error: profileErr } = await supabase
+                .from('customers')
+                .update(updatePayload)
+                .eq('id', user.id)
+            if (!profileErr) break
         }
 
         const headersList = await headers()
@@ -188,25 +192,20 @@ export async function registerB2BUserAction(formData: any) {
             console.error('Failed to send B2B application email:', emailError)
         }
 
-        // Notify admin
-        const adminEmail = process.env.MASTER_ADMIN_EMAIL
-        if (adminEmail) {
-            sendEmail({
-                to: adminEmail,
-                subject: `[NEW B2B APPLICATION] ${companyName} — ${firstName} ${lastName} (${email})`,
-                html: `
-                    <h3>New B2B Application</h3>
-                    <p><strong>Company:</strong> ${companyName}</p>
-                    <p><strong>VAT:</strong> ${vatNumber}</p>
-                    <p><strong>Contact:</strong> ${firstName} ${lastName} (${jobTitle || '—'})</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Country:</strong> ${country}</p>
-                    <p><strong>Business Type:</strong> ${businessType}</p>
-                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View in Admin</a></p>
-                `,
-                skipUnsubscribe: true,
-            }).catch(err => console.error('Failed to send admin B2B notification:', err))
-        }
+        // Notify all admins of new B2B application
+        notifyAdmins({
+            subject: `[NEW B2B APPLICATION] ${companyName} — ${firstName} ${lastName} (${email})`,
+            html: `
+                <h3>New B2B Application</h3>
+                <p><strong>Company:</strong> ${companyName}</p>
+                <p><strong>VAT:</strong> ${vatNumber}</p>
+                <p><strong>Contact:</strong> ${firstName} ${lastName} (${jobTitle || '—'})</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Country:</strong> ${country}</p>
+                <p><strong>Business Type:</strong> ${businessType}</p>
+                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View in Admin</a></p>
+            `,
+        }).catch(err => console.error('Failed to send admin B2B notification:', err))
 
         return { success: true }
     } catch (err: any) {

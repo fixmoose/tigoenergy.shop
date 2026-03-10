@@ -20,7 +20,8 @@
     "vatExcluded": "Sin IVA",
     "vatTerm": "IVA",
     "b2bPriceLabel": "Precio B2B",
-    "retailPriceLabel": "Precio minorista"
+    "retailPriceLabel": "Precio minorista",
+    "createAccountBenefits": "Save your details for faster checkout next time"
   },
   "header": {
     "selectCurrency": "Seleccionar moneda",
@@ -169,7 +170,29 @@
     "loadingCheckout": "Cargando pago...",
     "cartIsEmpty": "Su carrito esta vacio",
     "shipping": "Envío",
-    "total": "Total"
+    "total": "Total",
+    "personalPickup": "Personal Pick-up",
+    "standard": "Standard",
+    "boxes": "boxes",
+    "pickupReady": "Ready in 24h",
+    "deliveryDays": "3-5 business days",
+    "logisticsAccess": "Logistics & Access",
+    "truckAccess": "My delivery location has standard commercial truck access",
+    "truckAccessDesc": "Check this if a 12-ton truck can easily access and unload at your site.",
+    "truckAccessNotes": "Truck Access Notes / Working Hours",
+    "truckAccessPlaceholder": "e.g. Ramp available, Forklift on site, Open 8:00 - 16:00...",
+    "paymentInfo": "Payment Information",
+    "paymentInfoDesc": "Direct Wise-to-Wise transfers have a €0 fee. Please note that a 3% processing fee applies to all other payments, including Apple Pay and Credit/Debit cards.",
+    "slovenianB2bNote": "Slovenian B2B: 22% VAT applied (Domestic Sale).",
+    "euB2bNote": "EU B2B Reverse Charge: 0% VAT applied (Intra-Community Sale).",
+    "b2bFinalSale": "B2B Policy: All sales are final. 14-day return period is not applicable for business customers.",
+    "b2bTermsNote": "As a business customer, you acknowledge that all sales are final and common consumer return rights do not apply.",
+    "addressNoteLookup": "Please verify your address with Google by clicking in the address field and then on a Google suggested address.",
+    "addressNoteManual": "Automatic address lookup is currently unavailable. Please enter your address details manually.",
+    "guestName": "Name (First, Last and/or Company)",
+    "sameAsCompanyAddress": "Same as company address",
+    "lockedByVat": "Locked by VAT",
+    "selectCountry": "Select Country"
   },
   "subcategories": {
     "Optimization": "Optimización",
@@ -535,7 +558,10 @@
         "checkPhoneCode": "Revise su teléfono para el código de 6 dígitos",
         "emailVerified": "Email verificado con éxito",
         "phoneVerified": "Teléfono verificado con éxito",
-        "registrationSuccess": "Registro exitoso! Bienvenido a Tigo Energy."
+        "registrationSuccess": "Registro exitoso! Bienvenido a Tigo Energy.",
+        "viesLocked": "Esta dirección está bloqueada — debe coincidir con su registro VIES y aparecerá en todas las facturas oficiales.",
+        "addShipping": "Añadir dirección de envío separada (opcional)",
+        "addBilling": "Añadir dirección de facturación separada (opcional)"
       },
       "agreements": {
         "reviewInfo": "Revise su información",
@@ -582,7 +608,13 @@
         "taxId": "NIF / N° de registro",
         "select": "Seleccionar..."
       },
-      "vat": "Número IVA"
+      "vat": "Número IVA",
+      "businessTypes": {
+        "installer": "Instalador",
+        "reseller": "Revendedor",
+        "distributor": "Distribuidor",
+        "other": "Otro"
+      }
     },
     "forgotPassword": {
       "title": "¿Olvidó su contraseña?",

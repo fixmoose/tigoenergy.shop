@@ -7,6 +7,7 @@ import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { registerB2BUserAction } from '@/app/actions/auth'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { getMarketKeyFromHostname, getDomainForMarket } from '@/lib/constants/markets'
+import { createClient } from '@/lib/supabase/client'
 import React, { useState, useEffect, useRef } from 'react'
 
 /** Parse the raw VIES address string into structured parts */
@@ -293,13 +294,17 @@ export default function B2BRegistrationForm() {
 
         try {
             const result = await registerB2BUserAction({
-            ...formData,
-            extraShippingAddress: addShipping ? shippingAddr : null,
-            extraBillingAddress: addBilling ? billingAddr : null,
-        })
+                ...formData,
+                extraShippingAddress: addShipping ? shippingAddr : null,
+                extraBillingAddress: addBilling ? billingAddr : null,
+            })
             if (!result.success) throw new Error(result.error)
-            alert(t('messages.registrationSuccess'))
-            router.push('/checkout')
+
+            // Auto sign-in so the customer is logged in immediately after registration
+            const supabase = createClient()
+            await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password })
+
+            router.push('/auth/welcome')
         } catch (err: any) {
             setError(err.message || t('errors.registrationFailed'))
         } finally {
@@ -441,7 +446,7 @@ export default function B2BRegistrationForm() {
 
                         {vatVerified && viesAddress ? (
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-1">
-                                <p className="text-[10px] text-gray-400 mb-2">This address is locked as it must match your VIES registration and will appear on all official invoices.</p>
+                                <p className="text-[10px] text-gray-400 mb-2">{t('messages.viesLocked')}</p>
                                 <p className="text-sm font-medium text-gray-800">{viesAddress.street || '—'}</p>
                                 <p className="text-sm text-gray-600">{[viesAddress.postalCode, viesAddress.city].filter(Boolean).join(' ')}</p>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{viesAddress.country}</p>
@@ -470,7 +475,7 @@ export default function B2BRegistrationForm() {
                             onClick={() => setAddShipping(v => !v)}
                             className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
                         >
-                            <span>📦 Add separate shipping address (optional)</span>
+                            <span>📦 {t('messages.addShipping')}</span>
                             <span className="text-gray-400">{addShipping ? '▲' : '▼'}</span>
                         </button>
                         {addShipping && (
@@ -498,7 +503,7 @@ export default function B2BRegistrationForm() {
                             onClick={() => setAddBilling(v => !v)}
                             className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
                         >
-                            <span>🧾 Add separate billing address (optional)</span>
+                            <span>🧾 {t('messages.addBilling')}</span>
                             <span className="text-gray-400">{addBilling ? '▲' : '▼'}</span>
                         </button>
                         {addBilling && (
@@ -542,10 +547,10 @@ export default function B2BRegistrationForm() {
                     <div>
                         <label className="block text-sm font-medium mb-2">{t('labels.businessType')}</label>
                         <div className="grid grid-cols-2 gap-3">
-                            {['Installer', 'Reseller', 'Distributor', 'Other'].map(type => (
+                            {(['installer', 'reseller', 'distributor', 'other'] as const).map(type => (
                                 <label key={type} className={`border rounded-lg p-3 cursor-pointer flex items-center gap-2 hover:bg-gray-50 ${formData.businessType === type ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}>
                                     <input type="radio" name="businessType" className="w-4 h-4" checked={formData.businessType === type} onChange={() => setFormData(prev => ({ ...prev, businessType: type }))} />
-                                    <span className="text-sm font-medium">{type}</span>
+                                    <span className="text-sm font-medium">{t(`businessTypes.${type}`)}</span>
                                 </label>
                             ))}
                         </div>

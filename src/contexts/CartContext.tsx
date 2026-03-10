@@ -275,16 +275,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Welcome Back!</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Dobrodošli nazaj!</h3>
               <p className="text-gray-500 mb-8 leading-relaxed">
-                You have items in your cart from last time you were here. Want to keep them or start fresh?
+                V vaši košarici so shranjeni izdelki iz zadnjega obiska. Želite nadaljevati z obstoječo košarico ali začeti znova?
               </p>
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => setShowRestorePrompt(false)}
                   className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200"
                 >
-                  Restore my items
+                  Nadaljuj z obstoječo košarico
                 </button>
                 <button
                   onClick={async () => {
@@ -293,7 +293,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   }}
                   className="w-full bg-gray-100 text-gray-600 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition"
                 >
-                  Start Fresh
+                  Začni novo košarico
                 </button>
               </div>
             </div>

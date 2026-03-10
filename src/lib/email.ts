@@ -71,6 +71,33 @@ export async function sendEmail({
 }
 
 /**
+ * Sends an admin/internal notification to all configured admin addresses.
+ * Reads MASTER_ADMIN_EMAIL and ADMIN_NOTIFY_EMAILS (comma-separated) env vars.
+ * Always includes support@tigoenergy.shop as fallback.
+ */
+export async function notifyAdmins({ subject, html }: { subject: string; html: string }) {
+    const addresses = new Set<string>()
+
+    // Primary admin email
+    if (process.env.MASTER_ADMIN_EMAIL) addresses.add(process.env.MASTER_ADMIN_EMAIL)
+
+    // Extra notification emails (comma-separated)
+    if (process.env.ADMIN_NOTIFY_EMAILS) {
+        process.env.ADMIN_NOTIFY_EMAILS.split(',').map(e => e.trim()).filter(Boolean).forEach(e => addresses.add(e))
+    }
+
+    // Fallback: always include support address
+    addresses.add('support@tigoenergy.shop')
+
+    const sends = Array.from(addresses).map(to =>
+        sendEmail({ to, subject, html, skipUnsubscribe: true }).catch(err =>
+            console.error(`Failed to send admin notification to ${to}:`, err)
+        )
+    )
+    await Promise.allSettled(sends)
+}
+
+/**
  * Sends a transactional email using a UniOne template ID.
  */
 export async function sendTemplateEmail({ from, to, subject, templateId, substitutions, skipUnsubscribe = false }: Omit<SendEmailParams, 'html'> & { templateId: string }) {

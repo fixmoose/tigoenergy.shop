@@ -21,7 +21,8 @@
     "retailPriceLabel": "MPC",
     "b2bPriceLabel": "B2B cena",
     "vatExcluded": "Brez DDV",
-    "vatTerm": "DDV"
+    "vatTerm": "DDV",
+    "createAccountBenefits": "Shranite podatke za hitrejši nakup naslednjič"
   },
   "header": {
     "selectCurrency": "Izberi valuto",
@@ -171,7 +172,29 @@
     "loadingCheckout": "Nalagam blagajno...",
     "cartIsEmpty": "Vaša košarica je prazna",
     "shipping": "Dostava",
-    "total": "Skupaj"
+    "total": "Skupaj",
+    "personalPickup": "Osebni prevzem",
+    "standard": "Standard",
+    "boxes": "škatl",
+    "pickupReady": "Pripravljeno v 24h",
+    "deliveryDays": "3-5 delovnih dni",
+    "logisticsAccess": "Logistika & dostop",
+    "truckAccess": "Moje dostavno mesto ima standardni tovorni dostop",
+    "truckAccessDesc": "Označite, če 12-tonski tovornjak lahko enostavno dostopi in razloži na vašem mestu.",
+    "truckAccessNotes": "Opombe za dostop / delovni čas",
+    "truckAccessPlaceholder": "npr. Rampa na voljo, Viličar na mestu, Odprti 8:00 - 16:00...",
+    "paymentInfo": "Informacije o plačilu",
+    "paymentInfoDesc": "Neposredni prenosi Wise-to-Wise imajo 0 € pristojbine. Za vsa ostala plačila, vključno z Apple Pay in kreditnimi/debetnimi karticami, velja 3% strošek obdelave.",
+    "slovenianB2bNote": "Slovensko B2B: 22% DDV (domača prodaja).",
+    "euB2bNote": "EU B2B obrnjeno davčno breme: 0% DDV (znotrajskupnostna prodaja).",
+    "b2bFinalSale": "B2B politika: Vse prodaje so dokončne. 14-dnevna pravica do vračila ne velja za poslovne stranke.",
+    "b2bTermsNote": "Kot poslovna stranka potrjujete, da so vse prodaje dokončne in da splošne pravice potrošnikov do vračila ne veljajo.",
+    "addressNoteLookup": "Prosimo, preverite naslov z Googlom s klikom v polje in nato na predlagani naslov.",
+    "addressNoteManual": "Samodejno iskanje naslova trenutno ni na voljo. Prosimo, vnesite podatke o naslovu ročno.",
+    "guestName": "Ime, priimek in/ali podjetje",
+    "sameAsCompanyAddress": "Enak naslovu podjetja",
+    "lockedByVat": "Zaklenjeno z DDV",
+    "selectCountry": "Izberite državo"
   },
   "subcategories": {
     "Optimization": "Optimizacija",
@@ -460,7 +483,10 @@
         "checkPhoneCode": "Preverite svoj telefon za 6-mestno kodo",
         "emailVerified": "E-pošta uspešno potrjena",
         "phoneVerified": "Telefon uspešno potrjen",
-        "registrationSuccess": "Registracija uspešna! Dobrodošli v Tigo Energy."
+        "registrationSuccess": "Registracija uspešna! Dobrodošli v Tigo Energy.",
+        "viesLocked": "Ta naslov je zaklenjen — mora ustrezati vaši VIES registraciji in bo naveden na vseh uradnih računih.",
+        "addShipping": "Dodaj ločen naslov za dostavo (neobvezno)",
+        "addBilling": "Dodaj ločen naslov za račun (neobvezno)"
       },
       "agreements": {
         "reviewInfo": "Pregled vaših podatkov",
@@ -507,7 +533,13 @@
         "taxId": "Davčna / registrska št.",
         "select": "Izberite..."
       },
-      "vat": "Številka DDV"
+      "vat": "Številka DDV",
+      "businessTypes": {
+        "installer": "Monter",
+        "reseller": "Preprodajalec",
+        "distributor": "Distributer",
+        "other": "Drugo"
+      }
     },
     "forgotPassword": {
       "title": "Pozabljeno geslo?",

@@ -231,6 +231,7 @@ export default function CheckoutPage() {
                     const addresses: SavedAddress[] = customerData.addresses || []
                     setSavedAddresses(addresses)
                     const defaultShipping = addresses.find(a => a.isDefaultShipping)
+                    const defaultBilling = addresses.find(a => a.isDefaultBilling)
 
                     setFormData(prev => ({
                         ...prev,
@@ -243,11 +244,20 @@ export default function CheckoutPage() {
                         shipping_city: defaultShipping?.city || '',
                         shipping_postal_code: defaultShipping?.postalCode || '',
                         shipping_country: defaultShipping?.country || '',
-                        vat_id: customerData.vat_id || '',
+                        vat_id: customerData.vat_id || user.user_metadata?.vat_id || '',
+                        // Pre-fill billing from saved billing address
+                        billing_street: defaultBilling?.street || defaultShipping?.street || '',
+                        billing_city: defaultBilling?.city || defaultShipping?.city || '',
+                        billing_postal_code: defaultBilling?.postalCode || defaultShipping?.postalCode || '',
+                        billing_country: defaultBilling?.country || defaultShipping?.country || '',
                     }))
 
                     if (defaultShipping) {
                         setSelectedAddressId(defaultShipping.id)
+                    }
+                    // If billing differs from shipping, uncheck billingSame
+                    if (defaultBilling && defaultShipping && defaultBilling.id !== defaultShipping.id) {
+                        setBillingSame(false)
                     }
 
                     if (customerData.is_b2b) {
@@ -347,7 +357,11 @@ export default function CheckoutPage() {
                 if (filtered.length > 0) {
                     const currentRateAvailable = filtered.find(r => r.id === selectedShippingId)
                     if (!currentRateAvailable) {
-                        setSelectedShippingId(filtered[0].id)
+                        // For SI, prefer Personal Pick-up as default
+                        const pickupRate = formData.shipping_country === 'SI'
+                            ? filtered.find(r => r.carrier === 'Personal Pick-up')
+                            : null
+                        setSelectedShippingId(pickupRate ? pickupRate.id : filtered[0].id)
                     }
                 } else {
                     console.warn(`No shipping rates found for ${formData.shipping_country} at weight ${totalWeight}kg`);
@@ -637,7 +651,13 @@ export default function CheckoutPage() {
     }
 
     const selectedShippingRate = shippingRates.find(r => r.id === selectedShippingId)
-    const currentShippingCost = selectedShippingRate?.rate_eur || 0
+    const parcels = calculateTigoParcels(items as any)
+    const boxCount = parcels.length
+    const currentShippingCost = selectedShippingRate
+        ? (selectedShippingRate.carrier === 'DPD' && boxCount > 1
+            ? selectedShippingRate.rate_eur * boxCount
+            : selectedShippingRate.rate_eur)
+        : 0
 
     // B2B VAT Logic:
     // 1. If not B2B -> Charge VAT
@@ -764,7 +784,7 @@ export default function CheckoutPage() {
                                         <input type="checkbox" name="create_account" className="rounded text-green-600 focus:ring-green-500" checked={createAccount} onChange={e => setCreateAccount(e.target.checked)} />
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-gray-900 group-hover:text-green-700 transition-colors">{t('createAccountFaster')}</span>
-                                            <span className="text-xs text-gray-500">{t('createAccountBenefits')}</span>
+                                            <span className="text-xs text-gray-500">{tc('createAccountBenefits')}</span>
                                         </div>
                                     </label>
                                     {createAccount && (
@@ -802,7 +822,7 @@ export default function CheckoutPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium mb-1">
-                                        {!user ? "Name (First, Last and/or Company)" : t('companyName')} <span className="text-red-500">*</span>
+                                        {!user ? t('guestName') : t('companyName')} <span className="text-red-500">*</span>
                                     </label>
                                     <input type="text" name="company_name" required={!user} value={formData.company_name} onChange={handleChange} className={getInputClass('company_name')} />
                                 </div>
@@ -823,11 +843,11 @@ export default function CheckoutPage() {
                                 <div className="md:col-span-2">
                                     {hasShippingError ? (
                                         <p className="text-[11px] text-amber-600 font-medium bg-amber-50 p-2.5 rounded-lg border border-amber-100 mb-2">
-                                            <strong>Note:</strong> Automatic address lookup is currently unavailable (Referer restricted). Please enter your address details manually into the fields below.
+                                            {t('addressNoteManual')}
                                         </p>
                                     ) : (
                                         <p className="text-[11px] text-blue-600 font-medium bg-blue-50 p-2.5 rounded-lg border border-blue-100 mb-2">
-                                            <strong>Note:</strong> Please verify your address with Google by clicking in the address window and then on a Google suggested address.
+                                            {t('addressNoteLookup')}
                                         </p>
                                     )}
                                 </div>
@@ -862,13 +882,21 @@ export default function CheckoutPage() {
                                 <input type="text" name="shipping_postal_code" required value={formData.shipping_postal_code} onChange={handleChange} className={getInputClass('shipping_postal_code')} placeholder={t('postalCode')} />
                                 <input type="text" name="shipping_city" required value={formData.shipping_city} onChange={handleChange} className={getInputClass('shipping_city')} placeholder={t('city')} />
                                 <div className="md:col-span-2">
-                                    <select name="shipping_country" value={formData.shipping_country} onChange={handleChange} className={getInputClass('shipping_country', 'bg-white')}>
-                                        <option value="">-- Select Country --</option>
-                                        {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
-                                    </select>
+                                    {effectiveIsB2B && formData.vat_id ? (
+                                        <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700">
+                                            <span className="text-sm font-medium">{COUNTRIES.find(c => c.code === formData.shipping_country)?.name || formData.shipping_country}</span>
+                                            <span className="text-xs text-gray-400 ml-auto">{t('lockedByVat')}</span>
+                                            <input type="hidden" name="shipping_country" value={formData.shipping_country} />
+                                        </div>
+                                    ) : (
+                                        <select name="shipping_country" value={formData.shipping_country} onChange={handleChange} className={getInputClass('shipping_country', 'bg-white')}>
+                                            <option value="">-- {t('selectCountry')} --</option>
+                                            {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                                        </select>
+                                    )}
                                     {effectiveIsB2B && (
-                                        <div className="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-4">
-                                            <h3 className="text-sm font-bold text-blue-900 uppercase tracking-wider">Logistics & Access</h3>
+                                        <div className="mt-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-4">
+                                            <h3 className="text-sm font-bold text-blue-900 uppercase tracking-wider">{t('logisticsAccess')}</h3>
                                             <div className="flex flex-col gap-2">
                                                 <label className="flex items-center gap-2 cursor-pointer">
                                                     <input
@@ -878,20 +906,18 @@ export default function CheckoutPage() {
                                                         onChange={e => setFormData(prev => ({ ...prev, commercial_access: e.target.checked }))}
                                                         className="rounded text-blue-600"
                                                     />
-                                                    <span className="text-sm font-medium">My delivery location has standard commercial truck access</span>
+                                                    <span className="text-sm font-medium">{t('truckAccess')}</span>
                                                 </label>
-                                                <p className="text-[11px] text-gray-500 ml-6">
-                                                    Check this if a 12-ton truck can easily access and unload at your site.
-                                                </p>
+                                                <p className="text-[11px] text-gray-500 ml-6">{t('truckAccessDesc')}</p>
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-blue-800 mb-1 uppercase tracking-wider">Truck Access Notes / Working Hours</label>
+                                                <label className="block text-xs font-bold text-blue-800 mb-1 uppercase tracking-wider">{t('truckAccessNotes')}</label>
                                                 <textarea
                                                     name="truck_access_notes"
                                                     value={formData.truck_access_notes}
                                                     onChange={e => setFormData(prev => ({ ...prev, truck_access_notes: e.target.value }))}
                                                     className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                                    placeholder="e.g. Ramp available, Forklift on site, Open 8:00 - 16:00..."
+                                                    placeholder={t('truckAccessPlaceholder')}
                                                     rows={2}
                                                 />
                                             </div>
@@ -911,26 +937,29 @@ export default function CheckoutPage() {
                             ) : shippingRates.length > 0 ? (
                                 <div className="space-y-3">
                                     {shippingRates.map((rate) => {
-                                        const parcels = calculateTigoParcels(items as any)
-                                        const boxCount = parcels.length
-
+                                        const isPickup = rate.carrier === 'Personal Pick-up'
+                                        const effectiveRate = rate.carrier === 'DPD' && boxCount > 1
+                                            ? rate.rate_eur * boxCount
+                                            : rate.rate_eur
                                         return (
                                             <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-green-600" />
                                                     <div>
                                                         <div className="font-bold text-gray-900">
-                                                            {rate.carrier} {rate.service_type === 'pickup' ? '(Pickup)' : 'Standard'}
+                                                            {isPickup ? t('personalPickup') : `${rate.carrier} ${t('standard')}`}
                                                             {rate.carrier === 'DPD' && boxCount > 1 && (
                                                                 <span className="ml-2 text-xs font-normal text-green-600 bg-green-100 px-1.5 py-0.5 rounded">
-                                                                    ({boxCount} boxes)
+                                                                    ({boxCount} {t('boxes')})
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="text-xs text-gray-500">{rate.service_type === 'pickup' ? 'Ready in 24h' : '3-5 business days'}</div>
+                                                        <div className="text-xs text-gray-500">{isPickup ? t('pickupReady') : t('deliveryDays')}</div>
                                                     </div>
                                                 </div>
-                                                <div className="font-bold text-gray-900">{rate.rate_eur === 0 ? 'FREE' : formatPriceGross(rate.rate_eur)}</div>
+                                                <div className="font-bold text-gray-900">
+                                                    {isPickup ? t('personalPickup') : (effectiveRate === 0 ? t('free') : formatPriceGross(effectiveRate))}
+                                                </div>
                                             </label>
                                         )
                                     })}
@@ -947,7 +976,7 @@ export default function CheckoutPage() {
                             </h2>
                             <label className="flex items-center gap-2 mb-4 cursor-pointer">
                                 <input type="checkbox" name="billing_same" checked={billingSame} onChange={e => setBillingSame(e.target.checked)} className="rounded text-green-600" />
-                                <span className="text-sm font-medium">{t('sameAsShipping')}</span>
+                                <span className="text-sm font-medium">{effectiveIsB2B ? t('sameAsCompanyAddress') : t('sameAsShipping')}</span>
                             </label>
                             {!billingSame && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1008,16 +1037,15 @@ export default function CheckoutPage() {
                             <div className="mt-4 p-3 bg-amber-50/50 rounded-xl border border-amber-100 flex items-start gap-3 animate-in fade-in slide-in-from-top-1 duration-500">
                                 <span className="text-amber-500 text-sm">ℹ️</span>
                                 <div className="text-[11px] text-amber-900 leading-relaxed">
-                                    <span className="font-bold block mb-0.5 uppercase tracking-wider opacity-70">Payment Information</span>
-                                    Direct <strong>Wise-to-Wise</strong> transfers have a <strong>€ 0 fee</strong>.
-                                    Please note that a <strong>3% processing fee</strong> applies to all other payments, including Apple Pay and Credit/Debit cards.
+                                    <span className="font-bold block mb-0.5 uppercase tracking-wider opacity-70">{t('paymentInfo')}</span>
+                                    {t('paymentInfoDesc')}
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="lg:col-span-1">
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-[128px]">
                             <h2 className="text-lg font-bold mb-6">{t('orderSummary')}</h2>
                             <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2">
                                 {items.map(item => (
@@ -1052,14 +1080,12 @@ export default function CheckoutPage() {
                                     <p>
                                         {effectiveIsB2B
                                             ? (isSlovenianB2B
-                                                ? "Slovenian B2B: 22% VAT applied (Domestic Sale)."
-                                                : "EU B2B Reverse Charge: 0% VAT applied (Intra-Community Sale).")
+                                                ? t('slovenianB2bNote')
+                                                : t('euB2bNote'))
                                             : t('pricesIncludeVat', { rate: (vatRate * 100).toFixed(0) })}
                                     </p>
                                     {effectiveIsB2B && (
-                                        <p className="font-bold text-red-600">
-                                            B2B Policy: All sales are final. 14-day return period is not applicable for business customers.
-                                        </p>
+                                        <p className="font-bold text-red-600">{t('b2bFinalSale')}</p>
                                     )}
                                 </div>
                             </div>
@@ -1077,7 +1103,7 @@ export default function CheckoutPage() {
                                     <span className={`text-xs ${invalidFields.includes('terms_agreement') ? 'text-red-800 font-bold' : 'text-gray-500'} group-hover:text-gray-700 transition`}>
                                         {t('termsAgree')} <a href="/terms" target="_blank" className="text-green-600 hover:underline">{t('termsConditions')}</a> {t('privacyAcknowledge')} <a href="/privacy" target="_blank" className="text-green-600 hover:underline">{t('privacyPolicy')}</a>.
                                         {effectiveIsB2B
-                                            ? " As a business customer, you acknowledge that all sales are final and common consumer return rights do not apply."
+                                            ? ` ${t('b2bTermsNote')}`
                                             : ` ${t('warrantyReturnInfo')}`}
                                     </span>
                                 </label>

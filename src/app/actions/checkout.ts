@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { cookies, headers } from 'next/headers'
 import { clearCartServer } from '@/lib/db/cart'
 import { getMarketFromKey, MARKETS, EU_COUNTRY_CODES } from '@/lib/constants/markets'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, notifyAdmins } from '@/lib/email'
 import { buildOrderConfirmationEmail } from '@/lib/emails/order-confirmation'
 import { getEffectivePrice } from '@/lib/db/pricing'
 import { verifyRecaptcha } from '@/lib/recaptcha'
@@ -315,29 +315,23 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 html: finalHtml,
             })
 
-            // Notify admin of new order
-            const adminEmail = process.env.MASTER_ADMIN_EMAIL
-            if (adminEmail) {
-                const itemsListHtml = orderItemsData.map(i =>
-                    `<li>${i.product_name} (${i.sku}) x${i.quantity} — EUR ${i.total_price?.toFixed(2)}</li>`
-                ).join('')
-                await sendEmail({
-                    from: 'Tigo Energy Shop <noreply@tigoenergy.shop>',
-                    to: adminEmail,
-                    subject: `[NEW ORDER] #${order.order_number} — ${emailData.customer_name} (EUR ${grandTotal.toFixed(2)})`,
-                    html: `
-                        <h3>New Order Received: #${order.order_number}</h3>
-                        <p><strong>Customer:</strong> ${emailData.customer_name} (${email})</p>
-                        <p><strong>Company:</strong> ${emailData.customer_company || '—'}</p>
-                        <p><strong>Payment:</strong> ${emailData.payment_method}</p>
-                        <p><strong>Total:</strong> EUR ${grandTotal.toFixed(2)}</p>
-                        <p><strong>Items:</strong></p>
-                        <ul>${itemsListHtml}</ul>
-                        <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/orders/${order.id}">View Order in Admin</a></p>
-                    `,
-                    skipUnsubscribe: true,
-                }).catch(err => console.error('Failed to send admin order notification:', err))
-            }
+            // Notify all admins of new order
+            const itemsListHtml = orderItemsData.map(i =>
+                `<li>${i.product_name} (${i.sku}) x${i.quantity} — EUR ${i.total_price?.toFixed(2)}</li>`
+            ).join('')
+            notifyAdmins({
+                subject: `[NEW ORDER] #${order.order_number} — ${emailData.customer_name} (EUR ${grandTotal.toFixed(2)})`,
+                html: `
+                    <h3>New Order Received: #${order.order_number}</h3>
+                    <p><strong>Customer:</strong> ${emailData.customer_name} (${email})</p>
+                    <p><strong>Company:</strong> ${emailData.customer_company || '—'}</p>
+                    <p><strong>Payment:</strong> ${emailData.payment_method}</p>
+                    <p><strong>Total:</strong> EUR ${grandTotal.toFixed(2)}</p>
+                    <p><strong>Items:</strong></p>
+                    <ul>${itemsListHtml}</ul>
+                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/orders/${order.id}">View Order in Admin</a></p>
+                `,
+            }).catch(err => console.error('Failed to send admin order notification:', err))
         } catch (emailErr) {
             // Log but don't fail the order
             console.error('Failed to send order confirmation email:', emailErr)
@@ -352,20 +346,15 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
     } catch (err: any) {
         console.error('Checkout error:', err)
 
-        const adminEmail = process.env.MASTER_ADMIN_EMAIL
-        if (adminEmail) {
-            sendEmail({
-                to: adminEmail,
-                subject: `[CHECKOUT ERROR] ${err.message || 'Unknown error'}`,
-                html: `
-                    <h3>Checkout Error</h3>
-                    <p><strong>Error:</strong> ${err.message || 'Unknown error'}</p>
-                    <p><strong>Stack:</strong><pre style="font-size:11px">${err.stack || 'N/A'}</pre></p>
-                    <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-                `,
-                skipUnsubscribe: true,
-            }).catch(() => {})
-        }
+        notifyAdmins({
+            subject: `[CHECKOUT ERROR] ${err.message || 'Unknown error'}`,
+            html: `
+                <h3>Checkout Error</h3>
+                <p><strong>Error:</strong> ${err.message || 'Unknown error'}</p>
+                <p><strong>Stack:</strong><pre style="font-size:11px">${err.stack || 'N/A'}</pre></p>
+                <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+            `,
+        }).catch(() => {})
 
         return { success: false, error: err.message || 'Failed to place order' }
     }

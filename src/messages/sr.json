@@ -20,7 +20,8 @@
     "vatExcluded": "Bez PDV-a",
     "vatTerm": "PDV",
     "b2bPriceLabel": "B2B cena",
-    "retailPriceLabel": "Maloprodajna cena"
+    "retailPriceLabel": "Maloprodajna cena",
+    "createAccountBenefits": "Save your details for faster checkout next time"
   },
   "header": {
     "selectCurrency": "Izaberi valutu",
@@ -169,7 +170,29 @@
     "loadingCheckout": "Učitavanje plaćanja...",
     "cartIsEmpty": "Vaša korpa je prazna",
     "shipping": "Isporuka",
-    "total": "Ukupno"
+    "total": "Ukupno",
+    "personalPickup": "Personal Pick-up",
+    "standard": "Standard",
+    "boxes": "boxes",
+    "pickupReady": "Ready in 24h",
+    "deliveryDays": "3-5 business days",
+    "logisticsAccess": "Logistics & Access",
+    "truckAccess": "My delivery location has standard commercial truck access",
+    "truckAccessDesc": "Check this if a 12-ton truck can easily access and unload at your site.",
+    "truckAccessNotes": "Truck Access Notes / Working Hours",
+    "truckAccessPlaceholder": "e.g. Ramp available, Forklift on site, Open 8:00 - 16:00...",
+    "paymentInfo": "Payment Information",
+    "paymentInfoDesc": "Direct Wise-to-Wise transfers have a €0 fee. Please note that a 3% processing fee applies to all other payments, including Apple Pay and Credit/Debit cards.",
+    "slovenianB2bNote": "Slovenian B2B: 22% VAT applied (Domestic Sale).",
+    "euB2bNote": "EU B2B Reverse Charge: 0% VAT applied (Intra-Community Sale).",
+    "b2bFinalSale": "B2B Policy: All sales are final. 14-day return period is not applicable for business customers.",
+    "b2bTermsNote": "As a business customer, you acknowledge that all sales are final and common consumer return rights do not apply.",
+    "addressNoteLookup": "Please verify your address with Google by clicking in the address field and then on a Google suggested address.",
+    "addressNoteManual": "Automatic address lookup is currently unavailable. Please enter your address details manually.",
+    "guestName": "Name (First, Last and/or Company)",
+    "sameAsCompanyAddress": "Same as company address",
+    "lockedByVat": "Locked by VAT",
+    "selectCountry": "Select Country"
   },
   "subcategories": {
     "Optimization": "Optimizacija",
@@ -535,7 +558,10 @@
         "checkPhoneCode": "Proverite telefon za 6-cifreni kod",
         "emailVerified": "Email uspešno potvrđen",
         "phoneVerified": "Telefon uspešno potvrđen",
-        "registrationSuccess": "Registracija uspešna! Dobrodošli u Tigo Energy."
+        "registrationSuccess": "Registracija uspešna! Dobrodošli u Tigo Energy.",
+        "viesLocked": "Ova adresa je zaključana — mora odgovarati vašoj VIES registraciji i pojaviće se na svim zvaničnim fakturama.",
+        "addShipping": "Dodaj posebnu adresu za isporuku (opciono)",
+        "addBilling": "Dodaj posebnu adresu za fakturu (opciono)"
       },
       "agreements": {
         "reviewInfo": "Pregledajte svoje informacije",
@@ -582,7 +608,13 @@
         "taxId": "PIB / reg. br.",
         "select": "Izaberite..."
       },
-      "vat": "PDV broj"
+      "vat": "PDV broj",
+      "businessTypes": {
+        "installer": "Instalater",
+        "reseller": "Preprodavac",
+        "distributor": "Distributer",
+        "other": "Ostalo"
+      }
     },
     "forgotPassword": {
       "title": "Zaboravili ste lozinku?",
