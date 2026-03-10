@@ -29,9 +29,9 @@ const PLACEHOLDERS = [
     { key: '{company_vat}', label: 'Company VAT' },
     { key: '{company_email}', label: 'Company Email' },
     { key: '{company_phone}', label: 'Company Phone' },
-    { key: '{company_iban_si}', label: 'IBAN — NLB Slovenia' },
+    { key: '{company_iban_si}', label: 'IBAN — Delavska Hranilnica d.d. Slovenia' },
     { key: '{company_iban_be}', label: 'IBAN — Wise Belgium' },
-    { key: '{company_bic_si}', label: 'BIC — NLB' },
+    { key: '{company_bic_si}', label: 'BIC — Delavska Hranilnica d.d.' },
     { key: '{company_bic_be}', label: 'BIC — Wise' },
     { key: '{place_of_issue}', label: 'Place of Issue' },
     { key: '{invoice_number}', label: 'Invoice / Doc Number' },
@@ -67,7 +67,7 @@ const PREVIEW: Record<string, string> = {
     '{company_name}': 'Initra Energija d.o.o.',
     '{company_address}': 'Podsmreka 59A, 1356 Dobrova, SI',
     '{company_vat}': 'SI 62518313',
-    '{company_email}': 'info@tigoenergy.si',
+    '{company_email}': 'support@tigoenergy.shop',
     '{company_phone}': '+386 1 542 41 80',
     '{company_iban_si}': 'SI56 6100 0002 8944 371',
     '{company_iban_be}': 'BE55 9052 7486 2944',
@@ -170,7 +170,7 @@ const BANK_SECTION = `<div style="margin:0 48px 32px;background:#f9fafb;border:1
   </div>
   <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">NLB d.d. &mdash; Slovenia</div>
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Delavska Hranilnica d.d. &mdash; Slovenia</div>
       <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
         <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>

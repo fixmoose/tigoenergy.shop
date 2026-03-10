@@ -117,7 +117,23 @@ export async function adminCreateCustomerAction(formData: any) {
 
         if (authError) throw authError
 
-        // 2. Create Customer Profile
+        // 2. Build VIES address if available
+        const addresses: any[] = []
+        if (is_b2b && formData.vies_address) {
+            addresses.push({
+                id: Math.random().toString(36).substr(2, 9),
+                label: 'VIES Registered',
+                street: formData.vies_address,
+                city: '',
+                postalCode: '',
+                country: formData.vies_country || '',
+                isViesAddress: true,
+                isDefaultBilling: true,
+                isDefaultShipping: true,
+            })
+        }
+
+        // 3. Create Customer Profile
         const { error: profileError } = await supabase.from('customers').insert({
             id: authData.user.id,
             email,
@@ -129,7 +145,8 @@ export async function adminCreateCustomerAction(formData: any) {
             vat_id: formData.vat_id,
             vat_number: formData.vat_id,
             customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
-            account_status: 'active'
+            account_status: 'active',
+            ...(addresses.length > 0 && { addresses })
         })
 
         if (profileError && !profileError.message.includes('duplicate key')) {

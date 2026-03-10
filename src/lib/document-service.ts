@@ -71,7 +71,7 @@ const DEFAULT_COMPANY_DATA = {
     company_name: 'Initra Energija d.o.o.',
     company_address: 'Podsmreka 59A, 1356 Dobrova, SI',
     company_vat: 'SI 62518313',
-    company_email: 'info@tigoenergy.si',
+    company_email: 'support@tigoenergy.shop',
     company_phone: '+386 1 542 41 80',
     company_iban_be: 'BE55 9052 7486 2944',
     company_iban_si: 'SI56 6100 0002 8944 371',

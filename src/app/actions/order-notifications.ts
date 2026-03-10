@@ -34,7 +34,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
     const isSlovenia = billingCountry === 'SI'
     const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
     const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'NLB d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
+    const primaryBank = isSlovenia ? 'Delavska Hranilnica d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
 
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
@@ -108,7 +108,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
   </div>
   <!-- Footer -->
   <div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
-    Initra Energija d.o.o. &middot; Podsmreka 59A, 1356 Dobrova, SI &middot; info@tigoenergy.si &middot; +386 1 542 41 80
+    Initra Energija d.o.o. &middot; Podsmreka 59A, 1356 Dobrova, SI &middot; support@tigoenergy.shop &middot; +386 1 542 41 80
   </div>
 </div>
 </body></html>`
@@ -147,7 +147,7 @@ export async function sendPaymentReminderAction(orderId: string) {
     const isSlovenia = billingCountry === 'SI'
     const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
     const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'NLB d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
+    const primaryBank = isSlovenia ? 'Delavska Hranilnica d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
 
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
@@ -225,7 +225,7 @@ export async function sendPaymentReminderAction(orderId: string) {
   </div>
   <!-- Footer -->
   <div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
-    Initra Energija d.o.o. &middot; Podsmreka 59A, 1356 Dobrova, SI &middot; info@tigoenergy.si &middot; +386 1 542 41 80
+    Initra Energija d.o.o. &middot; Podsmreka 59A, 1356 Dobrova, SI &middot; support@tigoenergy.shop &middot; +386 1 542 41 80
   </div>
 </div>
 </body></html>`

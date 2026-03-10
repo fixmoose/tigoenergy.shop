@@ -277,9 +277,9 @@ export default function OrderDetailsPage() {
                                 </div>
 
                                 <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                                    {/* NLB — Slovenia */}
+                                    {/* Delavska Hranilnica d.d. — Slovenia */}
                                     <div className="bg-white rounded-xl p-4 border border-amber-100">
-                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-3">NLB d.d. — Slovenia</p>
+                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-3">Delavska Hranilnica d.d. — Slovenia</p>
                                         <div className="space-y-2">
                                             <div>
                                                 <p className="text-[9px] font-bold text-gray-400 uppercase">IBAN</p>

@@ -152,7 +152,9 @@ export default function CustomerList({ customers }: CustomerListProps) {
         password: '',
         type: 'b2c' as Tab,
         company_name: '',
-        vat_id: ''
+        vat_id: '',
+        vies_address: '',
+        vies_country: ''
     })
 
     const [editData, setEditData] = useState<Partial<Customer>>({})
@@ -184,6 +186,8 @@ export default function CustomerList({ customers }: CustomerListProps) {
                 is_b2b: formData.type === 'b2b',
                 company_name: formData.company_name,
                 vat_id: formData.vat_id,
+                vies_address: formData.vies_address,
+                vies_country: formData.vies_country,
                 customer_type: formData.type === 'guest' ? 'guest' : undefined
             })
             setIsModalOpen(false)
@@ -252,7 +256,9 @@ export default function CustomerList({ customers }: CustomerListProps) {
                 setFormData({
                     ...formData,
                     company_name: data.name,
-                    type: 'b2b'
+                    type: 'b2b',
+                    vies_address: data.address || '',
+                    vies_country: data.countryCode || ''
                 })
                 alert('VAT Verified! Company name auto-filled and type set to B2B.')
             } else {
