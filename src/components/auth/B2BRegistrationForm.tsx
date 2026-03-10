@@ -7,7 +7,28 @@ import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { registerB2BUserAction } from '@/app/actions/auth'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { getMarketKeyFromHostname, getDomainForMarket } from '@/lib/constants/markets'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+
+/** Parse the raw VIES address string into structured parts */
+function parseViesAddress(raw: string): { street: string; postalCode: string; city: string } {
+    const cleaned = raw.replace(/\r/g, '').trim()
+    const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean)
+
+    if (lines.length >= 2) {
+        const street = lines[0]
+        const lastLine = lines[lines.length - 1]
+        // Match "1234 CITY" or "1234-56 CITY" or "12345 CITY"
+        const m = lastLine.match(/^(\d[\d\s\-]{1,7}\d)\s+(.+)$/)
+        if (m) return { street, postalCode: m[1].replace(/\s/g, ''), city: m[2].replace(/\s+/g, ' ').trim() }
+        return { street, postalCode: '', city: lastLine }
+    }
+
+    // Single line — try "STREET, POSTAL CITY"
+    const m = cleaned.match(/^(.+?),?\s+(\d[\d\s\-]{1,7}\d)\s+(.+)$/)
+    if (m) return { street: m[1].trim(), postalCode: m[2].replace(/\s/g, ''), city: m[3].trim() }
+
+    return { street: cleaned, postalCode: '', city: '' }
+}
 
 const MARKET_PHONE_CODES: Record<string, string> = {
     SI: '+386',
@@ -90,6 +111,18 @@ export default function B2BRegistrationForm() {
         marketing: false // New field
     })
 
+    // VIES-locked address (non-editable, used for invoicing)
+    const [viesAddress, setViesAddress] = useState<{ street: string; postalCode: string; city: string; country: string } | null>(null)
+
+    // Optional extra addresses
+    const [addShipping, setAddShipping] = useState(false)
+    const [addBilling, setAddBilling] = useState(false)
+    const [shippingAddr, setShippingAddr] = useState({ street: '', city: '', postalCode: '', country: '' })
+    const [billingAddr, setBillingAddr] = useState({ street: '', city: '', postalCode: '', country: '' })
+
+    const shippingRef = useRef<HTMLInputElement>(null)
+    const billingRef = useRef<HTMLInputElement>(null)
+
     // Verification States
     const [vatVerified, setVatVerified] = useState(false)
     const [emailVerified, setEmailVerified] = useState(false)
@@ -170,11 +203,17 @@ export default function B2BRegistrationForm() {
                 }
 
                 setVatVerified(true)
+                // Parse VIES raw address into structured parts
+                const parsed = data.address ? parseViesAddress(data.address) : { street: '', postalCode: '', city: '' }
+                const viesCountry = data.countryCode || ''
+                setViesAddress({ ...parsed, country: viesCountry })
                 setFormData(prev => ({
                     ...prev,
                     companyName: data.name || prev.companyName,
-                    address: data.address || '',
-                    country: data.countryCode || prev.country
+                    address: parsed.street,
+                    city: parsed.city,
+                    postalCode: parsed.postalCode,
+                    country: viesCountry,
                 }))
                 // Auto-advance
                 setStep(2)
@@ -260,7 +299,11 @@ export default function B2BRegistrationForm() {
         setError('')
 
         try {
-            const result = await registerB2BUserAction(formData)
+            const result = await registerB2BUserAction({
+            ...formData,
+            extraShippingAddress: addShipping ? shippingAddr : null,
+            extraBillingAddress: addBilling ? billingAddr : null,
+        })
             if (!result.success) throw new Error(result.error)
             alert(t('messages.registrationSuccess'))
             router.push('/checkout')
@@ -356,21 +399,95 @@ export default function B2BRegistrationForm() {
                         </div>
                     </div>
 
+                    {/* VIES Registered Address — locked */}
                     <div className="pt-2">
-                        <h4 className="text-xs font-bold text-gray-700 mb-3">{t('labels.address')}</h4>
-                        <div className="space-y-3">
-                            <input
-                                ref={addressInputRef}
-                                placeholder={t('labels.address')}
-                                className="w-full border p-2.5 rounded-lg"
-                                value={formData.address}
-                                onChange={e => setFormData({ ...formData, address: e.target.value })}
-                            />
-                            <div className="flex gap-3">
-                                <input placeholder={t('labels.city')} className="flex-1 border p-2.5 rounded-lg" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
-                                <input placeholder={t('labels.zip')} className="w-24 border p-2.5 rounded-lg" value={formData.postalCode} onChange={e => setFormData({ ...formData, postalCode: e.target.value })} />
-                            </div>
+                        <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-xs font-bold text-gray-700">{t('labels.address')}</h4>
+                            {vatVerified && (
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                    🔒 VIES Verified
+                                </span>
+                            )}
                         </div>
+
+                        {vatVerified && viesAddress ? (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-1">
+                                <p className="text-[10px] text-gray-400 mb-2">This address is locked as it must match your VIES registration and will appear on all official invoices.</p>
+                                <p className="text-sm font-medium text-gray-800">{viesAddress.street || '—'}</p>
+                                <p className="text-sm text-gray-600">{[viesAddress.postalCode, viesAddress.city].filter(Boolean).join(' ')}</p>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{viesAddress.country}</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <input
+                                    ref={addressInputRef}
+                                    placeholder={t('labels.address')}
+                                    className="w-full border p-2.5 rounded-lg"
+                                    value={formData.address}
+                                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                />
+                                <div className="flex gap-3">
+                                    <input placeholder={t('labels.city')} className="flex-1 border p-2.5 rounded-lg" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} />
+                                    <input placeholder={t('labels.zip')} className="w-24 border p-2.5 rounded-lg" value={formData.postalCode} onChange={e => setFormData({ ...formData, postalCode: e.target.value })} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Optional: Separate Shipping Address */}
+                    <div className="border rounded-lg overflow-hidden">
+                        <button
+                            type="button"
+                            onClick={() => setAddShipping(v => !v)}
+                            className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                        >
+                            <span>📦 Add separate shipping address (optional)</span>
+                            <span className="text-gray-400">{addShipping ? '▲' : '▼'}</span>
+                        </button>
+                        {addShipping && (
+                            <div className="p-4 space-y-3 bg-white">
+                                <input
+                                    ref={shippingRef}
+                                    placeholder="Street address"
+                                    className="w-full border p-2.5 rounded-lg text-sm"
+                                    value={shippingAddr.street}
+                                    onChange={e => setShippingAddr(a => ({ ...a, street: e.target.value }))}
+                                />
+                                <div className="flex gap-3">
+                                    <input placeholder="City" className="flex-1 border p-2.5 rounded-lg text-sm" value={shippingAddr.city} onChange={e => setShippingAddr(a => ({ ...a, city: e.target.value }))} />
+                                    <input placeholder="ZIP" className="w-24 border p-2.5 rounded-lg text-sm" value={shippingAddr.postalCode} onChange={e => setShippingAddr(a => ({ ...a, postalCode: e.target.value }))} />
+                                    <input placeholder="Country" className="w-24 border p-2.5 rounded-lg text-sm uppercase" value={shippingAddr.country} onChange={e => setShippingAddr(a => ({ ...a, country: e.target.value.toUpperCase() }))} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Optional: Separate Billing Address */}
+                    <div className="border rounded-lg overflow-hidden">
+                        <button
+                            type="button"
+                            onClick={() => setAddBilling(v => !v)}
+                            className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                        >
+                            <span>🧾 Add separate billing address (optional)</span>
+                            <span className="text-gray-400">{addBilling ? '▲' : '▼'}</span>
+                        </button>
+                        {addBilling && (
+                            <div className="p-4 space-y-3 bg-white">
+                                <input
+                                    ref={billingRef}
+                                    placeholder="Street address"
+                                    className="w-full border p-2.5 rounded-lg text-sm"
+                                    value={billingAddr.street}
+                                    onChange={e => setBillingAddr(a => ({ ...a, street: e.target.value }))}
+                                />
+                                <div className="flex gap-3">
+                                    <input placeholder="City" className="flex-1 border p-2.5 rounded-lg text-sm" value={billingAddr.city} onChange={e => setBillingAddr(a => ({ ...a, city: e.target.value }))} />
+                                    <input placeholder="ZIP" className="w-24 border p-2.5 rounded-lg text-sm" value={billingAddr.postalCode} onChange={e => setBillingAddr(a => ({ ...a, postalCode: e.target.value }))} />
+                                    <input placeholder="Country" className="w-24 border p-2.5 rounded-lg text-sm uppercase" value={billingAddr.country} onChange={e => setBillingAddr(a => ({ ...a, country: e.target.value.toUpperCase() }))} />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded-lg border">
@@ -597,7 +714,14 @@ export default function B2BRegistrationForm() {
                             </div>
                             <div>
                                 <span className="block text-gray-400 font-medium">{t('labels.address')}</span>
-                                <span className="text-gray-700">{formData.address}, {formData.city}, {formData.postalCode}</span>
+                                {viesAddress ? (
+                                    <>
+                                        <span className="text-gray-700 block">{viesAddress.street}</span>
+                                        <span className="text-gray-500 block">{[viesAddress.postalCode, viesAddress.city].filter(Boolean).join(' ')}, {viesAddress.country}</span>
+                                    </>
+                                ) : (
+                                    <span className="text-gray-700">{formData.address}, {formData.city}, {formData.postalCode}</span>
+                                )}
                             </div>
                             <div>
                                 <span className="block text-gray-400 font-medium">{t('steps.business')}</span>

@@ -35,6 +35,16 @@ export function seoMiddleware(request: NextRequest) {
     requestHeaders.set('x-market-currency', market.currency)
     requestHeaders.set('x-market-locale', market.locale)
 
+    // Forward preferred language cookie as a request header so Server Components
+    // can read it via headers(). Only forward if the language is valid for this market.
+    const preferredLang = request.cookies.get('preferred_language')?.value
+    if (preferredLang && market.availableLanguages.includes(preferredLang)) {
+        requestHeaders.set('x-preferred-language', preferredLang)
+    } else {
+        // Ensure the market default is always applied (removes stale cookie language)
+        requestHeaders.set('x-preferred-language', market.defaultLanguage)
+    }
+
     const response = NextResponse.next({
         request: {
             headers: requestHeaders,

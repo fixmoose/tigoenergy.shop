@@ -33,12 +33,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Forward user's language preference cookie as a header for server components
-  const preferredLang = cookies.get('preferred_language')?.value
-  if (preferredLang) {
-    response.headers.set('x-preferred-language', preferredLang)
-  }
-
   return response
 }
 

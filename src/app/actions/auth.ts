@@ -83,7 +83,7 @@ export async function registerUserAction(formData: any) {
 export async function registerB2BUserAction(formData: any) {
     try {
         const supabase = await createAdminClient()
-        const { email, password, firstName, lastName, phone, companyName, vatNumber, address, companyAddress2, city, postalCode, country, website, businessType, employees, commercialAccess, preferredCarrier, jobTitle, newsletter, marketing } = formData
+        const { email, password, firstName, lastName, phone, companyName, vatNumber, address, companyAddress2, city, postalCode, country, website, businessType, employees, commercialAccess, preferredCarrier, jobTitle, newsletter, marketing, extraShippingAddress, extraBillingAddress } = formData
 
         const { data: userData, error: signUpError } = await supabase.auth.admin.createUser({
             email,
@@ -114,24 +114,54 @@ export async function registerB2BUserAction(formData: any) {
         const user = userData.user
         if (!user) throw new Error('Failed to create user')
 
-        // Save address to customers.addresses (the trigger creates the row, give it a moment)
+        // Build addresses array: VIES address is always first (invoice address), extras appended
+        const addresses: any[] = []
         if (address || city) {
-            const addressEntry = {
+            addresses.push({
                 id: Math.random().toString(36).substr(2, 9),
+                label: 'VIES Registered',
                 street: address || '',
                 street2: companyAddress2 || '',
                 city: city || '',
                 postalCode: postalCode || '',
                 country: country || '',
+                isViesAddress: true,
+                isDefaultBilling: !extraBillingAddress,
+                isDefaultShipping: !extraShippingAddress,
+            })
+        }
+        if (extraShippingAddress?.street) {
+            addresses.push({
+                id: Math.random().toString(36).substr(2, 9),
+                label: 'Shipping',
+                street: extraShippingAddress.street,
+                city: extraShippingAddress.city || '',
+                postalCode: extraShippingAddress.postalCode || '',
+                country: extraShippingAddress.country || country || '',
                 isDefaultShipping: true,
+                isDefaultBilling: false,
+            })
+        }
+        if (extraBillingAddress?.street) {
+            addresses.push({
+                id: Math.random().toString(36).substr(2, 9),
+                label: 'Billing',
+                street: extraBillingAddress.street,
+                city: extraBillingAddress.city || '',
+                postalCode: extraBillingAddress.postalCode || '',
+                country: extraBillingAddress.country || country || '',
+                isDefaultShipping: false,
                 isDefaultBilling: true,
-            }
+            })
+        }
+
+        if (addresses.length > 0) {
             // Retry up to 3 times in case the trigger hasn't created the row yet
             for (let attempt = 0; attempt < 3; attempt++) {
                 if (attempt > 0) await new Promise(r => setTimeout(r, 500))
                 const { error: addrErr } = await supabase
                     .from('customers')
-                    .update({ addresses: [addressEntry] })
+                    .update({ addresses })
                     .eq('id', user.id)
                 if (!addrErr) break
             }
