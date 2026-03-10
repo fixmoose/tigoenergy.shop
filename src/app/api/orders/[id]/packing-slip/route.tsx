@@ -72,9 +72,26 @@ export async function GET(
         }
 
         // 5. Replace Placeholders
-        const htmlContent = replacePlaceholders(template.content_html, documentData)
+        let htmlContent = replacePlaceholders(template.content_html, documentData)
 
-        // 6. Generate PDF
+        // 6. Inject legal clauses
+        const isB2BOrder = !!(order.company_name || order.vat_id)
+        const legalClause = `
+<div style="margin-top:32px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
+  <strong style="display:block;margin-bottom:4px;font-size:10.5px;">IMPORTANT — GOODS INSPECTION NOTICE / PREGLED BLAGA OB PREVZEMU</strong>
+  Please inspect all goods upon receipt. Any damage, shortages, or discrepancies must be reported to us at <a href="mailto:support@tigoenergy.shop" style="color:#16a34a;">support@tigoenergy.shop</a> within <strong>24 hours of delivery</strong>.
+  The delivery timestamp recorded by the carrier (e.g. DPD scan or delivery notification) constitutes the start of this 24-hour window.
+  Claims received after this period will not be considered.
+  <br><br>
+  Prosimo, preglejte vse blago ob prevzemu. Morebitne poškodbe, manjkajoče količine ali neskladnosti je potrebno prijaviti na <a href="mailto:support@tigoenergy.shop" style="color:#16a34a;">support@tigoenergy.shop</a> v roku <strong>24 ur od dostave</strong>.
+  Čas dostave, ki ga zabeleži prevoznik (npr. sken DPD ali obvestilo o dostavi), šteje kot začetek tega 24-urnega roka.
+  Reklamacije po tem roku ne bodo upoštevane.
+  ${isB2BOrder ? `<br><br><strong>B2B:</strong> All sales are final. No returns unless specifically authorized in writing by the seller. All warranties via manufacturer only; seller makes no product warranties.
+  <br>Vsa prodaja je dokončna. Vračilo ni možno brez pisne odobritve prodajalca. Garancije zagotavlja izključno proizvajalec.` : ''}
+</div>`
+        htmlContent = htmlContent.replace('</body>', legalClause + '</body>')
+
+        // 7. Generate PDF
         const pdfBuffer = await generatePdfFromHtml(htmlContent)
 
         // 7. Return PDF response

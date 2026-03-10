@@ -84,9 +84,24 @@ export async function GET(
         }
 
         // 5. Replace Placeholders
-        const htmlContent = replacePlaceholders(template.content_html, documentData)
+        let htmlContent = replacePlaceholders(template.content_html, documentData)
 
-        // 6. Generate PDF
+        // 6. Inject B2B legal clause for B2B orders
+        const isB2BOrder = !!(order.company_name || order.vat_id)
+        if (isB2BOrder) {
+            const b2bClause = `
+<div style="margin-top:32px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
+  <strong style="display:block;margin-bottom:4px;font-size:10.5px;">TERMS &amp; CONDITIONS / POGOJI POSLOVANJA</strong>
+  All sales are final. No returns are accepted unless specifically authorized in writing by the seller at the seller's sole discretion.
+  All product warranties are provided exclusively by the manufacturer. The seller makes no warranties, express or implied, regarding any products or their fitness for a particular purpose or uninterrupted operation.
+  <br><br>
+  Vsa prodaja je dokončna. Vračilo blaga ni možno, razen če ga pisno odobri prodajalec po lastni presoji.
+  Vse garancije za izdelke zagotavlja izključno proizvajalec. Prodajalec ne daje nobenih garancij, izrecnih ali implicitnih, glede izdelkov ali njihove ustreznosti za določen namen oziroma neprekinjenega delovanja.
+</div>`
+            htmlContent = htmlContent.replace('</body>', b2bClause + '</body>')
+        }
+
+        // 7. Generate PDF
         const pdfBuffer = await generatePdfFromHtml(htmlContent)
 
         // 7. Return PDF response
