@@ -117,7 +117,6 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
         to: order.customer_email,
         subject: `Payment Request — Order #${order.order_number} (${totalFormatted})`,
         html,
-        skipUnsubscribe: true,
     })
 
     return { success: true }
@@ -234,7 +233,6 @@ export async function sendPaymentReminderAction(orderId: string) {
         to: order.customer_email,
         subject: `Payment Reminder — Order #${order.order_number} (${totalFormatted})`,
         html,
-        skipUnsubscribe: true,
     })
 
     return { success: true }

@@ -332,12 +332,13 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
 
         const supabase = await createAdminClient()
 
-        // Find customer by ID or Email
-        const { data: customer, error: fetchError } = await supabase
-            .from('customers')
-            .select('id, email, preferred_language')
-            .or(`id.eq."${identifier}",email.eq."${identifier}"`)
-            .maybeSingle()
+        // Find customer by ID (UUID) or email
+        const isEmail = identifier.includes('@')
+        const query = supabase.from('customers').select('id, email, preferred_language')
+        const { data: customer, error: fetchError } = await (isEmail
+            ? query.eq('email', identifier)
+            : query.eq('id', identifier)
+        ).maybeSingle()
 
         if (fetchError || !customer) throw new Error('Customer not found')
 
