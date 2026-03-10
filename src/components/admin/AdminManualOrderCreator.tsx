@@ -13,6 +13,7 @@ interface ProductSnippet {
     price_eur: number
     b2b_price_eur?: number | null
     weight_kg: number
+    stock_quantity?: number | null
 }
 
 interface CustomerSnippet {
@@ -86,19 +87,19 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
         }
     }, [customerSearch])
 
+    // Load all products on mount
     useEffect(() => {
-        if (productSearch.length > 2) {
-            const delay = setTimeout(async () => {
-                const results = await searchProductsAction(productSearch)
-                if (results.success) {
-                    setProductResults(results.data as any)
-                }
-            }, 300)
-            return () => clearTimeout(delay)
-        } else {
-            setProductResults([])
-        }
-    }, [productSearch])
+        searchProductsAction('').then(r => {
+            if (r.success) setProductResults(r.data as any)
+        })
+    }, [])
+
+    const filteredProducts = productSearch.trim()
+        ? productResults.filter(p =>
+            p.name_en.toLowerCase().includes(productSearch.toLowerCase()) ||
+            p.sku.toLowerCase().includes(productSearch.toLowerCase())
+          )
+        : productResults
 
     // Logic for automatic VAT adjustment
     useEffect(() => {
@@ -518,14 +519,22 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                 <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Add Products</h3>
                             </div>
 
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Search products (SKU, name...)"
-                                    value={productSearch}
-                                    onChange={(e) => setProductSearch(e.target.value)}
-                                    className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all pr-10 hover:border-slate-300"
-                                />
+                            <div className="flex gap-2 mb-3">
+                                <div className="relative flex-1">
+                                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    <input
+                                        type="text"
+                                        placeholder="Filter by name or SKU..."
+                                        value={productSearch}
+                                        onChange={(e) => setProductSearch(e.target.value)}
+                                        className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all hover:border-slate-300"
+                                    />
+                                    {productSearch && (
+                                        <button type="button" onClick={() => setProductSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
+                                    )}
+                                </div>
                                 <button
                                     type="button"
                                     onClick={addCustomItem}
@@ -534,26 +543,51 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                     + Custom Item
                                 </button>
                             </div>
-                            {productResults.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                    {productResults.map(p => (
-                                        <button
-                                            key={p.id}
-                                            type="button"
-                                            onClick={() => addItem(p)}
-                                            className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between border-b last:border-0 border-slate-100"
-                                        >
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-slate-900">{p.name_en}</span>
-                                                <span className="text-[10px] text-slate-400 uppercase tracking-tighter">{p.sku}</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="font-bold text-slate-900">€{selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur}</span>
-                                            </div>
-                                        </button>
-                                    ))}
+
+                            {/* Product List */}
+                            <div className="border border-slate-200 rounded-xl overflow-hidden">
+                                <div className="bg-slate-50 px-3 py-2 flex items-center justify-between border-b border-slate-200">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                        {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+                                        {productSearch ? ` matching "${productSearch}"` : ''}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400">Click to add</span>
                                 </div>
-                            )}
+                                <div className="max-h-64 overflow-y-auto divide-y divide-slate-50">
+                                    {filteredProducts.length === 0 ? (
+                                        <p className="p-4 text-sm text-slate-400 text-center">No products found</p>
+                                    ) : filteredProducts.map(p => {
+                                        const stock = p.stock_quantity ?? 0
+                                        const inStock = stock > 0
+                                        const price = selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur
+                                        return (
+                                            <button
+                                                key={p.id}
+                                                type="button"
+                                                onClick={() => addItem(p)}
+                                                className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-3 transition-colors group"
+                                            >
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="font-medium text-slate-900 group-hover:text-green-700 text-sm truncate">{p.name_en}</span>
+                                                        {!inStock && (
+                                                            <span className="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase">Out of stock</span>
+                                                        )}
+                                                    </div>
+                                                    <span className="text-[10px] text-slate-400 font-mono">{p.sku}</span>
+                                                </div>
+                                                <div className="flex items-center gap-3 flex-shrink-0">
+                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-500'}`}>
+                                                        {inStock ? `${stock} in stock` : '0'}
+                                                    </span>
+                                                    <span className="font-bold text-slate-900 text-sm">€{price.toFixed(2)}</span>
+                                                    <svg className="w-4 h-4 text-slate-300 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                                </div>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
 
                             {items.length > 0 && (
                                 <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">

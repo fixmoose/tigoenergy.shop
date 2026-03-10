@@ -45,13 +45,18 @@ export async function updateProductFeatured(id: string, featured: boolean) {
 export async function searchProductsAction(query: string) {
     try {
         const supabase = await createClient()
-        const { data, error } = await supabase
+        let q = supabase
             .from('products')
-            .select('id, name_en, sku, price_eur, b2b_price_eur, weight_kg, active')
-            .or(`name_en.ilike.%${query}%,sku.ilike.%${query}%`)
+            .select('id, name_en, sku, price_eur, b2b_price_eur, weight_kg, active, stock_quantity')
             .eq('active', true)
-            .limit(20)
+            .order('name_en', { ascending: true })
+            .limit(200)
 
+        if (query.trim()) {
+            q = q.or(`name_en.ilike.%${query}%,sku.ilike.%${query}%`)
+        }
+
+        const { data, error } = await q
         if (error) throw error
         return { success: true, data }
     } catch (err: any) {
