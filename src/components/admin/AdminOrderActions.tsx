@@ -235,9 +235,13 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 if (!confirm(`Send order summary email to ${customerEmail || 'customer'}?`)) return
                                 setLoading(true)
                                 try {
-                                    await adminSendOrderToClientAction(orderId)
-                                    alert('Order sent to client successfully.')
-                                    router.refresh()
+                                    const res = await adminSendOrderToClientAction(orderId)
+                                    if (res.success) {
+                                        alert('Order sent to client successfully.')
+                                        router.refresh()
+                                    } else {
+                                        alert('Failed: ' + res.error)
+                                    }
                                 } catch (err: any) {
                                     alert('Failed: ' + err.message)
                                 } finally {
