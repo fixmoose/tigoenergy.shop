@@ -357,7 +357,7 @@ export default function Header() {
               {/* Account Dropdown */}
               <div className="flex flex-col items-center group relative cursor-pointer">
 
-                <Link href={mounted && user ? (isAdmin || user.email?.endsWith('@tigoenergy.com') ? "/admin/products" : "/dashboard") : "/auth/login"} className="flex flex-col items-center">
+                <Link href={mounted && user ? (isAdmin || user.email?.endsWith('@tigoenergy.com') ? "/admin" : "/dashboard") : "/auth/login"} className="flex flex-col items-center">
                   {mounted && user && !isAdmin ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-green-50 group-hover:border-white transition shadow-sm">
                       <img src="/b2c-avatar.png" alt="Profile" className="w-full h-full object-cover" />
@@ -378,7 +378,7 @@ export default function Header() {
                     <div className="w-56 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
                       <div className="py-1">
                         <Link
-                          href={isAdmin ? "/admin/products" : "/dashboard"}
+                          href={isAdmin ? "/admin" : "/dashboard"}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
                         >
                           {isAdmin ? t('adminDashboard') : t('myAccount')}
