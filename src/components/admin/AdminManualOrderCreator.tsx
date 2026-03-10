@@ -767,8 +767,11 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                     <span className="font-semibold text-slate-900">€{subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">Shipping</span>
-                                    <span className="font-semibold text-slate-900">€{shippingCost.toFixed(2)}</span>
+                                    <span className={pickupInPerson ? 'text-slate-400 line-through' : 'text-slate-500'}>Shipping</span>
+                                    {pickupInPerson
+                                        ? <span className="text-slate-400 text-xs font-medium italic">Pickup in person</span>
+                                        : <span className="font-semibold text-slate-900">€{shippingCost.toFixed(2)}</span>
+                                    }
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">VAT ({vatRate}%)</span>
