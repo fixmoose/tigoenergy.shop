@@ -332,28 +332,37 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
 
         const supabase = await createAdminClient()
 
-        // Find customer by ID (UUID) or email
+        // Find customer email and language
         const isEmail = identifier.includes('@')
-        const query = supabase.from('customers').select('id, email, preferred_language')
-        const { data: customer, error: fetchError } = await (isEmail
-            ? query.eq('email', identifier)
-            : query.eq('id', identifier)
-        ).maybeSingle()
+        let emailToReset: string
+        let locale = 'en'
 
-        if (fetchError || !customer) throw new Error('Customer not found')
+        if (isEmail) {
+            // Email passed directly — no DB lookup needed
+            emailToReset = identifier
+        } else {
+            // UUID passed — look up in customers table
+            const { data: customer, error: fetchError } = await supabase
+                .from('customers')
+                .select('id, email, preferred_language')
+                .eq('id', identifier)
+                .maybeSingle()
+
+            if (fetchError || !customer) throw new Error('Customer not found')
+            emailToReset = customer.email
+            locale = customer.preferred_language || 'en'
+        }
 
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
         if (!siteUrl) throw new Error('Site configuration error')
 
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'recovery',
-            email: customer.email,
+            email: emailToReset,
             options: { redirectTo: `${siteUrl}/auth/reset-password` }
         })
 
         if (linkError) throw linkError
-
-        const locale = customer.preferred_language || 'en'
         const resetLink = linkData.properties.action_link
 
         const subjectMap: Record<string, string> = {
@@ -403,10 +412,9 @@ body{font-family:Arial,sans-serif;color:#1a1a1a;background:#f9f9f9;margin:0;padd
 </div></div></div></body></html>`
 
         await sendEmail({
-            to: customer.email,
+            to: emailToReset,
             subject,
             html,
-            skipUnsubscribe: true,
         })
 
         return { success: true }
