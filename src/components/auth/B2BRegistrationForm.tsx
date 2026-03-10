@@ -123,6 +123,9 @@ export default function B2BRegistrationForm() {
     const shippingRef = useRef<HTMLInputElement>(null)
     const billingRef = useRef<HTMLInputElement>(null)
 
+    // VAT country mismatch notification
+    const [vatMismatch, setVatMismatch] = useState<{ vatCountry: string; targetDomain: string; redirectUrl: string } | null>(null)
+
     // Verification States
     const [vatVerified, setVatVerified] = useState(false)
     const [emailVerified, setEmailVerified] = useState(false)
@@ -186,20 +189,10 @@ export default function B2BRegistrationForm() {
                 // Actually, if I'm on .si and enter DE VAT, I must be rerouted.
 
                 if (vatCountry !== currentMarket && currentMarket !== 'SHOP') {
-                    // Mismatch found. Find where this VAT belongs.
                     const targetDomain = getDomainForMarket(vatCountry)
-                    const message = t('messages.vatMismatchRedirect', {
-                        market: vatCountry,
-                        domain: targetDomain
-                    }) || `This VAT number belongs to ${vatCountry}. Please register at ${targetDomain}. Redirect now?`
-
-                    if (confirm(message)) {
-                        window.location.href = `https://www.${targetDomain}/auth/register?type=b2b&vat=${formData.vatNumber.toUpperCase()}`
-                        return
-                    } else {
-                        setError(`VAT ${formData.vatNumber} is not allowed on this local domain (.${currentMarket.toLowerCase()}).`)
-                        return
-                    }
+                    const redirectUrl = `https://${targetDomain}/auth/register?type=b2b&vat=${formData.vatNumber.toUpperCase()}`
+                    setVatMismatch({ vatCountry, targetDomain, redirectUrl })
+                    return
                 }
 
                 setVatVerified(true)
@@ -323,6 +316,42 @@ export default function B2BRegistrationForm() {
 
             {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-6 text-sm flex items-center gap-2">⚠️ {error}</div>}
 
+            {/* VAT country mismatch notification */}
+            {vatMismatch && (
+                <div className="bg-amber-50 border border-amber-300 rounded-xl p-5 mb-6 space-y-3">
+                    <div className="flex items-start gap-3">
+                        <span className="text-2xl">🌍</span>
+                        <div>
+                            <p className="font-bold text-amber-900 text-sm">
+                                This VAT number is registered in <strong>{vatMismatch.vatCountry}</strong>, not on this domain.
+                            </p>
+                            <p className="text-amber-700 text-xs mt-1">
+                                This domain (<strong>{typeof window !== 'undefined' ? window.location.hostname : ''}</strong>) is exclusively for companies with a VAT registration in this country.
+                                Your <strong>{vatMismatch.vatCountry}</strong> VAT number must be registered on the correct regional store.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                        <a
+                            href={vatMismatch.redirectUrl}
+                            className="flex-1 text-center bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition-colors"
+                        >
+                            Go to {vatMismatch.targetDomain} →
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => setVatMismatch(null)}
+                            className="flex-1 text-center bg-white border border-amber-300 text-amber-700 font-medium py-2.5 px-4 rounded-lg text-sm hover:bg-amber-50 transition-colors"
+                        >
+                            Enter a different VAT number
+                        </button>
+                    </div>
+                    <p className="text-[10px] text-amber-600 italic">
+                        If your country is not listed as a separate domain, <a href={`https://tigoenergy.shop/auth/register?type=b2b&vat=${vatMismatch.vatCountry ? formData.vatNumber : ''}`} className="underline font-semibold">register on tigoenergy.shop</a> — our international store that accepts all EU VAT numbers.
+                    </p>
+                </div>
+            )}
+
             {/* STEP 1: VAT */}
             <StepCard number={1} title={t('steps.vat')} isActive={step === 1} isCompleted={step > 1} setStep={setStep}>
                 <div className="space-y-4">
@@ -336,7 +365,7 @@ export default function B2BRegistrationForm() {
                             type="text"
                             placeholder={t('placeholders.vat')}
                             value={formData.vatNumber}
-                            onChange={e => setFormData({ ...formData, vatNumber: e.target.value.toUpperCase() })}
+                            onChange={e => { setFormData({ ...formData, vatNumber: e.target.value.toUpperCase() }); setVatMismatch(null) }}
                             className="flex-1 border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-mono"
                         />
                         <button

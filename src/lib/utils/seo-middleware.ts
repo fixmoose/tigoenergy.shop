@@ -99,7 +99,9 @@ export function seoMiddleware(request: NextRequest) {
  * Determine market key from hostname
  */
 function getMarketKeyFromHost(host: string): string {
-    // Map hostnames to market keys
+    // Strip www. prefix and port so both www.tigoenergy.si and tigoenergy.si match
+    const clean = host.replace(/^www\./, '').replace(/:\d+$/, '').toLowerCase()
+
     const hostMap: Record<string, string> = {
         'tigoenergy.si': 'SI',
         'tigoenergy.de': 'DE',
@@ -125,7 +127,20 @@ function getMarketKeyFromHost(host: string): string {
         'tigoenergy.shop': 'SHOP',
     }
 
-    return hostMap[host] || 'SHOP'
+    if (hostMap[clean]) return hostMap[clean]
+
+    // Fallback: match by TLD (e.g. anything ending in .si → SI)
+    const tldMap: Record<string, string> = {
+        '.si': 'SI', '.de': 'DE', '.at': 'AT', '.ch': 'CH', '.fr': 'FR',
+        '.it': 'IT', '.es': 'ES', '.be': 'BE', '.nl': 'NL', '.pl': 'PL',
+        '.cz': 'CZ', '.sk': 'SK', '.hr': 'HR', '.se': 'SE', '.dk': 'DK',
+        '.ro': 'RO', '.rs': 'RS', '.mk': 'MK', '.me': 'ME',
+    }
+    for (const [tld, key] of Object.entries(tldMap)) {
+        if (clean.endsWith(tld)) return key
+    }
+
+    return 'SHOP'
 }
 
 /**
