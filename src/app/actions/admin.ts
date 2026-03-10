@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
 import { MARKETS } from '@/lib/constants/markets'
-import { TRANSLATION_MAP, applyTemplateTranslation } from '@/lib/template-translations'
+import { TRANSLATION_MAP, applyTemplateTranslation, ALL_APP_LANGUAGES } from '@/lib/template-translations'
 
 const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 
@@ -134,24 +134,29 @@ export async function adminCreateCustomerAction(formData: any) {
             })
         }
 
-        // 3. Create Customer Profile
-        const { error: profileError } = await supabase.from('customers').insert({
-            id: authData.user.id,
+        // 3. Update Customer Profile (DB trigger creates the row on auth.users insert;
+        //    we UPDATE with retries to ensure B2B fields + VIES address are saved)
+        const updatePayload: any = {
             email,
             first_name,
             last_name,
             phone,
             is_b2b: !!is_b2b,
-            company_name: formData.company_name,
-            vat_id: formData.vat_id,
-            vat_number: formData.vat_id,
+            company_name: formData.company_name || null,
+            vat_id: formData.vat_id || null,
             customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
             account_status: 'active',
-            ...(addresses.length > 0 && { addresses })
-        })
+        }
+        if (addresses.length > 0) updatePayload.addresses = addresses
 
-        if (profileError && !profileError.message.includes('duplicate key')) {
-            console.warn('Profile creation error:', profileError.message)
+        for (let attempt = 0; attempt < 3; attempt++) {
+            if (attempt > 0) await new Promise(r => setTimeout(r, 400))
+            const { error: profileError } = await supabase
+                .from('customers')
+                .update(updatePayload)
+                .eq('id', authData.user.id)
+            if (!profileError) break
+            if (attempt === 2) console.warn('Profile update error:', profileError.message)
         }
 
         revalidatePath('/admin/customers')
@@ -585,9 +590,7 @@ export async function syncTemplateToAllLanguagesAction(masterTemplateId: string)
         .eq('type', master.type)
         .neq('language', 'en')
 
-    const langs = variants && variants.length > 0
-        ? [...new Set(variants.map((v: any) => v.language))]
-        : Object.keys(TRANSLATION_MAP) // TRANSLATION_MAP imported from @/lib/template-translations
+    const langs = ALL_APP_LANGUAGES
 
     const results = await Promise.all(langs.map(lang => translateTemplateAction(masterTemplateId, lang)))
 
@@ -804,6 +807,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
             country: string;
             street2?: string;
         };
+        internal_notes?: string;
     };
 }) {
     try {
@@ -936,6 +940,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 language: 'en',
                 payment_method: order.payment_method || 'IBAN',
                 is_b2b: customer.is_b2b || false,
+                internal_notes: order.internal_notes || null,
                 delivery_country: order.shipping_address?.country || 'DE',
                 transaction_type: (order.shipping_address?.country === 'SI')
                     ? 'domestic'

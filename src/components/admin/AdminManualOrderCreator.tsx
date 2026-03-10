@@ -50,6 +50,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
     const [market, setMarket] = useState('si')
     const [paymentMethod, setPaymentMethod] = useState('IBAN')
     const [billingSame, setBillingSame] = useState(true)
+    const [pickupInPerson, setPickupInPerson] = useState(false)
 
     const [shippingAddress, setShippingAddress] = useState({
         street: '',
@@ -155,8 +156,8 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
             alert('Add at least one item')
             return
         }
-        if (!shippingAddress.street || !shippingAddress.city) {
-            alert('Shipping address is required')
+        if (!pickupInPerson && (!shippingAddress.street || !shippingAddress.city)) {
+            alert('Shipping address is required (or select Pickup in Person)')
             return
         }
 
@@ -166,12 +167,15 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                 customer: selectedCustomer as any,
                 order: {
                     market,
-                    shipping_cost: shippingCost,
+                    shipping_cost: pickupInPerson ? 0 : shippingCost,
                     vat_rate: vatRate,
                     payment_method: paymentMethod,
                     items,
-                    shipping_address: shippingAddress,
-                    billing_address: billingSame ? undefined : billingAddress
+                    shipping_address: pickupInPerson
+                        ? { street: 'Pickup in Person', city: 'Podsmreka', postal_code: '1356', country: 'SI' }
+                        : shippingAddress,
+                    billing_address: billingSame ? undefined : billingAddress,
+                    internal_notes: pickupInPerson ? 'Pickup in Person' : undefined,
                 }
             })
 
@@ -255,25 +259,25 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                             phone: customer.phone || '',
                                                             is_b2b: !!customer.is_b2b
                                                         })
-                                                        // Pre-fill shipping address
-                                                        const shipAddr = customer.addresses?.find((a: any) => a.type === 'shipping') || customer.addresses?.[0]
+                                                        // Pre-fill shipping address (uses isDefaultShipping flag)
+                                                        const shipAddr = customer.addresses?.find((a: any) => a.isDefaultShipping) || customer.addresses?.[0]
                                                         if (shipAddr) {
                                                             setShippingAddress({
                                                                 street: shipAddr.street || '',
                                                                 street2: shipAddr.street2 || '',
                                                                 city: shipAddr.city || '',
-                                                                postal_code: shipAddr.postal_code || '',
+                                                                postal_code: shipAddr.postalCode || shipAddr.postal_code || '',
                                                                 country: shipAddr.country?.toUpperCase() || 'SI'
                                                             })
                                                         }
-                                                        // Pre-fill billing address
-                                                        const billAddr = customer.addresses?.find((a: any) => a.type === 'billing')
+                                                        // Pre-fill billing address if different from shipping
+                                                        const billAddr = customer.addresses?.find((a: any) => a.isDefaultBilling && !a.isDefaultShipping)
                                                         if (billAddr) {
                                                             setBillingAddress({
                                                                 street: billAddr.street || '',
                                                                 street2: billAddr.street2 || '',
                                                                 city: billAddr.city || '',
-                                                                postal_code: billAddr.postal_code || '',
+                                                                postal_code: billAddr.postalCode || billAddr.postal_code || '',
                                                                 country: billAddr.country?.toUpperCase() || 'SI'
                                                             })
                                                             setBillingSame(false)
@@ -359,12 +363,32 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
 
                             {/* Address Section */}
                             <section className="space-y-4">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold">2</span>
-                                    <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Shipping & Billing</h3>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center font-bold">2</span>
+                                        <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Shipping & Billing</h3>
+                                    </div>
+                                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            checked={pickupInPerson}
+                                            onChange={e => {
+                                                setPickupInPerson(e.target.checked)
+                                                if (e.target.checked) setShippingCost(0)
+                                            }}
+                                            className="w-4 h-4 text-green-600 rounded cursor-pointer"
+                                        />
+                                        <span className="text-xs font-bold text-slate-600 uppercase">Pickup in Person</span>
+                                    </label>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                                {pickupInPerson && (
+                                    <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-medium">
+                                        Customer will pick up at: Podsmreka, 1356 (shipping cost €0)
+                                    </div>
+                                )}
+
+                                <div className={`grid grid-cols-2 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 ${pickupInPerson ? 'opacity-40 pointer-events-none' : ''}`}>
                                     <div className="col-span-2">
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Street Address</label>
                                         <input

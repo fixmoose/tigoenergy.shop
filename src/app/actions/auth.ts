@@ -99,6 +99,7 @@ export async function registerB2BUserAction(formData: any) {
                 commercial_access: commercialAccess,
                 business_type: businessType,
                 website,
+                employees,
                 job_title: jobTitle,
                 newsletter_subscribed: newsletter,
                 marketing_consent: marketing,

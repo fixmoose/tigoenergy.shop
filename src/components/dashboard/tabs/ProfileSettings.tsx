@@ -40,11 +40,24 @@ export default function ProfileSettings({ customer }: Props) {
     const [formData, setFormData] = useState({
         firstName: customer.first_name || '',
         lastName: customer.last_name || '',
-        company: customer.company_name || ''
+        company: customer.company_name || '',
+        website: '',
+        employees: '',
     })
 
     useEffect(() => {
         loadContacts()
+        // Load website/employees from user_metadata
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user?.user_metadata) {
+                const m = data.user.user_metadata
+                setFormData(prev => ({
+                    ...prev,
+                    website: m.website || '',
+                    employees: m.employees || '',
+                }))
+            }
+        })
     }, [])
 
     const loadContacts = async () => {
@@ -56,20 +69,28 @@ export default function ProfileSettings({ customer }: Props) {
         setLoading(true)
         setSuccess('')
 
-        const { error } = await supabase
-            .from('customers')
-            .update({
-                first_name: formData.firstName,
-                last_name: formData.lastName,
-                company_name: formData.company,
-                updated_at: new Date().toISOString()
+        const [profileResult, metaResult] = await Promise.all([
+            supabase
+                .from('customers')
+                .update({
+                    first_name: formData.firstName,
+                    last_name: formData.lastName,
+                    company_name: formData.company,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', customer.id),
+            supabase.auth.updateUser({
+                data: {
+                    website: formData.website || null,
+                    employees: formData.employees || null,
+                }
             })
-            .eq('id', customer.id)
+        ])
 
         setLoading(false)
 
-        if (error) {
-            console.error(error)
+        if (profileResult.error || metaResult.error) {
+            console.error(profileResult.error || metaResult.error)
             alert('Failed to update profile.')
         } else {
             setSuccess('Profile updated successfully!')
@@ -317,13 +338,41 @@ export default function ProfileSettings({ customer }: Props) {
                 )}
 
                 {customer.is_b2b && (
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                        <input
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.company}
-                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        />
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                            <input
+                                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                                value={formData.company}
+                                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            />
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Company Website</label>
+                                <input
+                                    type="url"
+                                    placeholder="https://..."
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                                    value={formData.website}
+                                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                                <select
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                    value={formData.employees}
+                                    onChange={(e) => setFormData({ ...formData, employees: e.target.value })}
+                                >
+                                    <option value="">Select...</option>
+                                    <option value="1-5">1–5</option>
+                                    <option value="6-20">6–20</option>
+                                    <option value="21-100">21–100</option>
+                                    <option value="100+">100+</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 )}
 
