@@ -321,6 +321,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             confirmedAt={order.confirmed_at || null}
             packingSlipUrl={order.packing_slip_url}
             shippingLabelUrl={order.shipping_label_url}
+            customerEmail={order.customer_email}
+            sendCount={(order as any).order_send_count || 0}
           />
         </div>
       </div>

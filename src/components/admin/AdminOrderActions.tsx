@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { issueOrderInvoiceAction, adminMarkDeliveredAction } from '@/app/actions/admin'
-import { adminSendOrderForPaymentAction } from '@/app/actions/order-notifications'
+import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 
 interface AdminOrderActionsProps {
     orderId: string
@@ -14,9 +14,11 @@ interface AdminOrderActionsProps {
     confirmedAt: string | null
     packingSlipUrl?: string | null
     shippingLabelUrl?: string | null
+    customerEmail?: string | null
+    sendCount?: number
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0 }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -215,6 +217,48 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                         <span>✓</span> Order Confirmed {confirmedAt && `at ${new Date(confirmedAt).toLocaleString()}`}
+                    </div>
+
+                    {/* Send to Client */}
+                    <div className="pt-1 space-y-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Order Document</p>
+                        <a
+                            href={`/api/orders/${orderId}/invoice`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-2.5 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-800 transition flex items-center justify-center gap-2 text-sm"
+                        >
+                            <span>📄</span> Download Order PDF
+                        </a>
+                        <button
+                            onClick={async () => {
+                                if (!confirm(`Send order summary email to ${customerEmail || 'customer'}?`)) return
+                                setLoading(true)
+                                try {
+                                    await adminSendOrderToClientAction(orderId)
+                                    alert('Order sent to client successfully.')
+                                    router.refresh()
+                                } catch (err: any) {
+                                    alert('Failed: ' + err.message)
+                                } finally {
+                                    setLoading(false)
+                                }
+                            }}
+                            disabled={loading}
+                            className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                        >
+                            <span>✉️</span> {loading ? 'Sending...' : 'Send to Client'}
+                            {sendCount > 0 && (
+                                <span className="ml-1 bg-indigo-800 text-indigo-200 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                    ×{sendCount}
+                                </span>
+                            )}
+                        </button>
+                        {sendCount > 0 && (
+                            <p className="text-[10px] text-center text-slate-400">
+                                Sent to {customerEmail || 'client'} {sendCount} time{sendCount !== 1 ? 's' : ''}
+                            </p>
+                        )}
                     </div>
 
                     {(status === 'processing' || status === 'shipped') && (

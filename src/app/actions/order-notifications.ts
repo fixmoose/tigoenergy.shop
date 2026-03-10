@@ -331,6 +331,81 @@ export async function sendOrderToAdminAction(orderId: string) {
 }
 
 /**
+ * Admin sends order summary email to the customer and tracks send count
+ */
+export async function adminSendOrderToClientAction(orderId: string) {
+    const cookieStore = await cookies()
+    if (cookieStore.get('tigo-admin')?.value !== '1') throw new Error('Unauthorized')
+
+    const supabase = await createAdminClient()
+
+    const { data: order, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single()
+
+    if (error || !order) throw new Error('Order not found')
+
+    const { data: orderItems } = await supabase
+        .from('order_items')
+        .select('*')
+        .eq('order_id', orderId)
+
+    const currency = order.currency || '€'
+    const customerName = `${(order.billing_address as any)?.first_name || ''} ${(order.billing_address as any)?.last_name || ''}`.trim() || order.customer_email
+    const orderDate = new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    const orderUrl = `${SITE_URL}/orders/${order.id}`
+
+    // Build items rows for the email table
+    const itemsHtml = (orderItems || []).map((item: any) => `
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle;">
+                <span style="font-weight: 600; color: #111; display: block;">${item.product_name}</span>
+                <span style="font-size: 11px; color: #9ca3af;">${item.sku || ''}</span>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; text-align: center; font-weight: 600;">${item.quantity}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; text-align: right; font-weight: 600;">${currency} ${(parseFloat(item.unit_price || 0) * item.quantity).toFixed(2)}</td>
+        </tr>`
+    ).join('')
+
+    const poRow = (order as any).po_number
+        ? `<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;"><span style="color:#6b7280;">P.O. Number</span><span style="font-weight:600;color:#111;">${(order as any).po_number}</span></div>`
+        : ''
+
+    const html = await renderTemplate('order-resend', {
+        name: customerName,
+        order_number: order.order_number,
+        order_date: orderDate,
+        po_row: poRow,
+        payment_method: order.payment_method || 'Bank Transfer',
+        order_items: itemsHtml,
+        subtotal: `${currency} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
+        shipping_cost: `${currency} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
+        vat_amount: `${currency} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
+        total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
+        order_url: orderUrl,
+    }, order.language || 'en')
+
+    await sendEmail({
+        to: order.customer_email,
+        subject: `Your Order #${order.order_number} — Tigo Energy SHOP`,
+        html,
+        skipUnsubscribe: true,
+    })
+
+    // Increment send count
+    await supabase
+        .from('orders')
+        .update({ order_send_count: ((order as any).order_send_count || 0) + 1 })
+        .eq('id', orderId)
+
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return { success: true }
+}
+
+/**
  * Confirms order and notifies customer
  */
 export async function confirmOrderAction(orderId: string) {
