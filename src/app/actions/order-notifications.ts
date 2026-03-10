@@ -395,7 +395,6 @@ export async function adminSendOrderToClientAction(orderId: string) {
             to: order.customer_email,
             subject: `Your Order #${order.order_number} — Tigo Energy SHOP`,
             html,
-            skipUnsubscribe: true,
         })
 
         // Increment send count (ignore if column doesn't exist yet)
