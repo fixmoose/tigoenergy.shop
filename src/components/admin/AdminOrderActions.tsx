@@ -223,12 +223,12 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     <div className="pt-1 space-y-2">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Order Document</p>
                         <a
-                            href={`/api/orders/${orderId}/invoice`}
+                            href={`/api/orders/${orderId}/proforma`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full py-2.5 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-800 transition flex items-center justify-center gap-2 text-sm"
                         >
-                            <span>📄</span> Download Order PDF
+                            <span>📄</span> Download Order Confirmation
                         </a>
                         <button
                             onClick={async () => {
