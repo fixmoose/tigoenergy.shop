@@ -3,6 +3,7 @@ import { createClient, createAdminClient } from '../../../../../lib/supabase/ser
 import { cookies } from 'next/headers'
 import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
+import { getLegalClauses } from '../../../../../lib/legal-clauses'
 
 export async function GET(
     req: NextRequest,
@@ -89,14 +90,15 @@ export async function GET(
         // 6. Inject B2B legal clause for B2B orders
         const isB2BOrder = !!(order.company_name || order.vat_id)
         if (isB2BOrder) {
+            const lang = order.language || 'en'
+            const clauses = getLegalClauses(lang)
+            const enClauses = getLegalClauses('en')
+            const isEnglish = lang === 'en'
             const b2bClause = `
 <div style="margin-top:32px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
-  <strong style="display:block;margin-bottom:4px;font-size:10.5px;">TERMS &amp; CONDITIONS / POGOJI POSLOVANJA</strong>
-  All sales are final. No returns are accepted unless specifically authorized in writing by the seller at the seller's sole discretion.
-  All product warranties are provided exclusively by the manufacturer. The seller makes no warranties, express or implied, regarding any products or their fitness for a particular purpose or uninterrupted operation.
-  <br><br>
-  Vsa prodaja je dokončna. Vračilo blaga ni možno, razen če ga pisno odobri prodajalec po lastni presoji.
-  Vse garancije za izdelke zagotavlja izključno proizvajalec. Prodajalec ne daje nobenih garancij, izrecnih ali implicitnih, glede izdelkov ali njihove ustreznosti za določen namen oziroma neprekinjenega delovanja.
+  <strong style="display:block;margin-bottom:4px;font-size:10.5px;">${clauses.invoiceTitle}${!isEnglish ? ` / ${enClauses.invoiceTitle}` : ''}</strong>
+  ${clauses.invoiceBody}
+  ${!isEnglish ? `<br><br><em style="color:#6b7280;">${enClauses.invoiceBody}</em>` : ''}
 </div>`
             htmlContent = htmlContent.replace('</body>', b2bClause + '</body>')
         }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import TemplateEditor from './TemplateEditor'
+import { applyTemplateTranslation } from '@/lib/template-translations'
 
 const DOCUMENT_TYPES = [
     { value: 'invoice', label: 'Invoice' },
@@ -518,11 +519,14 @@ export default function TemplateManager() {
         if (match) {
             setEditing({ ...match })
         } else {
+            // Auto-translate the default English template for non-English languages
+            const baseHtml = T[type] || ''
+            const content_html = lang !== 'en' ? applyTemplateTranslation(baseHtml, lang) : baseHtml
             setEditing({
                 type,
                 language: lang,
                 name: `${DOCUMENT_TYPES.find(d => d.value === type)?.label} (${lang.toUpperCase()})`,
-                content_html: T[type] || '',
+                content_html,
                 is_active: true,
                 is_default: true,
             })
@@ -613,8 +617,11 @@ export default function TemplateManager() {
                             </button>
                             <button
                                 onClick={() => {
-                                    if (confirm('Replace current content with the professional default template?'))
-                                        setEditing({ ...editing, content_html: T[selectedType] || '' })
+                                    if (confirm('Replace current content with the professional default template?')) {
+                                        const baseHtml = T[selectedType] || ''
+                                        const content_html = language !== 'en' ? applyTemplateTranslation(baseHtml, language) : baseHtml
+                                        setEditing({ ...editing, content_html })
+                                    }
                                 }}
                                 className="text-xs px-3 py-1.5 border border-blue-200 rounded font-medium text-blue-600 bg-blue-50 hover:bg-blue-100"
                             >

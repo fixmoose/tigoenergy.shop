@@ -42,29 +42,55 @@ export interface DocumentData {
 export async function getPinnedTemplate(type: string, language: string = 'en') {
     const supabase = await createAdminClient()
 
-    // Try to find the pinned (is_default = true) template for this type and language
-    const { data: template, error } = await supabase
+    // 1. Try language-specific default
+    const { data: template } = await supabase
         .from('document_templates')
         .select('*')
         .eq('type', type)
         .eq('language', language)
         .eq('is_default', true)
         .single()
+    if (template) return template
 
-    if (error || !template) {
-        // Fallback to any active template of that type and language
-        const { data: fallback } = await supabase
+    // 2. Try any template for this language
+    const { data: anyLang } = await supabase
+        .from('document_templates')
+        .select('*')
+        .eq('type', type)
+        .eq('language', language)
+        .limit(1)
+        .single()
+    if (anyLang) return anyLang
+
+    // 3. Fall back to English default, auto-translate in memory
+    if (language !== 'en') {
+        const { data: enTemplate } = await supabase
             .from('document_templates')
             .select('*')
             .eq('type', type)
-            .eq('language', language)
+            .eq('language', 'en')
+            .eq('is_default', true)
+            .single()
+        if (enTemplate) {
+            const { applyTemplateTranslation } = await import('./template-translations')
+            return { ...enTemplate, language, content_html: applyTemplateTranslation(enTemplate.content_html, language) }
+        }
+
+        // 4. Any English template
+        const { data: anyEn } = await supabase
+            .from('document_templates')
+            .select('*')
+            .eq('type', type)
+            .eq('language', 'en')
             .limit(1)
             .single()
-
-        return fallback || null
+        if (anyEn) {
+            const { applyTemplateTranslation } = await import('./template-translations')
+            return { ...anyEn, language, content_html: applyTemplateTranslation(anyEn.content_html, language) }
+        }
     }
 
-    return template
+    return null
 }
 
 const DEFAULT_COMPANY_DATA = {
