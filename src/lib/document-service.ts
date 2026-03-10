@@ -97,48 +97,40 @@ export function generateItemsTableHtml(items: any[], currency: string = '€', r
     let html = '';
 
     if (!rowsOnly) {
-        html += `
-        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 25px; font-size: 10px;">
+        html += `<table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead>
-                <tr>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">No.</th>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Product Description</th>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: left; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Article / Code</th>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: center; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Qty</th>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Net Price</th>
-                    <th style="background: #f8fafc; color: #64748b; font-weight: 700; text-align: right; padding: 12px; font-size: 8px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">Amount</th>
+                <tr style="border-bottom:2px solid #1a2b3c;">
+                    <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:4%;">No.</th>
+                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:42%;">Description</th>
+                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:18%;">Article / SKU</th>
+                    <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:8%;">Qty</th>
+                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Unit Price</th>
+                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Amount</th>
                 </tr>
             </thead>
             <tbody>`;
     }
 
     items.forEach((item, index) => {
-        const price = parseFloat(item.unit_price || 0).toFixed(2)
-        const total = (parseFloat(item.unit_price || 0) * item.quantity).toFixed(2)
-        const bgColor = index % 2 === 0 ? '#ffffff' : '#fafafa';
+        const price = parseFloat(item.unit_price || 0).toFixed(2);
+        const total = (parseFloat(item.unit_price || 0) * item.quantity).toFixed(2);
 
-        html += `
-            <tr style="background: ${bgColor};">
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; color: #94a3b8; font-weight: 500;">${index + 1}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">
-                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 2px;">${item.product_name}</div>
-                    <div style="font-size: 8px; color: #64748b; font-style: italic;">Original Product Specification Applied</div>
+        html += `<tr style="border-bottom:1px solid #f3f4f6;">
+                <td style="padding:16px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
+                <td style="padding:16px 12px;vertical-align:top;">
+                    <div style="font-size:12px;font-weight:600;color:#1a2b3c;">${item.product_name}</div>
+                    <div style="font-size:9px;color:#9ca3af;margin-top:2px;">CN Code: ${item.cn_code || '85414300'}</div>
                 </td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 9px;">
-                    <div style="color: #475569; font-weight: 500;">${item.sku || 'N/A'}</div>
-                    <div style="font-size: 8px; color: #94a3b8;">CN Code: ${item.cn_code || '85414300'}</div>
-                </td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: 700; color: #0f172a;">${item.quantity}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #475569; font-weight: 500;">${currency} ${price}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 800; color: #0f172a;">${currency} ${total}</td>
-            </tr>`
-    })
+                <td style="padding:16px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
+                <td style="padding:16px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
+                <td style="padding:16px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${currency} ${price}</td>
+                <td style="padding:16px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${currency} ${total}</td>
+            </tr>`;
+    });
 
     if (!rowsOnly) {
-        html += `
-            </tbody>
-        </table>`;
+        html += `</tbody></table>`;
     }
 
-    return html
+    return html;
 }

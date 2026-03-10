@@ -70,6 +70,7 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                                         const { adminResetCustomerPasswordAction } = await import('@/app/actions/admin')
                                         const res = await adminResetCustomerPasswordAction(customer.id)
                                         if (res.success) alert('Reset email sent successfully!')
+                                        else alert('Failed: ' + (res.error || 'Unknown error'))
                                     } catch (err: any) {
                                         alert('Error: ' + err.message)
                                     } finally {

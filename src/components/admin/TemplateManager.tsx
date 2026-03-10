@@ -98,7 +98,7 @@ const PREVIEW: Record<string, string> = {
     '{carrier_name}': 'DHL Express',
     '{rma_number}': 'RMA-2026-001',
     '{return_reason}': 'Defective product — not functioning as described',
-    '{items_table}': `<table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:11px;"><thead><tr><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">No.</th><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Description</th><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">SKU</th><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:center;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Qty</th><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:right;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Unit Price</th><th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:right;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Amount</th></tr></thead><tbody><tr><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#94a3b8;font-size:10px;">1</td><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;color:#0f172a;font-size:11px;">Tigo Optimizer TS4-A-O</div><div style="font-size:9px;color:#64748b;">CN Code: 85414300</div></td><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:10px;color:#475569;">TS4-A-O</td><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;text-align:center;font-weight:700;font-size:11px;">20</td><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;text-align:right;color:#475569;font-size:11px;">€ 50.00</td><td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:800;font-size:11px;">€ 1,000.00</td></tr></tbody></table>`,
+    '{items_table}': `<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="border-bottom:2px solid #1a2b3c;"><th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:4%;">No.</th><th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:42%;">Description</th><th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:18%;">Article / SKU</th><th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:8%;">Qty</th><th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Unit Price</th><th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Amount</th></tr></thead><tbody><tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:16px 0;color:#d1d5db;font-size:10px;vertical-align:top;">1</td><td style="padding:16px 12px;vertical-align:top;"><div style="font-size:12px;font-weight:600;color:#1a2b3c;">Tigo Optimizer TS4-A-O 700W</div><div style="font-size:9px;color:#9ca3af;margin-top:2px;">CN Code: 85414300</div></td><td style="padding:16px 12px;vertical-align:top;font-size:11px;color:#6b7280;">TS4-A-O-700</td><td style="padding:16px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">20</td><td style="padding:16px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">€ 50.00</td><td style="padding:16px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">€ 1,000.00</td></tr></tbody></table>`,
 }
 
 function applyPreview(html: string) {
@@ -109,321 +109,359 @@ function applyPreview(html: string) {
 
 // ─── Professional HTML templates ────────────────────────────────────────────
 
-const BANK_BLOCK = `<div style="margin-top:28px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
-  <div style="background:#f7fafc;border-bottom:1px solid #e2e8f0;padding:10px 18px;display:flex;align-items:center;gap:20px;">
-    <span style="font-size:9px;font-weight:800;color:#718096;text-transform:uppercase;letter-spacing:1.5px;">Bank Transfer Details</span>
-    <span style="font-size:10px;color:#4a5568;">Reference: <strong style="font-family:Courier New,monospace;color:#1a202c;">{reference}</strong></span>
-  </div>
-  <table style="width:100%;border-collapse:collapse;">
-    <tr>
-      <td style="width:50%;padding:16px 20px;vertical-align:top;border-right:1px solid #e2e8f0;">
-        <div style="font-size:12px;font-weight:700;color:#1a202c;margin-bottom:10px;">NLB d.d. &mdash; Slovenia</div>
-        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-          <tr><td style="color:#718096;padding-right:14px;min-width:85px;">IBAN</td><td style="font-family:Courier New,monospace;font-weight:700;color:#1a202c;letter-spacing:0.5px;">{company_iban_si}</td></tr>
-          <tr><td style="color:#718096;padding-right:14px;">BIC / SWIFT</td><td style="font-family:Courier New,monospace;font-weight:700;color:#1a202c;letter-spacing:0.5px;">{company_bic_si}</td></tr>
-          <tr><td style="color:#718096;padding-right:14px;">Account of</td><td style="color:#4a5568;">{company_name}</td></tr>
-        </table>
-      </td>
-      <td style="width:50%;padding:16px 20px;vertical-align:top;">
-        <div style="font-size:12px;font-weight:700;color:#1a202c;margin-bottom:10px;">Wise (TransferWise) &mdash; International</div>
-        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-          <tr><td style="color:#718096;padding-right:14px;min-width:85px;">IBAN</td><td style="font-family:Courier New,monospace;font-weight:700;color:#1a202c;letter-spacing:0.5px;">{company_iban_be}</td></tr>
-          <tr><td style="color:#718096;padding-right:14px;">BIC / SWIFT</td><td style="font-family:Courier New,monospace;font-weight:700;color:#1a202c;letter-spacing:0.5px;">{company_bic_be}</td></tr>
-          <tr><td style="color:#718096;padding-right:14px;">Account of</td><td style="color:#4a5568;">{company_name}</td></tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+const NAVY_HDR = (title: string, subtitle: string) => `<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}<br>{company_email}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;color:#ffffff;line-height:1;">${title}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0 18px;">${subtitle}</div>
+    </td>
+  </tr></table>
 </div>`
 
-const TOTALS_BLOCK = `<table style="width:100%;border-collapse:collapse;margin-top:16px;">
-  <tr>
+const META_ROW = (fields: {label:string,value:string,highlight?:boolean}[]) => `<div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:14px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    ${fields.map(f => `<td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">${f.label}</span><span style="font-size:12px;font-weight:600;color:${f.highlight ? '#f59e0b' : '#1a2b3c'};">${f.value}</span></td>`).join('')}
+  </tr></table>
+</div>`
+
+const BILL_SHIP = (leftLabel: string, leftContent: string, rightLabel: string, rightContent: string) => `<div style="padding:32px 48px;border-bottom:1px solid #f3f4f6;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:50%;vertical-align:top;padding-right:24px;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">${leftLabel}</div>
+      ${leftContent}
+    </td>
+    <td style="width:50%;vertical-align:top;padding-left:24px;border-left:1px solid #f3f4f6;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">${rightLabel}</div>
+      ${rightContent}
+    </td>
+  </tr></table>
+</div>`
+
+const ITEMS_SECTION = `<div style="padding:32px 48px;">
+  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">Items &amp; Services</div>
+  {items_table}
+</div>`
+
+const TOTALS_SECTION = `<div style="padding:0 48px 32px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:55%;"></td>
     <td style="width:45%;">
-      <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
-        <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:7px 0;color:#718096;">Subtotal (net)</td><td style="padding:7px 0;text-align:right;font-weight:600;">{subtotal_net}</td></tr>
-        <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:7px 0;color:#718096;">Shipping</td><td style="padding:7px 0;text-align:right;font-weight:600;">{shipping_cost}</td></tr>
-        <tr style="border-bottom:2px solid #1a202c;"><td style="padding:7px 0;color:#718096;">VAT</td><td style="padding:7px 0;text-align:right;font-weight:600;">{vat_total}</td></tr>
-        <tr><td colspan="2" style="padding-top:8px;"><table style="width:100%;border-collapse:collapse;"><tr><td style="background:#1a202c;color:#fff;font-weight:700;font-size:11.5px;padding:11px 14px;border-radius:4px 0 0 4px;">TOTAL DUE</td><td style="background:#1a202c;color:#fff;font-weight:900;font-size:15px;text-align:right;padding:11px 14px;border-radius:0 4px 4px 0;">{total_amount}</td></tr></table></td></tr>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr><td style="padding:5px 0;color:#9ca3af;">Subtotal (net)</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{subtotal_net}</td></tr>
+        <tr><td style="padding:5px 0;color:#9ca3af;">Shipping</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{shipping_cost}</td></tr>
+        <tr style="border-bottom:2px solid #1a2b3c;"><td style="padding:5px 0 10px;color:#9ca3af;">VAT</td><td style="padding:5px 0 10px;text-align:right;font-weight:600;color:#1a2b3c;">{vat_total}</td></tr>
+        <tr><td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">Grand Total</td><td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#1a2b3c;">{total_amount}</td></tr>
       </table>
     </td>
-  </tr>
-</table>`
+  </tr></table>
+</div>`
 
-const FOOTER_BLOCK = `<div style="margin-top:28px;padding-top:14px;border-top:1px solid #edf2f7;font-size:9px;color:#a0aec0;text-align:center;line-height:1.8;">
+const BANK_SECTION = `<div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+  <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
+    <span style="font-size:11px;color:#6b7280;margin-left:14px;">Reference: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
+  </div>
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">NLB d.d. &mdash; Slovenia</div>
+      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+      </table>
+    </td>
+    <td style="width:50%;padding:18px 20px;vertical-align:top;">
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Wise (TransferWise) &mdash; International</div>
+      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+      </table>
+    </td>
+  </tr></table>
+</div>`
+
+const FOOTER_SECTION = `<div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
   {company_name} &nbsp;&middot;&nbsp; {company_address} &nbsp;&middot;&nbsp; VAT: {company_vat} &nbsp;&middot;&nbsp; {company_email} &nbsp;&middot;&nbsp; {company_phone}
 </div>`
 
-const COMPANY_HEADER = `<img src="{company_logo}" alt="" style="height:50px;max-width:180px;object-fit:contain;display:block;margin-bottom:16px;">
-  <div style="font-size:12px;color:#4a5568;line-height:1.8;">
-    <strong style="font-size:13px;color:#1a202c;display:block;margin-bottom:2px;">{company_name}</strong>
-    {company_address}<br>VAT: {company_vat}<br>{company_email} &nbsp;&middot;&nbsp; {company_phone}
-  </div>`
+const WRAP_START = `<div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;width:794px;margin:0 auto;background:#ffffff;color:#333333;box-sizing:border-box;">`
+const WRAP_END = `</div>`
+
+const CUSTOMER_BLOCK = `<div style="font-size:13px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{customer_name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{customer_company}<br>VAT: {customer_vat}<br>{billing_address}<br>{customer_email}</div>`
 
 const T: Record<string, string> = {
 
-invoice: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:28px;font-weight:900;color:#1a202c;letter-spacing:-1px;text-transform:uppercase;margin-bottom:16px;">Invoice</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Invoice No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{invoice_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{invoice_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Due Date</td><td style="padding:3px 0;font-weight:700;color:#c53030;">{due_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Order Ref.</td><td style="padding:3px 0;color:#718096;">{order_number}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#1a202c;border-radius:2px;margin-bottom:28px;"></div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Bill To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:6px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>VAT: {customer_vat}<br>{billing_address}<br>{customer_email}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Deliver To</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;margin-bottom:12px;">{shipping_address}</div>
-    <div style="font-size:10px;color:#718096;">Payment: <strong style="color:#1a202c;">{payment_method}</strong></div>
-    <div style="font-size:10px;color:#718096;">Dispatch: <strong style="color:#1a202c;">{dispatch_date}</strong></div>
-    <div style="font-size:10px;color:#718096;">Place of issue: <strong style="color:#1a202c;">{place_of_issue}</strong></div>
-  </td>
-</tr></table>
-{items_table}
-${TOTALS_BLOCK}
-${BANK_BLOCK}
-${FOOTER_BLOCK}
-</div>`,
+invoice: `${WRAP_START}
+${NAVY_HDR('Invoice', '{invoice_number}')}
+${META_ROW([
+  {label:'Date', value:'{invoice_date}'},
+  {label:'Due Date', value:'{due_date}', highlight:true},
+  {label:'Order Ref.', value:'{order_number}'},
+  {label:'Place of Issue', value:'{place_of_issue}'},
+])}
+${BILL_SHIP('Bill To', CUSTOMER_BLOCK,
+  'Ship To',
+  `<div style="font-size:11px;color:#6b7280;line-height:1.8;margin-bottom:12px;">{shipping_address}</div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin-bottom:2px;">Payment Method</div>
+      <div style="font-size:11px;font-weight:600;color:#1a2b3c;margin-bottom:8px;">{payment_method}</div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin-bottom:2px;">Dispatch</div>
+      <div style="font-size:11px;color:#6b7280;">{dispatch_date}</div>`
+)}
+${ITEMS_SECTION}
+${TOTALS_SECTION}
+${BANK_SECTION}
+${FOOTER_SECTION}
+${WRAP_END}`,
 
-proforma_invoice: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:22px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:4px;">Proforma Invoice</div>
-    <div style="font-size:10px;color:#718096;margin-bottom:14px;font-style:italic;">This is not a tax document</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Proforma No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{invoice_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{invoice_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Valid Until</td><td style="padding:3px 0;font-weight:700;color:#c53030;">{due_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Order Ref.</td><td style="padding:3px 0;color:#718096;">{order_number}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#1a202c;border-radius:2px;margin-bottom:20px;"></div>
-<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:6px;padding:12px 18px;margin-bottom:24px;font-size:11px;color:#92400e;">
-  <strong>Note:</strong> This Proforma Invoice is provided for your records and payment purposes only. A tax invoice will be issued upon shipment. Goods will be dispatched upon receipt of full payment.
+proforma_invoice: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}<br>{company_email}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">Proforma Invoice</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;margin:4px 0 18px;">Not a tax document</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);">{invoice_number}</div>
+    </td>
+  </tr></table>
 </div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Bill To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:6px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>VAT: {customer_vat}<br>{billing_address}<br>{customer_email}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Deliver To</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{shipping_address}</div>
-  </td>
-</tr></table>
-{items_table}
-${TOTALS_BLOCK}
-${BANK_BLOCK}
-${FOOTER_BLOCK}
-</div>`,
+<div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:12px 48px;font-size:11px;color:#92400e;">
+  <strong>Note:</strong> This Proforma Invoice is provided for payment purposes only. A VAT invoice will be issued upon shipment. Goods are dispatched upon receipt of full payment.
+</div>
+${META_ROW([
+  {label:'Date', value:'{invoice_date}'},
+  {label:'Valid Until', value:'{due_date}', highlight:true},
+  {label:'Order Ref.', value:'{order_number}'},
+])}
+${BILL_SHIP('Bill To', CUSTOMER_BLOCK, 'Ship To', `<div style="font-size:11px;color:#6b7280;line-height:1.8;">{shipping_address}</div>`)}
+${ITEMS_SECTION}
+${TOTALS_SECTION}
+${BANK_SECTION}
+${FOOTER_SECTION}
+${WRAP_END}`,
 
-storno_invoice: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:24px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:16px;">Credit Note</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Credit Note No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{storno_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Original Invoice</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{invoice_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{invoice_date}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#dc2626;border-radius:2px;margin-bottom:20px;"></div>
-<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:12px 18px;margin-bottom:24px;font-size:11px;color:#991b1b;">
-  This Credit Note fully cancels and replaces invoice <strong>{invoice_number}</strong>. A refund of <strong>{total_amount}</strong> will be processed to your original payment method within 5&ndash;10 business days.
+storno_invoice: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}<br>{company_email}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;color:#ffffff;line-height:1;">Credit Note</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0 18px;">{storno_number}</div>
+    </td>
+  </tr></table>
 </div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Issued To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:6px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>VAT: {customer_vat}<br>{billing_address}<br>{customer_email}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Order Reference</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">Order: {order_number}<br>Date: {order_date}<br>Place of issue: {place_of_issue}</div>
-  </td>
-</tr></table>
-{items_table}
-<table style="width:100%;border-collapse:collapse;margin-top:16px;">
-  <tr>
+<div style="background:#fef2f2;border-bottom:2px solid #ef4444;padding:12px 48px;font-size:11px;color:#991b1b;">
+  This Credit Note cancels invoice <strong>{invoice_number}</strong>. A refund of <strong>{total_amount}</strong> will be processed within 5&ndash;10 business days.
+</div>
+${META_ROW([
+  {label:'Credit Note No.', value:'{storno_number}'},
+  {label:'Original Invoice', value:'{invoice_number}'},
+  {label:'Date', value:'{invoice_date}'},
+])}
+${BILL_SHIP('Issued To', CUSTOMER_BLOCK,
+  'Order Reference',
+  `<div style="font-size:11px;color:#6b7280;line-height:1.8;">Order: {order_number}<br>Date: {order_date}<br>Place of issue: {place_of_issue}</div>`
+)}
+${ITEMS_SECTION}
+<div style="padding:0 48px 32px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:55%;"></td>
     <td style="width:45%;">
-      <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
-        <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:7px 0;color:#718096;">Subtotal (net)</td><td style="padding:7px 0;text-align:right;font-weight:600;">{subtotal_net}</td></tr>
-        <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:7px 0;color:#718096;">Shipping</td><td style="padding:7px 0;text-align:right;font-weight:600;">{shipping_cost}</td></tr>
-        <tr style="border-bottom:2px solid #dc2626;"><td style="padding:7px 0;color:#718096;">VAT</td><td style="padding:7px 0;text-align:right;font-weight:600;">{vat_total}</td></tr>
-        <tr><td colspan="2" style="padding-top:8px;"><table style="width:100%;border-collapse:collapse;"><tr><td style="background:#dc2626;color:#fff;font-weight:700;font-size:11.5px;padding:11px 14px;border-radius:4px 0 0 4px;">AMOUNT CREDITED</td><td style="background:#dc2626;color:#fff;font-weight:900;font-size:15px;text-align:right;padding:11px 14px;border-radius:0 4px 4px 0;">{total_amount}</td></tr></table></td></tr>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr><td style="padding:5px 0;color:#9ca3af;">Subtotal (net)</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{subtotal_net}</td></tr>
+        <tr><td style="padding:5px 0;color:#9ca3af;">Shipping</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{shipping_cost}</td></tr>
+        <tr style="border-bottom:2px solid #ef4444;"><td style="padding:5px 0 10px;color:#9ca3af;">VAT</td><td style="padding:5px 0 10px;text-align:right;font-weight:600;color:#1a2b3c;">{vat_total}</td></tr>
+        <tr><td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#ef4444;">Amount Credited</td><td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#ef4444;">{total_amount}</td></tr>
       </table>
     </td>
-  </tr>
-</table>
-${FOOTER_BLOCK}
-</div>`,
-
-order_confirmation: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:22px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:16px;">Order Confirmation</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Order No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{order_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{order_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Est. Dispatch</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{dispatch_date}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#059669;border-radius:2px;margin-bottom:20px;"></div>
-<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:14px 18px;margin-bottom:24px;font-size:12px;color:#166534;">
-  <strong>Thank you for your order, {customer_name}!</strong> We have received your order and will process it promptly. You will receive a separate invoice once your order is dispatched.
+  </tr></table>
 </div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Bill To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:6px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>VAT: {customer_vat}<br>{billing_address}<br>{customer_email}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Ship To</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{shipping_address}</div>
-    <div style="margin-top:12px;font-size:10px;color:#718096;">Payment: <strong style="color:#1a202c;">{payment_method}</strong></div>
-  </td>
-</tr></table>
-{items_table}
-${TOTALS_BLOCK}
-${FOOTER_BLOCK}
-</div>`,
+${FOOTER_SECTION}
+${WRAP_END}`,
 
-packing_slip: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:26px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:16px;">Packing Slip</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Order No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{order_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{order_date}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#1a202c;border-radius:2px;margin-bottom:28px;"></div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Ship From</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{company_name}<br>{company_address}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Ship To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:4px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>{shipping_address}<br>{customer_phone}</div>
-  </td>
-</tr></table>
-<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:11px;">
-  <thead>
-    <tr>
-      <th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">No.</th>
-      <th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Product Description</th>
-      <th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:left;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">SKU / Article</th>
-      <th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:center;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Qty</th>
-      <th style="background:#f7fafc;color:#64748b;font-weight:700;text-align:center;padding:9px 12px;font-size:9px;text-transform:uppercase;border-bottom:2px solid #e2e8f0;">Checked &#10003;</th>
-    </tr>
-  </thead>
-</table>
-<div style="margin-top:32px;padding:14px 18px;border:1px dashed #e2e8f0;border-radius:6px;font-size:11px;color:#718096;">
-  Please verify all items before sealing the package. Report any discrepancies to <strong>{company_email}</strong>.
+order_confirmation: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}<br>{company_email}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">Order Confirmation</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0 18px;">{order_number}</div>
+    </td>
+  </tr></table>
 </div>
-${FOOTER_BLOCK}
-</div>`,
-
-delivery_note: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:26px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:16px;">Delivery Note</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Order No.</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{order_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Dispatch Date</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{dispatch_date}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Carrier</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{carrier_name}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Tracking No.</td><td style="padding:3px 0;font-weight:700;color:#2563eb;">{tracking_number}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#1a202c;border-radius:2px;margin-bottom:28px;"></div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Shipped From</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{company_name}<br>{company_address}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Delivered To</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:4px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>{shipping_address}<br>{customer_phone}</div>
-  </td>
-</tr></table>
-{items_table}
-<div style="margin-top:24px;padding:14px 18px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;font-size:11px;color:#0369a1;">
-  Please inspect all items upon receipt. Any damage or shortages must be reported to <strong>{company_email}</strong> within 48 hours of delivery.
+<div style="background:#f0fdf4;border-bottom:2px solid #22c55e;padding:14px 48px;font-size:12px;color:#166534;">
+  <strong>Thank you for your order, {customer_name}!</strong> Your order has been confirmed and is being prepared. A separate invoice will be issued upon dispatch.
 </div>
-${FOOTER_BLOCK}
-</div>`,
+${META_ROW([
+  {label:'Order Date', value:'{order_date}'},
+  {label:'Est. Dispatch', value:'{dispatch_date}'},
+  {label:'Payment', value:'{payment_method}'},
+])}
+${BILL_SHIP('Bill To', CUSTOMER_BLOCK,
+  'Ship To',
+  `<div style="font-size:11px;color:#6b7280;line-height:1.8;">{shipping_address}</div>`
+)}
+${ITEMS_SECTION}
+${TOTALS_SECTION}
+${FOOTER_SECTION}
+${WRAP_END}`,
 
-return_rma: `<div style="font-family:Arial,Helvetica,sans-serif;width:714px;margin:0 auto;padding:48px;background:#ffffff;color:#1a202c;box-sizing:border-box;">
-<table style="width:100%;border-collapse:collapse;margin-bottom:32px;"><tr>
-  <td style="vertical-align:top;width:55%;padding-right:24px;">${COMPANY_HEADER}</td>
-  <td style="vertical-align:top;text-align:right;width:45%;">
-    <div style="font-size:22px;font-weight:900;color:#1a202c;text-transform:uppercase;margin-bottom:16px;">Return Authorization</div>
-    <table style="border-collapse:collapse;font-size:11.5px;margin-left:auto;">
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">RMA Number</td><td style="padding:3px 0;font-weight:700;color:#1a202c;">{rma_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Original Order</td><td style="padding:3px 0;font-weight:600;color:#1a202c;">{order_number}</td></tr>
-      <tr><td style="padding:3px 14px 3px 0;color:#718096;text-align:right;">Date</td><td style="padding:3px 0;color:#718096;">{order_date}</td></tr>
-    </table>
-  </td>
-</tr></table>
-<div style="height:3px;background:#f59e0b;border-radius:2px;margin-bottom:20px;"></div>
-<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:14px 18px;margin-bottom:24px;font-size:11px;color:#92400e;">
+packing_slip: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;color:#ffffff;line-height:1;">Packing Slip</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0;">{order_number}</div>
+    </td>
+  </tr></table>
+</div>
+${META_ROW([
+  {label:'Order Date', value:'{order_date}'},
+])}
+${BILL_SHIP(
+  'Ship From',
+  `<div style="font-size:11px;color:#6b7280;line-height:1.8;">{company_name}<br>{company_address}</div>`,
+  'Ship To',
+  `<div style="font-size:13px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{customer_name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{customer_company}<br>{shipping_address}<br>{customer_phone}</div>`
+)}
+<div style="padding:32px 48px;">
+  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">Items to Pack</div>
+  <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    <thead>
+      <tr style="border-bottom:2px solid #1a2b3c;">
+        <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:5%;">No.</th>
+        <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:50%;">Product Description</th>
+        <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:20%;">SKU / Article</th>
+        <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:10%;">Qty</th>
+        <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:15%;">Checked &#10003;</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div style="margin-top:28px;padding:14px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;color:#6b7280;">
+    Please verify all items before sealing the package. Report discrepancies to <strong>{company_email}</strong>.
+  </div>
+</div>
+${FOOTER_SECTION}
+${WRAP_END}`,
+
+delivery_note: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:34px;font-weight:300;letter-spacing:-1.5px;color:#ffffff;line-height:1;">Delivery Note</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0;">{order_number}</div>
+    </td>
+  </tr></table>
+</div>
+${META_ROW([
+  {label:'Dispatch Date', value:'{dispatch_date}'},
+  {label:'Carrier', value:'{carrier_name}'},
+  {label:'Tracking No.', value:'{tracking_number}'},
+])}
+${BILL_SHIP(
+  'Shipped From',
+  `<div style="font-size:11px;color:#6b7280;line-height:1.8;">{company_name}<br>{company_address}</div>`,
+  'Delivered To',
+  `<div style="font-size:13px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{customer_name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{customer_company}<br>{shipping_address}<br>{customer_phone}</div>`
+)}
+${ITEMS_SECTION}
+<div style="margin:0 48px 32px;padding:14px 18px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:11px;color:#1d4ed8;">
+  Please inspect all items upon receipt. Any damage or shortages must be reported to <strong>{company_email}</strong> within 48 hours.
+</div>
+${FOOTER_SECTION}
+${WRAP_END}`,
+
+return_rma: `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">Return Authorization</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0;">RMA {rma_number}</div>
+    </td>
+  </tr></table>
+</div>
+<div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:12px 48px;font-size:11px;color:#92400e;">
   <strong>Return Reason:</strong> {return_reason}
 </div>
-<table style="width:100%;border-collapse:collapse;margin-bottom:28px;"><tr>
-  <td style="width:50%;vertical-align:top;padding-right:20px;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Customer</div>
-    <div style="font-size:13px;font-weight:700;color:#1a202c;margin-bottom:6px;">{customer_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{customer_company}<br>{billing_address}<br>{customer_email}<br>{customer_phone}</div>
-  </td>
-  <td style="width:50%;vertical-align:top;padding-left:20px;border-left:2px solid #edf2f7;">
-    <div style="font-size:9px;font-weight:800;color:#a0aec0;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;">Return Address</div>
-    <div style="font-size:12px;font-weight:700;color:#1a202c;margin-bottom:4px;">{company_name}</div>
-    <div style="font-size:12px;color:#4a5568;line-height:1.8;">{company_address}</div>
-    <div style="margin-top:8px;font-size:11px;color:#f59e0b;font-weight:700;">Mark package: RMA {rma_number}</div>
-  </td>
-</tr></table>
-{items_table}
-<div style="margin-top:24px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
-  <div style="background:#f7fafc;border-bottom:1px solid #e2e8f0;padding:10px 18px;">
-    <span style="font-size:9px;font-weight:800;color:#718096;text-transform:uppercase;letter-spacing:1.5px;">Return Instructions</span>
+${META_ROW([
+  {label:'RMA Number', value:'{rma_number}'},
+  {label:'Original Order', value:'{order_number}'},
+  {label:'Date', value:'{order_date}'},
+])}
+${BILL_SHIP(
+  'Customer',
+  `<div style="font-size:13px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{customer_name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{customer_company}<br>{billing_address}<br>{customer_email}<br>{customer_phone}</div>`,
+  'Return Address',
+  `<div style="font-size:13px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{company_name}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;margin-bottom:10px;">{company_address}</div>
+      <div style="font-size:11px;font-weight:700;color:#f59e0b;">Mark package: RMA {rma_number}</div>`
+)}
+${ITEMS_SECTION}
+<div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+  <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Return Instructions</span>
   </div>
-  <div style="padding:16px 18px;font-size:11px;color:#4a5568;line-height:1.8;">
+  <div style="padding:18px 20px;font-size:11px;color:#6b7280;line-height:2;">
     1. Pack all items securely in original packaging if possible.<br>
     2. Include this Return Authorization document inside the package.<br>
     3. Write <strong>RMA {rma_number}</strong> clearly on the outside of the package.<br>
-    4. Ship to the return address above. Return shipping costs are covered by the customer unless otherwise agreed.<br>
-    5. Contact us at <strong>{company_email}</strong> with the tracking number once shipped.
+    4. Ship to the return address above. Return shipping costs are borne by the customer unless otherwise agreed.<br>
+    5. Send the tracking number to <strong>{company_email}</strong> once shipped.
   </div>
 </div>
-${FOOTER_BLOCK}
-</div>`,
+${FOOTER_SECTION}
+${WRAP_END}`,
 
 }
 
