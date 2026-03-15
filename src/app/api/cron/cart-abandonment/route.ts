@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
                 to: customer.email,
                 subject: `${firstName ? `${firstName}, your` : 'Your'} cart is waiting`,
                 html,
+                emailType: 'cart_abandonment',
             })
             sent++
         } catch (err) {

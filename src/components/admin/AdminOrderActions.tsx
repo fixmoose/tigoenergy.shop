@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
+import type { OrderPayment } from '@/types/database'
 
 interface AdminOrderActionsProps {
     orderId: string
@@ -16,12 +17,22 @@ interface AdminOrderActionsProps {
     shippingLabelUrl?: string | null
     customerEmail?: string | null
     sendCount?: number
+    orderTotal?: number
+    amountPaid?: number
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0 }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0 }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
+    const [showPaymentForm, setShowPaymentForm] = useState(false)
+    const [payAmount, setPayAmount] = useState('')
+    const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0])
+    const [payMethod, setPayMethod] = useState('bank_transfer')
+    const [payReference, setPayReference] = useState('')
+    const [payNotes, setPayNotes] = useState('')
+    const [payments, setPayments] = useState<OrderPayment[]>([])
+    const [paymentsLoaded, setPaymentsLoaded] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -340,9 +351,190 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                         </div>
                     )}
 
-                    {paymentStatus !== 'paid' && (
-                        <div className="pt-4 border-t">
-                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Payment</p>
+                    {/* Payment Section */}
+                    <div className="pt-4 border-t">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Payment</p>
+
+                        {/* Payment status summary */}
+                        <div className={`rounded-lg p-3 mb-3 text-sm ${
+                            paymentStatus === 'paid' ? 'bg-green-50 border border-green-200 text-green-800' :
+                            paymentStatus === 'partially_paid' ? 'bg-amber-50 border border-amber-200 text-amber-800' :
+                            'bg-red-50 border border-red-200 text-red-700'
+                        }`}>
+                            <div className="flex justify-between items-center">
+                                <span className="font-medium">
+                                    {paymentStatus === 'paid' ? '✓ Paid in full' :
+                                     paymentStatus === 'partially_paid' ? '◐ Partially paid' :
+                                     '○ Unpaid'}
+                                </span>
+                                <span className="font-bold">
+                                    €{(amountPaid || 0).toFixed(2)} / €{(orderTotal || 0).toFixed(2)}
+                                </span>
+                            </div>
+                            {paymentStatus === 'partially_paid' && (
+                                <div className="mt-1 text-xs">
+                                    Remaining: <span className="font-bold">€{(orderTotal - (amountPaid || 0)).toFixed(2)}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Payment history */}
+                        {!paymentsLoaded ? (
+                            <button
+                                onClick={async () => {
+                                    const res = await getOrderPaymentsAction(orderId)
+                                    if (res.success) setPayments(res.data as OrderPayment[])
+                                    setPaymentsLoaded(true)
+                                }}
+                                className="text-xs text-blue-600 hover:underline mb-2"
+                            >
+                                Show payment history
+                            </button>
+                        ) : payments.length > 0 ? (
+                            <div className="mb-3 space-y-1.5">
+                                {payments.map(p => (
+                                    <div key={p.id} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2 text-xs border">
+                                        <div>
+                                            <span className="font-bold text-green-700">€{Number(p.amount).toFixed(2)}</span>
+                                            <span className="text-slate-400 mx-1">•</span>
+                                            <span className="text-slate-600">{new Date(p.payment_date).toLocaleDateString('en-GB')}</span>
+                                            <span className="text-slate-400 mx-1">•</span>
+                                            <span className="text-slate-500">{p.payment_method}</span>
+                                            {p.reference && <span className="text-slate-400 ml-1">({p.reference})</span>}
+                                        </div>
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm('Delete this payment record?')) return
+                                                const res = await adminDeletePaymentAction(p.id, orderId)
+                                                if (res.success) {
+                                                    setPayments(prev => prev.filter(x => x.id !== p.id))
+                                                    router.refresh()
+                                                } else {
+                                                    alert('Failed: ' + res.error)
+                                                }
+                                            }}
+                                            className="text-red-400 hover:text-red-600 font-bold ml-2"
+                                            title="Delete payment"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-xs text-slate-400 mb-2">No payments recorded yet.</p>
+                        )}
+
+                        {/* Record Payment button / form */}
+                        {paymentStatus !== 'paid' && !showPaymentForm && (
+                            <button
+                                onClick={() => {
+                                    setPayAmount(((orderTotal || 0) - (amountPaid || 0)).toFixed(2))
+                                    setPayDate(new Date().toISOString().split('T')[0])
+                                    setShowPaymentForm(true)
+                                }}
+                                className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm mb-2"
+                            >
+                                <span>💰</span> Record Payment
+                            </button>
+                        )}
+
+                        {showPaymentForm && (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3 mb-2">
+                                <p className="text-xs font-bold text-green-800 uppercase">Record Payment</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="text-[10px] text-slate-500 font-bold uppercase">Amount (€)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={payAmount}
+                                            onChange={e => setPayAmount(e.target.value)}
+                                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] text-slate-500 font-bold uppercase">Date</label>
+                                        <input
+                                            type="date"
+                                            value={payDate}
+                                            onChange={e => setPayDate(e.target.value)}
+                                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Method</label>
+                                    <select
+                                        value={payMethod}
+                                        onChange={e => setPayMethod(e.target.value)}
+                                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                                    >
+                                        <option value="bank_transfer">Bank Transfer</option>
+                                        <option value="wise">Wise</option>
+                                        <option value="stripe">Stripe</option>
+                                        <option value="cash">Cash</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Reference (optional)</label>
+                                    <input
+                                        type="text"
+                                        value={payReference}
+                                        onChange={e => setPayReference(e.target.value)}
+                                        placeholder="Transaction ID or bank ref"
+                                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Notes (optional)</label>
+                                    <input
+                                        type="text"
+                                        value={payNotes}
+                                        onChange={e => setPayNotes(e.target.value)}
+                                        placeholder="Any notes"
+                                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            const amt = parseFloat(payAmount)
+                                            if (!amt || amt <= 0) { alert('Enter a valid amount'); return }
+                                            setLoading(true)
+                                            try {
+                                                const res = await adminRecordPaymentAction(orderId, amt, payDate, payMethod, payReference, payNotes)
+                                                if (res.success) {
+                                                    setShowPaymentForm(false)
+                                                    setPayReference('')
+                                                    setPayNotes('')
+                                                    setPaymentsLoaded(false)
+                                                    router.refresh()
+                                                } else {
+                                                    alert('Failed: ' + res.error)
+                                                }
+                                            } finally {
+                                                setLoading(false)
+                                            }
+                                        }}
+                                        disabled={loading}
+                                        className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50"
+                                    >
+                                        {loading ? 'Saving...' : 'Confirm Payment'}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowPaymentForm(false)}
+                                        className="px-4 py-2 bg-white border rounded-lg text-sm text-slate-600 hover:bg-slate-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Send payment request to customer */}
+                        {paymentStatus !== 'paid' && (
                             <button
                                 onClick={async () => {
                                     if (!confirm('Send a payment request email to the customer with order details and IBAN instructions?')) return
@@ -357,12 +549,12 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                     }
                                 }}
                                 disabled={loading}
-                                className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
                             >
-                                <span>💳</span> {loading ? 'Sending...' : 'Send Payment Request to Customer'}
+                                <span>✉️</span> {loading ? 'Sending...' : 'Send Payment Request to Customer'}
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <div className="pt-4 border-t space-y-3">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Manual Uploads</p>

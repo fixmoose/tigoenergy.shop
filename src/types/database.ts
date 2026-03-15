@@ -197,6 +197,8 @@ export interface Order {
   vat_amount: number
   total: number
   currency?: string | null
+  display_currency?: string | null
+  exchange_rate?: number | null
 
   market: string
   language: string
@@ -247,6 +249,30 @@ export interface Order {
 
   created_at?: string | null
   updated_at?: string | null
+}
+
+export interface OrderPayment {
+  id: string
+  order_id: string
+  amount: number
+  payment_date: string
+  payment_method?: string | null
+  reference?: string | null
+  notes?: string | null
+  recorded_by?: string | null
+  created_at?: string | null
+}
+
+export interface EmailLog {
+  id: string
+  order_id?: string | null
+  email_type: string
+  recipient: string
+  subject: string
+  unione_job_id?: string | null
+  status: string
+  error?: string | null
+  sent_at?: string | null
 }
 
 export interface CartItem {

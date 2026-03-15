@@ -43,6 +43,13 @@ export async function GET(
     }
 
     try {
+        // 2b. Fetch payment records
+        const { data: payments } = await supabase
+            .from('order_payments')
+            .select('*')
+            .eq('order_id', id)
+            .order('payment_date', { ascending: true })
+
         // 3. Get Pinned Template
         const template = await getPinnedTemplate('invoice', order.language || 'en')
         if (!template) {
@@ -86,6 +93,51 @@ export async function GET(
 
         // 5. Replace Placeholders
         let htmlContent = replacePlaceholders(template.content_html, documentData)
+
+        // 5b. Inject payment records table if payments exist
+        if (payments && payments.length > 0) {
+            const amountPaid = payments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0)
+            const remaining = parseFloat(order.total || 0) - amountPaid
+
+            const paymentRows = payments.map((p: any) =>
+                `<tr>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${new Date(p.payment_date).toLocaleDateString('en-GB')}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.payment_method || 'Bank Transfer'}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.reference || '-'}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;text-align:right;font-weight:600;">€${parseFloat(p.amount).toFixed(2)}</td>
+                </tr>`
+            ).join('')
+
+            const paymentTable = `
+<div style="margin-top:24px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+    <div style="background:#f0fdf4;padding:10px 14px;border-bottom:1px solid #e5e7eb;">
+        <strong style="font-size:12px;color:#15803d;">Payments Received</strong>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+        <thead>
+            <tr style="background:#f9fafb;">
+                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">Date</th>
+                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">Method</th>
+                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">Reference</th>
+                <th style="text-align:right;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>${paymentRows}</tbody>
+        <tfoot>
+            <tr style="background:#f0fdf4;">
+                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">Total Paid</td>
+                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€${amountPaid.toFixed(2)}</td>
+            </tr>
+            ${remaining > 0.01 ? `<tr style="background:#fef3c7;">
+                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;">Balance Due</td>
+                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;text-align:right;">€${remaining.toFixed(2)}</td>
+            </tr>` : ''}
+        </tfoot>
+    </table>
+</div>`
+            // Insert before </body>
+            htmlContent = htmlContent.replace('</body>', paymentTable + '</body>')
+        }
 
         // 6. Inject B2B legal clause for B2B orders
         const isB2BOrder = !!(order.company_name || order.vat_id)

@@ -11,7 +11,7 @@ import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { calculateTigoParcels } from '@/lib/shipping/dpd'
 
-import { MARKETS, getMarketKeyFromHostname } from '@/lib/constants/markets'
+import { MARKETS, EU_COUNTRY_CODES, getMarketKeyFromHostname } from '@/lib/constants/markets'
 
 // Deriving comprehensive countries list from MARKETS config
 const COUNTRIES = Object.values(MARKETS)
@@ -55,7 +55,7 @@ const PAYMENT_METHODS = [
 
 export default function CheckoutPage() {
     const { items, subtotal, clearCart } = useCart()
-    const { formatPrice, formatPriceNet, formatPriceGross, isB2B, vatRate } = useCurrency()
+    const { formatPrice, formatPriceNet, formatPriceGross, isB2B, vatRate, currentCurrency, rates } = useCurrency()
     const { currentLanguage } = useMarket()
     const t = useTranslations('checkout')
     const tc = useTranslations('common')
@@ -619,6 +619,8 @@ export default function CheckoutPage() {
             data.append('cart_items', JSON.stringify(items))
             data.append('language', currentLanguage.code)
             data.append('recaptcha_token', token)
+            data.append('display_currency', currentCurrency.code)
+            data.append('exchange_rate', String(rates[currentCurrency.code] || 1))
             if (selectedShippingId) data.append('shipping_id', selectedShippingId)
 
             const res = await placeOrder({}, data)
@@ -666,6 +668,7 @@ export default function CheckoutPage() {
     // 3. If B2B is from outside Slovenia and VIES-validated -> 0% VAT (Reverse Charge)
     const isSlovenianB2B = effectiveIsB2B && formData.shipping_country === 'SI'
     const appliesVat = !effectiveIsB2B || isSlovenianB2B
+    const isExportOrder = formData.shipping_country && !EU_COUNTRY_CODES.includes(formData.shipping_country)
 
     const finalVatAmount = appliesVat ? (subtotal + currentShippingCost) * vatRate : 0
     const finalTotal = subtotal + currentShippingCost + finalVatAmount
@@ -1095,6 +1098,12 @@ export default function CheckoutPage() {
                                         <p className="font-bold text-red-600">{t('b2bFinalSale')}</p>
                                     )}
                                 </div>
+                                {isExportOrder && (
+                                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 text-[11px] text-amber-800 space-y-1">
+                                        <p className="font-bold">⚠️ {t('customsDisclaimerTitle')}</p>
+                                        <p>{t('customsDisclaimerBody')}</p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="mt-4 space-y-3">

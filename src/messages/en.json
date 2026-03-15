@@ -189,6 +189,8 @@
     "euB2bNote": "EU B2B Reverse Charge: 0% VAT applied (Intra-Community Sale).",
     "b2bFinalSale": "B2B Policy: All sales are final. 14-day return period is not applicable for business customers.",
     "b2bTermsNote": "As a business customer, you acknowledge that all sales are final and common consumer return rights do not apply.",
+    "customsDisclaimerTitle": "Customs & Import Duties Notice",
+    "customsDisclaimerBody": "This order ships outside the European Union. Custom duties, import taxes, and any other fees imposed by your country's customs authority are NOT included in the order total and are the sole responsibility of the buyer. Please contact your local customs authority to determine applicable fees before placing your order. If delivery fails due to unpaid customs charges and goods are returned to us, a restocking fee will apply.",
     "addressNoteLookup": "Please verify your address with Google by clicking in the address field and then on a Google suggested address.",
     "addressNoteManual": "Automatic address lookup is currently unavailable. Please enter your address details manually.",
     "guestName": "Name (First, Last and/or Company)",
@@ -568,10 +570,16 @@
   "staticPages": {
     "returns": {
       "title": "Returns & Warranty",
-      "h14DayReturns": "14-Day Returns",
-      "p14DayReturns": "We offer 14-day hassle-free returns for B2C customers for unused items in original packaging.",
+      "h14DayReturns": "14-Day Returns (B2C Customers)",
+      "p14DayReturns": "In accordance with EU consumer protection law, B2C customers may return unused items in their original packaging within 14 days of receipt for a full refund. Items must be in resalable condition. The buyer is responsible for return shipping costs unless the item is defective.",
+      "hRestockingFee": "Restocking Fees",
+      "pRestockingFee": "A minimum restocking fee of 25% applies to all returned items received within 7 days of the return request. Returns received after 7 days are subject to a minimum restocking fee of 35%. All restocking fees are assessed at our sole discretion based on the condition of the returned goods and applicable circumstances.",
+      "hB2BReturns": "B2B Return Policy",
+      "pB2BReturns": "All sales to business (B2B) customers are final. Returns from B2B customers are accepted solely at the discretion of Initra Energija d.o.o. and are not guaranteed. If a return is accepted, restocking fees and any associated costs will be determined on a case-by-case basis. By placing an order as a B2B customer, you acknowledge and accept these terms.",
+      "hNonEUReturns": "Non-EU / Export Orders",
+      "pNonEUReturns": "Orders shipped outside the European Union are subject to customs duties, import taxes, and other fees imposed by the destination country's customs authority. These charges are NOT included in our prices and are the sole responsibility of the buyer. If delivery fails due to the buyer refusing to pay customs fees and the goods are returned to us, a restocking fee will apply in addition to all return shipping costs. We strongly recommend contacting your local customs authority before ordering to understand applicable fees.",
       "hWarranty": "Warranty",
-      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components)."
+      "pWarranty": "Tigo Energy products come with industry-leading manufacturer warranties (up to 25 years for MLPE components). Warranty claims must be made through Initra Energija d.o.o. and are subject to the manufacturer's warranty terms and conditions."
     },
     "shipping": {
       "title": "Shipping Information",

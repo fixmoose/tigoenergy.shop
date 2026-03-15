@@ -79,11 +79,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [])
 
-    // Fetch live rates from EUR base
+    // Fetch cached rates from our server-side endpoint
     useEffect(() => {
         async function fetchRates() {
             try {
-                const res = await fetch('https://open.er-api.com/v6/latest/EUR')
+                const res = await fetch('/api/exchange-rates')
                 const data = await res.json()
                 if (data && data.rates) {
                     setRates(data.rates)

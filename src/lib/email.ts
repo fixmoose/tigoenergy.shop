@@ -15,6 +15,8 @@ interface SendEmailParams {
     templateId?: string
     substitutions?: Record<string, string>
     skipUnsubscribe?: boolean
+    orderId?: string
+    emailType?: string
 }
 
 export async function sendEmail({
@@ -24,7 +26,9 @@ export async function sendEmail({
     html,
     templateId,
     substitutions,
-    skipUnsubscribe = false
+    skipUnsubscribe = false,
+    orderId,
+    emailType,
 }: SendEmailParams) {
     const apiKey = process.env.UNIONE_API_KEY
     if (!apiKey) {
@@ -52,22 +56,66 @@ export async function sendEmail({
         },
     }
 
-    const response = await fetch(UNIONE_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-API-KEY': apiKey,
-        },
-        body: JSON.stringify(body),
-    })
+    let responseData: any = null
+    let errorMsg: string | null = null
 
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}))
-        throw new Error(`UniOne email error: ${error.message || response.statusText}`)
+    try {
+        const response = await fetch(UNIONE_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-API-KEY': apiKey,
+            },
+            body: JSON.stringify(body),
+        })
+
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => ({}))
+            errorMsg = errBody.message || response.statusText
+            throw new Error(`UniOne email error: ${errorMsg}`)
+        }
+
+        responseData = await response.json()
+    } catch (err: any) {
+        errorMsg = errorMsg || err.message
+        await logEmail({ orderId, emailType, recipient: to, subject, status: 'failed', error: errorMsg })
+        throw err
     }
 
-    return response.json()
+    await logEmail({
+        orderId, emailType, recipient: to, subject,
+        status: 'sent',
+        unioneJobId: responseData?.job_id,
+    })
+
+    return responseData
+}
+
+async function logEmail(params: {
+    orderId?: string
+    emailType?: string
+    recipient: string
+    subject: string
+    status: string
+    unioneJobId?: string
+    error?: string | null
+}) {
+    try {
+        const { createAdminClient } = await import('@/lib/supabase/server')
+        const supabase = await createAdminClient()
+        await supabase.from('email_logs').insert({
+            order_id: params.orderId || null,
+            email_type: params.emailType || 'unknown',
+            recipient: params.recipient,
+            subject: params.subject,
+            status: params.status,
+            unione_job_id: params.unioneJobId || null,
+            error: params.error || null,
+        })
+    } catch (logErr) {
+        console.error('Failed to log email:', logErr)
+    }
 }
 
 /**
@@ -90,7 +138,7 @@ export async function notifyAdmins({ subject, html }: { subject: string; html: s
     addresses.add('support@tigoenergy.shop')
 
     const sends = Array.from(addresses).map(to =>
-        sendEmail({ to, subject, html, skipUnsubscribe: true }).catch(err =>
+        sendEmail({ to, subject, html, skipUnsubscribe: true, emailType: 'admin_notification' }).catch(err =>
             console.error(`Failed to send admin notification to ${to}:`, err)
         )
     )

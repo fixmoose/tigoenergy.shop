@@ -55,7 +55,8 @@ export async function sendSupportOTP(email: string, recaptchaToken: string) {
         await sendEmail({
             to: email,
             subject: subject,
-            html
+            html,
+            emailType: 'support_otp',
         })
     } catch (emailError) {
         console.error('Failed to send support OTP email:', emailError)

@@ -4,6 +4,7 @@ import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
 import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'
+import OrderEmailHistory from '@/components/admin/OrderEmailHistory'
 
 const TRANSACTION_TYPES: Record<string, { label: string; color: string }> = {
   domestic: { label: 'Domestic (SI)', color: 'bg-slate-100 text-slate-700' },
@@ -313,6 +314,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
+          <OrderEmailHistory orderId={order.id} />
+
           <AdminOrderActions
             orderId={order.id}
             status={order.status || null}
@@ -323,6 +326,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             shippingLabelUrl={order.shipping_label_url}
             customerEmail={order.customer_email}
             sendCount={(order as any).order_send_count || 0}
+            orderTotal={order.total || 0}
+            amountPaid={(order as any).amount_paid || 0}
           />
         </div>
       </div>

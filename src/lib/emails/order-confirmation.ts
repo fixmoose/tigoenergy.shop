@@ -31,6 +31,7 @@ interface OrderEmailData {
     }
     paymentMethod: string
     language: string
+    isExport?: boolean
 }
 
 // Inline labels per language (subset — keeps the email self-contained)
@@ -53,6 +54,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Payment Method',
         footer: 'If you have any questions, contact us at support@tigoenergy.shop',
         thankYou: 'Thank you for choosing Tigo Energy!',
+        customsTitle: 'Important: Customs & Import Duties',
+        customsBody: 'This order is shipping outside the European Union. Customs duties, import taxes, and other fees are NOT included in the order total and are the sole responsibility of the buyer. Please contact your local customs authority to determine any additional charges before your shipment arrives. If delivery fails due to unpaid customs duties and goods are returned to us, a restocking fee will apply.',
     },
     de: {
         subject: 'Bestellbestätigung — #{orderNumber}',
@@ -72,6 +75,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Zahlungsart',
         footer: 'Bei Fragen kontaktieren Sie uns unter support@tigoenergy.shop',
         thankYou: 'Vielen Dank, dass Sie sich für Tigo Energy entschieden haben!',
+        customsTitle: 'Wichtig: Zölle & Einfuhrabgaben',
+        customsBody: 'Diese Bestellung wird außerhalb der Europäischen Union versendet. Zölle, Einfuhrsteuern und sonstige Gebühren sind NICHT im Bestellbetrag enthalten und liegen in der alleinigen Verantwortung des Käufers. Bitte erkundigen Sie sich bei Ihrer zuständigen Zollbehörde über mögliche Zusatzkosten, bevor Ihre Sendung eintrifft. Falls die Zustellung aufgrund nicht bezahlter Zollgebühren fehlschlägt und die Ware an uns zurückgesendet wird, fällt eine Wiedereinlagerungsgebühr an.',
     },
     fr: {
         subject: 'Confirmation de commande — #{orderNumber}',
@@ -91,6 +96,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Mode de paiement',
         footer: 'Pour toute question, contactez-nous à support@tigoenergy.shop',
         thankYou: 'Merci d\'avoir choisi Tigo Energy !',
+        customsTitle: 'Important : Droits de douane et taxes d\'importation',
+        customsBody: 'Cette commande est expédiée en dehors de l\'Union européenne. Les droits de douane, taxes d\'importation et autres frais ne sont PAS inclus dans le montant total et sont à la charge exclusive de l\'acheteur. Veuillez contacter votre autorité douanière locale pour connaître les frais supplémentaires avant l\'arrivée de votre envoi. En cas d\'échec de livraison dû au non-paiement des droits de douane et de retour des marchandises, des frais de réapprovisionnement seront appliqués.',
     },
     it: {
         subject: 'Conferma ordine — #{orderNumber}',
@@ -110,6 +117,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Metodo di pagamento',
         footer: 'Per domande, contattaci a support@tigoenergy.shop',
         thankYou: 'Grazie per aver scelto Tigo Energy!',
+        customsTitle: 'Importante: Dazi doganali e tasse di importazione',
+        customsBody: 'Questo ordine viene spedito al di fuori dell\'Unione Europea. Dazi doganali, tasse di importazione e altri oneri NON sono inclusi nel totale dell\'ordine e sono a carico esclusivo dell\'acquirente. Si prega di contattare l\'autorità doganale locale per determinare eventuali costi aggiuntivi prima dell\'arrivo della spedizione. In caso di mancata consegna per mancato pagamento dei dazi doganali e restituzione della merce, verrà applicata una tariffa di riassortimento.',
     },
     sl: {
         subject: 'Potrditev naročila — #{orderNumber}',
@@ -129,6 +138,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Način plačila',
         footer: 'Za vprašanja nas kontaktirajte na support@tigoenergy.shop',
         thankYou: 'Hvala, ker ste izbrali Tigo Energy!',
+        customsTitle: 'Pomembno: Carinske dajatve in uvozne takse',
+        customsBody: 'To naročilo se pošilja izven Evropske unije. Carinske dajatve, uvozni davki in druge pristojbine NISO vključene v skupni znesek naročila in so izključno odgovornost kupca. Pred prihodom pošiljke se prosim obrnite na pristojni carinski organ za informacije o morebitnih dodatnih stroških. V primeru neuspešne dostave zaradi neplačanih carinskih dajatev in vračila blaga se zaračuna pristojbina za vračilo na zalogo.',
     },
     es: {
         subject: 'Confirmación de pedido — #{orderNumber}',
@@ -148,6 +159,8 @@ const LABELS: Record<string, Record<string, string>> = {
         payment: 'Método de pago',
         footer: 'Si tienes preguntas, contáctanos en support@tigoenergy.shop',
         thankYou: '¡Gracias por elegir Tigo Energy!',
+        customsTitle: 'Importante: Aranceles aduaneros e impuestos de importación',
+        customsBody: 'Este pedido se envía fuera de la Unión Europea. Los aranceles aduaneros, impuestos de importación y otros cargos NO están incluidos en el total del pedido y son responsabilidad exclusiva del comprador. Contacte con su autoridad aduanera local para conocer los posibles cargos adicionales antes de la llegada de su envío. Si la entrega falla debido al impago de los derechos de aduana y la mercancía nos es devuelta, se aplicará una tarifa de reposición.',
     },
 }
 
@@ -241,6 +254,13 @@ export function buildOrderConfirmationEmail(data: OrderEmailData) {
                 <p style="font-size:14px;color:#333;margin:0">${data.paymentMethod.replace(/_/g, ' ').toUpperCase()}</p>
             </div>
         </div>
+
+        ${data.isExport ? `
+        <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:24px">
+            <p style="font-size:14px;font-weight:700;color:#92400e;margin:0 0 8px">⚠️ ${l.customsTitle}</p>
+            <p style="font-size:13px;color:#92400e;margin:0;line-height:1.5">${l.customsBody}</p>
+        </div>
+        ` : ''}
 
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
         <p style="font-size:13px;color:#888;text-align:center;margin:0 0 4px">${l.footer}</p>

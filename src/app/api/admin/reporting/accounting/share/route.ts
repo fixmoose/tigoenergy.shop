@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
         await sendEmail({
             to: email,
             subject: `Accounting Documents - Tigo Energy Shop - ${periodName}`,
+            emailType: 'accounting_share',
             html: `
                 <div style="font-family: sans-serif; color: #334155;">
                     <h2 style="color: #1e293b;">Accounting Data Request</h2>

@@ -133,6 +133,8 @@ export async function POST(
             to: order.customer_email,
             subject,
             html,
+            orderId: order.id,
+            emailType: 'shipping_notification',
         })
 
         return NextResponse.json({ ok: true })

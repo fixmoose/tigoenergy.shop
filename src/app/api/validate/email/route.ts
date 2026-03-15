@@ -71,7 +71,8 @@ export async function POST(request: Request) {
             await sendEmail({
                 to: email,
                 subject: subject,
-                html
+                html,
+                emailType: 'email_verification',
             })
         } catch (emailError) {
             console.error('Failed to send production email:', emailError)

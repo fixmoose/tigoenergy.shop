@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { getAdminsAction, inviteAdminAction, deleteAdminAction } from '@/app/actions/admin'
 import TemplateManager from '@/components/admin/TemplateManager'
+import BankStatementUpload from '@/components/admin/BankStatementUpload'
 
 type Category = {
     id: string
@@ -343,6 +344,9 @@ export default function SettingsPage() {
                 </div>
 
             </div>
+
+            {/* Banking Section */}
+            <BankStatementUpload />
 
             {/* Document Templates Section */}
             <TemplateManager />

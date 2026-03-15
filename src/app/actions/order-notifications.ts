@@ -117,6 +117,8 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
         to: order.customer_email,
         subject: `Payment Request — Order #${order.order_number} (${totalFormatted})`,
         html,
+        orderId,
+        emailType: 'payment_request',
     })
 
     return { success: true }
@@ -233,6 +235,8 @@ export async function sendPaymentReminderAction(orderId: string) {
         to: order.customer_email,
         subject: `Payment Reminder — Order #${order.order_number} (${totalFormatted})`,
         html,
+        orderId,
+        emailType: 'payment_reminder',
     })
 
     return { success: true }
@@ -256,6 +260,8 @@ export async function sendShippingLabelToAdminAction(orderId: string) {
     await sendEmail({
         to: ADMIN_EMAIL,
         subject: `[ADMIN] Shipping Label for Order #${order.order_number}`,
+        orderId,
+        emailType: 'shipping_label_admin',
         html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#333333;background:#f3f4f6;margin:0;padding:40px 0;">
 <div style="max-width:640px;margin:0 auto;background:#ffffff;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1);">
   <div style="background:#1a2b3c;padding:32px 48px;">
@@ -301,6 +307,8 @@ export async function sendOrderToAdminAction(orderId: string) {
     await sendEmail({
         to: ADMIN_EMAIL,
         subject: `[ADMIN] Order Details: #${order.order_number}`,
+        orderId,
+        emailType: 'order_details_admin',
         html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#333333;background:#f3f4f6;margin:0;padding:40px 0;">
 <div style="max-width:640px;margin:0 auto;background:#ffffff;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1);">
   <div style="background:#1a2b3c;padding:32px 48px;">
@@ -393,6 +401,8 @@ export async function adminSendOrderToClientAction(orderId: string) {
             to: order.customer_email,
             subject: `Your Order #${order.order_number} — Tigo Energy SHOP`,
             html,
+            orderId,
+            emailType: 'order_summary',
         })
 
         // Increment send count (ignore if column doesn't exist yet)
@@ -438,7 +448,9 @@ export async function confirmOrderAction(orderId: string) {
     await sendEmail({
         to: order.customer_email,
         subject: `Order Confirmed: #${order.order_number}`,
-        html
+        html,
+        orderId,
+        emailType: 'order_confirmation',
     })
 
     revalidatePath(`/admin/customers/${order.customer_id}`)

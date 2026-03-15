@@ -194,6 +194,8 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             vat_amount: vatAmount,
             total: grandTotal,
             currency: 'EUR',
+            display_currency: (rawData.display_currency as string) || 'EUR',
+            exchange_rate: parseFloat(rawData.exchange_rate as string) || 1.0,
 
             status: 'pending',
             payment_status: 'pending',
@@ -280,8 +282,24 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 ? (orderLanguage === 'sl' ? `Predračun — #${order.order_number}` : `Proforma Invoice — #${order.order_number}`)
                 : (orderLanguage === 'sl' ? `Potrditev naročila — #${order.order_number}` : `Order Confirmation — #${order.order_number}`)
 
+            const isExportOrder = orderPayload.transaction_type === 'export'
+
             if (dbHtml) {
                 finalHtml = dbHtml
+                // Append customs disclaimer for export orders using DB template
+                if (isExportOrder) {
+                    const customsLabels: Record<string, { title: string; body: string }> = {
+                        en: { title: 'Important: Customs & Import Duties', body: 'This order is shipping outside the European Union. Customs duties, import taxes, and other fees are NOT included in the order total and are the sole responsibility of the buyer. Please contact your local customs authority to determine any additional charges before your shipment arrives. If delivery fails due to unpaid customs duties and goods are returned to us, a restocking fee will apply.' },
+                        de: { title: 'Wichtig: Zölle & Einfuhrabgaben', body: 'Diese Bestellung wird außerhalb der Europäischen Union versendet. Zölle, Einfuhrsteuern und sonstige Gebühren sind NICHT im Bestellbetrag enthalten und liegen in der alleinigen Verantwortung des Käufers. Bitte erkundigen Sie sich bei Ihrer zuständigen Zollbehörde über mögliche Zusatzkosten, bevor Ihre Sendung eintrifft. Falls die Zustellung aufgrund nicht bezahlter Zollgebühren fehlschlägt und die Ware an uns zurückgesendet wird, fällt eine Wiedereinlagerungsgebühr an.' },
+                        sl: { title: 'Pomembno: Carinske dajatve in uvozne takse', body: 'To naročilo se pošilja izven Evropske unije. Carinske dajatve, uvozni davki in druge pristojbine NISO vključene v skupni znesek naročila in so izključno odgovornost kupca. Pred prihodom pošiljke se prosim obrnite na pristojni carinski organ za informacije o morebitnih dodatnih stroških. V primeru neuspešne dostave zaradi neplačanih carinskih dajatev in vračila blaga se zaračuna pristojbina za vračilo na zalogo.' },
+                    }
+                    const cl = customsLabels[orderLanguage] || customsLabels.en
+                    const disclaimerHtml = `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:24px 32px"><p style="font-size:14px;font-weight:700;color:#92400e;margin:0 0 8px">⚠️ ${cl.title}</p><p style="font-size:13px;color:#92400e;margin:0;line-height:1.5">${cl.body}</p></div>`
+                    // Insert before closing </body> or append at end
+                    finalHtml = finalHtml.includes('</body>')
+                        ? finalHtml.replace('</body>', `${disclaimerHtml}</body>`)
+                        : finalHtml + disclaimerHtml
+                }
             } else {
                 // Fallback to old hardcoded builder
                 const fallback = buildOrderConfirmationEmail({
@@ -304,6 +322,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                     shippingAddress: orderPayload.shipping_address as any,
                     paymentMethod: emailData.payment_method,
                     language: orderLanguage,
+                    isExport: orderPayload.transaction_type === 'export',
                 })
                 finalHtml = fallback.html
                 finalSubject = fallback.subject
@@ -314,6 +333,8 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 to: email,
                 subject: finalSubject,
                 html: finalHtml,
+                orderId: order.id,
+                emailType: 'order_confirmation',
             })
 
             // Notify all admins of new order

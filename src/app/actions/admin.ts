@@ -58,7 +58,8 @@ export async function inviteAdminAction(email: string) {
         await sendEmail({
             to: email,
             subject: 'Invitation to Tigo Energy SHOP Admin Team',
-            html
+            html,
+            emailType: 'admin_invite',
         })
 
         revalidatePath('/admin/settings')
@@ -198,7 +199,7 @@ export async function adminVerifyB2BCustomerAction(customerId: string) {
             fr: 'Votre compte B2B a été vérifié — Tigo Energy SHOP',
         }
         const subject = subjectMap[locale] || 'Your B2B Account is Verified — Tigo Energy SHOP'
-        await sendEmail({ to: customer.email, subject, html, skipUnsubscribe: true })
+        await sendEmail({ to: customer.email, subject, html, skipUnsubscribe: true, emailType: 'b2b_verification' })
 
         revalidatePath(`/admin/customers/${customerId}`)
         return { success: true }
@@ -241,7 +242,7 @@ export async function adminMarkDeliveredAction(orderId: string) {
                 fr: `Votre commande #${order.order_number} a été livrée`,
             }
             const subject = subjectMap[locale] || `Your Order #${order.order_number} Has Been Delivered`
-            await sendEmail({ to: order.customer_email, subject, html, skipUnsubscribe: true })
+            await sendEmail({ to: order.customer_email, subject, html, skipUnsubscribe: true, orderId, emailType: 'delivery_notification' })
         } catch (emailErr) {
             console.error('Failed to send delivered email:', emailErr)
         }
@@ -421,6 +422,7 @@ body{font-family:Arial,sans-serif;color:#1a1a1a;background:#f9f9f9;margin:0;padd
             to: emailToReset,
             subject,
             html,
+            emailType: 'password_reset',
         })
 
         return { success: true }
@@ -776,7 +778,8 @@ export async function adminSendBulkMarketingEmailAction(letterId: string, custom
             await sendEmail({
                 to: customer.email,
                 subject: letter.title,
-                html: personalizedHtml
+                html: personalizedHtml,
+                emailType: 'marketing',
             })
             results.sent++
         } catch (err: any) {
@@ -898,7 +901,8 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                     await sendEmail({
                         to: customer.email,
                         subject: setupSubjectMap[setupLocale] || 'Activate Your Tigo Energy SHOP Account',
-                        html: welcomeHtml
+                        html: welcomeHtml,
+                        emailType: 'account_setup',
                     });
                 }
             } catch (emailErr) {
@@ -1004,7 +1008,9 @@ export async function adminCreateOrderWithCustomerAction(payload: {
             await sendEmail({
                 to: customer.email,
                 subject: ibanSubjectMap[ibanLocale] || `Order #${orderNumber} Confirmation - Payment Required`,
-                html: ibanHtml
+                html: ibanHtml,
+                orderId: orderData.id,
+                emailType: 'payment_request',
             });
         } catch (emailErr) {
             console.error('Failed to send IBAN email:', emailErr);
@@ -1078,4 +1084,318 @@ export async function issueOrderInvoiceAction(orderId: string) {
         console.error('Error in issueOrderInvoiceAction:', err);
         return { success: false, error: err.message || 'Failed to issue invoice' };
     }
+}
+
+/**
+ * Record a payment against an order (supports partial/multiple payments)
+ */
+export async function adminRecordPaymentAction(
+    orderId: string,
+    amount: number,
+    paymentDate: string,
+    paymentMethod?: string,
+    reference?: string,
+    notes?: string
+) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        if (!amount || amount <= 0) throw new Error('Amount must be greater than 0')
+
+        const supabase = await createAdminClient()
+
+        // Get current order
+        const { data: order, error: orderErr } = await supabase
+            .from('orders')
+            .select('id, total, amount_paid, payment_status')
+            .eq('id', orderId)
+            .single()
+
+        if (orderErr || !order) throw new Error('Order not found')
+
+        // Insert payment record
+        const { error: insertErr } = await supabase
+            .from('order_payments')
+            .insert({
+                order_id: orderId,
+                amount,
+                payment_date: paymentDate,
+                payment_method: paymentMethod || 'bank_transfer',
+                reference: reference || null,
+                notes: notes || null,
+            })
+
+        if (insertErr) throw insertErr
+
+        // Calculate new total paid
+        const newAmountPaid = (order.amount_paid || 0) + amount
+        const orderTotal = order.total || 0
+        const newPaymentStatus = newAmountPaid >= orderTotal ? 'paid' : 'partially_paid'
+
+        // Update order
+        const updates: any = {
+            amount_paid: newAmountPaid,
+            payment_status: newPaymentStatus,
+        }
+        if (newPaymentStatus === 'paid') {
+            updates.paid_at = new Date().toISOString()
+        }
+
+        const { error: updateErr } = await supabase
+            .from('orders')
+            .update(updates)
+            .eq('id', orderId)
+
+        if (updateErr) throw updateErr
+
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true, newAmountPaid, paymentStatus: newPaymentStatus }
+    } catch (err: any) {
+        console.error('Error in adminRecordPaymentAction:', err)
+        return { success: false, error: err.message || 'Failed to record payment' }
+    }
+}
+
+/**
+ * Fetch payment records for an order
+ */
+export async function getOrderPaymentsAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        const supabase = await createAdminClient()
+
+        const { data, error } = await supabase
+            .from('order_payments')
+            .select('*')
+            .eq('order_id', orderId)
+            .order('payment_date', { ascending: true })
+
+        if (error) throw error
+        return { success: true, data: data || [] }
+    } catch (err: any) {
+        return { success: false, error: err.message, data: [] }
+    }
+}
+
+/**
+ * Delete a payment record and recalculate order totals
+ */
+export async function adminDeletePaymentAction(paymentId: string, orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        const supabase = await createAdminClient()
+
+        // Delete the payment
+        const { error: delErr } = await supabase
+            .from('order_payments')
+            .delete()
+            .eq('id', paymentId)
+
+        if (delErr) throw delErr
+
+        // Recalculate total paid from remaining payments
+        const { data: remaining } = await supabase
+            .from('order_payments')
+            .select('amount')
+            .eq('order_id', orderId)
+
+        const newAmountPaid = (remaining || []).reduce((sum, p) => sum + (p.amount || 0), 0)
+
+        // Get order total
+        const { data: order } = await supabase
+            .from('orders')
+            .select('total')
+            .eq('id', orderId)
+            .single()
+
+        const orderTotal = order?.total || 0
+        const newPaymentStatus = newAmountPaid <= 0 ? 'unpaid' : newAmountPaid >= orderTotal ? 'paid' : 'partially_paid'
+
+        await supabase
+            .from('orders')
+            .update({
+                amount_paid: newAmountPaid,
+                payment_status: newPaymentStatus,
+                paid_at: newPaymentStatus === 'paid' ? new Date().toISOString() : null,
+            })
+            .eq('id', orderId)
+
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true }
+    } catch (err: any) {
+        return { success: false, error: err.message || 'Failed to delete payment' }
+    }
+}
+
+/**
+ * Process a bank statement (MT940/CAMT.053) and match transactions to unpaid orders.
+ * Returns matched and unmatched credit transactions.
+ */
+export async function processBankStatementAction(fileContent: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const { parseBankStatement } = await import('@/lib/mt940-parser')
+        const supabase = await createAdminClient()
+
+        const statements = parseBankStatement(fileContent)
+        if (statements.length === 0) {
+            return { success: false, error: 'No valid statements found in the file. Please upload an MT940 (.sta) or CAMT.053 (.xml) file.' }
+        }
+
+        // Get all credits (incoming payments)
+        const credits = statements.flatMap(s =>
+            s.transactions.filter(t => t.type === 'credit')
+        )
+
+        if (credits.length === 0) {
+            return { success: true, matched: [], unmatched: [], stats: { total: 0, credits: 0, debits: statements.flatMap(s => s.transactions).length } }
+        }
+
+        // Fetch all unpaid/partially paid orders
+        const { data: orders, error: ordersErr } = await supabase
+            .from('orders')
+            .select('id, order_number, total, amount_paid, payment_status, customer_email, status')
+            .in('payment_status', ['pending', 'unpaid', 'partially_paid'])
+            .neq('status', 'cancelled')
+
+        if (ordersErr) throw new Error('Failed to fetch orders: ' + ordersErr.message)
+
+        const matched: {
+            transactionDate: string
+            transactionAmount: number
+            transactionRef: string
+            transactionDesc: string
+            orderId: string
+            orderNumber: string
+            orderTotal: number
+            amountPaid: number
+            remaining: number
+            confidence: 'high' | 'medium' | 'low'
+        }[] = []
+        const unmatched: typeof credits = []
+
+        for (const credit of credits) {
+            let bestMatch: typeof matched[0] | null = null
+            let bestConfidence: 'high' | 'medium' | 'low' = 'low'
+
+            for (const order of orders || []) {
+                const remaining = (order.total || 0) - (order.amount_paid || 0)
+                const refNormalized = credit.reference.toUpperCase().replace(/[\s-]/g, '')
+                const orderNumNormalized = order.order_number.toUpperCase().replace(/[\s-]/g, '')
+                const descNormalized = credit.description.toUpperCase().replace(/[\s-]/g, '')
+
+                // Check if order number appears in reference or description
+                const refHasOrderNum = refNormalized.includes(orderNumNormalized) || descNormalized.includes(orderNumNormalized)
+                const amountMatches = Math.abs(credit.amount - remaining) < 0.02
+
+                let confidence: 'high' | 'medium' | 'low' = 'low'
+                if (refHasOrderNum && amountMatches) {
+                    confidence = 'high'
+                } else if (refHasOrderNum) {
+                    confidence = 'medium'
+                } else if (amountMatches && remaining > 50) {
+                    // Amount match alone is only useful for larger, unique amounts
+                    confidence = 'low'
+                } else {
+                    continue
+                }
+
+                const confRank = { high: 3, medium: 2, low: 1 }
+                if (!bestMatch || confRank[confidence] > confRank[bestConfidence]) {
+                    bestMatch = {
+                        transactionDate: credit.date,
+                        transactionAmount: credit.amount,
+                        transactionRef: credit.reference,
+                        transactionDesc: credit.description,
+                        orderId: order.id,
+                        orderNumber: order.order_number,
+                        orderTotal: order.total || 0,
+                        amountPaid: order.amount_paid || 0,
+                        remaining,
+                        confidence,
+                    }
+                    bestConfidence = confidence
+                }
+            }
+
+            if (bestMatch) {
+                matched.push(bestMatch)
+            } else {
+                unmatched.push(credit)
+            }
+        }
+
+        // Sort: high confidence first
+        matched.sort((a, b) => {
+            const rank = { high: 3, medium: 2, low: 1 }
+            return rank[b.confidence] - rank[a.confidence]
+        })
+
+        return {
+            success: true,
+            matched,
+            unmatched,
+            stats: {
+                total: statements.flatMap(s => s.transactions).length,
+                credits: credits.length,
+                debits: statements.flatMap(s => s.transactions).filter(t => t.type === 'debit').length,
+                matchedCount: matched.length,
+                unmatchedCount: unmatched.length,
+                accounts: statements.map(s => s.accountId).filter(Boolean),
+            },
+        }
+    } catch (err: any) {
+        console.error('Error processing bank statement:', err)
+        return { success: false, error: err.message || 'Failed to process bank statement' }
+    }
+}
+
+/**
+ * Confirm matched payments from bank statement — records them as actual payments.
+ */
+export async function confirmBankStatementMatchesAction(
+    matches: { orderId: string; amount: number; date: string; reference: string }[]
+) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const results: { orderId: string; success: boolean; error?: string }[] = []
+
+        for (const match of matches) {
+            const result = await adminRecordPaymentAction(
+                match.orderId,
+                match.amount,
+                match.date,
+                'bank_transfer',
+                match.reference,
+                'Auto-matched from bank statement'
+            )
+            results.push({
+                orderId: match.orderId,
+                success: result.success,
+                error: result.success ? undefined : result.error,
+            })
+        }
+
+        revalidatePath('/admin/orders')
+        return { success: true, results }
+    } catch (err: any) {
+        console.error('Error confirming bank statement matches:', err)
+        return { success: false, error: err.message || 'Failed to confirm matches' }
+    }
+}
+
+/**
+ * Fetch email logs for an order
+ */
+export async function getOrderEmailLogsAction(orderId: string) {
+    if (!await checkIsAdmin()) throw new Error('Unauthorized')
+    const supabase = await createAdminClient()
+    const { data, error } = await supabase
+        .from('email_logs')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('sent_at', { ascending: false })
+    if (error) return { success: false, error: error.message }
+    return { success: true, data }
 }
