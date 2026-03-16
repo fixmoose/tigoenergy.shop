@@ -36,12 +36,14 @@ const COUNTRY_PREFIXES: Record<string, string> = {
 
 interface SavedAddress {
     id: string
+    label?: string
     street: string
     city: string
     postalCode: string
     country: string
     isDefaultShipping?: boolean
     isDefaultBilling?: boolean
+    isViesAddress?: boolean
 }
 
 interface PaymentPrefs {
@@ -233,7 +235,7 @@ export default function CheckoutPage() {
                     const addresses: SavedAddress[] = customerData.addresses || []
                     setSavedAddresses(addresses)
                     const defaultShipping = addresses.find(a => a.isDefaultShipping)
-                    const defaultBilling = addresses.find(a => a.isDefaultBilling)
+                    const viesAddress = addresses.find(a => a.isViesAddress)
 
                     // Fallback to user_metadata for address fields when no saved addresses
                     const meta = user.user_metadata || {}
@@ -241,6 +243,13 @@ export default function CheckoutPage() {
                     const shippingCity = defaultShipping?.city || meta.city || ''
                     const shippingPostal = defaultShipping?.postalCode || meta.postal_code || meta.postalCode || ''
                     const shippingCountry = defaultShipping?.country || meta.country || ''
+
+                    // For B2B: billing is always VIES address; for B2C: billing = shipping
+                    const billingSource = customerData.is_b2b && viesAddress ? viesAddress : null
+                    const billingStreet = billingSource?.street || shippingStreet
+                    const billingCity = billingSource?.city || shippingCity
+                    const billingPostal = billingSource?.postalCode || shippingPostal
+                    const billingCountry = billingSource?.country || shippingCountry
 
                     setFormData(prev => ({
                         ...prev,
@@ -254,23 +263,20 @@ export default function CheckoutPage() {
                         shipping_postal_code: shippingPostal,
                         shipping_country: shippingCountry,
                         vat_id: customerData.vat_id || user.user_metadata?.vat_id || '',
-                        // Pre-fill billing from saved billing address, fallback to shipping
-                        billing_street: defaultBilling?.street || shippingStreet,
-                        billing_city: defaultBilling?.city || shippingCity,
-                        billing_postal_code: defaultBilling?.postalCode || shippingPostal,
-                        billing_country: defaultBilling?.country || shippingCountry,
+                        billing_street: billingStreet,
+                        billing_city: billingCity,
+                        billing_postal_code: billingPostal,
+                        billing_country: billingCountry,
                     }))
 
                     if (defaultShipping) {
                         setSelectedAddressId(defaultShipping.id)
                     }
-                    // If billing differs from shipping, uncheck billingSame
-                    if (defaultBilling && defaultShipping && defaultBilling.id !== defaultShipping.id) {
-                        setBillingSame(false)
-                    }
 
                     if (customerData.is_b2b) {
                         setLocalIsB2B(true)
+                        // B2B: billing is always VIES, keep billingSame false and lock it
+                        if (viesAddress) setBillingSame(false)
                         setFormData(prev => ({
                             ...prev,
                             commercial_access: customerData.commercial_access || false,
@@ -849,6 +855,12 @@ export default function CheckoutPage() {
                                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {savedAddresses.map(addr => (
                                         <button key={addr.id} type="button" onClick={() => handleSelectAddress(addr)} className={`text-left p-3 border-2 rounded-lg ${selectedAddressId === addr.id ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
+                                            {(addr.label || addr.isDefaultShipping) && (
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    {addr.label && <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">{addr.label}</span>}
+                                                    {addr.isDefaultShipping && <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-semibold">{t('defaultShipping')}</span>}
+                                                </div>
+                                            )}
                                             <p className="font-medium text-sm">{addr.street}</p>
                                             <p className="text-gray-500 text-xs">{addr.postalCode} {addr.city}, {addr.country}</p>
                                         </button>
@@ -1017,9 +1029,26 @@ export default function CheckoutPage() {
                                 <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
                                 {t('billingAddress')}
                             </h2>
+                            {effectiveIsB2B ? (
+                                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">{t('viesRegisteredAddress')}</p>
+                                    <div className="text-sm text-gray-900 space-y-0.5">
+                                        <p className="font-semibold">{formData.company_name}</p>
+                                        <p>{formData.billing_street}</p>
+                                        <p>{formData.billing_postal_code} {formData.billing_city}</p>
+                                        <p className="uppercase text-xs text-gray-500">{formData.billing_country}</p>
+                                        {formData.vat_id && <p className="text-xs text-blue-600 font-mono mt-1">{formData.vat_id}</p>}
+                                    </div>
+                                    <input type="hidden" name="billing_street" value={formData.billing_street} />
+                                    <input type="hidden" name="billing_city" value={formData.billing_city} />
+                                    <input type="hidden" name="billing_postal_code" value={formData.billing_postal_code} />
+                                    <input type="hidden" name="billing_country" value={formData.billing_country} />
+                                </div>
+                            ) : (
+                            <>
                             <label className="flex items-center gap-2 mb-4 cursor-pointer">
                                 <input type="checkbox" name="billing_same" checked={billingSame} onChange={e => setBillingSame(e.target.checked)} className="rounded text-green-600" />
-                                <span className="text-sm font-medium">{effectiveIsB2B ? t('sameAsCompanyAddress') : t('sameAsShipping')}</span>
+                                <span className="text-sm font-medium">{t('sameAsShipping')}</span>
                             </label>
                             {!billingSame && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1056,6 +1085,8 @@ export default function CheckoutPage() {
                                         </select>
                                     </div>
                                 </div>
+                            )}
+                            </>
                             )}
                         </div>
 

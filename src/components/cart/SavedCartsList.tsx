@@ -79,9 +79,10 @@ export default function SavedCartsList() {
     if (savedCarts.length === 0) return null
 
     return (
-        <div className="mt-8 border-t border-gray-100 pt-6">
-            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>💾</span> Saved Carts
+        <div className="mt-6">
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider text-gray-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                Saved Carts
             </h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {savedCarts.map(cart => (

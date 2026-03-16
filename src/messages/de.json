@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Produkt-Support",
     "tigoProductSupportDesc": "Technische Hilfe für Tigo-Produkte",
     "onlineShopSupport": "Online-Shop Support",
-    "onlineShopSupportDesc": "Hilfe bei Bestellungen und Versand"
+    "onlineShopSupportDesc": "Hilfe bei Bestellungen und Versand",
+    "emptyCart": "Warenkorb leeren"
   },
   "footer": {
     "products": "Produkte",
@@ -196,7 +197,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Bestellnummer (P.O.)",
     "poNumberOptional": "optional",
-    "poNumberPlaceholder": "z.B. PO-2024-001 oder Projektname"
+    "poNumberPlaceholder": "z.B. PO-2024-001 oder Projektname",
+    "defaultShipping": "Standard-Versand",
+    "viesRegisteredAddress": "VIES-registrierte Adresse"
   },
   "subcategories": {
     "Optimization": "Optimierung",
@@ -333,7 +336,12 @@
       "shipping": "Versand",
       "vat": "MwSt.",
       "total": "Gesamtbetrag",
-      "footerNote": "Sie können Ihren Bestellstatus in Ihrem Konto-Profil verfolgen."
+      "footerNote": "Sie können Ihren Bestellstatus in Ihrem Konto-Profil verfolgen.",
+      "paymentInstructions": "Zahlungsanweisungen",
+      "bankRegular": "Reguläre Geschwindigkeit",
+      "bankFaster": "Schneller",
+      "paymentReference": "Zahlungsreferenz",
+      "payNowWise": "Jetzt mit Wise bezahlen"
     },
     "orderPartial": {
       "title": "Bestellung erhalten",

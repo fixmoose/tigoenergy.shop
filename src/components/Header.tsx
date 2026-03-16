@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 
 export default function Header() {
-  const { count, subtotal, items, openDrawer, lastAddedAt } = useCart()
+  const { count, subtotal, items, openDrawer, lastAddedAt, clearCart } = useCart()
   const [cartBounce, setCartBounce] = useState(false)
   const { currentCurrency, setCurrency, formatPrice } = useCurrency()
   const { market, currentLanguage, setLanguage } = useMarket()
@@ -492,10 +492,20 @@ export default function Header() {
                               + {items.length - 3} more items
                             </div>
                           )}
-                          <div className="p-3 bg-gray-50 border-t border-gray-100">
+                          <div className="p-3 bg-gray-50 border-t border-gray-100 space-y-2">
                             <Link href="/cart" className="block w-full bg-green-600 hover:bg-green-700 text-white text-center text-xs font-bold py-2 rounded transition uppercase tracking-wide">
                               {t('viewCartCheckout')}
                             </Link>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                clearCart()
+                              }}
+                              className="block w-full text-center text-xs text-red-500 hover:text-red-700 font-medium py-1 transition"
+                            >
+                              {t('emptyCart')}
+                            </button>
                           </div>
                         </>
                       )}

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '../../../../../lib/supabase/server'
 import { cookies } from 'next/headers'
-import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
+import { getPinnedTemplate, replacePlaceholders, generatePackingItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
 import { getLegalClauses } from '../../../../../lib/legal-clauses'
+import { calculateTigoParcels } from '../../../../../lib/shipping/dpd'
 
 export async function GET(
     req: NextRequest,
@@ -54,12 +55,23 @@ export async function GET(
             return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
         }
 
+        // Calculate parcels/boxes using DPD packing logic
+        const orderItems = order.order_items || []
+        const parcels = calculateTigoParcels(orderItems.map((item: any) => ({
+            name: item.product_name || item.sku || '',
+            sku: item.sku || '',
+            quantity: item.quantity,
+            weight_kg: item.weight_kg || 0,
+        })))
+        const totalWeight = orderItems.reduce((sum: number, item: any) => sum + (parseFloat(item.weight_kg || 0) * item.quantity), 0)
+
         const documentData: DocumentData = {
             order_number: order.order_number,
             order_date: new Date(order.created_at).toLocaleDateString(),
             customer_name: `${order.billing_address?.first_name || ''} ${order.billing_address?.last_name || ''}`.trim() || order.customer_email,
             customer_email: order.customer_email,
             customer_company: order.company_name,
+            customer_phone: order.shipping_address?.phone || order.customer_phone || '',
             billing_address: formatAddress(order.billing_address),
             shipping_address: formatAddress(order.shipping_address),
             subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
@@ -67,7 +79,10 @@ export async function GET(
             shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
             total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
             payment_method: order.payment_method || 'N/A',
-            items_table: generateItemsTableHtml(order.order_items, order.currency || '€'),
+            items_table: '',
+            packing_items_table: generatePackingItemsTableHtml(orderItems),
+            total_boxes: String(parcels.length),
+            total_weight: `${totalWeight.toFixed(2)} kg`,
             tracking_number: order.tracking_number || 'N/A',
             carrier_name: order.shipping_carrier || 'Standard'
         }

@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy suport produse",
     "tigoProductSupportDesc": "Asistență tehnică pentru produsele Tigo Energy",
     "onlineShopSupport": "Suport magazin online",
-    "onlineShopSupportDesc": "Ajutor cu comenzile și livrarea"
+    "onlineShopSupportDesc": "Ajutor cu comenzile și livrarea",
+    "emptyCart": "Golește coșul"
   },
   "footer": {
     "products": "Produse",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Număr comandă (P.O.)",
     "poNumberOptional": "opțional",
-    "poNumberPlaceholder": "ex. PO-2024-001 sau nume proiect"
+    "poNumberPlaceholder": "ex. PO-2024-001 sau nume proiect",
+    "defaultShipping": "Livrare implicită",
+    "viesRegisteredAddress": "Adresă înregistrată VIES"
   },
   "subcategories": {
     "Optimization": "Optimizare",
@@ -332,7 +335,12 @@
       "shipping": "Livrare",
       "vat": "TVA",
       "total": "Total plătit",
-      "footerNote": "Puteți urmări starea comenzii dvs. în profilul contului dvs."
+      "footerNote": "Puteți urmări starea comenzii dvs. în profilul contului dvs.",
+      "paymentInstructions": "Instrucțiuni de plată",
+      "bankRegular": "Viteză obișnuită",
+      "bankFaster": "Mai rapid",
+      "paymentReference": "Referință plată",
+      "payNowWise": "Plătiți acum cu Wise"
     },
     "orderPartial": {
       "title": "Comandă primită",

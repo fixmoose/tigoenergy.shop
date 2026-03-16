@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy продуктова поддръжка",
     "tigoProductSupportDesc": "Техническа помощ за продукти Tigo Energy",
     "onlineShopSupport": "Поддръжка на онлайн магазина",
-    "onlineShopSupportDesc": "Помощ с поръчки и доставка"
+    "onlineShopSupportDesc": "Помощ с поръчки и доставка",
+    "emptyCart": "Изпразни количката"
   },
   "footer": {
     "products": "Продукти",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Номер на поръчка (P.O.)",
     "poNumberOptional": "незадължително",
-    "poNumberPlaceholder": "напр. PO-2024-001 или ime na proekt"
+    "poNumberPlaceholder": "напр. PO-2024-001 или ime na proekt",
+    "defaultShipping": "Доставка по подразбиране",
+    "viesRegisteredAddress": "VIES регистриран адрес"
   },
   "subcategories": {
     "Optimization": "Оптимизация",
@@ -332,7 +335,12 @@
       "shipping": "Доставка",
       "vat": "ДДС",
       "total": "Общо платено",
-      "footerNote": "Можете да проследите състоянието на поръчката си във вашия профил."
+      "footerNote": "Можете да проследите състоянието на поръчката си във вашия профил.",
+      "paymentInstructions": "Инструкции за плащане",
+      "bankRegular": "Обичайна скорост",
+      "bankFaster": "По-бързо",
+      "paymentReference": "Референция за плащане",
+      "payNowWise": "Платете сега с Wise"
     },
     "orderPartial": {
       "title": "Поръчката е получена",

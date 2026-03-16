@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy podpora produktov",
     "tigoProductSupportDesc": "Technická pomoc s produktmi Tigo Energy",
     "onlineShopSupport": "Podpora internetového obchodu",
-    "onlineShopSupportDesc": "Pomoc s objednávkami a dopravou"
+    "onlineShopSupportDesc": "Pomoc s objednávkami a dopravou",
+    "emptyCart": "Vyprázdniť košík"
   },
   "footer": {
     "products": "Produkty",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Číslo objednávky (P.O.)",
     "poNumberOptional": "nepovinné",
-    "poNumberPlaceholder": "napr. PO-2024-001 alebo názov projektu"
+    "poNumberPlaceholder": "napr. PO-2024-001 alebo názov projektu",
+    "defaultShipping": "Predvolené doručenie",
+    "viesRegisteredAddress": "Adresa registrovaná vo VIES"
   },
   "subcategories": {
     "Optimization": "Optimalizácia",
@@ -332,7 +335,12 @@
       "shipping": "Doprava",
       "vat": "DPH",
       "total": "Celkom zaplatené",
-      "footerNote": "Stav svojej objednávky môžete sledovať vo svojom profile účtu."
+      "footerNote": "Stav svojej objednávky môžete sledovať vo svojom profile účtu.",
+      "paymentInstructions": "Platobné pokyny",
+      "bankRegular": "Bežná rýchlosť",
+      "bankFaster": "Rýchlejšie",
+      "paymentReference": "Platobná referencia",
+      "payNowWise": "Zaplatiť teraz cez Wise"
     },
     "orderPartial": {
       "title": "Objednávka prijatá",

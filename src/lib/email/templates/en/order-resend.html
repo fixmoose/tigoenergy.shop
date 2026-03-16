@@ -284,6 +284,34 @@
                 </div>
             </div>
 
+            <!-- Payment Instructions -->
+            <div style="background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="font-size: 14px; font-weight: 700; color: #92400e; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px;">Payment Instructions</h3>
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 12px; vertical-align: top; width: 50%;">
+                            <p style="font-size: 10px; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px;">Regular speed</p>
+                            <p style="font-size: 11px; color: #666; margin: 0 0 2px;">IBAN</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #111; font-family: monospace; margin: 0 0 8px;">SI56 6100 0002 8944 371</p>
+                            <p style="font-size: 11px; color: #666; margin: 0 0 2px;">BIC/SWIFT</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #111; font-family: monospace; margin: 0;">HDELSI22</p>
+                        </td>
+                        <td style="padding: 8px 12px; vertical-align: top; width: 50%;">
+                            <p style="font-size: 10px; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px;">Faster</p>
+                            <p style="font-size: 11px; color: #666; margin: 0 0 2px;">IBAN</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #111; font-family: monospace; margin: 0 0 8px;">BE55 9052 7486 2944</p>
+                            <p style="font-size: 11px; color: #666; margin: 0 0 2px;">BIC/SWIFT</p>
+                            <p style="font-size: 13px; font-weight: 700; color: #111; font-family: monospace; margin: 0;">TRWIBEB1XXX</p>
+                        </td>
+                    </tr>
+                </table>
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 12px; margin-top: 12px;">
+                    <p style="font-size: 11px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px;">Payment Reference</p>
+                    <p style="font-size: 18px; font-weight: 900; color: #1e3a5f; font-family: monospace; margin: 0;">{{reference}}</p>
+                </div>
+                {{wise_payment_link}}
+            </div>
+
             <div class="cta-box">
                 <p class="cta-text">View your order details, track status, and pay online through your account.</p>
                 <a href="{{order_url}}" class="button">View Order &amp; Pay</a>

@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy podrška proizvodima",
     "tigoProductSupportDesc": "Tehnička pomoć s Tigo Energy proizvodima",
     "onlineShopSupport": "Podrška za online trgovinu",
-    "onlineShopSupportDesc": "Pomoć s narudžbama i dostavom"
+    "onlineShopSupportDesc": "Pomoć s narudžbama i dostavom",
+    "emptyCart": "Isprazni košaricu"
   },
   "footer": {
     "products": "Proizvodi",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Narudžbenica (P.O.)",
     "poNumberOptional": "neobavezno",
-    "poNumberPlaceholder": "npr. PO-2024-001 ili naziv projekta"
+    "poNumberPlaceholder": "npr. PO-2024-001 ili naziv projekta",
+    "defaultShipping": "Zadana dostava",
+    "viesRegisteredAddress": "VIES registrirana adresa"
   },
   "subcategories": {
     "Optimization": "Optimizacija",
@@ -332,7 +335,12 @@
       "shipping": "Dostava",
       "vat": "PDV",
       "total": "Ukupno plaćeno",
-      "footerNote": "Status svoje narudžbe možete pratiti u svom profilu računa."
+      "footerNote": "Status svoje narudžbe možete pratiti u svom profilu računa.",
+      "paymentInstructions": "Upute za plaćanje",
+      "bankRegular": "Redovna brzina",
+      "bankFaster": "Brže",
+      "paymentReference": "Referenca plaćanja",
+      "payNowWise": "Plati sada s Wise"
     },
     "orderPartial": {
       "title": "Narudžba primljena",

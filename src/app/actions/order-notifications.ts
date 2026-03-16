@@ -30,15 +30,11 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
         .select('*')
         .eq('order_id', orderId)
 
-    const billingCountry = ((order.billing_address as any)?.country || '').toUpperCase()
-    const isSlovenia = billingCountry === 'SI'
-    const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
-    const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'Delavska Hranilnica — Regular speed' : 'Wise — Faster'
-
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
     const totalFormatted = `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`
+    const refCode = order.order_number.replace('ETRG-ORD-', '').slice(-6)
+    const wisePayUrl = `https://wise.com/pay/business/initraenergijadoo?amount=${parseFloat(order.total || 0).toFixed(2)}&currency=${order.currency || 'EUR'}&description=${refCode}`
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#333333;background:#f3f4f6;margin:0;padding:40px 0;">
 <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:0;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);">
@@ -79,31 +75,40 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
       </td>
     </tr></table>
   </div>
-  <!-- Bank details -->
+  <!-- Bank details — both accounts -->
   <div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
     <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
       <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
-      <span style="font-size:11px;color:#6b7280;margin-left:14px;">Reference: <strong style="font-family:monospace;color:#1a2b3c;">${order.order_number}</strong></span>
     </div>
-    <div style="padding:18px 20px;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">${primaryBank}</div>
-      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${primaryIban}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${primaryBic}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Amount</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${totalFormatted}</td></tr>
-      </table>
-    </div>
+    <table style="width:100%;border-collapse:collapse;"><tr>
+      <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Regular speed</div>
+        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+          <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">SI56 6100 0002 8944 371</td></tr>
+          <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">HDELSI22</td></tr>
+        </table>
+      </td>
+      <td style="width:50%;padding:18px 20px;vertical-align:top;">
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Faster</div>
+        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+          <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">BE55 9052 7486 2944</td></tr>
+          <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">TRWIBEB1XXX</td></tr>
+        </table>
+      </td>
+    </tr></table>
   </div>
   <!-- Reference notice -->
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
       <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
-      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}</td>
+      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${refCode}</td>
     </tr></table>
     <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
   </div>
-  <!-- CTA -->
+  <!-- CTA buttons -->
   <div style="padding:0 48px 32px;text-align:center;">
+    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">⚡ Pay Now with Wise</a>
+    <br><br>
     <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">View Order in My Account</a>
   </div>
   <!-- Footer -->
@@ -144,15 +149,11 @@ export async function sendPaymentReminderAction(orderId: string) {
         .select('*')
         .eq('order_id', orderId)
 
-    const billingCountry = ((order.billing_address as any)?.country || '').toUpperCase()
-    const isSlovenia = billingCountry === 'SI'
-    const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
-    const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'Delavska Hranilnica — Regular speed' : 'Wise — Faster'
-
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
     const totalFormatted = `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`
+    const refCode = order.order_number.replace('ETRG-ORD-', '').slice(-6)
+    const wisePayUrl = `https://wise.com/pay/business/initraenergijadoo?amount=${parseFloat(order.total || 0).toFixed(2)}&currency=${order.currency || 'EUR'}&description=${refCode}`
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#333333;background:#f3f4f6;margin:0;padding:40px 0;">
 <div style="max-width:640px;margin:0 auto;background:#ffffff;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);">
@@ -197,31 +198,40 @@ export async function sendPaymentReminderAction(orderId: string) {
       </td>
     </tr></table>
   </div>
-  <!-- Bank details -->
+  <!-- Bank details — both accounts -->
   <div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
     <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
       <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
-      <span style="font-size:11px;color:#6b7280;margin-left:14px;">Reference: <strong style="font-family:monospace;color:#1a2b3c;">${order.order_number}</strong></span>
     </div>
-    <div style="padding:18px 20px;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">${primaryBank}</div>
-      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${primaryIban}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${primaryBic}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Amount</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">${totalFormatted}</td></tr>
-      </table>
-    </div>
+    <table style="width:100%;border-collapse:collapse;"><tr>
+      <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Regular speed</div>
+        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+          <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">SI56 6100 0002 8944 371</td></tr>
+          <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">HDELSI22</td></tr>
+        </table>
+      </td>
+      <td style="width:50%;padding:18px 20px;vertical-align:top;">
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Faster</div>
+        <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+          <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">BE55 9052 7486 2944</td></tr>
+          <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">TRWIBEB1XXX</td></tr>
+        </table>
+      </td>
+    </tr></table>
   </div>
   <!-- Reference notice -->
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
       <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
-      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}</td>
+      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${refCode}</td>
     </tr></table>
     <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
   </div>
-  <!-- CTA -->
+  <!-- CTA buttons -->
   <div style="padding:0 48px 32px;text-align:center;">
+    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">⚡ Pay Now with Wise</a>
+    <br><br>
     <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">View Order in My Account</a>
   </div>
   <!-- Footer -->
@@ -383,6 +393,9 @@ export async function adminSendOrderToClientAction(orderId: string) {
             ? `<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;"><span style="color:#6b7280;">P.O. Number</span><span style="font-weight:600;color:#111;">${(order as any).po_number}</span></div>`
             : ''
 
+        const refCode = order.order_number.replace('ETRG-ORD-', '').slice(-6)
+        const wisePayLink = `<div style="text-align:center;margin-top:16px"><a href="https://wise.com/pay/business/initraenergijadoo?amount=${parseFloat(order.total || 0).toFixed(2)}&currency=${currency === '€' ? 'EUR' : currency}&description=${refCode}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Pay Now with Wise</a></div>`
+
         const html = await renderTemplate('order-resend', {
             name: customerName,
             order_number: order.order_number,
@@ -395,6 +408,8 @@ export async function adminSendOrderToClientAction(orderId: string) {
             vat_amount: `${currency} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
             total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
             order_url: orderUrl,
+            reference: `SI00 ${refCode}`,
+            wise_payment_link: wisePayLink,
         }, order.language || 'en')
 
         await sendEmail({
@@ -469,11 +484,44 @@ export async function confirmOrderAction(orderId: string) {
 
     if (error || !order) throw new Error('Order not found')
 
-    // 2. Notify Customer
+    // 2. Fetch order items for the email
+    const { data: orderItems } = await supabase
+        .from('order_items')
+        .select('*')
+        .eq('order_id', orderId)
+
+    const currency = order.currency || 'EUR'
+    const refCode = order.order_number.replace('ETRG-ORD-', '').slice(-6)
+    const locale = order.language || 'en'
+    const shipping = (order.shipping_address as any) || {}
+
+    // Build items HTML for the template
+    const itemsHtml = (orderItems || []).map((item: any) => `
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle;">
+                <span class="product-name">${item.product_name || item.sku}</span>
+                <span class="product-sku">${item.sku}</span>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; text-align: center;">${item.quantity}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #f3f4f6; text-align: right; font-weight: 600;">${currency} ${parseFloat(item.total_price || 0).toFixed(2)}</td>
+        </tr>
+    `).join('')
+
+    // Notify Customer with full data
     const html = await renderTemplate('order-confirmation', {
         order_number: order.order_number,
-        status: 'Confirmed & Processing'
-    }, order.language || 'en')
+        name: shipping.first_name || order.customer_email?.split('@')[0] || '',
+        order_date: new Date(order.created_at).toLocaleDateString(locale === 'sl' ? 'sl-SI' : locale === 'de' ? 'de-DE' : 'en-GB'),
+        payment_method: (order.payment_method || 'bank_transfer').replace(/_/g, ' '),
+        order_items: itemsHtml,
+        subtotal: `${currency} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
+        shipping_cost: parseFloat(order.shipping_cost || 0) === 0 ? 'FREE' : `${currency} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
+        vat_amount: `${currency} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
+        total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
+        status: 'Confirmed & Processing',
+        reference: `SI00 ${refCode}`,
+        wise_payment_link: `<div style="text-align:center;margin-top:16px"><a href="https://wise.com/pay/business/initraenergijadoo?amount=${parseFloat(order.total || 0).toFixed(2)}&currency=${currency}&description=${refCode}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Pay Now with Wise</a></div>`,
+    }, locale)
 
     await sendEmail({
         to: order.customer_email,

@@ -57,7 +57,8 @@
     "tigoProductSupport": "Suporte de produtos Tigo Energy",
     "tigoProductSupportDesc": "Ajuda técnica com produtos Tigo Energy",
     "onlineShopSupport": "Suporte da loja online",
-    "onlineShopSupportDesc": "Ajuda com encomendas e envios"
+    "onlineShopSupportDesc": "Ajuda com encomendas e envios",
+    "emptyCart": "Esvaziar carrinho"
   },
   "footer": {
     "products": "Produtos",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Ordem de compra (P.O.)",
     "poNumberOptional": "opcional",
-    "poNumberPlaceholder": "ex. PO-2024-001 ou nome do projeto"
+    "poNumberPlaceholder": "ex. PO-2024-001 ou nome do projeto",
+    "defaultShipping": "Envio padrão",
+    "viesRegisteredAddress": "Endereço registado VIES"
   },
   "subcategories": {
     "Optimization": "Otimização",
@@ -332,7 +335,12 @@
       "shipping": "Envio",
       "vat": "IVA",
       "total": "Total Pago",
-      "footerNote": "Pode acompanhar o estado da sua encomenda no seu Perfil de Conta."
+      "footerNote": "Pode acompanhar o estado da sua encomenda no seu Perfil de Conta.",
+      "paymentInstructions": "Instruções de pagamento",
+      "bankRegular": "Velocidade regular",
+      "bankFaster": "Mais rápido",
+      "paymentReference": "Referência de pagamento",
+      "payNowWise": "Pagar agora com Wise"
     },
     "orderPartial": {
       "title": "Encomenda Recebida",

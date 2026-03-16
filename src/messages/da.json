@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Product Support",
     "tigoProductSupportDesc": "Teknisk hjælp med Tigo produkter",
     "onlineShopSupport": "Online Shop Support",
-    "onlineShopSupportDesc": "Hjælp med ordrer og forsendelse"
+    "onlineShopSupportDesc": "Hjælp med ordrer og forsendelse",
+    "emptyCart": "Tøm kurv"
   },
   "footer": {
     "products": "Produkter",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Indkøbsordre (P.O.)",
     "poNumberOptional": "valgfrit",
-    "poNumberPlaceholder": "f.eks. PO-2024-001 eller projektnavn"
+    "poNumberPlaceholder": "f.eks. PO-2024-001 eller projektnavn",
+    "defaultShipping": "Standard levering",
+    "viesRegisteredAddress": "VIES-registreret adresse"
   },
   "subcategories": {
     "Optimization": "Optimering",
@@ -332,7 +335,12 @@
       "shipping": "Forsendelse",
       "vat": "Moms",
       "total": "I alt betalt",
-      "footerNote": "Du kan spore din ordrestatus i din kontoprofil."
+      "footerNote": "Du kan spore din ordrestatus i din kontoprofil.",
+      "paymentInstructions": "Betalingsinstruktioner",
+      "bankRegular": "Almindelig hastighed",
+      "bankFaster": "Hurtigere",
+      "paymentReference": "Betalingsreference",
+      "payNowWise": "Betal nu med Wise"
     },
     "orderPartial": {
       "title": "Ordre modtaget",

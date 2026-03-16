@@ -58,7 +58,8 @@
     "tigoProductSupport": "Tigo Energy podpora za izdelke",
     "tigoProductSupportDesc": "Tehnična pomoč za izdelke Tigo Energy",
     "onlineShopSupport": "Podpora spletne trgovine",
-    "onlineShopSupportDesc": "Pomoč pri naročilih in dostavi"
+    "onlineShopSupportDesc": "Pomoč pri naročilih in dostavi",
+    "emptyCart": "Izprazni košarico"
   },
   "footer": {
     "products": "Izdelki",
@@ -204,7 +205,9 @@
     "paymentWiseLabel": "Hitro plačilo (Wise, ApplePay, kreditne in debetne kartice)",
     "paymentWiseDesc": "Plačajte takoj prek Wise strani.",
     "paymentInvoiceLabel": "SEPA/SWIFT bančno nakazilo",
-    "paymentInvoiceDesc": "Predplačilo prek SEPA/Wire nakazila. Predračun bo izdan po oddaji naročila. Blago bo odposlano po potrditvi plačila."
+    "paymentInvoiceDesc": "Predplačilo prek SEPA/Wire nakazila. Predračun bo izdan po oddaji naročila. Blago bo odposlano po potrditvi plačila.",
+    "defaultShipping": "Privzeta dostava",
+    "viesRegisteredAddress": "VIES registrirani naslov"
   },
   "subcategories": {
     "Optimization": "Optimizacija",
@@ -341,7 +344,12 @@
       "shipping": "Dostava",
       "vat": "DDV",
       "total": "Skupaj plačano",
-      "footerNote": "Statusu naročila lahko sledite v svojem profilu računa."
+      "footerNote": "Statusu naročila lahko sledite v svojem profilu računa.",
+      "paymentInstructions": "Navodila za plačilo",
+      "bankRegular": "Običajna hitrost",
+      "bankFaster": "Hitrejše",
+      "paymentReference": "Referenca plačila",
+      "payNowWise": "Plačaj zdaj z Wise"
     },
     "orderPartial": {
       "title": "Naročilo prejeto",
@@ -755,7 +763,9 @@
     "uploading": "Nalaganje...",
     "yourUploads": "Vaše naložene datoteke",
     "uploadedOn": "Naloženo dne {date}",
-    "fileTypes": "Naložite lahko le datoteke PDF, JPG ali PNG."
+    "fileTypes": "Naložite lahko le datoteke PDF, JPG ali PNG.",
+    "setAsDefaultShipping": "Nastavi kot privzeti naslov za dostavo",
+    "setAsDefaultBilling": "Nastavi kot privzeti naslov za račun"
   },
   "staticPages": {
     "returns": {

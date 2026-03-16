@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Product Support",
     "tigoProductSupportDesc": "Техничка помош со Tigo производи",
     "onlineShopSupport": "Поддршка за онлајн продавница",
-    "onlineShopSupportDesc": "Помош со нарачки и испорака"
+    "onlineShopSupportDesc": "Помош со нарачки и испорака",
+    "emptyCart": "Испразни кошничка"
   },
   "footer": {
     "products": "Производи",
@@ -192,7 +193,9 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "defaultShipping": "Стандардна испорака",
+    "viesRegisteredAddress": "VIES регистрирана адреса"
   },
   "subcategories": {
     "Optimization": "Оптимизација",
@@ -329,7 +332,12 @@
       "shipping": "Испорака",
       "vat": "ДДВ",
       "total": "Вкупно платено",
-      "footerNote": "Можете да го следите статусот на вашата нарачка во вашиот Профил на сметка."
+      "footerNote": "Можете да го следите статусот на вашата нарачка во вашиот Профил на сметка.",
+      "paymentInstructions": "Инструкции за плаќање",
+      "bankRegular": "Редовна брзина",
+      "bankFaster": "Побрзо",
+      "paymentReference": "Референца за плаќање",
+      "payNowWise": "Платете сега со Wise"
     },
     "orderPartial": {
       "title": "Нарачката е примена",

@@ -64,7 +64,7 @@ export const BANK_SECTION = `<div style="margin:0 48px 32px;background:#f9fafb;b
   </div>
   <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Delavska Hranilnica d.d. &mdash; Slovenia</div>
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Regular speed</div>
       <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
         <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
@@ -72,7 +72,7 @@ export const BANK_SECTION = `<div style="margin:0 48px 32px;background:#f9fafb;b
       </table>
     </td>
     <td style="width:50%;padding:18px 20px;vertical-align:top;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Wise (TransferWise) &mdash; International</div>
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">Faster</div>
       <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
         <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
@@ -195,19 +195,20 @@ ${BILL_SHIP(
 )}
 <div style="padding:32px 48px;">
   <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">Items to Pack</div>
-  <table style="width:100%;border-collapse:collapse;font-size:11px;">
-    <thead>
-      <tr style="border-bottom:2px solid #1a2b3c;">
-        <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:5%;">No.</th>
-        <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:50%;">Product Description</th>
-        <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:20%;">SKU / Article</th>
-        <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:10%;">Qty</th>
-        <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:15%;">Checked &#10003;</th>
+  {packing_items_table}
+  <div style="margin-top:20px;padding:14px 18px;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="padding:4px 0;font-weight:700;">Total Parcels / Boxes:</td>
+        <td style="padding:4px 0;text-align:right;font-size:18px;font-weight:900;">{total_boxes}</td>
       </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div style="margin-top:28px;padding:14px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;color:#6b7280;">
+      <tr>
+        <td style="padding:4px 0;font-weight:700;">Total Weight:</td>
+        <td style="padding:4px 0;text-align:right;font-size:18px;font-weight:900;">{total_weight}</td>
+      </tr>
+    </table>
+  </div>
+  <div style="margin-top:16px;padding:14px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;color:#6b7280;">
     Please verify all items before sealing the package. Report discrepancies to <strong>{company_email}</strong>.
   </div>
 </div>
@@ -331,14 +332,14 @@ proforma_invoice: `${WRAP_START}
       </div>
     </td>
     <td style="vertical-align:top;text-align:right;width:42%;">
-      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">Proforma Invoice</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;margin:4px 0 18px;">Not a tax document</div>
+      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">{proforma_title}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;margin:4px 0 18px;">{proforma_subtitle}</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.5);">{invoice_number}</div>
     </td>
   </tr></table>
 </div>
 <div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:12px 48px;font-size:11px;color:#92400e;">
-  <strong>Note:</strong> This Proforma Invoice is provided for payment purposes only. A VAT invoice will be issued upon shipment. Goods are dispatched upon receipt of full payment.
+  <strong>{proforma_note_label}</strong> {proforma_note_text}
 </div>
 ${META_ROW([
     { label: 'Date', value: '{invoice_date}' },

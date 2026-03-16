@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy toodete tugi",
     "tigoProductSupportDesc": "Tehniline abi Tigo Energy toodetega",
     "onlineShopSupport": "Veebipoe tugi",
-    "onlineShopSupportDesc": "Abi tellimuste ja tarnimisega"
+    "onlineShopSupportDesc": "Abi tellimuste ja tarnimisega",
+    "emptyCart": "Tühjenda ostukorv"
   },
   "footer": {
     "products": "Tooted",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Ostutellimus (P.O.)",
     "poNumberOptional": "valikuline",
-    "poNumberPlaceholder": "nt. PO-2024-001 või projekti nimi"
+    "poNumberPlaceholder": "nt. PO-2024-001 või projekti nimi",
+    "defaultShipping": "Vaikimisi tarne",
+    "viesRegisteredAddress": "VIES-registreeritud aadress"
   },
   "subcategories": {
     "Optimization": "Optimeerimine",
@@ -332,7 +335,12 @@
       "shipping": "Tarne",
       "vat": "KM",
       "total": "Kokku tasutud",
-      "footerNote": "Saate oma tellimuse olekut jälgida oma konto profiilis."
+      "footerNote": "Saate oma tellimuse olekut jälgida oma konto profiilis.",
+      "paymentInstructions": "Maksjuhised",
+      "bankRegular": "Tavaline kiirus",
+      "bankFaster": "Kiirem",
+      "paymentReference": "Makse viide",
+      "payNowWise": "Maksa nüüd Wise'iga"
     },
     "orderPartial": {
       "title": "Tellimus kätte saadud",

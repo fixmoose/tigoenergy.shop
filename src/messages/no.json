@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy produktstøtte",
     "tigoProductSupportDesc": "Teknisk hjelp med Tigo Energy-produkter",
     "onlineShopSupport": "Nettbutikk-støtte",
-    "onlineShopSupportDesc": "Hjelp med bestillinger og levering"
+    "onlineShopSupportDesc": "Hjelp med bestillinger og levering",
+    "emptyCart": "Tøm handlekurv"
   },
   "footer": {
     "products": "Produkter",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Innkjøpsordre (P.O.)",
     "poNumberOptional": "valgfritt",
-    "poNumberPlaceholder": "f.eks. PO-2024-001 eller prosjektnavn"
+    "poNumberPlaceholder": "f.eks. PO-2024-001 eller prosjektnavn",
+    "defaultShipping": "Standard levering",
+    "viesRegisteredAddress": "VIES-registrert adresse"
   },
   "subcategories": {
     "Optimization": "Optimalisering",
@@ -332,7 +335,12 @@
       "shipping": "Frakt",
       "vat": "MVA",
       "total": "Totalt betalt",
-      "footerNote": "Du kan spore bestillingsstatusen din i din kontoprofil."
+      "footerNote": "Du kan spore bestillingsstatusen din i din kontoprofil.",
+      "paymentInstructions": "Betalingsinstruksjoner",
+      "bankRegular": "Vanlig hastighet",
+      "bankFaster": "Raskere",
+      "paymentReference": "Betalingsreferanse",
+      "payNowWise": "Betal nå med Wise"
     },
     "orderPartial": {
       "title": "Bestilling mottatt",

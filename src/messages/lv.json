@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy produktu atbalsts",
     "tigoProductSupportDesc": "Tehniskā palīdzība ar Tigo Energy produktiem",
     "onlineShopSupport": "Tiešsaistes veikala atbalsts",
-    "onlineShopSupportDesc": "Palīdzība ar pasūtījumiem un piegādi"
+    "onlineShopSupportDesc": "Palīdzība ar pasūtījumiem un piegādi",
+    "emptyCart": "Iztukšot grozu"
   },
   "footer": {
     "products": "Produkti",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Pirkuma pasūtījums (P.O.)",
     "poNumberOptional": "neobligāts",
-    "poNumberPlaceholder": "piem. PO-2024-001 vai projekta nosaukums"
+    "poNumberPlaceholder": "piem. PO-2024-001 vai projekta nosaukums",
+    "defaultShipping": "Noklusējuma piegāde",
+    "viesRegisteredAddress": "VIES reģistrēta adrese"
   },
   "subcategories": {
     "Optimization": "Optimizācija",
@@ -332,7 +335,12 @@
       "shipping": "Piegāde",
       "vat": "PVN",
       "total": "Kopā apmaksai",
-      "footerNote": "Jūs varat izsekot sava pasūtījuma statusam savā konta profilā."
+      "footerNote": "Jūs varat izsekot sava pasūtījuma statusam savā konta profilā.",
+      "paymentInstructions": "Maksājuma instrukcijas",
+      "bankRegular": "Parastais ātrums",
+      "bankFaster": "Ātrāk",
+      "paymentReference": "Maksājuma atsauce",
+      "payNowWise": "Maksāt tagad ar Wise"
     },
     "orderPartial": {
       "title": "Pasūtījums saņemts",

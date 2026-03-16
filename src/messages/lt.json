@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy produktų palaikymas",
     "tigoProductSupportDesc": "Techninė pagalba su Tigo Energy produktais",
     "onlineShopSupport": "Internetinės parduotuvės pagalba",
-    "onlineShopSupportDesc": "Pagalba su užsakymais ir pristatymu"
+    "onlineShopSupportDesc": "Pagalba su užsakymais ir pristatymu",
+    "emptyCart": "Ištuštinti krepšelį"
   },
   "footer": {
     "products": "Produktai",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Pirkimo užsakymas (P.O.)",
     "poNumberOptional": "neprivaloma",
-    "poNumberPlaceholder": "pvz. PO-2024-001 arba projekto pavadinimas"
+    "poNumberPlaceholder": "pvz. PO-2024-001 arba projekto pavadinimas",
+    "defaultShipping": "Numatytasis pristatymas",
+    "viesRegisteredAddress": "VIES registruotas adresas"
   },
   "subcategories": {
     "Optimization": "Optimizavimas",
@@ -332,7 +335,12 @@
       "shipping": "Pristatymas",
       "vat": "PVM",
       "total": "Iš viso sumokėta",
-      "footerNote": "Savo užsakymo būseną galite sekti savo paskyros profilyje."
+      "footerNote": "Savo užsakymo būseną galite sekti savo paskyros profilyje.",
+      "paymentInstructions": "Mokėjimo instrukcijos",
+      "bankRegular": "Įprastas greitis",
+      "bankFaster": "Greitesnis",
+      "paymentReference": "Mokėjimo nuoroda",
+      "payNowWise": "Mokėti dabar per Wise"
     },
     "orderPartial": {
       "title": "Užsakymas gautas",

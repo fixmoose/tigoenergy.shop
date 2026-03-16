@@ -319,7 +319,8 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 total_amount: `EUR ${grandTotal.toFixed(2)}`,
                 payment_method: String(rawData.payment_method || 'invoice'),
                 items_table: generateItemsTableHtml(orderItemsData, 'EUR'),
-                reference: `SI00 ${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}`
+                reference: `SI00 ${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}`,
+                wise_payment_link: `<div style="text-align:center;margin-top:16px"><a href="https://wise.com/pay/business/initraenergijadoo?amount=${grandTotal.toFixed(2)}&currency=EUR&description=${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Pay Now with Wise</a></div>`
             }
 
             // Try to get dynamic template from DB

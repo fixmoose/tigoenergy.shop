@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy termék támogatás",
     "tigoProductSupportDesc": "Műszaki segítség Tigo termékekhez",
     "onlineShopSupport": "Online áruház támogatás",
-    "onlineShopSupportDesc": "Segítség rendelésekkel és szállítással"
+    "onlineShopSupportDesc": "Segítség rendelésekkel és szállítással",
+    "emptyCart": "Kosár ürítése"
   },
   "footer": {
     "products": "Termékek",
@@ -195,7 +196,9 @@
     "selectCountry": "Select Country",
     "poNumber": "Rendelésszám (P.O.)",
     "poNumberOptional": "nem kötelező",
-    "poNumberPlaceholder": "pl. PO-2024-001 vagy projekt neve"
+    "poNumberPlaceholder": "pl. PO-2024-001 vagy projekt neve",
+    "defaultShipping": "Alapértelmezett szállítás",
+    "viesRegisteredAddress": "VIES-ben bejegyzett cím"
   },
   "subcategories": {
     "Optimization": "Optimalizálás",
@@ -332,7 +335,12 @@
       "shipping": "Szállítás",
       "vat": "ÁFA",
       "total": "Összesen fizetve",
-      "footerNote": "Rendelése állapotát nyomon követheti Fiókprofiljában."
+      "footerNote": "Rendelése állapotát nyomon követheti Fiókprofiljában.",
+      "paymentInstructions": "Fizetési utasítások",
+      "bankRegular": "Normál sebesség",
+      "bankFaster": "Gyorsabb",
+      "paymentReference": "Fizetési referencia",
+      "payNowWise": "Fizessen most a Wise-szal"
     },
     "orderPartial": {
       "title": "Rendelés beérkezett",

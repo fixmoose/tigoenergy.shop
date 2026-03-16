@@ -81,6 +81,32 @@ export default function AddressBook({ customer }: Props) {
         if (!error) setAddresses(updatedAddresses)
     }
 
+    const handleSetDefaultShipping = async (id: string) => {
+        const updatedAddresses = addresses.map(a => ({
+            ...a,
+            isDefaultShipping: a.id === id,
+        }))
+        const { error } = await supabase
+            .from('customers')
+            .update({ addresses: updatedAddresses, updated_at: new Date().toISOString() })
+            .eq('id', customer.id)
+
+        if (!error) setAddresses(updatedAddresses)
+    }
+
+    const handleSetDefaultBilling = async (id: string) => {
+        const updatedAddresses = addresses.map(a => ({
+            ...a,
+            isDefaultBilling: a.id === id,
+        }))
+        const { error } = await supabase
+            .from('customers')
+            .update({ addresses: updatedAddresses, updated_at: new Date().toISOString() })
+            .eq('id', customer.id)
+
+        if (!error) setAddresses(updatedAddresses)
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -127,9 +153,39 @@ export default function AddressBook({ customer }: Props) {
                             </div>
                         </div>
 
-                        <div className="mt-4 flex gap-2">
-                            {addr.isDefaultShipping && <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-semibold">{t('defaultShipping')}</span>}
-                            {addr.isDefaultBilling && <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-semibold">{t('billing')}</span>}
+                        <div className="mt-4 flex gap-2 flex-wrap">
+                            <button
+                                onClick={() => handleSetDefaultShipping(addr.id)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                                    addr.isDefaultShipping
+                                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                                        : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200'
+                                }`}
+                                title={addr.isDefaultShipping ? t('defaultShipping') : t('setAsDefaultShipping')}
+                            >
+                                {addr.isDefaultShipping ? (
+                                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                ) : (
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /></svg>
+                                )}
+                                {t('defaultShipping')}
+                            </button>
+                            <button
+                                onClick={() => handleSetDefaultBilling(addr.id)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                                    addr.isDefaultBilling
+                                        ? 'bg-gray-200 text-gray-700 border border-gray-300'
+                                        : 'bg-gray-50 text-gray-400 border border-gray-200 hover:bg-gray-100 hover:text-gray-600 hover:border-gray-300'
+                                }`}
+                                title={addr.isDefaultBilling ? t('billing') : t('setAsDefaultBilling')}
+                            >
+                                {addr.isDefaultBilling ? (
+                                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                ) : (
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /></svg>
+                                )}
+                                {t('billing')}
+                            </button>
                         </div>
                     </div>
                 ))}

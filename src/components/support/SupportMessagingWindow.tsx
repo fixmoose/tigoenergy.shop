@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { sendSupportOTP, verifySupportOTP, submitSupportRequestV2, addMessageToSupportRequest, getSupportMessages } from '@/app/actions/support_v2'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
+import { createClient } from '@/lib/supabase/client'
 
 interface Props {
     type?: 'shipping' | 'return' | 'general' | 'sales'
@@ -28,6 +29,20 @@ export default function SupportMessagingWindow({ type = 'general', title, orderI
     const [error, setError] = useState('')
     const [savedToken, setSavedToken] = useState<string | null>(null)
     const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
+
+    // Skip email/OTP for logged-in users
+    useEffect(() => {
+        const supabase = createClient()
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user?.email) {
+                setEmail(user.email)
+                setName(user.user_metadata?.full_name || user.user_metadata?.name || '')
+                setStep('message')
+                // Get a recaptcha token for submission
+                executeRecaptcha('SUPPORT').then(token => setSavedToken(token)).catch(() => {})
+            }
+        })
+    }, [])
 
     const handleSendOTP = async () => {
         setLoading(true)

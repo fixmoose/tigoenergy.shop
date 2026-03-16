@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
@@ -23,6 +23,70 @@ interface AdminOrderActionsProps {
     modificationUnlocked?: boolean
 }
 
+type FlowStep = 'received' | 'confirm' | 'payment' | 'packing' | 'shipping' | 'delivered' | 'invoice'
+
+function StepCard({ step, currentStep, children, title, subtitle, icon, color }: {
+    step: FlowStep
+    currentStep: FlowStep
+    children: React.ReactNode
+    title: string
+    subtitle: string
+    icon: string
+    color: string
+}) {
+    const stepOrder: FlowStep[] = ['received', 'confirm', 'payment', 'packing', 'shipping', 'delivered', 'invoice']
+    const stepIdx = stepOrder.indexOf(step)
+    const currentIdx = stepOrder.indexOf(currentStep)
+    const isCompleted = stepIdx < currentIdx
+    const isActive = stepIdx === currentIdx
+    const isFuture = stepIdx > currentIdx
+
+    const colorMap: Record<string, { border: string, text: string, bg: string }> = {
+        slate: { border: 'border-slate-200', text: 'text-slate-700', bg: 'bg-slate-50' },
+        green: { border: 'border-green-300', text: 'text-green-800', bg: 'bg-green-50' },
+        amber: { border: 'border-amber-300', text: 'text-amber-800', bg: 'bg-amber-50' },
+        blue: { border: 'border-blue-300', text: 'text-blue-800', bg: 'bg-blue-50' },
+        red: { border: 'border-red-300', text: 'text-red-800', bg: 'bg-red-50' },
+        indigo: { border: 'border-indigo-300', text: 'text-indigo-800', bg: 'bg-indigo-50' },
+        purple: { border: 'border-purple-300', text: 'text-purple-800', bg: 'bg-purple-50' },
+    }
+    const c = colorMap[color] || colorMap.slate
+
+    if (isCompleted) {
+        return (
+            <div className="rounded-xl border border-green-200 bg-green-50/50 p-3 opacity-70">
+                <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">&#10003;</span>
+                    <span className="text-xs font-bold text-green-700 uppercase tracking-wider">{title}</span>
+                    <span className="text-[10px] text-green-600 ml-auto">{subtitle}</span>
+                </div>
+            </div>
+        )
+    }
+
+    if (isFuture) {
+        return (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-3 opacity-40">
+                <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">{icon}</span>
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</span>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className={`rounded-xl border-2 ${c.border} ${c.bg} p-4 shadow-sm`}>
+            <div className="flex items-center gap-2 mb-2">
+                <span className={`w-6 h-6 rounded-full ${c.bg} ${c.text} flex items-center justify-center text-xs font-bold animate-pulse border-2 ${c.border} flex-shrink-0`}>{icon}</span>
+                <span className={`text-xs font-bold ${c.text} uppercase tracking-wider`}>{title}</span>
+            </div>
+            <p className={`text-[10px] ${c.text} opacity-70 ml-8 mb-3`}>{subtitle}</p>
+            <div className="ml-8">{children}</div>
+        </div>
+    )
+}
+
 export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
@@ -35,6 +99,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const [payNotes, setPayNotes] = useState('')
     const [payments, setPayments] = useState<OrderPayment[]>([])
     const [paymentsLoaded, setPaymentsLoaded] = useState(false)
+    const [driverEmail, setDriverEmail] = useState('')
+    const [showDriverForm, setShowDriverForm] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -49,7 +115,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const remainingMs = Math.max(0, (2 * 60 * 60 * 1000) - diffMs)
 
     const formatTime = (ms: number) => {
-        const hours = Math.floor(ms / (3600000))
+        const hours = Math.floor(ms / 3600000)
         const minutes = Math.floor((ms % 3600000) / 60000)
         const seconds = Math.floor((ms % 60000) / 1000)
         return `${hours}h ${minutes}m ${seconds}s`
@@ -58,22 +124,29 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const isWithin2h = diffHours < 2
     const isPending = status === 'pending'
     const isConfirmed = !!confirmedAt || status !== 'pending'
+    const isPaid = paymentStatus === 'paid'
+    const isShipped = status === 'shipped'
+    const isDelivered = status === 'delivered' || status === 'completed'
+
+    const getCurrentStep = (): FlowStep => {
+        if (isPending && !confirmedAt) return 'confirm'
+        if (!isPaid) return 'payment'
+        if (!packingSlipUrl) return 'packing'
+        if (!isShipped && !isDelivered) return 'shipping'
+        if (isShipped && !isDelivered) return 'delivered'
+        return 'invoice'
+    }
+
+    const currentStep = getCurrentStep()
 
     const handleConfirm = async () => {
-        if (isWithin2h && !confirm('The 2-hour cancellation window for the customer has not expired yet. Are you sure you want to confirm now?')) {
-            return
-        }
-
+        if (isWithin2h && !confirm('The 2-hour cancellation window has not expired yet. Confirm now?')) return
         setLoading(true)
         try {
             const { error } = await supabase
                 .from('orders')
-                .update({
-                    status: 'processing',
-                    confirmed_at: new Date().toISOString()
-                })
+                .update({ status: 'processing', confirmed_at: new Date().toISOString() })
                 .eq('id', orderId)
-
             if (error) throw error
             router.refresh()
         } catch (err) {
@@ -87,31 +160,19 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const handleShipOrder = async (carrier: 'GLS' | 'DPD') => {
         setLoading(true)
         try {
-            // Only generate mock data for GLS for now
             const mockTrackingNumber = carrier === 'GLS' ? `GLS${Math.floor(Math.random() * 1000000000)}` : ''
-            const mockTrackingUrl = carrier === 'GLS'
-                ? `https://gls-group.eu/EU/en/track-trace?match=${mockTrackingNumber}`
-                : ''
-
+            const mockTrackingUrl = carrier === 'GLS' ? `https://gls-group.eu/EU/en/track-trace?match=${mockTrackingNumber}` : ''
             const res = await fetch(`/api/admin/orders/${orderId}/ship`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    carrier,
-                    trackingNumber: mockTrackingNumber,
-                    trackingUrl: mockTrackingUrl
-                })
+                body: JSON.stringify({ carrier, trackingNumber: mockTrackingNumber, trackingUrl: mockTrackingUrl })
             })
-
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to process shipping')
-
-            // If DPD, the server returns the real tracking info in the order state or response
-            // For now, the API returns { ok: true }
-            alert(`${carrier} shipment processed successfully.\nConfirmation email sent to customer.`)
+            alert(`${carrier} shipment processed. Email sent to customer.`)
             router.refresh()
         } catch (err: any) {
-            console.error('Error shipping order:', err)
+            console.error('Error shipping:', err)
             alert(err.message || 'Failed to process shipping.')
         } finally {
             setLoading(false)
@@ -121,45 +182,24 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const handleUploadDoc = async (e: React.ChangeEvent<HTMLInputElement>, type: 'invoice' | 'packing_slip' | 'delivery_note') => {
         const file = e.target.files?.[0]
         if (!file) return
-
         setUploadingDoc(type)
         try {
             const fileName = `${type}_${orderId}_${Date.now()}.${file.name.split('.').pop()}`
             const filePath = `orders/${orderId}/${fileName}`
-
-            const { error: uploadError } = await supabase.storage
-                .from('invoices')
-                .upload(filePath, file)
-
+            const { error: uploadError } = await supabase.storage.from('invoices').upload(filePath, file)
             if (uploadError) throw uploadError
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('invoices')
-                .getPublicUrl(filePath)
-
-            // Update order record
+            const { data: { publicUrl } } = supabase.storage.from('invoices').getPublicUrl(filePath)
             const updates: any = {}
-            if (type === 'invoice') {
-                updates.invoice_url = publicUrl
-                updates.invoice_created_at = new Date().toISOString()
-            } else if (type === 'packing_slip') {
-                updates.packing_slip_url = publicUrl
-            } else if (type === 'delivery_note') {
-                updates.shipping_label_url = publicUrl
-            }
-
-            const { error: updateError } = await supabase
-                .from('orders')
-                .update(updates)
-                .eq('id', orderId)
-
+            if (type === 'invoice') { updates.invoice_url = publicUrl; updates.invoice_created_at = new Date().toISOString() }
+            else if (type === 'packing_slip') { updates.packing_slip_url = publicUrl }
+            else if (type === 'delivery_note') { updates.shipping_label_url = publicUrl }
+            const { error: updateError } = await supabase.from('orders').update(updates).eq('id', orderId)
             if (updateError) throw updateError
-
-            alert(`${type.replace('_', ' ')} uploaded successfully.`)
+            alert(`${type.replace('_', ' ')} uploaded.`)
             router.refresh()
         } catch (err: any) {
             console.error('Upload error:', err)
-            alert('Failed to upload document: ' + err.message)
+            alert('Failed: ' + err.message)
         } finally {
             setUploadingDoc(null)
         }
@@ -175,8 +215,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             } else {
                 alert(res.error || 'Failed to issue invoice')
             }
-        } catch (err: any) {
-            console.error('Error issuing invoice:', err)
+        } catch {
             alert('Failed to issue invoice')
         } finally {
             setLoading(false)
@@ -184,451 +223,285 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     }
 
     const handleMarkDelivered = async () => {
-        if (!confirm('Mark this order as delivered and notify the customer?')) return
+        if (!confirm('Mark as delivered and notify customer?')) return
         setLoading(true)
         try {
             const res = await adminMarkDeliveredAction(orderId)
-            if (res.success) {
-                router.refresh()
-            } else {
-                alert(res.error || 'Failed to mark as delivered')
-            }
-        } catch (err: any) {
-            alert('Failed to mark as delivered')
-        } finally {
-            setLoading(false)
-        }
+            if (res.success) { router.refresh() } else { alert(res.error || 'Failed') }
+        } catch { alert('Failed to mark as delivered') } finally { setLoading(false) }
     }
 
     if (status === 'cancelled') return null
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
-            <h3 className="font-semibold text-slate-800">Order Management</h3>
+        <div className="bg-white rounded-xl shadow-sm border p-5">
+            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                <span className="text-blue-500">&#9889;</span> Order Flow
+            </h3>
 
-            {isPending && !confirmedAt ? (
-                <div className="space-y-4">
-                    {isWithin2h && (
-                        <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-800">
-                            <p className="font-medium flex items-center gap-2">
-                                <span className="animate-pulse">⏳</span> Cancellation window active
-                            </p>
-                            <p className="text-xs mt-1">
-                                Customer can still cancel for another <span className="font-bold">{formatTime(remainingMs)}</span>.
-                            </p>
-                        </div>
-                    )}
-                    <button
-                        onClick={handleConfirm}
-                        disabled={loading}
-                        className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50 shadow-lg shadow-green-100"
-                    >
-                        {loading ? 'Processing...' : 'Confirm Order'}
-                    </button>
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-100">
-                        <span>✓</span> Order Confirmed {confirmedAt && `at ${new Date(confirmedAt).toLocaleString()}`}
-                    </div>
+            <div className="space-y-3">
+                {/* Step 1: Order Received */}
+                <StepCard step="received" currentStep={currentStep} title="Order Received" subtitle={createdAt ? new Date(createdAt).toLocaleDateString('en-GB') : ''} icon="1" color="slate">
+                    <span />
+                </StepCard>
 
-                    {/* Unlock for Customer Modification */}
-                    {modificationUnlocked ? (
-                        <div className="flex items-center gap-2 text-sm text-amber-700 font-medium bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">
-                            <span>🔓</span> Unlocked for customer modification
-                        </div>
-                    ) : (
-                        <button
-                            onClick={async () => {
-                                if (!confirm('Allow the customer to modify this order? They will be able to convert it back to a cart and re-order.')) return
-                                setLoading(true)
-                                try {
-                                    const res = await adminUnlockOrder(orderId)
-                                    if (res.success) {
-                                        alert('Order unlocked for modification.')
-                                        router.refresh()
-                                    } else {
-                                        alert('Failed: ' + res.error)
-                                    }
-                                } catch (err: any) {
-                                    alert('Failed: ' + err.message)
-                                } finally {
-                                    setLoading(false)
-                                }
-                            }}
-                            disabled={loading}
-                            className="w-full py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl font-bold text-sm hover:bg-amber-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            <span>🔓</span> Unlock for Customer Modification
-                        </button>
-                    )}
-
-                    {/* Send to Client */}
-                    <div className="pt-1 space-y-2">
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Order Document</p>
-                        <a
-                            href={`/api/orders/${orderId}/proforma`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full py-2.5 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-800 transition flex items-center justify-center gap-2 text-sm"
-                        >
-                            <span>📄</span> Download Order Confirmation
-                        </a>
-                        <button
-                            onClick={async () => {
-                                if (!confirm(`Send order summary email to ${customerEmail || 'customer'}?`)) return
-                                setLoading(true)
-                                try {
-                                    const res = await adminSendOrderToClientAction(orderId)
-                                    if (res.success) {
-                                        alert('Order sent to client successfully.')
-                                        router.refresh()
-                                    } else {
-                                        alert('Failed: ' + res.error)
-                                    }
-                                } catch (err: any) {
-                                    alert('Failed: ' + err.message)
-                                } finally {
-                                    setLoading(false)
-                                }
-                            }}
-                            disabled={loading}
-                            className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
-                        >
-                            <span>✉️</span> {loading ? 'Sending...' : 'Send to Client'}
-                            {sendCount > 0 && (
-                                <span className="ml-1 bg-indigo-800 text-indigo-200 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                                    ×{sendCount}
-                                </span>
-                            )}
-                        </button>
-                        {sendCount > 0 && (
-                            <p className="text-[10px] text-center text-slate-400">
-                                Sent to {customerEmail || 'client'} {sendCount} time{sendCount !== 1 ? 's' : ''}
-                            </p>
+                {/* Step 2: Confirm Order */}
+                <StepCard step="confirm" currentStep={currentStep} title="Confirm Order" subtitle="Check stock, pricing & accuracy" icon="2" color="green">
+                    <div className="space-y-2">
+                        {isWithin2h && isPending && (
+                            <div className="bg-amber-100 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+                                <span className="animate-pulse">&#9203;</span> Customer can cancel for <strong>{formatTime(remainingMs)}</strong>
+                            </div>
                         )}
-                    </div>
-
-                    {(status === 'processing' || status === 'shipped') && (
-                        <div className="space-y-6">
-                            {/* Step 2: Packing */}
-                            <div className={`p-4 rounded-xl border-2 transition-all ${!packingSlipUrl ? 'border-amber-200 bg-amber-50' : 'border-slate-100 bg-white opacity-60'}`}>
-                                <h4 className="text-xs font-black uppercase text-amber-700 mb-2 flex items-center gap-2">
-                                    <span>📦</span> Step 2: Packing
-                                </h4>
-                                <p className="text-[10px] text-amber-600 mb-3 font-medium">Generate the packing slip to start preparing the items in the warehouse.</p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
-                                        className="flex-1 py-2 bg-white border border-amber-300 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-100 transition"
-                                    >
-                                        Generate & View Slip
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Step 3: Shipping */}
-                            <div className={`p-4 rounded-xl border-2 transition-all ${status === 'processing' ? 'border-blue-200 bg-blue-50' : 'border-slate-100 bg-white opacity-60'}`}>
-                                <h4 className="text-xs font-black uppercase text-blue-700 mb-2 flex items-center gap-2">
-                                    <span>🚚</span> Step 3: Shipping
-                                </h4>
-                                <p className="text-[10px] text-blue-600 mb-3 font-medium">Create the official DPD shipping label and notify the customer.</p>
-                                <button
-                                    onClick={() => handleShipOrder('DPD')}
-                                    disabled={loading || status === 'shipped'}
-                                    className="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition disabled:opacity-50 shadow-lg shadow-red-100 flex items-center justify-center gap-2"
-                                >
-                                    <span>🏷️</span> Process DPD Label
-                                </button>
-                                {shippingLabelUrl && (
-                                    <a href={shippingLabelUrl} target="_blank" className="block text-center mt-2 text-[10px] font-bold text-red-600 hover:underline">
-                                        View Generated Label PDF
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {(status === 'shipped' || status === 'delivered' || status === 'completed') && (
-                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
-                            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Shipping Tools</p>
-                            <div className="flex flex-col gap-2">
-                                <button className="text-left text-sm text-blue-600 hover:underline flex items-center gap-2">
-                                    <span>📄</span> Re-print Shipping Label
-                                </button>
-                                <button className="text-left text-sm text-blue-600 hover:underline flex items-center gap-2">
-                                    <span>✉️</span> Re-email Label to Customer
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {(status === 'shipped' || status === 'delivered' || status === 'completed' || status === 'processing') && (
-                        <div className="pt-2 space-y-2">
-                            <button
-                                onClick={handleIssueInvoice}
-                                disabled={loading}
-                                className="w-full py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <span>📄</span> {loading ? 'Wait...' : 'Issue Official Invoice'}
-                            </button>
-                            {status === 'shipped' && (
-                                <button
-                                    onClick={handleMarkDelivered}
-                                    disabled={loading}
-                                    className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    <span>✅</span> {loading ? 'Wait...' : 'Mark as Delivered & Notify Customer'}
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Payment Section */}
-                    <div className="pt-4 border-t">
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Payment</p>
-
-                        {/* Payment status summary */}
-                        <div className={`rounded-lg p-3 mb-3 text-sm ${
-                            paymentStatus === 'paid' ? 'bg-green-50 border border-green-200 text-green-800' :
-                            paymentStatus === 'partially_paid' ? 'bg-amber-50 border border-amber-200 text-amber-800' :
-                            'bg-red-50 border border-red-200 text-red-700'
-                        }`}>
-                            <div className="flex justify-between items-center">
-                                <span className="font-medium">
-                                    {paymentStatus === 'paid' ? '✓ Paid in full' :
-                                     paymentStatus === 'partially_paid' ? '◐ Partially paid' :
-                                     '○ Unpaid'}
-                                </span>
-                                <span className="font-bold">
-                                    €{(amountPaid || 0).toFixed(2)} / €{(orderTotal || 0).toFixed(2)}
-                                </span>
-                            </div>
-                            {paymentStatus === 'partially_paid' && (
-                                <div className="mt-1 text-xs">
-                                    Remaining: <span className="font-bold">€{(orderTotal - (amountPaid || 0)).toFixed(2)}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Payment history */}
-                        {!paymentsLoaded ? (
+                        <button onClick={handleConfirm} disabled={loading} className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                            {loading ? 'Processing...' : 'Confirm Order'}
+                        </button>
+                        {modificationUnlocked ? (
+                            <div className="text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">Unlocked for customer modification</div>
+                        ) : !isConfirmed && (
                             <button
                                 onClick={async () => {
-                                    const res = await getOrderPaymentsAction(orderId)
-                                    if (res.success) setPayments(res.data as OrderPayment[])
-                                    setPaymentsLoaded(true)
+                                    if (!confirm('Allow customer to modify this order?')) return
+                                    setLoading(true)
+                                    try {
+                                        const res = await adminUnlockOrder(orderId)
+                                        if (res.success) { alert('Unlocked.'); router.refresh() } else { alert('Failed: ' + res.error) }
+                                    } catch (err: any) { alert('Failed: ' + err.message) } finally { setLoading(false) }
                                 }}
-                                className="text-xs text-blue-600 hover:underline mb-2"
-                            >
-                                Show payment history
-                            </button>
-                        ) : payments.length > 0 ? (
-                            <div className="mb-3 space-y-1.5">
-                                {payments.map(p => (
-                                    <div key={p.id} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2 text-xs border">
-                                        <div>
-                                            <span className="font-bold text-green-700">€{Number(p.amount).toFixed(2)}</span>
-                                            <span className="text-slate-400 mx-1">•</span>
-                                            <span className="text-slate-600">{new Date(p.payment_date).toLocaleDateString('en-GB')}</span>
-                                            <span className="text-slate-400 mx-1">•</span>
-                                            <span className="text-slate-500">{p.payment_method}</span>
-                                            {p.reference && <span className="text-slate-400 ml-1">({p.reference})</span>}
-                                        </div>
-                                        <button
-                                            onClick={async () => {
-                                                if (!confirm('Delete this payment record?')) return
-                                                const res = await adminDeletePaymentAction(p.id, orderId)
-                                                if (res.success) {
-                                                    setPayments(prev => prev.filter(x => x.id !== p.id))
-                                                    router.refresh()
-                                                } else {
-                                                    alert('Failed: ' + res.error)
-                                                }
-                                            }}
-                                            className="text-red-400 hover:text-red-600 font-bold ml-2"
-                                            title="Delete payment"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-xs text-slate-400 mb-2">No payments recorded yet.</p>
+                                disabled={loading}
+                                className="w-full py-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg font-semibold hover:bg-amber-100 transition disabled:opacity-50"
+                            >Unlock for Modification</button>
                         )}
+                    </div>
+                </StepCard>
 
-                        {/* Record Payment button / form */}
+                {/* Step 3: Payment */}
+                <StepCard step="payment" currentStep={currentStep} title="Payment" subtitle="Send payment request & confirm receipt" icon="3" color="amber">
+                    <div className="space-y-2">
+                        <div className={`rounded-lg px-3 py-2 text-xs font-medium flex justify-between items-center ${
+                            paymentStatus === 'paid' ? 'bg-green-100 border border-green-200 text-green-800' :
+                            paymentStatus === 'partially_paid' ? 'bg-amber-100 border border-amber-200 text-amber-800' :
+                            'bg-red-100 border border-red-200 text-red-700'
+                        }`}>
+                            <span>{paymentStatus === 'paid' ? '&#10003; Paid' : paymentStatus === 'partially_paid' ? '&#9680; Partial' : '&#9675; Unpaid'}</span>
+                            <span className="font-bold">&euro;{(amountPaid || 0).toFixed(2)} / &euro;{(orderTotal || 0).toFixed(2)}</span>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={async () => {
+                                    if (!confirm(`Send order to ${customerEmail}?`)) return
+                                    setLoading(true)
+                                    try {
+                                        const res = await adminSendOrderToClientAction(orderId)
+                                        if (res.success) { alert('Sent.'); router.refresh() } else { alert('Failed: ' + res.error) }
+                                    } catch (err: any) { alert('Failed: ' + err.message) } finally { setLoading(false) }
+                                }}
+                                disabled={loading}
+                                className="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition disabled:opacity-50"
+                            >
+                                Send to Client{sendCount > 0 && <span className="ml-1 bg-indigo-800 text-indigo-200 text-[9px] px-1.5 py-0.5 rounded-full">&times;{sendCount}</span>}
+                            </button>
+                            {paymentStatus !== 'paid' && (
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm('Send payment request email?')) return
+                                        setLoading(true)
+                                        try { await adminSendOrderForPaymentAction(orderId); alert('Sent.') }
+                                        catch (err: any) { alert('Failed: ' + err.message) } finally { setLoading(false) }
+                                    }}
+                                    disabled={loading}
+                                    className="flex-1 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600 transition disabled:opacity-50"
+                                >Payment Request</button>
+                            )}
+                        </div>
+
                         {paymentStatus !== 'paid' && !showPaymentForm && (
                             <button
                                 onClick={() => {
                                     setPayAmount(((orderTotal || 0) - (amountPaid || 0)).toFixed(2))
                                     setPayDate(new Date().toISOString().split('T')[0])
                                     setShowPaymentForm(true)
+                                    if (!paymentsLoaded) {
+                                        getOrderPaymentsAction(orderId).then(res => {
+                                            if (res.success) setPayments(res.data as OrderPayment[])
+                                            setPaymentsLoaded(true)
+                                        })
+                                    }
                                 }}
-                                className="w-full py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm mb-2"
-                            >
-                                <span>💰</span> Record Payment
-                            </button>
+                                className="w-full py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition"
+                            >Record Payment</button>
                         )}
 
                         {showPaymentForm && (
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3 mb-2">
-                                <p className="text-xs font-bold text-green-800 uppercase">Record Payment</p>
+                            <div className="bg-white border border-green-200 rounded-lg p-3 space-y-2">
+                                {paymentsLoaded && payments.length > 0 && (
+                                    <div className="space-y-1 mb-2">
+                                        {payments.map(p => (
+                                            <div key={p.id} className="flex items-center justify-between bg-slate-50 rounded px-2 py-1.5 text-[10px] border">
+                                                <div>
+                                                    <span className="font-bold text-green-700">&euro;{Number(p.amount).toFixed(2)}</span>
+                                                    <span className="text-slate-400 mx-1">&middot;</span>
+                                                    <span className="text-slate-600">{new Date(p.payment_date).toLocaleDateString('en-GB')}</span>
+                                                    <span className="text-slate-400 mx-1">&middot;</span>
+                                                    <span className="text-slate-500">{p.payment_method}</span>
+                                                    {p.reference && <span className="text-slate-400 ml-1">({p.reference})</span>}
+                                                </div>
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!confirm('Delete this payment?')) return
+                                                        const res = await adminDeletePaymentAction(p.id, orderId)
+                                                        if (res.success) { setPayments(prev => prev.filter(x => x.id !== p.id)); router.refresh() }
+                                                        else { alert('Failed: ' + res.error) }
+                                                    }}
+                                                    className="text-red-400 hover:text-red-600 font-bold ml-2"
+                                                >&#10005;</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="text-[10px] text-slate-500 font-bold uppercase">Amount (€)</label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            value={payAmount}
-                                            onChange={e => setPayAmount(e.target.value)}
-                                            className="w-full border rounded-lg px-3 py-2 text-sm"
-                                        />
+                                        <label className="text-[9px] text-slate-500 font-bold uppercase">Amount</label>
+                                        <input type="number" step="0.01" value={payAmount} onChange={e => setPayAmount(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs" />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] text-slate-500 font-bold uppercase">Date</label>
-                                        <input
-                                            type="date"
-                                            value={payDate}
-                                            onChange={e => setPayDate(e.target.value)}
-                                            className="w-full border rounded-lg px-3 py-2 text-sm"
-                                        />
+                                        <label className="text-[9px] text-slate-500 font-bold uppercase">Date</label>
+                                        <input type="date" value={payDate} onChange={e => setPayDate(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs" />
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Method</label>
-                                    <select
-                                        value={payMethod}
-                                        onChange={e => setPayMethod(e.target.value)}
-                                        className="w-full border rounded-lg px-3 py-2 text-sm"
-                                    >
-                                        <option value="bank_transfer">Bank Transfer</option>
-                                        <option value="wise">Wise</option>
-                                        <option value="stripe">Stripe</option>
-                                        <option value="cash">Cash</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Reference (optional)</label>
-                                    <input
-                                        type="text"
-                                        value={payReference}
-                                        onChange={e => setPayReference(e.target.value)}
-                                        placeholder="Transaction ID or bank ref"
-                                        className="w-full border rounded-lg px-3 py-2 text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] text-slate-500 font-bold uppercase">Notes (optional)</label>
-                                    <input
-                                        type="text"
-                                        value={payNotes}
-                                        onChange={e => setPayNotes(e.target.value)}
-                                        placeholder="Any notes"
-                                        className="w-full border rounded-lg px-3 py-2 text-sm"
-                                    />
-                                </div>
+                                <select value={payMethod} onChange={e => setPayMethod(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs">
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="wise">Wise</option>
+                                    <option value="stripe">Stripe</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <input type="text" value={payReference} onChange={e => setPayReference(e.target.value)} placeholder="Reference (optional)" className="w-full border rounded px-2 py-1.5 text-xs" />
                                 <div className="flex gap-2">
                                     <button
                                         onClick={async () => {
                                             const amt = parseFloat(payAmount)
-                                            if (!amt || amt <= 0) { alert('Enter a valid amount'); return }
+                                            if (!amt || amt <= 0) { alert('Enter valid amount'); return }
                                             setLoading(true)
                                             try {
                                                 const res = await adminRecordPaymentAction(orderId, amt, payDate, payMethod, payReference, payNotes)
-                                                if (res.success) {
-                                                    setShowPaymentForm(false)
-                                                    setPayReference('')
-                                                    setPayNotes('')
-                                                    setPaymentsLoaded(false)
-                                                    router.refresh()
-                                                } else {
-                                                    alert('Failed: ' + res.error)
-                                                }
-                                            } finally {
-                                                setLoading(false)
-                                            }
+                                                if (res.success) { setShowPaymentForm(false); setPayReference(''); setPayNotes(''); setPaymentsLoaded(false); router.refresh() }
+                                                else { alert('Failed: ' + res.error) }
+                                            } finally { setLoading(false) }
                                         }}
                                         disabled={loading}
-                                        className="flex-1 py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50"
-                                    >
-                                        {loading ? 'Saving...' : 'Confirm Payment'}
-                                    </button>
-                                    <button
-                                        onClick={() => setShowPaymentForm(false)}
-                                        className="px-4 py-2 bg-white border rounded-lg text-sm text-slate-600 hover:bg-slate-50"
-                                    >
-                                        Cancel
-                                    </button>
+                                        className="flex-1 py-1.5 bg-green-600 text-white rounded text-xs font-bold hover:bg-green-700 disabled:opacity-50"
+                                    >{loading ? 'Saving...' : 'Confirm'}</button>
+                                    <button onClick={() => setShowPaymentForm(false)} className="px-3 py-1.5 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Send payment request to customer */}
-                        {paymentStatus !== 'paid' && (
-                            <button
-                                onClick={async () => {
-                                    if (!confirm('Send a payment request email to the customer with order details and IBAN instructions?')) return
-                                    setLoading(true)
-                                    try {
-                                        await adminSendOrderForPaymentAction(orderId)
-                                        alert('Payment request sent to customer.')
-                                    } catch (err: any) {
-                                        alert('Failed: ' + err.message)
-                                    } finally {
-                                        setLoading(false)
-                                    }
-                                }}
-                                disabled={loading}
-                                className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
-                            >
-                                <span>✉️</span> {loading ? 'Sending...' : 'Send Payment Request to Customer'}
-                            </button>
+                        <a href={`/api/orders/${orderId}/proforma`} target="_blank" rel="noopener noreferrer"
+                            className="block w-full py-1.5 text-center bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">
+                            Download Proforma
+                        </a>
+                    </div>
+                </StepCard>
+
+                {/* Step 4: Packing */}
+                <StepCard step="packing" currentStep={currentStep} title="Packing" subtitle="Generate packing slip & prepare items" icon="4" color="blue">
+                    <button onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
+                        className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition">
+                        Generate Packing Slip
+                    </button>
+                </StepCard>
+
+                {/* Step 5: Shipping */}
+                <StepCard step="shipping" currentStep={currentStep} title="Shipping" subtitle="Create DPD label & notify customer" icon="5" color="red">
+                    <div className="space-y-2">
+                        <button onClick={() => handleShipOrder('DPD')} disabled={loading}
+                            className="w-full py-2.5 bg-red-600 text-white rounded-lg font-bold text-sm hover:bg-red-700 transition disabled:opacity-50">
+                            {loading ? 'Processing...' : 'Process DPD Label'}
+                        </button>
+                        {shippingLabelUrl && (
+                            <a href={shippingLabelUrl} target="_blank" className="block text-center text-[10px] font-bold text-red-600 hover:underline">View Label PDF</a>
                         )}
                     </div>
+                </StepCard>
 
-                    <div className="pt-4 border-t space-y-3">
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Manual Uploads</p>
+                {/* Step 6: Delivery */}
+                <StepCard step="delivered" currentStep={currentStep} title="Delivery" subtitle="Confirm delivery by DPD, driver portal, or manually" icon="6" color="green">
+                    <div className="space-y-2">
+                        <button onClick={handleMarkDelivered} disabled={loading}
+                            className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                            {loading ? 'Processing...' : 'Mark as Delivered (Manual)'}
+                        </button>
 
-                        <div className="flex flex-col gap-2">
-                            <label className="flex flex-col">
-                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Invoice</span>
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleUploadDoc(e, 'invoice')}
-                                    disabled={!!uploadingDoc}
-                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                />
-                                {uploadingDoc === 'invoice' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
-                            </label>
-
-                            <label className="flex flex-col">
-                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Packing Slip</span>
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleUploadDoc(e, 'packing_slip')}
-                                    disabled={!!uploadingDoc}
-                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
-                                />
-                                {uploadingDoc === 'packing_slip' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
-                            </label>
-
-                            <label className="flex flex-col">
-                                <span className="text-[10px] text-slate-400 font-bold uppercase ml-1">Delivery Note</span>
-                                <input
-                                    type="file"
-                                    onChange={(e) => handleUploadDoc(e, 'delivery_note')}
-                                    disabled={!!uploadingDoc}
-                                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"
-                                />
-                                {uploadingDoc === 'delivery_note' && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
-                            </label>
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                            <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or send to driver</span></div>
                         </div>
+
+                        {!showDriverForm ? (
+                            <button onClick={() => setShowDriverForm(true)}
+                                className="w-full py-2 bg-slate-700 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition">
+                                Send Dobavnica to Driver
+                            </button>
+                        ) : (
+                            <div className="bg-white border border-slate-200 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] font-bold text-slate-500 uppercase">Driver will receive a link to collect signature digitally</p>
+                                <input
+                                    type="email"
+                                    value={driverEmail}
+                                    onChange={e => setDriverEmail(e.target.value)}
+                                    placeholder="driver@email.com"
+                                    className="w-full border rounded px-3 py-2 text-sm"
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            if (!driverEmail) { alert('Enter driver email'); return }
+                                            setLoading(true)
+                                            try {
+                                                const res = await adminSendDeliveryToDriverAction(orderId, driverEmail)
+                                                if (res.success) { alert('Delivery link sent to driver!'); setShowDriverForm(false) }
+                                                else { alert('Failed: ' + res.error) }
+                                            } catch (err: any) { alert('Failed: ' + err.message) }
+                                            finally { setLoading(false) }
+                                        }}
+                                        disabled={loading}
+                                        className="flex-1 py-2 bg-slate-700 text-white rounded text-xs font-bold hover:bg-slate-800 disabled:opacity-50"
+                                    >{loading ? 'Sending...' : 'Send Link'}</button>
+                                    <button onClick={() => setShowDriverForm(false)} className="px-3 py-2 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
+                </StepCard>
+
+                {/* Step 7: Invoice & Compliance */}
+                <StepCard step="invoice" currentStep={currentStep} title="Invoice & Compliance" subtitle="Issue invoice, trigger OEEE / Intrastat" icon="7" color="purple">
+                    <div className="space-y-2">
+                        <button onClick={handleIssueInvoice} disabled={loading}
+                            className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700 transition disabled:opacity-50">
+                            {loading ? 'Wait...' : 'Issue Official Invoice'}
+                        </button>
+                        <p className="text-[10px] text-slate-500">After invoice: OEEE (SI domestic) or Intrastat (EU) triggered automatically.</p>
+                    </div>
+                </StepCard>
+            </div>
+
+            {/* Manual Uploads */}
+            <details className="mt-4 border-t pt-3">
+                <summary className="text-[10px] font-bold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-600">Manual Uploads</summary>
+                <div className="mt-2 flex flex-col gap-2">
+                    {(['invoice', 'packing_slip', 'delivery_note'] as const).map(type => (
+                        <label key={type} className="flex flex-col">
+                            <span className="text-[9px] text-slate-400 font-bold uppercase ml-1">{type.replace(/_/g, ' ')}</span>
+                            <input type="file" onChange={(e) => handleUploadDoc(e, type)} disabled={!!uploadingDoc}
+                                className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100" />
+                            {uploadingDoc === type && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
+                        </label>
+                    ))}
                 </div>
-            )}
+            </details>
         </div>
     )
 }

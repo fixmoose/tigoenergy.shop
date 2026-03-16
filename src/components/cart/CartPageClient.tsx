@@ -126,7 +126,7 @@ export default function CartPageClient() {
             </div>
           )}
 
-          {/* Saved Carts Section (Only if logged in) */}
+          {/* Saved Carts — integrated into the same view */}
           {user && <SavedCartsList />}
         </div>
 

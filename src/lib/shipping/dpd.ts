@@ -25,7 +25,8 @@ export interface DPDShipmentResponse {
 
 export interface OrderItem {
     sku: string;
-    name: string;
+    name?: string;
+    product_name?: string;
     quantity: number;
     weight_kg: number;
 }
@@ -61,8 +62,8 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
     let otherWeight = 0;
 
     items.forEach(item => {
-        const name = item.name.toUpperCase();
-        const sku = item.sku.toUpperCase();
+        const name = (item.name || item.product_name || '').toUpperCase();
+        const sku = (item.sku || '').toUpperCase();
         const weight = Number(item.weight_kg);
 
         // Classify items

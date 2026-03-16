@@ -57,7 +57,8 @@
     "tigoProductSupport": "Tigo Energy подршка за производе",
     "tigoProductSupportDesc": "Техничка помоћ за Tigo Energy производе",
     "onlineShopSupport": "Подршка за online продавницу",
-    "onlineShopSupportDesc": "Помоћ са поруџбинама и испоруком"
+    "onlineShopSupportDesc": "Помоћ са поруџбинама и испоруком",
+    "emptyCart": "Испразни корпу"
   },
   "footer": {
     "products": "Производи",
@@ -192,7 +193,9 @@
     "guestName": "Name (First, Last and/or Company)",
     "sameAsCompanyAddress": "Same as company address",
     "lockedByVat": "Locked by VAT",
-    "selectCountry": "Select Country"
+    "selectCountry": "Select Country",
+    "defaultShipping": "Подразумевана испорука",
+    "viesRegisteredAddress": "VIES регистрована адреса"
   },
   "subcategories": {
     "Optimization": "Оптимизација",
@@ -329,7 +332,12 @@
       "shipping": "Испорака",
       "vat": "ПДВ",
       "total": "Укупно плаћено",
-      "footerNote": "Можете пратити статус своје поруџбине на свом профилу налога."
+      "footerNote": "Можете пратити статус своје поруџбине на свом профилу налога.",
+      "paymentInstructions": "Упутства за плаћање",
+      "bankRegular": "Редовна брзина",
+      "bankFaster": "Брже",
+      "paymentReference": "Референца плаћања",
+      "payNowWise": "Платите сада путем Wise"
     },
     "orderPartial": {
       "title": "Поруџбина примљена",

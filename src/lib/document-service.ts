@@ -25,9 +25,17 @@ export interface DocumentData {
     dispatch_date?: string
     place_of_issue?: string
     reference?: string
+    // Proforma localized labels
+    proforma_title?: string
+    proforma_subtitle?: string
+    proforma_note_label?: string
+    proforma_note_text?: string
     // Packing slip specific
     tracking_number?: string
     carrier_name?: string
+    packing_items_table?: string
+    total_boxes?: string
+    total_weight?: string
     // Company details (can be overridden)
     company_name?: string
     company_address?: string
@@ -117,6 +125,45 @@ export function replacePlaceholders(html: string, data: DocumentData) {
     })
 
     return result
+}
+
+export function generatePackingItemsTableHtml(items: any[]) {
+    let html = `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+            <tr style="border-bottom:2px solid #1a2b3c;">
+                <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:5%;">No.</th>
+                <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:35%;">Product Description</th>
+                <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:18%;">SKU / Article</th>
+                <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:8%;">Qty</th>
+                <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Unit Weight</th>
+                <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Total Weight</th>
+                <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:6%;">&#10003;</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    items.forEach((item, index) => {
+        const unitWeight = parseFloat(item.weight_kg || 0);
+        const totalWeight = unitWeight * item.quantity;
+
+        html += `<tr style="border-bottom:1px solid #f3f4f6;">
+                <td style="padding:14px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
+                <td style="padding:14px 12px;vertical-align:top;">
+                    <div style="font-size:12px;font-weight:600;color:#1a2b3c;">${item.product_name || item.name || ''}</div>
+                    <div style="font-size:9px;color:#9ca3af;margin-top:2px;">CN Code: ${item.cn_code || '85414300'}</div>
+                </td>
+                <td style="padding:14px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
+                <td style="padding:14px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
+                <td style="padding:14px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${unitWeight.toFixed(3)} kg</td>
+                <td style="padding:14px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${totalWeight.toFixed(3)} kg</td>
+                <td style="padding:14px 0;text-align:center;vertical-align:top;">
+                    <div style="width:16px;height:16px;border:2px solid #d1d5db;border-radius:3px;margin:0 auto;"></div>
+                </td>
+            </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    return html;
 }
 
 export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false) {

@@ -63,6 +63,35 @@ export async function GET(
         const validUntil = new Date(new Date(order.created_at).getTime() + 30 * 24 * 60 * 60 * 1000)
             .toLocaleDateString(lang === 'sl' ? 'sl-SI' : lang === 'hr' ? 'hr-HR' : lang === 'de' ? 'de-DE' : 'en-GB')
 
+        // Localized proforma labels
+        const proformaLabels: Record<string, { title: string; subtitle: string; noteLabel: string; noteText: string }> = {
+            sl: {
+                title: 'Predračun',
+                subtitle: 'Ni davčni dokument',
+                noteLabel: 'Opomba:',
+                noteText: 'Ta predračun je izdan zgolj za namene plačila. DDV račun bo izdan ob odpremi. Blago se odpremi po prejemu celotnega plačila.',
+            },
+            de: {
+                title: 'Proforma-Rechnung',
+                subtitle: 'Kein Steuerdokument',
+                noteLabel: 'Hinweis:',
+                noteText: 'Diese Proforma-Rechnung dient nur zu Zahlungszwecken. Eine MwSt.-Rechnung wird bei Versand ausgestellt. Die Ware wird nach Erhalt der vollständigen Zahlung versandt.',
+            },
+            hr: {
+                title: 'Predračun',
+                subtitle: 'Nije porezni dokument',
+                noteLabel: 'Napomena:',
+                noteText: 'Ovaj predračun je izdan samo u svrhu plaćanja. PDV račun će biti izdan pri otpremi. Roba se otprema po primitku cjelokupne uplate.',
+            },
+            en: {
+                title: 'Proforma Invoice',
+                subtitle: 'Not a tax document',
+                noteLabel: 'Note:',
+                noteText: 'This Proforma Invoice is provided for payment purposes only. A VAT invoice will be issued upon shipment. Goods are dispatched upon receipt of full payment.',
+            },
+        }
+        const pLabels = proformaLabels[lang] || proformaLabels.en
+
         const documentData: DocumentData = {
             order_number: order.order_number,
             order_date: orderDate,
@@ -87,7 +116,12 @@ export async function GET(
             due_date: validUntil,
             reference: `SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`,
             place_of_issue: 'Podsmreka',
-            dispatch_date: 'Upon payment',
+            dispatch_date: lang === 'sl' ? 'Po prejemu plačila' : 'Upon payment',
+            // Localized proforma labels
+            proforma_title: pLabels.title,
+            proforma_subtitle: pLabels.subtitle,
+            proforma_note_label: pLabels.noteLabel,
+            proforma_note_text: pLabels.noteText,
         }
 
         // Try DB template first, fall back to built-in
