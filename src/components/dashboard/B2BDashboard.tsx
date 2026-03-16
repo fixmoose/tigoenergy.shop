@@ -10,6 +10,7 @@ import PaymentMethods from './tabs/PaymentMethods'
 import Documentation from './tabs/Documentation'
 import MyOrders from './tabs/MyOrders'
 import B2BTerms from './tabs/B2BTerms'
+import { useTranslations } from 'next-intl'
 
 interface Props {
     user: User
@@ -18,6 +19,7 @@ interface Props {
 
 export default function B2BDashboard({ user, customer }: Props) {
     const [activeHash, setActiveHash] = useState('overview')
+    const t = useTranslations('dashboard')
 
     // Handle hash on mount
     useEffect(() => {
@@ -30,37 +32,37 @@ export default function B2BDashboard({ user, customer }: Props) {
 
     const TABS = [
         {
-            id: 'overview', label: 'Company Overview', icon: (
+            id: 'overview', label: t('b2bTabs.overview'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
             )
         },
         {
-            id: 'orders', label: 'Purchase History (Net)', icon: (
+            id: 'orders', label: t('b2bTabs.orders'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             )
         },
         {
-            id: 'profile', label: 'Business Profile', icon: (
+            id: 'profile', label: t('b2bTabs.profile'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             )
         },
         {
-            id: 'address', label: 'Logistics Addresses', icon: (
+            id: 'address', label: t('b2bTabs.address'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             )
         },
         {
-            id: 'terms', label: 'Commercial Contract', icon: (
+            id: 'terms', label: t('b2bTabs.terms'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             )
         },
         {
-            id: 'payment', label: 'Finance & Payments', icon: (
+            id: 'payment', label: t('b2bTabs.payment'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
             )
         },
         {
-            id: 'docs', label: 'Technical Docs', icon: (
+            id: 'docs', label: t('b2bTabs.docs'), icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             )
         },
@@ -115,8 +117,8 @@ export default function B2BDashboard({ user, customer }: Props) {
                             <span className="text-white font-black text-xl">{customer.company_name?.substring(0, 1).toUpperCase() || 'B'}</span>
                         </div>
                         <div className="text-center">
-                            <h3 className="font-bold text-gray-900 truncate">{customer.company_name || 'Business Partner'}</h3>
-                            <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">{customer.vat_id ? 'Verified B2B' : 'B2B Partner'}</p>
+                            <h3 className="font-bold text-gray-900 truncate">{customer.company_name || t('businessPartner')}</h3>
+                            <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">{customer.vat_id ? t('verifiedB2B') : t('b2bPartner')}</p>
                         </div>
                     </div>
                     <nav className="p-2 space-y-1">
@@ -140,42 +142,42 @@ export default function B2BDashboard({ user, customer }: Props) {
             <main className="flex-1 min-w-0 flex flex-col gap-12 pb-20">
                 <section id="overview" className="scroll-mt-[180px]">
                     <div className="mb-4 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Business Overview</h2>
-                        <span className="bg-blue-50 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter">B2B Terms Apply</span>
+                        <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('businessOverview')}</h2>
+                        <span className="bg-blue-50 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter">{t('b2bTermsApply')}</span>
                     </div>
                     <DashboardOverview user={user} customer={customer} />
                 </section>
 
                 <section id="orders" className="scroll-mt-[180px]">
                     <div className="mb-4 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Purchase History</h2>
-                        <span className="text-[10px] text-gray-400 font-medium">Net Pricing Model</span>
+                        <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('purchaseHistory')}</h2>
+                        <span className="text-[10px] text-gray-400 font-medium">{t('netPricingModel')}</span>
                     </div>
                     < MyOrders user={user} customer={customer} />
                 </section>
 
                 <section id="profile" className="scroll-mt-[180px]">
-                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Business Information</h2>
+                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('businessInfo')}</h2>
                     <ProfileSettings customer={customer} />
                 </section>
 
                 <section id="address" className="scroll-mt-[180px]">
-                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Logistics & Branches</h2>
+                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('logisticsBranches')}</h2>
                     <AddressBook customer={customer} />
                 </section>
 
                 <section id="terms" className="scroll-mt-[180px]">
-                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Legal Framework</h2>
+                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('legalFramework')}</h2>
                     <B2BTerms customer={customer} />
                 </section>
 
                 <section id="payment" className="scroll-mt-[180px]">
-                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Payment Information</h2>
+                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('paymentInfo')}</h2>
                     <PaymentMethods customer={customer} />
                 </section>
 
                 <section id="docs" className="scroll-mt-[180px]">
-                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">Resources</h2>
+                    <h2 className="mb-4 text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('resources')}</h2>
                     <Documentation customer={customer} />
                 </section>
             </main>

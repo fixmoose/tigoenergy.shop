@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Customer } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 interface Props {
     customer: Customer
@@ -16,6 +17,7 @@ interface UploadedDoc {
 }
 
 export default function Documentation({ customer }: Props) {
+    const t = useTranslations('dashboard')
     const agreedDate = new Date(customer.created_at || Date.now()).toLocaleDateString()
     const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([])
     const [uploading, setUploading] = useState(false)
@@ -57,24 +59,24 @@ export default function Documentation({ customer }: Props) {
     const DOCUMENTS = [
         {
             id: 'terms',
-            title: 'Terms & Conditions',
-            version: 'v2.4 (2025)',
+            title: t('termsConditions'),
+            version: t('termsVersion'),
             agreed: true,
-            desc: 'General terms of service for Tigo Energy Shop.'
+            desc: t('termsDesc')
         },
         {
             id: 'privacy',
-            title: 'Privacy Policy',
-            version: 'v1.2 (2024)',
+            title: t('privacyPolicy'),
+            version: t('privacyVersion'),
             agreed: true,
-            desc: 'How we handle and protect your personal data.'
+            desc: t('privacyDesc')
         },
         {
             id: 'sepa',
-            title: 'SEPA Mandate Template',
+            title: t('sepaTemplate'),
             version: 'v1.0',
             agreed: false,
-            desc: 'Blank template for SEPA Direct Debit authorization.'
+            desc: t('sepaTemplateDesc')
         }
     ]
 
@@ -108,7 +110,7 @@ export default function Documentation({ customer }: Props) {
                                 {doc.agreed && (
                                     <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded-full border border-green-100 flex items-center gap-1">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                        Agreed
+                                        {t('agreed')}
                                     </span>
                                 )}
                             </div>
@@ -117,8 +119,8 @@ export default function Documentation({ customer }: Props) {
 
                             {doc.agreed && (
                                 <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500 mb-4 border border-gray-100">
-                                    <p className="font-medium text-gray-700">Confirmation</p>
-                                    Customer accepted on: {agreedDate}
+                                    <p className="font-medium text-gray-700">{t('confirmation')}</p>
+                                    {t('customerAcceptedOn', { date: agreedDate })}
                                 </div>
                             )}
                         </div>
@@ -128,7 +130,7 @@ export default function Documentation({ customer }: Props) {
                             className="w-full border border-gray-200 text-gray-700 font-medium py-2.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center justify-center gap-2"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            Download PDF
+                            {t('downloadPdf')}
                         </button>
                     </div>
                 ))}
@@ -138,19 +140,19 @@ export default function Documentation({ customer }: Props) {
                     <div className="p-4 bg-gray-50 text-gray-400 rounded-full mb-4 group-hover:bg-green-50 group-hover:text-green-500 transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                     </div>
-                    <h3 className="font-bold text-gray-900 text-lg mb-2">Upload Document</h3>
-                    <p className="text-sm text-gray-500 mb-6">Scan and upload your signed SEPA mandate or other requested documents.</p>
+                    <h3 className="font-bold text-gray-900 text-lg mb-2">{t('uploadDocument')}</h3>
+                    <p className="text-sm text-gray-500 mb-6">{t('uploadDesc')}</p>
 
                     <label className={`cursor-pointer bg-gray-900 text-white px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-black transition-all w-full flex items-center justify-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         {uploading ? (
                             <>
                                 <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                Uploading...
+                                {t('uploading')}
                             </>
                         ) : (
                             <>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                Select File
+                                {t('selectFile')}
                             </>
                         )}
                         <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} accept=".pdf,.jpg,.png" />
@@ -162,7 +164,7 @@ export default function Documentation({ customer }: Props) {
             {uploadedDocs.length > 0 && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="p-4 bg-gray-50 border-b border-gray-100 font-bold text-gray-700">
-                        Your Uploads
+                        {t('yourUploads')}
                     </div>
                     <div className="divide-y divide-gray-50">
                         {uploadedDocs.map(doc => (
@@ -173,7 +175,7 @@ export default function Documentation({ customer }: Props) {
                                     </div>
                                     <div>
                                         <h4 className="font-medium text-gray-900">{doc.name}</h4>
-                                        <p className="text-xs text-gray-500">Uploaded on {doc.date}</p>
+                                        <p className="text-xs text-gray-500">{t('uploadedOn', { date: doc.date })}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">

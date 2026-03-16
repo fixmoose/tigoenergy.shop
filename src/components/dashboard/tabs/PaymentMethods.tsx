@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, DragEvent } from 'react'
 import { Customer } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 interface Props {
     customer: Customer
@@ -31,6 +32,7 @@ interface UploadedDoc {
 }
 
 export default function PaymentMethods({ customer }: Props) {
+    const t = useTranslations('dashboard')
     const [enabledMethods, setEnabledMethods] = useState<Record<MethodId, boolean>>({
         wise: false,
         iban: false
@@ -216,7 +218,7 @@ export default function PaymentMethods({ customer }: Props) {
     const METHODS: { id: MethodId, name: string, icon: any, desc: string, note?: string }[] = [
         {
             id: 'wise',
-            name: 'Quick Pay (Wise, ApplePay, Credit & Debit Cards)',
+            name: t('quickPay'),
             icon: (
                 <div className="flex -space-x-2">
                     <img src="/wise-logo.png" alt="Wise" className="w-10 h-10 object-contain bg-white rounded-full border border-gray-100 p-1 z-20" />
@@ -226,18 +228,18 @@ export default function PaymentMethods({ customer }: Props) {
                     </div>
                 </div>
             ),
-            desc: 'Pay instantly using Wise balance, ApplePay, or any Credit/Debit card.'
+            desc: t('quickPayDesc')
         },
         {
             id: 'iban',
-            name: 'IBAN Bank Transfer',
+            name: t('ibanTransfer'),
             icon: (
                 <svg className="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
                 </svg>
             ),
-            desc: 'Prepayment via Wise BE account. Proforma Invoice will be issued after placing an order. Goods will ship after payment confirmed on our side.',
-            note: 'Manual verification required'
+            desc: t('ibanTransferDesc'),
+            note: t('manualVerification')
         }
     ]
 
@@ -276,7 +278,7 @@ export default function PaymentMethods({ customer }: Props) {
                                 {methodDetails[method.id].connected && (
                                     <div className="mt-1 text-xs font-medium text-green-600 flex items-center gap-1">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                        Connected: {methodDetails[method.id].details}
+                                        {t('connected')}: {methodDetails[method.id].details}
                                     </div>
                                 )}
                             </div>
@@ -289,14 +291,14 @@ export default function PaymentMethods({ customer }: Props) {
                                         onClick={() => { setModal({ isOpen: true, type: method.id }); setTempInput(''); }}
                                         className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition whitespace-nowrap"
                                     >
-                                        {method.id === 'iban' ? 'View Details' : 'Connect'}
+                                        {method.id === 'iban' ? t('viewDetails') : t('connect')}
                                     </button>
                                 ) : (
                                     <button
                                         onClick={() => { setModal({ isOpen: true, type: method.id }); setTempInput(methodDetails[method.id].details || ''); }}
                                         className="text-sm text-gray-500 hover:text-gray-900 underline whitespace-nowrap"
                                     >
-                                        Manage
+                                        {t('manage')}
                                     </button>
                                 )}
 
@@ -309,7 +311,7 @@ export default function PaymentMethods({ customer }: Props) {
                                         className="w-4 h-4 text-green-600 focus:ring-green-500"
                                     />
                                     <span className={`text-sm font-medium ${preferredMethod === method.id ? 'text-green-700' : 'text-gray-500'}`}>
-                                        Preferred
+                                        {t('preferred')}
                                     </span>
                                 </label>
                             </div>
@@ -323,7 +325,7 @@ export default function PaymentMethods({ customer }: Props) {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl animate-in fade-in zoom-in-95 my-8">
                         <h3 className="text-xl font-bold mb-4">
-                            {modal.type === 'iban' ? 'Bank Transfer & SEPA Settings' : `Connect ${METHODS.find(m => m.id === modal.type)?.name}`}
+                            {modal.type === 'iban' ? t('bankTransferSettings') : `${t('connect')} ${METHODS.find(m => m.id === modal.type)?.name}`}
                         </h3>
 
 
@@ -565,14 +567,14 @@ export default function PaymentMethods({ customer }: Props) {
                                 onClick={() => setModal({ isOpen: false, type: null })}
                                 className="flex-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
                             >
-                                Cancel
+                                {t('cancel')}
                             </button>
                             {modal.type !== 'wise' && (
                                 <button
                                     onClick={handleSaveDetails}
                                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                                 >
-                                    {modal.type === 'iban' ? 'Save' : 'Save & Connect'}
+                                    {modal.type === 'iban' ? t('save') : t('saveAndConnect')}
                                 </button>
                             )}
                         </div>

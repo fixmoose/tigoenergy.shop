@@ -26,6 +26,7 @@ interface Props {
 
 export default function ProfileSettings({ customer }: Props) {
     const tGdpr = useTranslations('gdpr')
+    const t = useTranslations('dashboard')
     const supabase = createClient()
     const { currentCurrency, setCurrency } = useCurrency()
     const { market, currentLanguage, setLanguage } = useMarket()
@@ -93,7 +94,7 @@ export default function ProfileSettings({ customer }: Props) {
             console.error(profileResult.error || metaResult.error)
             alert('Failed to update profile.')
         } else {
-            setSuccess('Profile updated successfully!')
+            setSuccess(t('profileUpdated'))
             setTimeout(() => setSuccess(''), 3000)
         }
     }
@@ -176,13 +177,13 @@ export default function ProfileSettings({ customer }: Props) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                Personal Details
+                {t('personalDetails')}
             </h2>
 
             <div className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('firstName')}</label>
                         <input
                             className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                             value={formData.firstName}
@@ -190,7 +191,7 @@ export default function ProfileSettings({ customer }: Props) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('lastName')}</label>
                         <input
                             className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                             value={formData.lastName}
@@ -202,7 +203,7 @@ export default function ProfileSettings({ customer }: Props) {
                 <div className="grid md:grid-cols-2 gap-8 py-6 border-t border-gray-100">
                     <div>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-bold text-gray-900">Email Addresses</h3>
+                            <h3 className="text-sm font-bold text-gray-900">{t('emailAddresses')}</h3>
                             {contacts.filter(c => c.type === 'email').length < 2 && (
                                 <button onClick={() => setShowAddContact('email')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
                                     <PlusIcon className="w-5 h-5" />
@@ -240,7 +241,7 @@ export default function ProfileSettings({ customer }: Props) {
 
                     <div>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-bold text-gray-900">Phone Numbers</h3>
+                            <h3 className="text-sm font-bold text-gray-900">{t('phoneNumbers')}</h3>
                             {contacts.filter(c => c.type === 'phone').length < 2 && (
                                 <button onClick={() => setShowAddContact('phone')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
                                     <PlusIcon className="w-5 h-5" />
@@ -283,12 +284,12 @@ export default function ProfileSettings({ customer }: Props) {
                         <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
                             <div className="p-8">
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                    {verificationStep ? 'Verify ' : 'Add '} {showAddContact === 'email' ? 'Email' : 'Phone'}
+                                    {verificationStep ? t('verifyContact', { type: showAddContact === 'email' ? t('addEmail') : t('addPhone') }) : t('addContact', { type: showAddContact === 'email' ? t('addEmail') : t('addPhone') })}
                                 </h3>
                                 <p className="text-sm text-gray-500 mb-6">
                                     {verificationStep
-                                        ? `We sent a code to ${newContactValue}`
-                                        : `Enter your new ${showAddContact} and we'll send a code.`}
+                                        ? t('codeSentTo', { value: newContactValue })
+                                        : t('enterNewContact', { type: showAddContact || '' })}
                                 </p>
 
                                 {!verificationStep ? (
@@ -301,13 +302,13 @@ export default function ProfileSettings({ customer }: Props) {
                                             onChange={(e) => setNewContactValue(e.target.value)}
                                         />
                                         <div className="flex gap-3 pt-2">
-                                            <button onClick={() => setShowAddContact(null)} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">Cancel</button>
+                                            <button onClick={() => setShowAddContact(null)} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">{t('cancel')}</button>
                                             <button
                                                 onClick={handleAddContact}
                                                 disabled={loading || !newContactValue}
                                                 className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
                                             >
-                                                {loading ? 'Sending...' : 'Send Code'}
+                                                {loading ? t('sending') : t('sendCode')}
                                             </button>
                                         </div>
                                     </div>
@@ -321,13 +322,13 @@ export default function ProfileSettings({ customer }: Props) {
                                             onChange={(e) => setVerificationCode(e.target.value)}
                                         />
                                         <div className="flex gap-3 pt-2">
-                                            <button onClick={() => { setVerificationStep(false); setVerificationCode('') }} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">Back</button>
+                                            <button onClick={() => { setVerificationStep(false); setVerificationCode('') }} className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition">{t('back')}</button>
                                             <button
                                                 onClick={handleVerifyContact}
                                                 disabled={loading || verificationCode.length < 6}
                                                 className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
                                             >
-                                                {loading ? 'Verifying...' : 'Verify'}
+                                                {loading ? t('verifying') : t('verify')}
                                             </button>
                                         </div>
                                     </div>
@@ -340,7 +341,7 @@ export default function ProfileSettings({ customer }: Props) {
                 {customer.is_b2b && (
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('companyName')}</label>
                             <input
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                                 value={formData.company}
@@ -349,7 +350,7 @@ export default function ProfileSettings({ customer }: Props) {
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Company Website</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('companyWebsite')}</label>
                                 <input
                                     type="url"
                                     placeholder="https://..."
@@ -359,13 +360,13 @@ export default function ProfileSettings({ customer }: Props) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Number of Employees</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('numEmployees')}</label>
                                 <select
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                     value={formData.employees}
                                     onChange={(e) => setFormData({ ...formData, employees: e.target.value })}
                                 >
-                                    <option value="">Select...</option>
+                                    <option value="">{t('select')}</option>
                                     <option value="1-5">1–5</option>
                                     <option value="6-20">6–20</option>
                                     <option value="21-100">21–100</option>
@@ -379,7 +380,7 @@ export default function ProfileSettings({ customer }: Props) {
                 <div className="pt-6 border-t mt-2">
                     <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
-                        Regional Settings
+                        {t('regionalSettings')}
                     </h3>
 
                     {/* Market info (always shown) */}
@@ -395,7 +396,7 @@ export default function ProfileSettings({ customer }: Props) {
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Currency — editable only for picker markets */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('currency')}</label>
                             {market.hasCurrencyPicker ? (
                                 <select
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -415,14 +416,14 @@ export default function ProfileSettings({ customer }: Props) {
                             )}
                             <p className="mt-2 text-xs text-gray-500">
                                 {market.hasCurrencyPicker
-                                    ? 'Used for all price displays across the store.'
-                                    : `Currency is set by your market (${market.countryName}).`}
+                                    ? t('currencyDesc')
+                                    : t('currencyLockedDesc', { market: market.countryName })}
                             </p>
                         </div>
 
                         {/* Language — editable only for picker markets */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t('language')}</label>
                             {market.hasLanguagePicker ? (
                                 <select
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -446,24 +447,24 @@ export default function ProfileSettings({ customer }: Props) {
                             )}
                             <p className="mt-2 text-xs text-gray-500">
                                 {market.hasLanguagePicker
-                                    ? 'Selected language will be used for emails and documents.'
-                                    : `Language is set by your market (${market.countryName}).`}
+                                    ? t('languageDesc')
+                                    : t('languageLockedDesc', { market: market.countryName })}
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <div className="pt-2 border-t mt-2">
-                    <p className="text-xs text-gray-500 mb-4">Account Security & Actions</p>
+                    <p className="text-xs text-gray-500 mb-4">{t('accountSecurity')}</p>
                     <div className="flex flex-wrap gap-4 items-center">
-                        <button className="text-sm font-medium text-blue-600 hover:underline">Change Email</button>
+                        <button className="text-sm font-medium text-blue-600 hover:underline">{t('changeEmail')}</button>
                         <span className="text-gray-300">|</span>
-                        <button className="text-sm font-medium text-blue-600 hover:underline">Change Password</button>
+                        <button className="text-sm font-medium text-blue-600 hover:underline">{t('changePassword')}</button>
                         <span className="text-gray-300">|</span>
                         <button
                             onClick={async () => {
-                                if (confirm('Are you sure you want to delete your account?')) {
-                                    if (confirm('This action cannot be undone. All your data will be permanently removed. Are you REALLY sure?')) {
+                                if (confirm(t('deleteConfirm'))) {
+                                    if (confirm(t('deleteConfirmFinal'))) {
                                         const { deleteAccount } = await import('@/app/actions/user')
                                         const res = await deleteAccount()
                                         if (res?.success) {
@@ -475,7 +476,7 @@ export default function ProfileSettings({ customer }: Props) {
                             }}
                             className="text-sm font-bold text-red-600 hover:text-red-800 hover:underline"
                         >
-                            Delete Account
+                            {t('deleteAccount')}
                         </button>
                     </div>
 
@@ -502,7 +503,7 @@ export default function ProfileSettings({ customer }: Props) {
                         disabled={loading}
                         className="bg-gray-900 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-black transition disabled:opacity-50"
                     >
-                        {loading ? 'Saving...' : 'Update Profile'}
+                        {loading ? t('saving') : t('updateProfile')}
                     </button>
                     {success && <span className="text-green-600 font-medium text-sm animate-in fade-in">{success}</span>}
                 </div>
