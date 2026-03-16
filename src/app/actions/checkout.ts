@@ -354,7 +354,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                     <p><strong>Total:</strong> EUR ${grandTotal.toFixed(2)}</p>
                     <p><strong>Items:</strong></p>
                     <ul>${itemsListHtml}</ul>
-                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/orders/${order.id}">View Order in Admin</a></p>
+                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL}/admin/orders/${order.id}">View Order in Admin</a></p>
                 `,
             }).catch(err => console.error('Failed to send admin order notification:', err))
         } catch (emailErr) {

@@ -183,9 +183,76 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                             className="w-full text-sm font-bold text-gray-900 border-b border-gray-200 focus:border-blue-500 outline-none pb-1"
                         />
                     ) : (
-                        <p className="text-sm font-bold text-gray-900">{customer.vat_id || 'N/A'}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold text-gray-900">{customer.vat_id || 'N/A'}</p>
+                            {customer.vat_validated && (
+                                <span className="text-[9px] font-black bg-green-50 text-green-700 px-1.5 py-0.5 rounded border border-green-100 uppercase tracking-widest">VIES Verified</span>
+                            )}
+                        </div>
+                    )}
+                    {!isEditing && customer.vat_validated_at && (
+                        <p className="text-[10px] text-gray-400 mt-0.5">Validated: {new Date(customer.vat_validated_at).toLocaleDateString()}</p>
                     )}
                 </div>
+
+                {/* Registration & Compliance Info */}
+                {!isEditing && (
+                    <div className="pt-4 border-t border-gray-100 space-y-4">
+                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Registration Info</h4>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Account Type</label>
+                                <p className="text-sm font-bold text-gray-900">{customer.is_b2b ? 'B2B' : (customer.customer_type === 'guest' ? 'Guest' : 'B2C')}</p>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</label>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${customer.account_status === 'banned' ? 'bg-red-50 text-red-700' : customer.account_status === 'active' ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
+                                    {customer.account_status || 'pending'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {customer.terms_agreed_at && (
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Terms Agreed</label>
+                                <p className="text-sm font-bold text-green-700">{new Date(customer.terms_agreed_at).toLocaleString()}</p>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Newsletter</label>
+                                <p className="text-sm font-bold text-gray-900">{customer.newsletter_subscribed ? 'Subscribed' : 'No'}</p>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Marketing</label>
+                                <p className="text-sm font-bold text-gray-900">{customer.marketing_consent ? 'Opted In' : 'No'}</p>
+                            </div>
+                        </div>
+
+                        {(customer as any).preferred_language && (
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Language</label>
+                                <p className="text-sm font-bold text-gray-900 uppercase">{(customer as any).preferred_language}</p>
+                            </div>
+                        )}
+
+                        {customer.created_at && (
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Registered</label>
+                                <p className="text-sm font-bold text-gray-900">{new Date(customer.created_at).toLocaleString()}</p>
+                            </div>
+                        )}
+
+                        {customer.internal_notes && (
+                            <div>
+                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Internal Notes</label>
+                                <p className="text-sm text-gray-600 bg-yellow-50 p-2 rounded-lg border border-yellow-100 whitespace-pre-wrap">{customer.internal_notes}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {isEditing && (
                     <div className="pt-6 border-t border-gray-100">

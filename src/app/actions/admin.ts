@@ -37,7 +37,7 @@ export async function inviteAdminAction(email: string) {
         if (!await checkIsAdmin()) throw new Error('Unauthorized')
 
         const supabase = await createAdminClient()
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL
         if (!siteUrl) throw new Error('Site configuration error')
 
         const { data, error } = await supabase.auth.admin.generateLink({
@@ -360,7 +360,7 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
             }
         }
 
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL
         if (!siteUrl) throw new Error('Site configuration error')
 
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
@@ -878,7 +878,7 @@ export async function adminCreateOrderWithCustomerAction(payload: {
 
             // Send Password Setup Email
             try {
-                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
                 const { data: linkData } = await supabase.auth.admin.generateLink({
                     type: 'recovery',
                     email: customer.email,

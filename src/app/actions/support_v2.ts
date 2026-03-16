@@ -184,7 +184,7 @@ export async function submitSupportRequestV2(formData: {
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
                         ${escapeHtml(formData.message)}
                     </div>
-                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/support/${request.id}" 
+                    <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL}/admin/support/${request.id}" 
                           style="background: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View in Admin Dashboard
                     </a></p>

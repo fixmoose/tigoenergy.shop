@@ -8,7 +8,7 @@ import { createCustomer } from '@/app/actions/customers'
 import { adminCreateCustomerAction, adminUpdateCustomerAction, adminResetCustomerPasswordAction } from '@/app/actions/admin'
 import { createClient } from '@/lib/supabase/client'
 
-type Tab = 'guest' | 'b2c' | 'b2b'
+type Tab = 'all' | 'guest' | 'b2c' | 'b2b'
 
 interface CustomerListProps {
     customers: (Customer & { orders?: any[] })[]
@@ -58,7 +58,7 @@ interface UploadedDoc {
 
 export default function CustomerList({ customers }: CustomerListProps) {
     const supabase = createClient()
-    const [activeTab, setActiveTab] = useState<Tab>('b2c')
+    const [activeTab, setActiveTab] = useState<Tab>('all')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -160,7 +160,11 @@ export default function CustomerList({ customers }: CustomerListProps) {
     const [editData, setEditData] = useState<Partial<Customer>>({})
 
     // Filter Logic
-    const filteredCustomers = customers.filter(c => {
+    const sortedCustomers = [...customers].sort((a, b) =>
+        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+    )
+    const filteredCustomers = sortedCustomers.filter(c => {
+        if (activeTab === 'all') return true
         // Guest
         if (activeTab === 'guest') {
             return c.customer_type === 'guest'
@@ -289,6 +293,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
 
             {/* Tabs */}
             <div className="flex gap-1 mb-6 bg-slate-100 p-1 rounded-lg w-fit">
+                <button
+                    onClick={() => setActiveTab('all')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'all' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-600 hover:text-slate-800'
+                        }`}
+                >
+                    All Customers
+                </button>
                 <button
                     onClick={() => setActiveTab('guest')}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'guest' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-600 hover:text-slate-800'

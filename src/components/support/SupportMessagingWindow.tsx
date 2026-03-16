@@ -19,6 +19,10 @@ export default function SupportMessagingWindow({ type = 'general', title, orderI
     const [email, setEmail] = useState('')
     const [name, setName] = useState('')
     const [otp, setOtp] = useState('')
+    const [siteId, setSiteId] = useState('')
+    const [invoiceNumber, setInvoiceNumber] = useState('')
+    const [storePurchased, setStorePurchased] = useState('')
+    const [description, setDescription] = useState('')
     const [message, setMessage] = useState(prefillMessage || '')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -58,10 +62,20 @@ export default function SupportMessagingWindow({ type = 'general', title, orderI
         setLoading(true)
         setError('')
         try {
+            const metaLines = [
+                siteId && `Site ID: ${siteId}`,
+                invoiceNumber && `Invoice #: ${invoiceNumber}`,
+                storePurchased && `Store: ${storePurchased}`,
+                description && `Description: ${description}`,
+            ].filter(Boolean)
+            const fullMessage = metaLines.length > 0
+                ? `${metaLines.join('\n')}\n\n${message}`
+                : message
+
             await submitSupportRequestV2({
                 type,
                 subject: title || `Support Request from ${email}`,
-                message,
+                message: fullMessage,
                 email,
                 name,
                 recaptchaToken: savedToken as string
@@ -137,13 +151,49 @@ export default function SupportMessagingWindow({ type = 'general', title, orderI
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
                         <div className="text-sm text-gray-600 mb-2 font-medium">Help us identify you and describe your request.</div>
                         <input
-                            type="text" placeholder="Full Name"
+                            type="text" placeholder="Full Name *"
                             className="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
                             value={name} onChange={e => setName(e.target.value)}
                         />
+                        <div className="grid grid-cols-2 gap-3">
+                            <input
+                                type="text" placeholder="Site ID"
+                                className="p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none shadow-sm text-sm"
+                                value={siteId} onChange={e => setSiteId(e.target.value)}
+                            />
+                            <input
+                                type="text" placeholder="Invoice # / St. Racuna"
+                                className="p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none shadow-sm text-sm"
+                                value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)}
+                            />
+                        </div>
+                        <select
+                            className="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none shadow-sm text-sm text-gray-700"
+                            value={storePurchased} onChange={e => setStorePurchased(e.target.value)}
+                        >
+                            <option value="">Store purchased from...</option>
+                            <option value="tigoenergy.si">tigoenergy.si</option>
+                            <option value="tigoenergy.de">tigoenergy.de</option>
+                            <option value="tigoenergy.fr">tigoenergy.fr</option>
+                            <option value="tigoenergy.it">tigoenergy.it</option>
+                            <option value="tigoenergy.es">tigoenergy.es</option>
+                            <option value="tigoenergy.nl">tigoenergy.nl</option>
+                            <option value="tigoenergy.pl">tigoenergy.pl</option>
+                            <option value="tigoenergy.at">tigoenergy.at</option>
+                            <option value="tigoenergy.ch">tigoenergy.ch</option>
+                            <option value="tigoenergy.be">tigoenergy.be</option>
+                            <option value="tigoenergy.org.uk">tigoenergy.org.uk</option>
+                            <option value="tigoenergy.shop">tigoenergy.shop</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input
+                            type="text" placeholder="Brief description of the issue"
+                            className="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none shadow-sm text-sm"
+                            value={description} onChange={e => setDescription(e.target.value)}
+                        />
                         <textarea
-                            placeholder="How can we help?"
-                            className="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none h-36 shadow-sm"
+                            placeholder="How can we help? *"
+                            className="w-full p-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none h-28 shadow-sm"
                             value={message} onChange={e => setMessage(e.target.value)}
                         />
                         <button

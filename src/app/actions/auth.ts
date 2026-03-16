@@ -64,7 +64,7 @@ export async function registerUserAction(formData: any) {
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Country:</strong> ${country || '—'}</p>
                 <p><strong>Type:</strong> B2C</p>
-                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View Customer in Admin</a></p>
+                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL}/admin/customers/${user.id}">View Customer in Admin</a></p>
             `,
         }).catch(err => console.error('Failed to send admin registration notification:', err))
 
@@ -204,7 +204,7 @@ export async function registerB2BUserAction(formData: any) {
                 <p><strong>Email:</strong> ${email}</p>
                 <p><strong>Country:</strong> ${country}</p>
                 <p><strong>Business Type:</strong> ${businessType}</p>
-                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL}/admin/customers/${user.id}">View in Admin</a></p>
+                <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL}/admin/customers/${user.id}">View in Admin</a></p>
             `,
         }).catch(err => console.error('Failed to send admin B2B notification:', err))
 
