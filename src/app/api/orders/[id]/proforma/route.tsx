@@ -3,7 +3,94 @@ import { createClient, createAdminClient } from '../../../../../lib/supabase/ser
 import { cookies } from 'next/headers'
 import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, DocumentData } from '../../../../../lib/document-service'
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
-import { DOCUMENT_TEMPLATES } from '../../../../../lib/document-templates'
+import { CUSTOMER_BLOCK, WRAP_START, WRAP_END } from '../../../../../lib/document-templates'
+
+// Fully localized proforma template — uses {label_*} placeholders instead of hardcoded English
+const LOCALIZED_PROFORMA_TEMPLATE = `${WRAP_START}
+<div style="background:#1a2b3c;padding:40px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;width:58%;padding-right:20px;">
+      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
+        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+        {company_address}<br>VAT: {company_vat}<br>{company_email}
+      </div>
+    </td>
+    <td style="vertical-align:top;text-align:right;width:42%;">
+      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">{proforma_title}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;margin:4px 0 18px;">{proforma_subtitle}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);">{invoice_number}</div>
+    </td>
+  </tr></table>
+</div>
+<div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:12px 48px;font-size:11px;color:#92400e;">
+  <strong>{proforma_note_label}</strong> {proforma_note_text}
+</div>
+<div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:14px 48px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_date}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{invoice_date}</span></td>
+    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_valid_until}</span><span style="font-size:12px;font-weight:600;color:#f59e0b;">{due_date}</span></td>
+    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_order_ref}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{order_number}</span></td>
+    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_payment_method}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{payment_method}</span></td>
+  </tr></table>
+</div>
+<div style="padding:32px 48px;border-bottom:1px solid #f3f4f6;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:50%;vertical-align:top;padding-right:24px;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">{label_bill_to}</div>
+      ${CUSTOMER_BLOCK}
+    </td>
+    <td style="width:50%;vertical-align:top;padding-left:24px;border-left:1px solid #f3f4f6;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">{label_ship_to}</div>
+      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{shipping_address}</div>
+    </td>
+  </tr></table>
+</div>
+<div style="padding:32px 48px;">
+  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">{label_items}</div>
+  {items_table}
+</div>
+<div style="padding:0 48px 32px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:55%;"></td>
+    <td style="width:45%;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr><td style="padding:5px 0;color:#9ca3af;">{label_subtotal}</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{subtotal_net}</td></tr>
+        <tr><td style="padding:5px 0;color:#9ca3af;">{label_shipping}</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{shipping_cost}</td></tr>
+        <tr style="border-bottom:2px solid #1a2b3c;"><td style="padding:5px 0 10px;color:#9ca3af;">{label_vat}</td><td style="padding:5px 0 10px;text-align:right;font-weight:600;color:#1a2b3c;">{vat_total}</td></tr>
+        <tr><td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">{label_total}</td><td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#1a2b3c;">{total_amount}</td></tr>
+      </table>
+    </td>
+  </tr></table>
+</div>
+<div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+  <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">{label_bank_details}</span>
+    <span style="font-size:11px;color:#6b7280;margin-left:14px;">{label_reference}: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
+  </div>
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">{label_regular}</div>
+      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+      </table>
+    </td>
+    <td style="width:50%;padding:18px 20px;vertical-align:top;">
+      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">{label_faster}</div>
+      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
+        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+      </table>
+    </td>
+  </tr></table>
+</div>
+<div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
+  {company_name} &middot; {company_address} &middot; VAT: {company_vat} &middot; {company_email} &middot; {company_phone}
+</div>
+${WRAP_END}`
 
 export async function GET(
     req: NextRequest,
@@ -63,34 +150,46 @@ export async function GET(
         const validUntil = new Date(new Date(order.created_at).getTime() + 30 * 24 * 60 * 60 * 1000)
             .toLocaleDateString(lang === 'sl' ? 'sl-SI' : lang === 'hr' ? 'hr-HR' : lang === 'de' ? 'de-DE' : 'en-GB')
 
-        // Localized proforma labels
-        const proformaLabels: Record<string, { title: string; subtitle: string; noteLabel: string; noteText: string }> = {
+        // Fully localized document labels
+        const docLabels: Record<string, Record<string, string>> = {
             sl: {
-                title: 'Predračun',
-                subtitle: 'Ni davčni dokument',
-                noteLabel: 'Opomba:',
-                noteText: 'Ta predračun je izdan zgolj za namene plačila. DDV račun bo izdan ob odpremi. Blago se odpremi po prejemu celotnega plačila.',
+                title: 'Predračun', subtitle: 'Ni davčni dokument',
+                noteLabel: 'Opomba:', noteText: 'Ta predračun je izdan zgolj za namene plačila. DDV račun bo izdan ob odpremi. Blago se odpremi po prejemu celotnega plačila.',
+                labelDate: 'Datum', labelValidUntil: 'Veljavno do', labelOrderRef: 'Ref. naročila', labelPaymentMethod: 'Način plačila',
+                labelBillTo: 'Kupec', labelShipTo: 'Naslov dostave',
+                labelItems: 'Postavke', labelNo: 'Št.', labelDescription: 'Opis', labelSku: 'Artikel / SKU', labelQty: 'Kol.', labelUnitPrice: 'Cena/enoto', labelAmount: 'Znesek',
+                labelSubtotal: 'Osnova (neto)', labelShipping: 'Dostava', labelVat: 'DDV', labelTotal: 'Skupaj',
+                labelBankDetails: 'Podatki za nakazilo', labelReference: 'Referenca', labelRegular: 'Običajno', labelFaster: 'Hitrejše',
             },
             de: {
-                title: 'Proforma-Rechnung',
-                subtitle: 'Kein Steuerdokument',
-                noteLabel: 'Hinweis:',
-                noteText: 'Diese Proforma-Rechnung dient nur zu Zahlungszwecken. Eine MwSt.-Rechnung wird bei Versand ausgestellt. Die Ware wird nach Erhalt der vollständigen Zahlung versandt.',
+                title: 'Proforma-Rechnung', subtitle: 'Kein Steuerdokument',
+                noteLabel: 'Hinweis:', noteText: 'Diese Proforma-Rechnung dient nur zu Zahlungszwecken. Eine MwSt.-Rechnung wird bei Versand ausgestellt. Die Ware wird nach Erhalt der vollständigen Zahlung versandt.',
+                labelDate: 'Datum', labelValidUntil: 'Gültig bis', labelOrderRef: 'Bestellnr.', labelPaymentMethod: 'Zahlungsart',
+                labelBillTo: 'Rechnungsadresse', labelShipTo: 'Lieferadresse',
+                labelItems: 'Positionen', labelNo: 'Nr.', labelDescription: 'Beschreibung', labelSku: 'Artikel / SKU', labelQty: 'Menge', labelUnitPrice: 'Einzelpreis', labelAmount: 'Betrag',
+                labelSubtotal: 'Zwischensumme (netto)', labelShipping: 'Versand', labelVat: 'MwSt.', labelTotal: 'Gesamtbetrag',
+                labelBankDetails: 'Bankverbindung', labelReference: 'Referenz', labelRegular: 'Regulär', labelFaster: 'Schneller',
             },
             hr: {
-                title: 'Predračun',
-                subtitle: 'Nije porezni dokument',
-                noteLabel: 'Napomena:',
-                noteText: 'Ovaj predračun je izdan samo u svrhu plaćanja. PDV račun će biti izdan pri otpremi. Roba se otprema po primitku cjelokupne uplate.',
+                title: 'Predračun', subtitle: 'Nije porezni dokument',
+                noteLabel: 'Napomena:', noteText: 'Ovaj predračun je izdan samo u svrhu plaćanja. PDV račun će biti izdan pri otpremi. Roba se otprema po primitku cjelokupne uplate.',
+                labelDate: 'Datum', labelValidUntil: 'Vrijedi do', labelOrderRef: 'Ref. narudžbe', labelPaymentMethod: 'Način plaćanja',
+                labelBillTo: 'Kupac', labelShipTo: 'Adresa dostave',
+                labelItems: 'Stavke', labelNo: 'Br.', labelDescription: 'Opis', labelSku: 'Artikl / SKU', labelQty: 'Kol.', labelUnitPrice: 'Jed. cijena', labelAmount: 'Iznos',
+                labelSubtotal: 'Osnovica (neto)', labelShipping: 'Dostava', labelVat: 'PDV', labelTotal: 'Ukupno',
+                labelBankDetails: 'Podaci za plaćanje', labelReference: 'Referenca', labelRegular: 'Redovno', labelFaster: 'Brže',
             },
             en: {
-                title: 'Proforma Invoice',
-                subtitle: 'Not a tax document',
-                noteLabel: 'Note:',
-                noteText: 'This Proforma Invoice is provided for payment purposes only. A VAT invoice will be issued upon shipment. Goods are dispatched upon receipt of full payment.',
+                title: 'Proforma Invoice', subtitle: 'Not a tax document',
+                noteLabel: 'Note:', noteText: 'This Proforma Invoice is provided for payment purposes only. A VAT invoice will be issued upon shipment. Goods are dispatched upon receipt of full payment.',
+                labelDate: 'Date', labelValidUntil: 'Valid Until', labelOrderRef: 'Order Ref.', labelPaymentMethod: 'Payment Method',
+                labelBillTo: 'Bill To', labelShipTo: 'Ship To',
+                labelItems: 'Items & Services', labelNo: 'No.', labelDescription: 'Description', labelSku: 'Article / SKU', labelQty: 'Qty', labelUnitPrice: 'Unit Price', labelAmount: 'Amount',
+                labelSubtotal: 'Subtotal (net)', labelShipping: 'Shipping', labelVat: 'VAT', labelTotal: 'Grand Total',
+                labelBankDetails: 'Bank Transfer Details', labelReference: 'Reference', labelRegular: 'Regular speed', labelFaster: 'Faster',
             },
         }
-        const pLabels = proformaLabels[lang] || proformaLabels.en
+        const L = docLabels[lang] || docLabels.en
 
         const documentData: DocumentData = {
             order_number: order.order_number,
@@ -108,8 +207,11 @@ export async function GET(
                 ? (lang === 'sl' ? 'Prevzem' : lang === 'hr' ? 'Preuzimanje' : 'Pickup / Free')
                 : `${currency} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
             total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
-            payment_method: order.payment_method || 'Bank Transfer',
-            items_table: generateItemsTableHtml(order.order_items, currency),
+            payment_method: order.payment_method || (lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'),
+            items_table: generateItemsTableHtml(order.order_items, currency, false, {
+                no: L.labelNo, description: L.labelDescription, sku: L.labelSku,
+                qty: L.labelQty, unitPrice: L.labelUnitPrice, amount: L.labelAmount,
+            }),
             // Proforma-specific fields
             invoice_number: `PRF-${order.order_number}`,
             invoice_date: orderDate,
@@ -117,18 +219,33 @@ export async function GET(
             reference: `SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`,
             place_of_issue: 'Podsmreka',
             dispatch_date: lang === 'sl' ? 'Po prejemu plačila' : 'Upon payment',
-            // Localized proforma labels
-            proforma_title: pLabels.title,
-            proforma_subtitle: pLabels.subtitle,
-            proforma_note_label: pLabels.noteLabel,
-            proforma_note_text: pLabels.noteText,
+            // Localized labels
+            proforma_title: L.title,
+            proforma_subtitle: L.subtitle,
+            proforma_note_label: L.noteLabel,
+            proforma_note_text: L.noteText,
+            label_date: L.labelDate,
+            label_valid_until: L.labelValidUntil,
+            label_order_ref: L.labelOrderRef,
+            label_payment_method: L.labelPaymentMethod,
+            label_bill_to: L.labelBillTo,
+            label_ship_to: L.labelShipTo,
+            label_items: L.labelItems,
+            label_subtotal: L.labelSubtotal,
+            label_shipping: L.labelShipping,
+            label_vat: L.labelVat,
+            label_total: L.labelTotal,
+            label_bank_details: L.labelBankDetails,
+            label_reference: L.labelReference,
+            label_regular: L.labelRegular,
+            label_faster: L.labelFaster,
         }
 
-        // Try DB template first, fall back to built-in
+        // Try DB template first, fall back to built-in localized template
         const dbTemplate = await getPinnedTemplate('proforma_invoice', lang)
         const htmlContent = dbTemplate
             ? replacePlaceholders(dbTemplate.content_html, documentData)
-            : replacePlaceholders(DOCUMENT_TEMPLATES.proforma_invoice, documentData)
+            : replacePlaceholders(LOCALIZED_PROFORMA_TEMPLATE, documentData)
 
         const pdfBuffer = await generatePdfFromHtml(htmlContent)
 

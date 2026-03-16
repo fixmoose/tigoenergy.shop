@@ -76,8 +76,25 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         </Link>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-6">
         <OrderWorkflowTracker order={order} />
+      </div>
+
+      <div className="mb-6">
+        <AdminOrderActions
+          orderId={order.id}
+          status={order.status || null}
+          paymentStatus={order.payment_status || null}
+          createdAt={order.created_at || null}
+          confirmedAt={order.confirmed_at || null}
+          packingSlipUrl={order.packing_slip_url}
+          shippingLabelUrl={order.shipping_label_url}
+          customerEmail={order.customer_email}
+          sendCount={(order as any).order_send_count || 0}
+          orderTotal={order.total || 0}
+          amountPaid={(order as any).amount_paid || 0}
+          modificationUnlocked={order.modification_unlocked || false}
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
@@ -315,21 +332,6 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           )}
 
           <OrderEmailHistory orderId={order.id} />
-
-          <AdminOrderActions
-            orderId={order.id}
-            status={order.status || null}
-            paymentStatus={order.payment_status || null}
-            createdAt={order.created_at || null}
-            confirmedAt={order.confirmed_at || null}
-            packingSlipUrl={order.packing_slip_url}
-            shippingLabelUrl={order.shipping_label_url}
-            customerEmail={order.customer_email}
-            sendCount={(order as any).order_send_count || 0}
-            orderTotal={order.total || 0}
-            amountPaid={(order as any).amount_paid || 0}
-            modificationUnlocked={order.modification_unlocked || false}
-          />
         </div>
       </div>
     </div>

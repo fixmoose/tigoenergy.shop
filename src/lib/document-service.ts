@@ -45,6 +45,23 @@ export interface DocumentData {
     company_iban_be?: string
     company_iban_si?: string
     company_bic?: string
+    // Localized document labels
+    label_date?: string
+    label_valid_until?: string
+    label_order_ref?: string
+    label_payment_method?: string
+    label_bill_to?: string
+    label_ship_to?: string
+    label_items?: string
+    label_subtotal?: string
+    label_shipping?: string
+    label_vat?: string
+    label_total?: string
+    label_bank_details?: string
+    label_reference?: string
+    label_regular?: string
+    label_faster?: string
+    [key: string]: string | undefined | null
 }
 
 export async function getPinnedTemplate(type: string, language: string = 'en') {
@@ -166,19 +183,20 @@ export function generatePackingItemsTableHtml(items: any[]) {
     return html;
 }
 
-export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false) {
+export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false, headers?: { no?: string; description?: string; sku?: string; qty?: string; unitPrice?: string; amount?: string }) {
     let html = '';
+    const h = headers || {};
 
     if (!rowsOnly) {
         html += `<table style="width:100%;border-collapse:collapse;font-size:11px;">
             <thead>
                 <tr style="border-bottom:2px solid #1a2b3c;">
-                    <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:4%;">No.</th>
-                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:42%;">Description</th>
-                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:18%;">Article / SKU</th>
-                    <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:8%;">Qty</th>
-                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Unit Price</th>
-                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">Amount</th>
+                    <th style="text-align:left;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:4%;">${h.no || 'No.'}</th>
+                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:42%;">${h.description || 'Description'}</th>
+                    <th style="text-align:left;padding:0 12px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:18%;">${h.sku || 'Article / SKU'}</th>
+                    <th style="text-align:center;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:8%;">${h.qty || 'Qty'}</th>
+                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">${h.unitPrice || 'Unit Price'}</th>
+                    <th style="text-align:right;padding:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;width:14%;">${h.amount || 'Amount'}</th>
                 </tr>
             </thead>
             <tbody>`;

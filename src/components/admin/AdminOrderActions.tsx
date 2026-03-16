@@ -54,29 +54,29 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
 
     if (isCompleted) {
         return (
-            <div className="rounded-xl border border-green-200 bg-green-50/50 p-3 opacity-70">
+            <div className="rounded-xl border border-green-200 bg-green-50/50 p-3 opacity-70 min-w-0">
                 <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">&#10003;</span>
-                    <span className="text-xs font-bold text-green-700 uppercase tracking-wider">{title}</span>
-                    <span className="text-[10px] text-green-600 ml-auto">{subtitle}</span>
+                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider truncate">{title}</span>
                 </div>
+                <p className="text-[9px] text-green-600 mt-1 ml-7 truncate">{subtitle}</p>
             </div>
         )
     }
 
     if (isFuture) {
         return (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-3 opacity-40">
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 p-3 opacity-40 min-w-0">
                 <div className="flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">{icon}</span>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">{title}</span>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className={`rounded-xl border-2 ${c.border} ${c.bg} p-4 shadow-sm`}>
+        <div className={`rounded-xl border-2 ${c.border} ${c.bg} p-4 shadow-sm min-w-0 col-span-2`}>
             <div className="flex items-center gap-2 mb-2">
                 <span className={`w-6 h-6 rounded-full ${c.bg} ${c.text} flex items-center justify-center text-xs font-bold animate-pulse border-2 ${c.border} flex-shrink-0`}>{icon}</span>
                 <span className={`text-xs font-bold ${c.text} uppercase tracking-wider`}>{title}</span>
@@ -239,7 +239,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <span className="text-blue-500">&#9889;</span> Order Flow
             </h3>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-8 gap-2 items-start">
                 {/* Step 1: Order Received */}
                 <StepCard step="received" currentStep={currentStep} title="Order Received" subtitle={createdAt ? new Date(createdAt).toLocaleDateString('en-GB') : ''} icon="1" color="slate">
                     <span />
