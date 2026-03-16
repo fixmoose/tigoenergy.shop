@@ -370,9 +370,9 @@
     "delivered": {
       "title": "¡Entregado!",
       "text": "¡Excelentes noticias! Tu pedido #{{order_number}} ha sido entregado con éxito. Esperamos que estés contento con tus nuevos productos Tigo Energy.",
-      "attachmentNote": "Para tus registros, hemos adjuntado los siguientes documentos a este correo electrónico:",
-      "doc1": "Confirmación de entrega",
-      "doc2": "Factura oficial",
+      "attachmentNote": "Puedes descargar los siguientes documentos desde la página de tu pedido:",
+      "doc1": "Ver pedido y detalles de entrega",
+      "doc2": "Descargar factura",
       "footerNote": "Gracias por elegir a Initra Energija como tu socio de Tigo Energy. Si tienes alguna pregunta sobre la instalación o la configuración del producto, nuestro equipo técnico está aquí para ayudarte."
     },
     "b2bVerified": {

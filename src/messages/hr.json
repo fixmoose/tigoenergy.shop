@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Dostavljeno!",
       "text": "Odlične vijesti! Vaša narudžba #{{order_number}} je uspješno dostavljena. Nadamo se da ste zadovoljni svojim novim Tigo Energy proizvodima.",
-      "attachmentNote": "Za vašu evidenciju, ovom e-mailu smo priložili sljedeće dokumente:",
-      "doc1": "Potvrda o dostavi",
-      "doc2": "Službeni račun",
+      "attachmentNote": "Sljedeće dokumente možete preuzeti sa stranice vaše narudžbe:",
+      "doc1": "Pregledaj narudžbu i detalje dostave",
+      "doc2": "Preuzmi račun",
       "footerNote": "Hvala vam što ste odabrali Initra Energija kao svog Tigo Energy partnera. Ako imate bilo kakvih pitanja o instalaciji ili postavljanju proizvoda, naš tehnički tim je tu da vam pomogne."
     },
     "b2bVerified": {

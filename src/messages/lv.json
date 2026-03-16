@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Piegādāts!",
       "text": "Lieliskas ziņas! Jūsu pasūtījums #{{order_number}} ir veiksmīgi piegādāts. Ceram, ka esat apmierināti ar saviem jaunajiem Tigo Energy produktiem.",
-      "attachmentNote": "Jūsu vajadzībām mēs šim e-pastam esam pievienojuši šādus dokumentus:",
-      "doc1": "Piegādes apstiprinājums",
-      "doc2": "Oficiālais rēķins",
+      "attachmentNote": "Šos dokumentus varat lejupielādēt no sava pasūtījuma lapas:",
+      "doc1": "Skatīt pasūtījumu un piegādes informāciju",
+      "doc2": "Lejupielādēt rēķinu",
       "footerNote": "Paldies, ka izvēlējāties Initra Energija kā savu Tigo Energy partneri. Ja jums ir kādi jautājumi par uzstādīšanu vai produkta iestatīšanu, mūsu tehniskā komanda ir gatava palīdzēt."
     },
     "b2bVerified": {

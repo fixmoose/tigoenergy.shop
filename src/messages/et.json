@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Tarnitud!",
       "text": "Suurepärased uudised! Teie tellimus #{{order_number}} on edukalt kohale toimetatud. Loodame, et olete rahul oma uute Tigo Energy toodetega.",
-      "attachmentNote": "Teie andmete jaoks oleme sellele e-kirjale lisanud järgmised dokumendid:",
-      "doc1": "Kättetoimetamise kinnitus",
-      "doc2": "Ametlik arve",
+      "attachmentNote": "Saate järgmised dokumendid alla laadida oma tellimuse lehelt:",
+      "doc1": "Vaata tellimust ja tarneandmeid",
+      "doc2": "Laadi arve alla",
       "footerNote": "Täname, et valisite Initra Energija oma Tigo Energy partneriks. Kui teil on küsimusi paigalduse või seadistamise kohta, on meie tehniline tiim valmis aitama."
     },
     "b2bVerified": {

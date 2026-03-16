@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Levererat!",
       "text": "Goda nyheter! Din beställning #{{order_number}} har levererats. Vi hoppas att du är nöjd med dina nya Tigo Energy-produkter.",
-      "attachmentNote": "För dina register har vi bifogat följande dokument till detta e-postmeddelande:",
-      "doc1": "Leveransbekräftelse",
-      "doc2": "Officiell faktura",
+      "attachmentNote": "Du kan ladda ner följande dokument från din beställningssida:",
+      "doc1": "Visa beställning och leveransdetaljer",
+      "doc2": "Ladda ner faktura",
       "footerNote": "Tack för att du valde Initra Energija som din Tigo Energy-partner. Om du har några frågor om installation eller produktinställningar finns vårt tekniska team här för att hjälpa till."
     },
     "b2bVerified": {

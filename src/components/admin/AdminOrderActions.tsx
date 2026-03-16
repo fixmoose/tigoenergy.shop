@@ -472,44 +472,17 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     : 'Send dobavnica to driver or confirm manually'
                 } icon="6" color="green">
                     <div className="space-y-3">
-                        {/* Pickup: prominent pickup button + option to add delivery */}
-                        {isPickup && (
-                            <>
-                                <button onClick={handleMarkDelivered} disabled={loading}
-                                    className="w-full py-2.5 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
-                                    {loading ? 'Processing...' : 'Mark as Picked Up'}
-                                </button>
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or add delivery</span></div>
-                                </div>
-                                <button onClick={() => handleShipOrder('DPD')} disabled={loading}
-                                    className="w-full py-2 bg-red-600 text-white rounded-lg font-bold text-xs hover:bg-red-700 transition disabled:opacity-50">
-                                    {loading ? 'Processing...' : 'Convert to DPD Delivery'}
-                                </button>
-                            </>
-                        )}
-
-                        {/* DPD tracking info */}
-                        {!isPickup && shippingCarrier === 'DPD' && trackingNumber && (
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1.5">
-                                <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">DPD Tracking</p>
-                                <p className="text-sm font-mono text-red-900">{trackingNumber}</p>
-                                {trackingUrl && (
-                                    <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
-                                        className="inline-block text-xs font-bold text-red-600 hover:underline">
-                                        Track on DPD &rarr;
-                                    </a>
-                                )}
-                                <p className="text-[10px] text-red-500">Delivery status is checked automatically. Invoice will be issued when DPD confirms delivery.</p>
-                            </div>
-                        )}
-
-                        {/* Driver delivery — for non-DPD, non-pickup */}
-                        {!isPickup && shippingCarrier !== 'DPD' && (
+                        {/* Pickup or internal driver: send dobavnica for signature */}
+                        {(isPickup || (!isPickup && shippingCarrier !== 'DPD')) && (
                             <div className="bg-white border border-slate-200 rounded-lg p-3 space-y-2">
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Send Dobavnica to Driver</p>
-                                <p className="text-[10px] text-slate-400">Driver receives a link to view the delivery note and collect signature digitally.</p>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                    {isPickup ? 'Dobavnica za prevzem' : 'Send Dobavnica to Driver'}
+                                </p>
+                                <p className="text-[10px] text-slate-400">
+                                    {isPickup
+                                        ? 'Send dobavnica to local worker — customer signs on /driver portal at pickup.'
+                                        : 'Driver receives a link to view the delivery note and collect signature digitally.'}
+                                </p>
                                 {savedDrivers.length > 0 && (
                                     <select
                                         value={savedDrivers.some(d => d.email === driverEmail) ? driverEmail : '__custom'}
@@ -537,7 +510,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                         setLoading(true)
                                         try {
                                             const res = await adminSendDeliveryToDriverAction(orderId, driverEmail)
-                                            if (res.success) { alert('Delivery link sent to driver!') }
+                                            if (res.success) { alert('Dobavnica link sent!') }
                                             else { alert('Failed: ' + res.error) }
                                         } catch (err: any) { alert('Failed: ' + err.message) }
                                         finally { setLoading(false) }
@@ -545,6 +518,39 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                     disabled={loading || !driverEmail}
                                     className="w-full py-2 bg-slate-700 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition disabled:opacity-50"
                                 >{loading ? 'Sending...' : 'Send Dobavnica Link'}</button>
+                            </div>
+                        )}
+
+                        {/* Pickup: extra options */}
+                        {isPickup && (
+                            <>
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or</span></div>
+                                </div>
+                                <button onClick={handleMarkDelivered} disabled={loading}
+                                    className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Mark as Picked Up (no signature)'}
+                                </button>
+                                <button onClick={() => handleShipOrder('DPD')} disabled={loading}
+                                    className="w-full py-2 bg-red-600 text-white rounded-lg font-bold text-xs hover:bg-red-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Convert to DPD Delivery'}
+                                </button>
+                            </>
+                        )}
+
+                        {/* DPD tracking info */}
+                        {!isPickup && shippingCarrier === 'DPD' && trackingNumber && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1.5">
+                                <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">DPD Tracking</p>
+                                <p className="text-sm font-mono text-red-900">{trackingNumber}</p>
+                                {trackingUrl && (
+                                    <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
+                                        className="inline-block text-xs font-bold text-red-600 hover:underline">
+                                        Track on DPD &rarr;
+                                    </a>
+                                )}
+                                <p className="text-[10px] text-red-500">Delivery status is checked automatically. Invoice will be issued when DPD confirms delivery.</p>
                             </div>
                         )}
 

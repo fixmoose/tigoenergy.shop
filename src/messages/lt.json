@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Pristatyta!",
       "text": "Puikios naujienos! Jūsų užsakymas #{{order_number}} buvo sėkmingai pristatytas. Tikimės, kad esate patenkinti savo naujaisiais „Tigo Energy“ gaminiais.",
-      "attachmentNote": "Jūsų įrašams prie šio el. laiško pridėjome šiuos dokumentus:",
-      "doc1": "Pristatymo patvirtinimas",
-      "doc2": "Oficiali sąskaita faktūra",
+      "attachmentNote": "Šiuos dokumentus galite atsisiųsti iš savo užsakymo puslapio:",
+      "doc1": "Peržiūrėti užsakymą ir pristatymo informaciją",
+      "doc2": "Atsisiųsti sąskaitą faktūrą",
       "footerNote": "Dėkojame, kad pasirinkote „Initra Energija“ kaip savo „Tigo Energy“ partnerį. Jei turite klausimų dėl montavimo ar gaminio nustatymo, mūsų techninė komanda yra pasirengusi padėti."
     },
     "b2bVerified": {

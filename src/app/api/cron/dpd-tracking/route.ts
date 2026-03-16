@@ -71,9 +71,12 @@ export async function GET(req: NextRequest) {
             try {
                 const locale = order.language || 'en'
                 const customerName = (order.shipping_address as any)?.first_name || order.customer_email
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
                 const html = await renderTemplate('delivered', {
                     name: customerName,
                     order_number: String(order.order_number),
+                    order_url: `${siteUrl}/orders/${order.id}`,
+                    invoice_url: order.invoice_number ? `${siteUrl}/api/orders/${order.id}/invoice?download=1` : `${siteUrl}/orders/${order.id}`,
                 }, locale)
                 const subjectMap: Record<string, string> = {
                     sl: `Vaše naročilo #${order.order_number} je dostavljeno`,

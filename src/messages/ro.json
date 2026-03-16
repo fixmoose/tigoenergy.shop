@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Livrat!",
       "text": "Vești bune! Comanda dvs. #{{order_number}} a fost livrată cu succes. Sperăm că sunteți mulțumit de noile dvs. produse Tigo Energy.",
-      "attachmentNote": "Pentru evidențele dvs., am atașat următoarele documente la acest e-mail:",
-      "doc1": "Confirmare de livrare",
-      "doc2": "Factură oficială",
+      "attachmentNote": "Puteți descărca următoarele documente din pagina comenzii dvs.:",
+      "doc1": "Vizualizați comanda și detaliile livrării",
+      "doc2": "Descărcați factura",
       "footerNote": "Vă mulțumim că ați ales Initra Energija ca partener Tigo Energy. Dacă aveți întrebări despre instalare sau configurarea produsului, echipa noastră tehnică este aici pentru a vă ajuta."
     },
     "b2bVerified": {

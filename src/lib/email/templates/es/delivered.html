@@ -110,10 +110,14 @@
             <p>{{t_email_delivered_attachmentNote}}</p>
             <div class="attachment-box">
                 <div class="attachment-item">
-                    <span class="attachment-icon">📋</span> {{t_email_delivered_doc1}}
+                    <a href="{{order_url}}" style="color:#16a34a;text-decoration:none;font-weight:600;">
+                        <span class="attachment-icon">📋</span> {{t_email_delivered_doc1}}
+                    </a>
                 </div>
                 <div class="attachment-item">
-                    <span class="attachment-icon">📄</span> {{t_email_delivered_doc2}}
+                    <a href="{{invoice_url}}" style="color:#16a34a;text-decoration:none;font-weight:600;">
+                        <span class="attachment-icon">📄</span> {{t_email_delivered_doc2}}
+                    </a>
                 </div>
             </div>
 

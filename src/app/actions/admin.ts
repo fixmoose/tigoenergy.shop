@@ -231,9 +231,12 @@ export async function adminMarkDeliveredAction(orderId: string) {
         const customerName = (order.shipping_address as any)?.first_name || order.customer_email
 
         try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
             const html = await renderTemplate('delivered', {
                 name: customerName,
                 order_number: String(order.order_number),
+                order_url: `${siteUrl}/orders/${orderId}`,
+                invoice_url: order.invoice_url ? `${siteUrl}${order.invoice_url}` : `${siteUrl}/orders/${orderId}`,
             }, locale)
             const subjectMap: Record<string, string> = {
                 sl: `Vaše naročilo #${order.order_number} je dostavljeno`,

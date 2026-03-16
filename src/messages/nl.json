@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Afgeleverd!",
       "text": "Goed nieuws! Uw bestelling #{{order_number}} is succesvol afgeleverd. We hopen dat u tevreden bent met uw nieuwe Tigo Energy producten.",
-      "attachmentNote": "Voor uw administratie hebben we de volgende documenten bij deze e-mail gevoegd:",
-      "doc1": "Leveringsbevestiging",
-      "doc2": "Officiële factuur",
+      "attachmentNote": "U kunt de volgende documenten downloaden vanaf uw bestelpagina:",
+      "doc1": "Bestelling en leveringsdetails bekijken",
+      "doc2": "Factuur downloaden",
       "footerNote": "Bedankt voor het kiezen van Initra Energija als uw Tigo Energy partner. Als u vragen heeft over de installatie of productconfiguratie, staat ons technische team voor u klaar."
     },
     "b2bVerified": {

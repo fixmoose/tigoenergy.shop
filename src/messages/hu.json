@@ -370,9 +370,9 @@
     "delivered": {
       "title": "Kézbesítve!",
       "text": "Nagyszerű hírek! Rendelését (#{{order_number}}) sikeresen kézbesítettük. Reméljük, elégedett az új Tigo Energy termékeivel.",
-      "attachmentNote": "Nyilvántartása számára az alábbi dokumentumokat mellékeltük ehhez az e-mailhez:",
-      "doc1": "Kézbesítési igazolás",
-      "doc2": "Hivatalos számla",
+      "attachmentNote": "Az alábbi dokumentumokat letöltheti a rendelési oldaláról:",
+      "doc1": "Rendelés és szállítási részletek megtekintése",
+      "doc2": "Számla letöltése",
       "footerNote": "Köszönjük, hogy az Initra Energija-t választotta Tigo Energy partnerének. Ha bármilyen kérdése van a termék telepítésével vagy beállításával kapcsolatban, műszaki csapatunk készséggel áll rendelkezésére."
     },
     "b2bVerified": {
