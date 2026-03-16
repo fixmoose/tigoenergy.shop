@@ -721,6 +721,7 @@
     "pending": "Oczekujące",
     "confirmed": "Potwierdzone",
     "invoice": "Faktura",
+    "proforma": "Proforma",
     "invoiceNotReady": "Faktura będzie dostępna do pobrania po dostarczeniu zamówienia.",
     "modifyOrder": "Zmień zamówienie",
     "cancelOrder": "Anuluj zamówienie",

@@ -908,6 +908,7 @@
     "pending": "V obdelavi",
     "confirmed": "Potrjeno",
     "invoice": "Račun",
+    "proforma": "Predračun",
     "invoiceNotReady": "Račun bo na voljo za prenos, ko bo naročilo dostavljeno.",
     "modifyOrder": "Spremeni naročilo",
     "cancelOrder": "Prekliči naročilo",

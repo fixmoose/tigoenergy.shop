@@ -8,6 +8,7 @@ import { sendEmail, notifyAdmins } from '@/lib/email'
 import { buildOrderConfirmationEmail } from '@/lib/emails/order-confirmation'
 import { getEffectivePrice } from '@/lib/db/pricing'
 import { verifyRecaptcha } from '@/lib/recaptcha'
+import { normalizeCountryCode } from '@/lib/normalize-country'
 
 export type CheckoutState = {
     success?: boolean
@@ -165,7 +166,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 street2: rawData.shipping_street2,
                 city: rawData.shipping_city,
                 postal_code: rawData.shipping_postal_code,
-                country: rawData.shipping_country
+                country: normalizeCountryCode(rawData.shipping_country as string || '')
             },
             billing_address: rawData.billing_same === 'on' ? {
                 first_name: rawData.shipping_first_name,
@@ -174,16 +175,15 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 street2: rawData.shipping_street2,
                 city: rawData.shipping_city,
                 postal_code: rawData.shipping_postal_code,
-                country: rawData.shipping_country
+                country: normalizeCountryCode(rawData.shipping_country as string || '')
             } : {
-                // Handle separate billing if implemented in form
                 first_name: rawData.billing_first_name || rawData.shipping_first_name,
                 last_name: rawData.billing_last_name || rawData.shipping_last_name,
                 street: rawData.billing_street,
                 street2: rawData.billing_street2,
                 city: rawData.billing_city,
                 postal_code: rawData.billing_postal_code,
-                country: rawData.billing_country
+                country: normalizeCountryCode(rawData.billing_country as string || '')
             },
 
             subtotal,
@@ -253,7 +253,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                     street: rawData.shipping_street || '',
                     city: rawData.shipping_city || '',
                     postalCode: rawData.shipping_postal_code || '',
-                    country: rawData.shipping_country || '',
+                    country: normalizeCountryCode(rawData.shipping_country as string || ''),
                 }
 
                 // Only add if this address doesn't already exist

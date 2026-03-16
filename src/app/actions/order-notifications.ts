@@ -9,6 +9,98 @@ import { generateItemsTableHtml } from '@/lib/document-service'
 const ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
 
+// Localized labels for payment request / reminder emails
+const PAYMENT_EMAIL_LABELS: Record<string, Record<string, string>> = {
+    sl: {
+        paymentRequest: 'Zahtevek za plačilo',
+        paymentReminder: 'Opomnik za plačilo',
+        totalDue: 'Znesek za plačilo',
+        status: 'Status',
+        awaitingPayment: 'Čaka na plačilo',
+        paymentPending: 'Plačilo v teku',
+        orderItems: 'Postavke naročila',
+        grandTotal: 'Skupaj',
+        bankTransferDetails: 'Podatki za nakazilo',
+        regularSpeed: 'Običajno',
+        faster: 'Hitrejše',
+        reference: 'Referenca',
+        referenceNote: 'Vedno navedite številko naročila kot referenco za plačilo, da lahko plačilo pravilno evidentiramo.',
+        payNowWise: 'Plačaj zdaj z Wise',
+        viewOrder: 'Ogled naročila v mojem računu',
+        reminderNotice: 'Prijazno opozorilo:',
+        reminderBody: 'Opažamo, da plačilo za naročilo <strong>#{order}</strong> še ni bilo prejeto. Prosimo, izvedite bančno nakazilo čim prej, da se izognemo zamudi.',
+        subject: 'Zahtevek za plačilo',
+        reminderSubject: 'Opomnik za plačilo',
+    },
+    de: {
+        paymentRequest: 'Zahlungsaufforderung',
+        paymentReminder: 'Zahlungserinnerung',
+        totalDue: 'Fälliger Betrag',
+        status: 'Status',
+        awaitingPayment: 'Zahlung ausstehend',
+        paymentPending: 'Zahlung ausstehend',
+        orderItems: 'Bestellpositionen',
+        grandTotal: 'Gesamtbetrag',
+        bankTransferDetails: 'Bankverbindung',
+        regularSpeed: 'Regulär',
+        faster: 'Schneller',
+        reference: 'Referenz',
+        referenceNote: 'Bitte geben Sie immer die Bestellnummer als Zahlungsreferenz an, damit wir Ihre Zahlung zuordnen können.',
+        payNowWise: 'Jetzt mit Wise bezahlen',
+        viewOrder: 'Bestellung in meinem Konto ansehen',
+        reminderNotice: 'Freundliche Erinnerung:',
+        reminderBody: 'Wir haben festgestellt, dass die Zahlung für Bestellung <strong>#{order}</strong> noch nicht eingegangen ist. Bitte überweisen Sie den Betrag so bald wie möglich, um Verzögerungen zu vermeiden.',
+        subject: 'Zahlungsaufforderung',
+        reminderSubject: 'Zahlungserinnerung',
+    },
+    hr: {
+        paymentRequest: 'Zahtjev za plaćanje',
+        paymentReminder: 'Podsjetnik za plaćanje',
+        totalDue: 'Ukupno za plaćanje',
+        status: 'Status',
+        awaitingPayment: 'Čeka plaćanje',
+        paymentPending: 'Plaćanje na čekanju',
+        orderItems: 'Stavke narudžbe',
+        grandTotal: 'Ukupno',
+        bankTransferDetails: 'Podaci za plaćanje',
+        regularSpeed: 'Redovno',
+        faster: 'Brže',
+        reference: 'Referenca',
+        referenceNote: 'Uvijek navedite broj narudžbe kao referencu plaćanja kako bismo mogli evidentirati vašu uplatu.',
+        payNowWise: 'Plati odmah putem Wise',
+        viewOrder: 'Pogledaj narudžbu u mom računu',
+        reminderNotice: 'Prijateljski podsjetnik:',
+        reminderBody: 'Primijetili smo da uplata za narudžbu <strong>#{order}</strong> još nije zaprimljena. Molimo izvršite bankovni prijenos što je prije moguće kako biste izbjegli kašnjenja.',
+        subject: 'Zahtjev za plaćanje',
+        reminderSubject: 'Podsjetnik za plaćanje',
+    },
+    en: {
+        paymentRequest: 'Payment Request',
+        paymentReminder: 'Payment Reminder',
+        totalDue: 'Total Due',
+        status: 'Status',
+        awaitingPayment: 'Awaiting Payment',
+        paymentPending: 'Payment Pending',
+        orderItems: 'Order Items',
+        grandTotal: 'Grand Total',
+        bankTransferDetails: 'Bank Transfer Details',
+        regularSpeed: 'Regular speed',
+        faster: 'Faster',
+        reference: 'Reference',
+        referenceNote: 'Always include the order number as payment reference so we can match your payment.',
+        payNowWise: 'Pay Now with Wise',
+        viewOrder: 'View Order in My Account',
+        reminderNotice: 'Friendly Reminder:',
+        reminderBody: 'We noticed that payment for order <strong>#{order}</strong> has not yet been received. Please complete your bank transfer at your earliest convenience to avoid any delays.',
+        subject: 'Payment Request',
+        reminderSubject: 'Payment Reminder',
+    },
+}
+
+function getPaymentLabels(lang: string) {
+    return PAYMENT_EMAIL_LABELS[lang] || PAYMENT_EMAIL_LABELS.en
+}
+
 /**
  * Admin sends an order to customer for payment — includes items table, IBAN/BIC, and link to their account
  */
@@ -30,6 +122,8 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
         .select('*')
         .eq('order_id', orderId)
 
+    const lang = order.language || 'en'
+    const L = getPaymentLabels(lang)
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
     const totalFormatted = `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`
@@ -49,7 +143,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
         </div>
       </td>
       <td style="vertical-align:top;text-align:right;">
-        <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1;">Payment Request</div>
+        <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1;">${L.paymentRequest}</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0 0;">#${order.order_number}</div>
       </td>
     </tr></table>
@@ -57,19 +151,19 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
   <!-- Meta row -->
   <div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:14px 48px;">
     <table style="width:100%;border-collapse:collapse;"><tr>
-      <td style="padding:2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">Total Due</span><span style="font-size:14px;font-weight:700;color:#1a2b3c;">${totalFormatted}</span></td>
-      <td style="padding:2px 0;text-align:right;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">Status</span><span style="font-size:12px;font-weight:600;color:#f59e0b;">Awaiting Payment</span></td>
+      <td style="padding:2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">${L.totalDue}</span><span style="font-size:14px;font-weight:700;color:#1a2b3c;">${totalFormatted}</span></td>
+      <td style="padding:2px 0;text-align:right;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">${L.status}</span><span style="font-size:12px;font-weight:600;color:#f59e0b;">${L.awaitingPayment}</span></td>
     </tr></table>
   </div>
   <!-- Items -->
   <div style="padding:32px 48px;">
-    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">Order Items</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">${L.orderItems}</div>
     ${itemsHtml}
     <table style="width:100%;border-collapse:collapse;margin-top:16px;"><tr>
       <td style="width:55%;"></td>
       <td style="width:45%;">
         <table style="width:100%;border-collapse:collapse;"><tr style="border-top:2px solid #1a2b3c;">
-          <td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">Grand Total</td>
+          <td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">${L.grandTotal}</td>
           <td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#1a2b3c;">${totalFormatted}</td>
         </tr></table>
       </td>
@@ -78,18 +172,18 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
   <!-- Bank details — both accounts -->
   <div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
     <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
-      <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
+      <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">${L.bankTransferDetails}</span>
     </div>
     <table style="width:100%;border-collapse:collapse;"><tr>
       <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
-        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Regular speed</div>
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${L.regularSpeed}</div>
         <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
           <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">SI56 6100 0002 8944 371</td></tr>
           <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">HDELSI22</td></tr>
         </table>
       </td>
       <td style="width:50%;padding:18px 20px;vertical-align:top;">
-        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Faster</div>
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${L.faster}</div>
         <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
           <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">BE55 9052 7486 2944</td></tr>
           <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">TRWIBEB1XXX</td></tr>
@@ -100,16 +194,16 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
   <!-- Reference notice -->
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
-      <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
+      <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">${L.reference}</td>
       <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${refCode}</td>
     </tr></table>
-    <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
+    <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">${L.referenceNote}</p>
   </div>
   <!-- CTA buttons -->
   <div style="padding:0 48px 32px;text-align:center;">
-    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">⚡ Pay Now with Wise</a>
+    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">${L.payNowWise}</a>
     <br><br>
-    <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">View Order in My Account</a>
+    <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">${L.viewOrder}</a>
   </div>
   <!-- Footer -->
   <div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
@@ -120,7 +214,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
 
     await sendEmail({
         to: order.customer_email,
-        subject: `Payment Request — Order #${order.order_number} (${totalFormatted})`,
+        subject: `${L.subject} — #${order.order_number} (${totalFormatted})`,
         html,
         orderId,
         emailType: 'payment_request',
@@ -149,6 +243,8 @@ export async function sendPaymentReminderAction(orderId: string) {
         .select('*')
         .eq('order_id', orderId)
 
+    const lang = order.language || 'en'
+    const L = getPaymentLabels(lang)
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
     const totalFormatted = `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`
@@ -168,31 +264,31 @@ export async function sendPaymentReminderAction(orderId: string) {
         </div>
       </td>
       <td style="vertical-align:top;text-align:right;">
-        <div style="font-size:24px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">Payment Reminder</div>
+        <div style="font-size:24px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">${L.paymentReminder}</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.45);margin:6px 0 0;">#${order.order_number}</div>
       </td>
     </tr></table>
   </div>
   <!-- Reminder notice -->
   <div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:14px 48px;font-size:12px;color:#92400e;">
-    <strong>Friendly Reminder:</strong> We noticed that payment for order <strong>#${order.order_number}</strong> has not yet been received. Please complete your bank transfer at your earliest convenience to avoid any delays.
+    <strong>${L.reminderNotice}</strong> ${L.reminderBody.replace('#{order}', order.order_number)}
   </div>
   <!-- Meta row -->
   <div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:14px 48px;">
     <table style="width:100%;border-collapse:collapse;"><tr>
-      <td style="padding:2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">Total Due</span><span style="font-size:14px;font-weight:700;color:#1a2b3c;">${totalFormatted}</span></td>
-      <td style="padding:2px 0;text-align:right;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">Status</span><span style="font-size:12px;font-weight:600;color:#ef4444;">Payment Pending</span></td>
+      <td style="padding:2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">${L.totalDue}</span><span style="font-size:14px;font-weight:700;color:#1a2b3c;">${totalFormatted}</span></td>
+      <td style="padding:2px 0;text-align:right;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">${L.status}</span><span style="font-size:12px;font-weight:600;color:#ef4444;">${L.paymentPending}</span></td>
     </tr></table>
   </div>
   <!-- Items -->
   <div style="padding:32px 48px;">
-    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">Order Items</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">${L.orderItems}</div>
     ${itemsHtml}
     <table style="width:100%;border-collapse:collapse;margin-top:16px;"><tr>
       <td style="width:55%;"></td>
       <td style="width:45%;">
         <table style="width:100%;border-collapse:collapse;"><tr style="border-top:2px solid #1a2b3c;">
-          <td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">Grand Total</td>
+          <td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">${L.grandTotal}</td>
           <td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#1a2b3c;">${totalFormatted}</td>
         </tr></table>
       </td>
@@ -201,18 +297,18 @@ export async function sendPaymentReminderAction(orderId: string) {
   <!-- Bank details — both accounts -->
   <div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
     <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
-      <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
+      <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">${L.bankTransferDetails}</span>
     </div>
     <table style="width:100%;border-collapse:collapse;"><tr>
       <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
-        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Regular speed</div>
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${L.regularSpeed}</div>
         <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
           <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">SI56 6100 0002 8944 371</td></tr>
           <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">HDELSI22</td></tr>
         </table>
       </td>
       <td style="width:50%;padding:18px 20px;vertical-align:top;">
-        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Faster</div>
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">${L.faster}</div>
         <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
           <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">BE55 9052 7486 2944</td></tr>
           <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">TRWIBEB1XXX</td></tr>
@@ -223,16 +319,16 @@ export async function sendPaymentReminderAction(orderId: string) {
   <!-- Reference notice -->
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
-      <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
+      <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">${L.reference}</td>
       <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${refCode}</td>
     </tr></table>
-    <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
+    <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">${L.referenceNote}</p>
   </div>
   <!-- CTA buttons -->
   <div style="padding:0 48px 32px;text-align:center;">
-    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">⚡ Pay Now with Wise</a>
+    <a href="${wisePayUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;margin-bottom:12px;">${L.payNowWise}</a>
     <br><br>
-    <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">View Order in My Account</a>
+    <a href="${orderLink}" style="display:inline-block;background:#1a2b3c;color:#ffffff;padding:14px 36px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:0.3px;">${L.viewOrder}</a>
   </div>
   <!-- Footer -->
   <div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
@@ -243,7 +339,7 @@ export async function sendPaymentReminderAction(orderId: string) {
 
     await sendEmail({
         to: order.customer_email,
-        subject: `Payment Reminder — Order #${order.order_number} (${totalFormatted})`,
+        subject: `${L.reminderSubject} — #${order.order_number} (${totalFormatted})`,
         html,
         orderId,
         emailType: 'payment_reminder',

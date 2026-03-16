@@ -721,6 +721,7 @@
     "pending": "In sospeso",
     "confirmed": "Confermato",
     "invoice": "Fattura",
+    "proforma": "Proforma",
     "invoiceNotReady": "La fattura sarà disponibile dopo la consegna.",
     "modifyOrder": "Modifica ordine",
     "cancelOrder": "Annulla ordine",

@@ -16,6 +16,7 @@ interface AdminOrderActionsProps {
     confirmedAt: string | null
     packingSlipUrl?: string | null
     shippingLabelUrl?: string | null
+    invoiceUrl?: string | null
     customerEmail?: string | null
     sendCount?: number
     orderTotal?: number
@@ -87,7 +88,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -407,9 +408,29 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
 
                 {/* Step 4: Packing */}
                 <StepCard step="packing" currentStep={currentStep} title="Packing" subtitle="Generate packing slip & prepare items" icon="4" color="blue">
-                    <button onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
-                        className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition">
-                        Generate Packing Slip
+                    <button
+                        onClick={async () => {
+                            // Open the PDF in a new tab
+                            window.open(`/api/orders/${orderId}/packing-slip`, '_blank')
+                            // Save packing slip URL to DB so the workflow can advance
+                            setLoading(true)
+                            try {
+                                const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
+                                const { error: updateErr } = await supabase
+                                    .from('orders')
+                                    .update({ packing_slip_url: packingUrl })
+                                    .eq('id', orderId)
+                                if (updateErr) console.error('Failed to save packing slip URL:', updateErr)
+                                router.refresh()
+                            } catch (err) {
+                                console.error('Error saving packing slip URL:', err)
+                            } finally {
+                                setLoading(false)
+                            }
+                        }}
+                        disabled={loading}
+                        className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50">
+                        {loading ? 'Processing...' : 'Generate Packing Slip'}
                     </button>
                 </StepCard>
 
@@ -487,6 +508,36 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     </div>
                 </StepCard>
             </div>
+
+            {/* Uploaded Documents */}
+            {(invoiceUrl || packingSlipUrl || shippingLabelUrl) && (
+                <div className="mt-4 border-t pt-3">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Documents</div>
+                    <div className="flex flex-wrap gap-2">
+                        {invoiceUrl && (
+                            <a href={invoiceUrl} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[10px] font-bold hover:bg-purple-100 transition">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Invoice
+                            </a>
+                        )}
+                        {packingSlipUrl && (
+                            <a href={packingSlipUrl} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Packing Slip
+                            </a>
+                        )}
+                        {shippingLabelUrl && (
+                            <a href={shippingLabelUrl} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold hover:bg-red-100 transition">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Shipping Label
+                            </a>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Manual Uploads */}
             <details className="mt-4 border-t pt-3">

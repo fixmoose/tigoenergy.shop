@@ -721,6 +721,7 @@
     "pending": "Venter",
     "confirmed": "Bekreftet",
     "invoice": "Faktura",
+    "proforma": "Proforma",
     "invoiceNotReady": "Fakturaen blir tilgjengelig for nedlasting når ordren er levert.",
     "modifyOrder": "Endre ordre",
     "cancelOrder": "Avbestille ordre",

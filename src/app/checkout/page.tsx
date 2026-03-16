@@ -869,9 +869,9 @@ export default function CheckoutPage() {
                                 <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
                                 {t('shippingAddress')}
                             </h2>
-                            {savedAddresses.length > 0 && (
+                            {savedAddresses.filter(a => !a.isViesAddress).length > 0 && (
                                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {savedAddresses.map(addr => (
+                                    {savedAddresses.filter(a => !a.isViesAddress).map(addr => (
                                         <button key={addr.id} type="button" onClick={() => handleSelectAddress(addr)} className={`text-left p-3 border-2 rounded-lg ${selectedAddressId === addr.id ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
                                             {(addr.label || addr.isDefaultShipping) && (
                                                 <div className="flex items-center gap-2 mb-1">
@@ -932,13 +932,14 @@ export default function CheckoutPage() {
                                 )}
                                 <div className="md:col-span-2">
                                     <input
-                                        ref={shippingRef}
+                                        ref={selectedAddressId ? undefined : shippingRef}
                                         type="text"
                                         name="shipping_street"
                                         required
+                                        readOnly={!!selectedAddressId}
                                         value={formData.shipping_street}
                                         onChange={handleChange}
-                                        className={getInputClass('shipping_street')}
+                                        className={`${getInputClass('shipping_street')} ${selectedAddressId ? 'bg-gray-50 cursor-not-allowed' : ''}`}
                                         placeholder={t('streetAddress')}
                                     />
                                 </div>
@@ -952,8 +953,8 @@ export default function CheckoutPage() {
                                         placeholder="Suite, Apt, PO Box, etc. (Optional)"
                                     />
                                 </div>
-                                <input type="text" name="shipping_postal_code" required value={formData.shipping_postal_code} onChange={handleChange} className={getInputClass('shipping_postal_code')} placeholder={t('postalCode')} />
-                                <input type="text" name="shipping_city" required value={formData.shipping_city} onChange={handleChange} className={getInputClass('shipping_city')} placeholder={t('city')} />
+                                <input type="text" name="shipping_postal_code" required readOnly={!!selectedAddressId} value={formData.shipping_postal_code} onChange={handleChange} className={`${getInputClass('shipping_postal_code')} ${selectedAddressId ? 'bg-gray-50 cursor-not-allowed' : ''}`} placeholder={t('postalCode')} />
+                                <input type="text" name="shipping_city" required readOnly={!!selectedAddressId} value={formData.shipping_city} onChange={handleChange} className={`${getInputClass('shipping_city')} ${selectedAddressId ? 'bg-gray-50 cursor-not-allowed' : ''}`} placeholder={t('city')} />
                                 <div className="md:col-span-2">
                                     {effectiveIsB2B && formData.vat_id ? (
                                         <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50 text-gray-700">

@@ -913,6 +913,7 @@
     "pending": "Pending",
     "confirmed": "Confirmed",
     "invoice": "Invoice",
+    "proforma": "Proforma",
     "invoiceNotReady": "Invoice will be available for download once the order is delivered.",
     "modifyOrder": "Modify Order",
     "cancelOrder": "Cancel Order",

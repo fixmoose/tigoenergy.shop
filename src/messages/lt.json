@@ -721,6 +721,7 @@
     "pending": "Laukiama",
     "confirmed": "Patvirtinta",
     "invoice": "Sąskaita faktūra",
+    "proforma": "Proforma",
     "invoiceNotReady": "Sąskaita faktūra bus prieinama atsisiųsti po užsakymo pristatymo.",
     "modifyOrder": "Keisti užsakymą",
     "cancelOrder": "Atšaukti užsakymą",

@@ -721,6 +721,7 @@
     "pending": "Pendiente",
     "confirmed": "Confirmado",
     "invoice": "Factura",
+    "proforma": "Proforma",
     "invoiceNotReady": "La factura estará disponible tras la entrega.",
     "modifyOrder": "Modificar pedido",
     "cancelOrder": "Cancelar pedido",

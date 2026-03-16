@@ -421,6 +421,15 @@ export default function OrderDetailsPage() {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                                     {t('invoice')}
                                 </button>
+                                <a
+                                    href={`/api/orders/${order.id}/proforma`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    {t('proforma')}
+                                </a>
                                 <div className="flex flex-col items-end gap-1">
                                     <div className="flex flex-wrap items-center gap-3">
                                         {canModify && (
@@ -607,82 +616,8 @@ export default function OrderDetailsPage() {
                                 })}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Right Column: Summary */}
-                    <div className="space-y-6">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 sticky top-[140px] z-30">
-                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">{t('paymentSummary')}</h3>
-                            <div className="space-y-4">
-                                <div className="flex justify-between text-gray-500 text-sm">
-                                    <span>{t('subtotalNet')}</span>
-                                    <span className="font-bold text-gray-900">{order.currency} {order.subtotal.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-500 text-sm">
-                                    <span>{t('vat', { rate: ((order.vat_rate || 0.19) * 100).toFixed(0) })}</span>
-                                    <span className="font-bold text-gray-900">{order.currency} {order.vat_amount.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-500 text-sm">
-                                    <span>{t('shipping', { carrier: order.shipping_carrier })}</span>
-                                    <span className="font-bold text-gray-900">{order.currency} {order.shipping_cost.toFixed(2)}</span>
-                                </div>
-                                <div className="pt-6 border-t border-gray-100 flex justify-between items-center bg-gray-50 -mx-8 px-8 py-5 mt-4">
-                                    <span className="text-xs font-black text-gray-900 uppercase tracking-widest">{t('grandTotal')}</span>
-                                    <span className="text-3xl font-black text-green-600">{order.currency} {order.total.toFixed(2)}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 space-y-4">
-                                <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                                        <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest">{t('paymentDetails')}</span>
-                                    </div>
-                                    <p className="text-sm text-blue-700 font-black capitalize mb-1">{order.payment_method?.replace(/_/g, ' ')}</p>
-                                    <p className="text-[10px] text-blue-500 uppercase tracking-widest">Status: <span className="font-black underline">{order.payment_status}</span></p>
-
-                                    {order.payment_status === 'pending' && (order.payment_method === 'wise' || order.payment_method === 'invoice' || order.payment_method === 'iban' || order.payment_method === 'bank_transfer') && (
-                                        <div className="mt-4 pt-4 border-t border-blue-100">
-                                            <a
-                                                href={`https://wise.com/pay/business/initraenergijadoo?amount=${order.total.toFixed(2)}&currency=${order.currency || 'EUR'}&description=${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-700 transition w-full"
-                                            >
-                                                <span>{t('payNowWise')}</span>
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                </svg>
-                                            </a>
-                                            <p className="text-[9px] text-blue-400 mt-2 text-center leading-tight">
-                                                {t('wiseSupports')}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {order.tracking_number && (
-                                    <div className="bg-green-50 p-5 rounded-2xl border border-green-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                            <span className="text-[10px] font-black text-green-800 uppercase tracking-widest">{t('trackingInfo')}</span>
-                                        </div>
-                                        <p className="text-xs text-green-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
-                                        <a
-                                            href={order.tracking_url || '#'}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"
-                                        >
-                                            {order.tracking_number}
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Tigo Product Support */}
+                        {/* Tigo Product Support — below items for visibility */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <button
                                 onClick={() => setTigoSupport(s => ({ ...s, open: !s.open }))}
@@ -764,6 +699,80 @@ export default function OrderDetailsPage() {
                                     )}
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Right Column: Summary */}
+                    <div className="space-y-6">
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 sticky top-[140px] z-30">
+                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">{t('paymentSummary')}</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between text-gray-500 text-sm">
+                                    <span>{t('subtotalNet')}</span>
+                                    <span className="font-bold text-gray-900">{order.currency} {order.subtotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-500 text-sm">
+                                    <span>{t('vat', { rate: ((order.vat_rate || 0.19) * 100).toFixed(0) })}</span>
+                                    <span className="font-bold text-gray-900">{order.currency} {order.vat_amount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-500 text-sm">
+                                    <span>{t('shipping', { carrier: order.shipping_carrier })}</span>
+                                    <span className="font-bold text-gray-900">{order.currency} {order.shipping_cost.toFixed(2)}</span>
+                                </div>
+                                <div className="pt-6 border-t border-gray-100 flex justify-between items-center bg-gray-50 -mx-8 px-8 py-5 mt-4">
+                                    <span className="text-xs font-black text-gray-900 uppercase tracking-widest">{t('grandTotal')}</span>
+                                    <span className="text-3xl font-black text-green-600">{order.currency} {order.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 space-y-4">
+                                <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                                        <span className="text-[10px] font-black text-blue-800 uppercase tracking-widest">{t('paymentDetails')}</span>
+                                    </div>
+                                    <p className="text-sm text-blue-700 font-black capitalize mb-1">{order.payment_method?.replace(/_/g, ' ')}</p>
+                                    <p className="text-[10px] text-blue-500 uppercase tracking-widest">Status: <span className="font-black underline">{order.payment_status}</span></p>
+
+                                    {order.payment_status === 'pending' && (order.payment_method === 'wise' || order.payment_method === 'invoice' || order.payment_method === 'iban' || order.payment_method === 'bank_transfer') && (
+                                        <div className="mt-4 pt-4 border-t border-blue-100">
+                                            <a
+                                                href={`https://wise.com/pay/business/initraenergijadoo?amount=${order.total.toFixed(2)}&currency=${order.currency || 'EUR'}&description=${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-700 transition w-full"
+                                            >
+                                                <span>{t('payNowWise')}</span>
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                </svg>
+                                            </a>
+                                            <p className="text-[9px] text-blue-400 mt-2 text-center leading-tight">
+                                                {t('wiseSupports')}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {order.tracking_number && (
+                                    <div className="bg-green-50 p-5 rounded-2xl border border-green-100">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                            <span className="text-[10px] font-black text-green-800 uppercase tracking-widest">{t('trackingInfo')}</span>
+                                        </div>
+                                        <p className="text-xs text-green-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
+                                        <a
+                                            href={order.tracking_url || '#'}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"
+                                        >
+                                            {order.tracking_number}
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Quick Links */}

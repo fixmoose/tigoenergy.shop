@@ -721,6 +721,7 @@
     "pending": "Čeká na vyřízení",
     "confirmed": "Potvrzeno",
     "invoice": "Faktura",
+    "proforma": "Proforma",
     "invoiceNotReady": "Faktura bude k dispozici ke stažení po doručení objednávky.",
     "modifyOrder": "Upravit objednávku",
     "cancelOrder": "Zrušit objednávku",

@@ -5,6 +5,7 @@ import { getPinnedTemplate, replacePlaceholders, generatePackingItemsTableHtml, 
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
 import { getLegalClauses } from '../../../../../lib/legal-clauses'
 import { calculateTigoParcels } from '../../../../../lib/shipping/dpd'
+import { DOCUMENT_TEMPLATES } from '../../../../../lib/document-templates'
 
 export async function GET(
     req: NextRequest,
@@ -43,10 +44,13 @@ export async function GET(
     }
 
     try {
-        // 3. Get Pinned Template
-        const template = await getPinnedTemplate('packing_slip', order.language || 'en')
-        if (!template) {
-            return NextResponse.json({ error: 'Packing slip template not found' }, { status: 404 })
+        // 3. Get Pinned Template — fall back to hardcoded if DB template is broken/missing items placeholder
+        let templateHtml: string
+        const dbTemplate = await getPinnedTemplate('packing_slip', order.language || 'en')
+        if (dbTemplate?.content_html?.includes('{packing_items_table}')) {
+            templateHtml = dbTemplate.content_html
+        } else {
+            templateHtml = DOCUMENT_TEMPLATES.packing_slip
         }
 
         // 4. Prepare Data for Placeholders
@@ -88,7 +92,7 @@ export async function GET(
         }
 
         // 5. Replace Placeholders
-        let htmlContent = replacePlaceholders(template.content_html, documentData)
+        let htmlContent = replacePlaceholders(templateHtml, documentData)
 
         // 6. Inject legal clauses
         const isB2BOrder = !!(order.company_name || order.vat_id)

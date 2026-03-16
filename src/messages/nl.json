@@ -721,6 +721,7 @@
     "pending": "In behandeling",
     "confirmed": "Bevestigd",
     "invoice": "Factuur",
+    "proforma": "Proforma",
     "invoiceNotReady": "De factuur is beschikbaar voor download zodra de bestelling is afgeleverd.",
     "modifyOrder": "Bestelling wijzigen",
     "cancelOrder": "Bestelling annuleren",

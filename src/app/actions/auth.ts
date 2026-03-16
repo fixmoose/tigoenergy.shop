@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmail, renderTemplate, getEmailTranslations, notifyAdmins } from '@/lib/email'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
+import { normalizeCountryCode } from '@/lib/normalize-country'
 
 export async function registerUserAction(formData: any) {
     try {
@@ -48,7 +49,7 @@ export async function registerUserAction(formData: any) {
                 street2: address2 || '',
                 city: city || '',
                 postalCode: postalCode || '',
-                country: country || '',
+                country: normalizeCountryCode(country || ''),
                 isDefaultShipping: true,
                 isDefaultBilling: true,
             })
@@ -150,7 +151,7 @@ export async function registerB2BUserAction(formData: any) {
                 street2: companyAddress2 || '',
                 city: city || '',
                 postalCode: postalCode || '',
-                country: country || '',
+                country: normalizeCountryCode(country || ''),
                 isViesAddress: true,
                 isDefaultBilling: !extraBillingAddress,
                 isDefaultShipping: !extraShippingAddress,
@@ -163,7 +164,7 @@ export async function registerB2BUserAction(formData: any) {
                 street: extraShippingAddress.street,
                 city: extraShippingAddress.city || '',
                 postalCode: extraShippingAddress.postalCode || '',
-                country: extraShippingAddress.country || country || '',
+                country: normalizeCountryCode(extraShippingAddress.country || country || ''),
                 isDefaultShipping: true,
                 isDefaultBilling: false,
             })
@@ -175,7 +176,7 @@ export async function registerB2BUserAction(formData: any) {
                 street: extraBillingAddress.street,
                 city: extraBillingAddress.city || '',
                 postalCode: extraBillingAddress.postalCode || '',
-                country: extraBillingAddress.country || country || '',
+                country: normalizeCountryCode(extraBillingAddress.country || country || ''),
                 isDefaultShipping: false,
                 isDefaultBilling: true,
             })

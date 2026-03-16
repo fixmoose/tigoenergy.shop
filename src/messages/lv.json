@@ -721,6 +721,7 @@
     "pending": "Gaida",
     "confirmed": "Apstiprināts",
     "invoice": "Rēķins",
+    "proforma": "Proforma",
     "invoiceNotReady": "Rēķins būs pieejams lejupielādei pēc pasūtījuma piegādes.",
     "modifyOrder": "Mainīt pasūtījumu",
     "cancelOrder": "Atcelt pasūtījumu",

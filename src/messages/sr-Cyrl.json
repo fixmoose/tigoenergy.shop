@@ -718,6 +718,7 @@
     "pending": "На чекању",
     "confirmed": "Потврђено",
     "invoice": "Фактура",
+    "proforma": "Proforma",
     "invoiceNotReady": "Фактура ће бити доступна за преузимање након испоруке наруџбине.",
     "modifyOrder": "Измени наруџбину",
     "cancelOrder": "Откажи наруџбину",

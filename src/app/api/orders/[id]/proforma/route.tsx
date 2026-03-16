@@ -241,18 +241,15 @@ export async function GET(
             label_faster: L.labelFaster,
         }
 
-        // Try DB template first, fall back to built-in localized template
-        const dbTemplate = await getPinnedTemplate('proforma_invoice', lang)
-        const htmlContent = dbTemplate
-            ? replacePlaceholders(dbTemplate.content_html, documentData)
-            : replacePlaceholders(LOCALIZED_PROFORMA_TEMPLATE, documentData)
+        // Always use built-in localized template (DB templates have broken translations)
+        const htmlContent = replacePlaceholders(LOCALIZED_PROFORMA_TEMPLATE, documentData)
 
         const pdfBuffer = await generatePdfFromHtml(htmlContent)
 
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=Proforma_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=${encodeURIComponent(L.title)}_${order.order_number}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })

@@ -722,6 +722,7 @@
     "pending": "Ausstehend",
     "confirmed": "Bestätigt",
     "invoice": "Rechnung",
+    "proforma": "Proforma-Rechnung",
     "invoiceNotReady": "Die Rechnung steht nach der Lieferung zum Download bereit.",
     "modifyOrder": "Bestellung ändern",
     "cancelOrder": "Bestellung stornieren",

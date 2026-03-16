@@ -4,6 +4,19 @@ import { createClient } from '@/lib/supabase/client'
 import { Customer } from '@/types/database'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { useTranslations } from 'next-intl'
+import { MARKETS } from '@/lib/constants/markets'
+
+// Client-side country normalizer
+const COUNTRY_LOOKUP: Record<string, string> = Object.fromEntries(
+    Object.values(MARKETS).flatMap(c => [
+        [c.countryName.toUpperCase(), c.country],
+        [c.country.toUpperCase(), c.country],
+    ])
+)
+function normalizeCountry(val: string): string {
+    if (!val) return val
+    return COUNTRY_LOOKUP[val.toUpperCase()] || val
+}
 
 interface Props {
     customer: Customer
@@ -34,7 +47,7 @@ export default function AddressBook({ customer }: Props) {
             street: parsed.street,
             city: parsed.city,
             postalCode: parsed.postal_code,
-            country: parsed.country
+            country: normalizeCountry(parsed.country)
         }))
     })
 
@@ -44,7 +57,7 @@ export default function AddressBook({ customer }: Props) {
             street: newAddress.street || '',
             city: newAddress.city || '',
             postalCode: newAddress.postalCode || '',
-            country: newAddress.country || 'SI',
+            country: normalizeCountry(newAddress.country || 'SI'),
             isDefaultShipping: addresses.length === 0,
             isDefaultBilling: addresses.length === 0
         }
