@@ -378,11 +378,13 @@
       "footerNote": "Bine ați venit la bord! Așteptăm cu nerăbdare să vă sprijinim proiectele solare."
     },
     "b2bApplication": {
-      "title": "Cerere B2B primită",
-      "bannerTitle": "Verificare în curs",
-      "bannerText": "Echipa noastră examinează în prezent documentația și informațiile companiei dvs. Acest proces durează de obicei până la 48 de ore.",
-      "text": "Odată ce informațiile dvs. sunt verificate, vă vom notifica prin e-mail și contul dvs. va fi complet operațional, cu acces la prețurile B2B și instrumentele profesionale.",
-      "footerNote": "Între timp, dacă aveți întrebări urgente, nu ezitați să răspundeți la acest e-mail."
+      "title": "Cont B2B creat",
+      "greeting": "Bună ziua",
+      "thankYou": "Vă mulțumim că ați înregistrat un cont B2B la Tigo Energy SHOP. Suntem încântați să vă avem alături!",
+      "bannerTitle": "Contul dvs. este pregătit!",
+      "bannerText": "Contul dvs. B2B este acum activ. Puteți începe să faceți cumpărături imediat și să beneficiați de prețuri B2B și instrumente profesionale.",
+      "text": "Pur și simplu conectați-vă la contul dvs. pentru a răsfoi gama noastră completă de produse, a accesa prețurile B2B și a plasa comenzi.",
+      "footerNote": "Dacă aveți întrebări, nu ezitați să răspundeți la acest e-mail."
     },
     "passwordReset": {
       "title": "Resetați-vă parola",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Revizuiți-vă informațiile",
         "editDetails": "Editați detaliile",
-        "terms": "Sunt de acord cu Termenii și condițiile și Politica de utilizare acceptabilă.",
-        "privacy": "Confirm Politica de confidențialitate și înțeleg cum sunt procesate datele mele.",
+        "terms": "Sunt de acord cu <terms>Termenii și condițiile</terms> și <aup>Politica de utilizare acceptabilă</aup>.",
+        "privacy": "Confirm <privacy>Politica de confidențialitate</privacy> și înțeleg cum sunt procesate datele mele.",
         "newsletter": "Abonați-vă la Newsletter pentru cele mai recente știri și actualizări.",
         "marketing": "Sunt de acord să primesc prețuri promoționale și oferte speciale.",
         "authorized": "Confirm că sunt autorizat de companie să mă înregistrez în numele acesteia.",
-        "legitimate": "Aceasta este o entitate comercială legitimă.",
+        "legitimate": "Compania este activ juridic și nu se află în nicio procedură de insolvență sau similară.",
         "confirmCreate": "Confirmă și creează cont",
         "creating": "Se creează contul..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Nu a fost găsit niciun token de resetare. Vă rugăm să utilizați linkul de resetare din e-mail.",
       "expireNote": "Linkurile de resetare expiră după o oră sau pot fi utilizate o singură dată. Vă rugăm să solicitați un link nou.",
       "pwdPlaceholder": "Minim 6 caractere"
+    },
+    "welcomePage": {
+      "greeting": "Bun venit, {name}!",
+      "verified": "Cont verificat",
+      "message": "Adresa dvs. de e-mail a fost verificată și contul dvs. este acum activ. Acum puteți cumpăra produse Tigo la <highlight>cele mai bune prețuri din Europa</highlight>.",
+      "shopNow": "Cumpără acum",
+      "orGoTo": "Sau mergeți la",
+      "dashboard": "Panoul de control"
     }
   },
   "cookieConsent": {

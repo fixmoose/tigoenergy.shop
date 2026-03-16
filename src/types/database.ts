@@ -247,6 +247,12 @@ export interface Order {
   cancelled_at?: string | null
   terms_agreed_at?: string | null
 
+  // Order modification
+  modification_unlocked?: boolean
+  modification_unlocked_at?: string | null
+  original_order_id?: string | null
+  is_modification?: boolean
+
   created_at?: string | null
   updated_at?: string | null
 }

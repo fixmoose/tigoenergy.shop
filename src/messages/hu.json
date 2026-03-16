@@ -378,11 +378,13 @@
       "footerNote": "Üdvözöljük fedélzetén! Várjuk, hogy támogassuk napelem projektjeit."
     },
     "b2bApplication": {
-      "title": "B2B jelentkezés beérkezett",
-      "bannerTitle": "Ellenőrzés folyamatban",
-      "bannerText": "Csapatunk jelenleg is vizsgálja a dokumentációját és a céginformációkat. Ez a folyamat általában legfeljebb 48 órát vesz igénybe.",
-      "text": "Amint adatait ellenőriztük, e-mailben értesítjük, és fiókja teljes mértékben működőképessé válik a B2B árakhoz és professzionális eszközökhöz való hozzáféréssel.",
-      "footerNote": "Addig is, ha sürgős kérdése van, bátran válaszoljon erre az e-mailre."
+      "title": "B2B fiók létrehozva",
+      "greeting": "Üdvözöljük",
+      "thankYou": "Köszönjük, hogy B2B fiókot regisztrált a Tigo Energy SHOP-ban. Örülünk, hogy velünk van!",
+      "bannerTitle": "Fiókja készen áll!",
+      "bannerText": "B2B fiókja most aktív. Azonnal elkezdheti a vásárlást, és élvezheti a B2B árakat és professzionális eszközöket.",
+      "text": "Egyszerűen jelentkezzen be fiókjába, hogy böngészhesse teljes termékkínálatunkat, hozzáférjen B2B áraihoz és rendeléseket adjon le.",
+      "footerNote": "Ha kérdése van, nyugodtan válaszoljon erre az e-mailre."
     },
     "passwordReset": {
       "title": "Jelszó visszaállítása",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Információk áttekintése",
         "editDetails": "Adatok szerkesztése",
-        "terms": "Elfogadom a felhasználási feltételeket és a megfelelő használatra vonatkozó szabályzatot.",
-        "privacy": "Tudomásul veszem az adatvédelmi szabályzatot és megértettem az adataim feldolgozásának módját.",
+        "terms": "Elfogadom a <terms>felhasználási feltételeket</terms> és a <aup>megfelelő használatra vonatkozó szabályzatot</aup>.",
+        "privacy": "Tudomásul veszem az <privacy>adatvédelmi szabályzatot</privacy> és megértettem az adataim feldolgozásának módját.",
         "newsletter": "Feliratkozom a hírlevélre a legfrissebb hírekért és frissítésekért.",
         "marketing": "Beleegyezem promóciós árak és speciális ajánlatok fogadásába.",
         "authorized": "Megerősítem, hogy felhatalmazással rendelkezem a cég nevében történő regisztrációhoz.",
-        "legitimate": "Ez egy legitim gazdasági egység.",
+        "legitimate": "A vállalkozás jogilag aktív, és nem áll csőd- vagy hasonló eljárás alatt.",
         "confirmCreate": "Megerősítés és fiók létrehozása",
         "creating": "Fiók létrehozása..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Nem található visszaállító token. Kérjük, használja az e-mailben kapott visszaállító linket.",
       "expireNote": "A visszaállító linkek 1 óra után lejárnak, vagy csak egyszer használhatók fel. Kérjük, kérjen új linket.",
       "pwdPlaceholder": "Min. 6 karakter"
+    },
+    "welcomePage": {
+      "greeting": "Üdvözöljük, {name}!",
+      "verified": "Fiók megerősítve",
+      "message": "Az e-mail címe megerősítésre került, és fiókja most aktív. Most már vásárolhat Tigo termékeket a <highlight>legjobb európai árakon</highlight>.",
+      "shopNow": "Vásárlás most",
+      "orGoTo": "Vagy lépjen az",
+      "dashboard": "Irányítópultra"
     }
   },
   "cookieConsent": {

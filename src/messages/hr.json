@@ -378,11 +378,13 @@
       "footerNote": "Dobrodošli! Radujemo se suradnji na vašim solarnih projektima."
     },
     "b2bApplication": {
-      "title": "B2B prijava primljena",
-      "bannerTitle": "Provjera u tijeku",
-      "bannerText": "Naš tim trenutno pregledava vašu dokumentaciju i podatke o tvrtki. Ovaj postupak obično traje do 48 sati.",
-      "text": "Nakon što se vaši podaci verificiraju, obavijestit ćemo vas e-mailom i vaš će račun biti potpuno operativan s pristupom B2B cijenama i profesionalnim alatima.",
-      "footerNote": "U međuvremenu, ako imate bilo kakvih hitnih pitanja, slobodno odgovorite na ovaj e-mail."
+      "title": "B2B račun kreiran",
+      "greeting": "Pozdrav",
+      "thankYou": "Hvala što ste registrirali B2B račun na Tigo Energy SHOP. Drago nam je što ste s nama!",
+      "bannerTitle": "Vaš račun je spreman!",
+      "bannerText": "Vaš B2B račun je sada aktivan. Odmah možete početi s kupovinom i uživati u B2B cijenama i profesionalnim alatima.",
+      "text": "Jednostavno se prijavite na svoj račun kako biste pregledali našu kompletnu ponudu proizvoda, pristupili B2B cijenama i napravili narudžbe.",
+      "footerNote": "Ako imate pitanja, slobodno odgovorite na ovaj e-mail."
     },
     "passwordReset": {
       "title": "Ponastavljanje lozinke",
@@ -492,12 +494,12 @@
       "agreements": {
         "reviewInfo": "Pregledajte svoje podatke",
         "editDetails": "Uredi podatke",
-        "terms": "Slažem se s uvjetima pružanja usluge i politikom prihvatljivog korištenja.",
-        "privacy": "Potvrđujem upoznatost s politikom privatnosti i razumijem kako se obrađuju moji podaci.",
+        "terms": "Slažem se s <terms>uvjetima pružanja usluge</terms> i <aup>politikom prihvatljivog korištenja</aup>.",
+        "privacy": "Potvrđujem upoznatost s <privacy>politikom privatnosti</privacy> i razumijem kako se obrađuju moji podaci.",
         "newsletter": "Pretplatite se na naš newsletter za najnovije vijesti i ažuriranja.",
         "marketing": "Pristajem na primanje promotivnih ponuda i posebnih pogodnosti.",
         "authorized": "Potvrđujem da sam ovlašten od strane tvrtke za registraciju u njeno ime.",
-        "legitimate": "Ovo je legitiman poslovni subjekt.",
+        "legitimate": "Tvrtka je pravno aktivna i nije u stečajnom ili sličnom postupku.",
         "confirmCreate": "Potvrdi i kreiraj račun",
         "creating": "Kreiranje računa..."
       },
@@ -561,6 +563,14 @@
       "noToken": "Token za ponovno postavljanje nije pronađen. Molimo upotrijebite poveznicu iz svoje e-pošte.",
       "expireNote": "Poveznice za ponovno postavljanje istječu nakon 1 sata ili se mogu upotrijebiti samo jednom. Molimo zatražite novu poveznicu.",
       "pwdPlaceholder": "Najmanje 6 znakova"
+    },
+    "welcomePage": {
+      "greeting": "Dobrodošli, {name}!",
+      "verified": "Račun potvrđen",
+      "message": "Vaša e-mail adresa je potvrđena i vaš račun je sada aktivan. Sada možete kupovati Tigo proizvode po <highlight>najboljim cijenama u Europi</highlight>.",
+      "shopNow": "Kupuj sada",
+      "orGoTo": "Ili idite na svoju",
+      "dashboard": "Upravljačku ploču"
     }
   },
   "staticPages": {

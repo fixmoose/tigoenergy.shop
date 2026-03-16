@@ -378,11 +378,13 @@
       "footerNote": "Welkom aan boord! We kijken ernaar uit om uw zonne-energieprojecten te ondersteunen."
     },
     "b2bApplication": {
-      "title": "B2B-aanvraag ontvangen",
-      "bannerTitle": "Verificatie in uitvoering",
-      "bannerText": "Ons team beoordeelt momenteel uw documentatie en bedrijfsinformatie. Dit proces duurt doorgaans maximaal 48 uur.",
-      "text": "Zodra uw informatie is geverifieerd, stellen wij u per e-mail op de hoogte en is uw account volledig operationeel met toegang tot B2B-prijzen en professionele tools.",
-      "footerNote": "Mocht u in de tussentijd dringende vragen hebben, aarzel dan niet om op deze e-mail te reageren."
+      "title": "B2B-account aangemaakt",
+      "greeting": "Hallo",
+      "thankYou": "Bedankt voor het registreren van een B2B-account bij Tigo Energy SHOP. We zijn blij dat u erbij bent!",
+      "bannerTitle": "Uw account is gereed!",
+      "bannerText": "Uw B2B-account is nu actief. U kunt direct beginnen met winkelen en profiteren van B2B-prijzen en professionele tools.",
+      "text": "Log eenvoudig in op uw account om ons volledige productassortiment te bekijken, toegang te krijgen tot uw B2B-prijzen en bestellingen te plaatsen.",
+      "footerNote": "Als u vragen heeft, beantwoord dan gerust deze e-mail."
     },
     "passwordReset": {
       "title": "Stel je wachtwoord opnieuw in",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Controleer uw gegevens",
         "editDetails": "Gegevens bewerken",
-        "terms": "Ik ga akkoord met de Algemene Voorwaarden en het Acceptable Use Policy.",
-        "privacy": "Ik erken het privacybeleid en begrijp hoe mijn gegevens worden verwerkt.",
+        "terms": "Ik ga akkoord met de <terms>Algemene Voorwaarden</terms> en het <aup>Acceptable Use Policy</aup>.",
+        "privacy": "Ik erken het <privacy>privacybeleid</privacy> en begrijp hoe mijn gegevens worden verwerkt.",
         "newsletter": "Abonneer op onze nieuwsbrief voor het laatste nieuws en updates.",
         "marketing": "Ik ga akkoord met het ontvangen van promotionele prijzen en speciale aanbiedingen.",
         "authorized": "Ik bevestig dat ik door het bedrijf ben gemachtigd om namens hen te registreren.",
-        "legitimate": "Dit is een legitieme zakelijke entiteit.",
+        "legitimate": "Het bedrijf is juridisch actief en verkeert niet in een faillissements- of vergelijkbare procedure.",
         "confirmCreate": "Bevestigen & Account aanmaken",
         "creating": "Account aanmaken..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Geen reset-token gevonden. Gebruik de reset-link uit uw e-mail.",
       "expireNote": "Reset-links verlopen na 1 uur of kunnen slechts één keer worden gebruikt. Vraag een nieuwe link aan.",
       "pwdPlaceholder": "Min. 6 tekens"
+    },
+    "welcomePage": {
+      "greeting": "Welkom, {name}!",
+      "verified": "Account geverifieerd",
+      "message": "Uw e-mailadres is geverifieerd en uw account is nu actief. U kunt nu Tigo-producten kopen tegen de <highlight>beste prijzen in Europa</highlight>.",
+      "shopNow": "Nu winkelen",
+      "orGoTo": "Of ga naar uw",
+      "dashboard": "Dashboard"
     }
   },
   "cookieConsent": {

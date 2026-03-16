@@ -49,8 +49,8 @@ interface PaymentPrefs {
 }
 
 const PAYMENT_METHODS = [
-    { id: 'wise', label: 'Quick Pay (Wise, ApplePay, Credit & Debit Cards)', desc: 'Pay instantly via Wise landing page.', icon: '⚡', enabled: true },
-    { id: 'invoice', label: 'IBAN Bank Transfer', desc: 'Prepayment via Wise BE account. Proforma Invoice will be issued after placing an order. Goods will ship after payment confirmed on our side.', icon: '🏦', enabled: true },
+    { id: 'wise', labelKey: 'paymentWiseLabel', descKey: 'paymentWiseDesc', icon: '⚡', enabled: true },
+    { id: 'invoice', labelKey: 'paymentInvoiceLabel', descKey: 'paymentInvoiceDesc', icon: '🏦', enabled: true },
 ]
 
 export default function CheckoutPage() {
@@ -65,6 +65,7 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [modifyingOrder, setModifyingOrder] = useState<{ orderNumber: string; orderId: string } | null>(null)
     const [billingSame, setBillingSame] = useState(true)
     const [createAccount, setCreateAccount] = useState(false)
     const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
@@ -234,6 +235,13 @@ export default function CheckoutPage() {
                     const defaultShipping = addresses.find(a => a.isDefaultShipping)
                     const defaultBilling = addresses.find(a => a.isDefaultBilling)
 
+                    // Fallback to user_metadata for address fields when no saved addresses
+                    const meta = user.user_metadata || {}
+                    const shippingStreet = defaultShipping?.street || meta.company_address || meta.street || ''
+                    const shippingCity = defaultShipping?.city || meta.city || ''
+                    const shippingPostal = defaultShipping?.postalCode || meta.postal_code || meta.postalCode || ''
+                    const shippingCountry = defaultShipping?.country || meta.country || ''
+
                     setFormData(prev => ({
                         ...prev,
                         email: user.email || '',
@@ -241,16 +249,16 @@ export default function CheckoutPage() {
                         shipping_last_name: customerData.last_name || user.user_metadata?.last_name || '',
                         shipping_phone: (customerData.phone && customerData.phone.length > 4) ? customerData.phone : (user.user_metadata?.phone && user.user_metadata.phone.length > 4 ? user.user_metadata.phone : ''),
                         company_name: customerData.company_name || user.user_metadata?.company_name || '',
-                        shipping_street: defaultShipping?.street || '',
-                        shipping_city: defaultShipping?.city || '',
-                        shipping_postal_code: defaultShipping?.postalCode || '',
-                        shipping_country: defaultShipping?.country || '',
+                        shipping_street: shippingStreet,
+                        shipping_city: shippingCity,
+                        shipping_postal_code: shippingPostal,
+                        shipping_country: shippingCountry,
                         vat_id: customerData.vat_id || user.user_metadata?.vat_id || '',
-                        // Pre-fill billing from saved billing address
-                        billing_street: defaultBilling?.street || defaultShipping?.street || '',
-                        billing_city: defaultBilling?.city || defaultShipping?.city || '',
-                        billing_postal_code: defaultBilling?.postalCode || defaultShipping?.postalCode || '',
-                        billing_country: defaultBilling?.country || defaultShipping?.country || '',
+                        // Pre-fill billing from saved billing address, fallback to shipping
+                        billing_street: defaultBilling?.street || shippingStreet,
+                        billing_city: defaultBilling?.city || shippingCity,
+                        billing_postal_code: defaultBilling?.postalCode || shippingPostal,
+                        billing_country: defaultBilling?.country || shippingCountry,
                     }))
 
                     if (defaultShipping) {
@@ -283,7 +291,20 @@ export default function CheckoutPage() {
             setLoading(false)
         }
         init()
+
+        // Check if modifying an order
+        try {
+            const raw = sessionStorage.getItem('modifying_order')
+            if (raw) setModifyingOrder(JSON.parse(raw))
+        } catch {}
     }, [])
+
+    // Auto-validate VAT on load for B2B users with a pre-filled VAT ID
+    useEffect(() => {
+        if (!loading && formData.vat_id && formData.vat_id.length >= 4 && !vatResult && !validatingVat) {
+            handleVatValidate()
+        }
+    }, [loading])
 
     const totalWeight = items.reduce((sum, item) => sum + ((item.weight_kg || 0) * (item.quantity || 0)), 0)
 
@@ -531,7 +552,7 @@ export default function CheckoutPage() {
             requiredFields.push('billing_first_name', 'billing_last_name', 'billing_street', 'billing_city', 'billing_postal_code', 'billing_country')
         }
         if (!selectedShippingId && shippingRates.length > 0) {
-            setError('Please select a shipping method.')
+            setError(t('selectShippingMethod'))
             return false
         }
         const missing = requiredFields.filter(field => {
@@ -548,7 +569,7 @@ export default function CheckoutPage() {
 
         if (missing.length > 0) {
             setInvalidFields(missing)
-            setError('Missing mandatory information. Please check the highlighted fields below.')
+            setError(t('requiredFields'))
 
             // Scroll to the first missing field and highlight all
             const firstMissingField = missing[0]
@@ -567,7 +588,7 @@ export default function CheckoutPage() {
             return false
         }
         if (!user && !emailVerified) {
-            setError("Please verify your email address first")
+            setError(t('verifyEmailFirst'))
             setInvalidFields(['email'])
 
             // Flash email field and scroll to it
@@ -622,6 +643,7 @@ export default function CheckoutPage() {
             data.append('display_currency', currentCurrency.code)
             data.append('exchange_rate', String(rates[currentCurrency.code] || 1))
             if (selectedShippingId) data.append('shipping_id', selectedShippingId)
+            if (modifyingOrder) data.append('original_order_id', modifyingOrder.orderId)
 
             const res = await placeOrder({}, data)
             if (res.error) {
@@ -629,6 +651,7 @@ export default function CheckoutPage() {
                 resetRecaptcha()
             } else if (res.success && res.orderId) {
                 clearCart()
+                sessionStorage.removeItem('modifying_order')
                 window.location.href = `/checkout/success/${res.orderId}`
             }
         } catch (err: any) {
@@ -690,6 +713,16 @@ export default function CheckoutPage() {
         <div className="bg-gray-50 min-h-screen pb-12">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('secureCheckout')}</h1>
+
+                {modifyingOrder && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        <p className="text-sm text-blue-800">
+                            <strong>Updating Order #{modifyingOrder.orderNumber}</strong> — Review your changes and place the updated order.
+                        </p>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         {(invalidFields.length > 0 || error) && (
@@ -968,7 +1001,7 @@ export default function CheckoutPage() {
                                                     </div>
                                                 </div>
                                                 <div className="font-bold text-gray-900">
-                                                    {isPickup ? t('personalPickup') : (effectiveRate === 0 ? t('free') : formatPriceGross(effectiveRate))}
+                                                    {isPickup ? t('personalPickup') : (effectiveRate === 0 ? t('free') : formatPriceNet(effectiveRate))}
                                                 </div>
                                             </label>
                                         )
@@ -1036,8 +1069,8 @@ export default function CheckoutPage() {
                                     <label key={method.id} className={`flex items-center gap-3 p-4 border rounded-xl transition-all ${method.enabled ? 'cursor-pointer hover:border-green-300 hover:bg-green-50/30' : 'opacity-50 cursor-not-allowed bg-gray-50'} ${method.id === preferredPayment && method.enabled ? 'border-green-500 bg-green-50/50' : 'border-gray-200'}`}>
                                         <input type="radio" name="payment_method" value={method.id} defaultChecked={method.id === preferredPayment} disabled={!method.enabled} className="text-green-600" />
                                         <div className="flex-1">
-                                            <div className="font-bold text-gray-900">{method.label} {method.id === preferredPayment && <span className="ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">{t('preferred')}</span>}</div>
-                                            <div className="text-xs text-gray-500">{method.desc}</div>
+                                            <div className="font-bold text-gray-900">{t(method.labelKey)} {method.id === preferredPayment && <span className="ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">{t('preferred')}</span>}</div>
+                                            <div className="text-xs text-gray-500">{t(method.descKey)}</div>
                                         </div>
                                         <div className="text-xl">{method.icon}</div>
                                     </label>
@@ -1078,7 +1111,7 @@ export default function CheckoutPage() {
 
                             <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
                                 <div className="flex justify-between text-gray-600"><span>{t('subtotalNet')}</span><span>{formatPriceNet(subtotal)}</span></div>
-                                <div className="flex justify-between text-gray-600"><span>{t('shipping')}</span><span>{currentShippingCost === 0 ? t('free') : formatPriceNet(currentShippingCost)}</span></div>
+                                <div className="flex justify-between text-gray-600"><span>{t('shipping')}</span><span>{selectedShippingRate?.carrier === 'Personal Pick-up' ? t('personalPickup') : (currentShippingCost === 0 ? t('free') : formatPriceNet(currentShippingCost))}</span></div>
                                 {!appliesVat && (
                                     <div className="flex justify-between text-gray-600"><span>{t('vat', { rate: (vatRate * 100).toFixed(0) })}</span><span>{formatPriceNet(0)}</span></div>
                                 )}
@@ -1150,6 +1183,9 @@ export default function CheckoutPage() {
                             <button type="submit" disabled={submitting} className="w-full mt-6 bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
                                 {submitting ? t('processing') : t('placeOrder')}
                             </button>
+                            <Link href="/cart" className="block w-full mt-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium py-2 transition-colors">
+                                ← {t('backToCart')}
+                            </Link>
                         </div>
                     </div>
                 </form>

@@ -155,6 +155,7 @@
     "vat": "VAT ({rate}%)",
     "free": "FREE",
     "placeOrder": "Place Order",
+    "backToCart": "Back to Cart",
     "processing": "Processing...",
     "termsAgree": "I agree to the",
     "termsConditions": "Terms & Conditions",
@@ -164,8 +165,10 @@
     "newsletterSubscribe": "Subscribe to our newsletter for solar updates and exclusive offers.",
     "b2bNote": "B2B Order: Net prices shown. VAT reverse charge may apply.",
     "pricesIncludeVat": "Prices include {rate}% VAT.",
-    "requiredFields": "Please complete all required fields",
+    "requiredFields": "Missing mandatory information. Please check the highlighted fields below.",
     "requiredFieldsDesc": "Fields marked with a red border are mandatory.",
+    "verifyEmailFirst": "Please verify your email address first.",
+    "selectShippingMethod": "Please select a shipping method.",
     "noShippingMethods": "No shipping methods available for your selection.",
     "newAddress": "+ New Address",
     "comingSoon": "Coming soon",
@@ -199,7 +202,11 @@
     "selectCountry": "Select Country",
     "poNumber": "Purchase Order (P.O.)",
     "poNumberOptional": "optional",
-    "poNumberPlaceholder": "e.g. PO-2024-001 or project name"
+    "poNumberPlaceholder": "e.g. PO-2024-001 or project name",
+    "paymentWiseLabel": "Quick Pay (Wise, ApplePay, Credit & Debit Cards)",
+    "paymentWiseDesc": "Pay instantly via Wise landing page.",
+    "paymentInvoiceLabel": "SEPA/SWIFT Bank Transfer",
+    "paymentInvoiceDesc": "Prepayment via SEPA/Wire. Proforma Invoice will be issued after placing an order. Goods will ship after payment confirmed on our side."
   },
   "subcategories": {
     "Optimization": "Optimization",
@@ -382,11 +389,13 @@
       "footerNote": "Welcome aboard! We look forward to supporting your solar projects."
     },
     "b2bApplication": {
-      "title": "B2B Application Received",
-      "bannerTitle": "Verification in Progress",
-      "bannerText": "Our team is currently reviewing your documentation and company information. This process typically takes up to 48 hours.",
-      "text": "Once your information is verified, we will notify you via email and your account will be fully operational with access to B2B pricing and professional tools.",
-      "footerNote": "In the meantime, if you have any urgent questions, feel free to reply to this email."
+      "title": "B2B Account Created",
+      "greeting": "Hello",
+      "thankYou": "Thank you for registering a B2B account with Tigo Energy SHOP. We are excited to have you on board!",
+      "bannerTitle": "Your account is ready!",
+      "bannerText": "Your B2B account is now active. You can start shopping immediately and enjoy B2B pricing and professional tools.",
+      "text": "Simply log in to your account to browse our full product range, access your B2B pricing, and place orders.",
+      "footerNote": "If you have any questions, feel free to reply to this email."
     },
     "passwordReset": {
       "title": "Reset your password",
@@ -496,12 +505,12 @@
       "agreements": {
         "reviewInfo": "Review Your Information",
         "editDetails": "Edit Details",
-        "terms": "I agree to the Terms & Conditions and Acceptable Use Policy.",
-        "privacy": "I acknowledge the Privacy Policy and understand how my data is processed.",
+        "terms": "I agree to the <terms>Terms & Conditions</terms> and <aup>Acceptable Use Policy</aup>.",
+        "privacy": "I acknowledge the <privacy>Privacy Policy</privacy> and understand how my data is processed.",
         "newsletter": "Subscribe to our Newsletter for latest news and updates.",
         "marketing": "I agree to receive Promotional Pricing and special offers.",
         "authorized": "I confirm that I am authorized by the company to register on their behalf.",
-        "legitimate": "This is a legitimate business entity.",
+        "legitimate": "The company is legally active and not in any bankruptcy or similar proceedings.",
         "confirmCreate": "Confirm & Create Account",
         "creating": "Creating Account..."
       },
@@ -565,6 +574,14 @@
       "noToken": "No reset token found. Please use the reset link from your email.",
       "expireNote": "Reset links expire after 1 hour or can only be used once. Please request a new link.",
       "pwdPlaceholder": "Min 6 characters"
+    },
+    "welcomePage": {
+      "greeting": "Welcome, {name}!",
+      "verified": "Account Verified",
+      "message": "Your email has been verified and your account is now active. You can now shop for Tigo products at the <highlight>best prices available in Europe</highlight>.",
+      "shopNow": "Shop Now",
+      "orGoTo": "Or go to your",
+      "dashboard": "Dashboard"
     }
   },
   "staticPages": {

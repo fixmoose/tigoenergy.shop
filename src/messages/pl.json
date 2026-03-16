@@ -378,11 +378,13 @@
       "footerNote": "Witamy na pokładzie! Z niecierpliwością czekamy na wsparcie Twoich projektów solarnych."
     },
     "b2bApplication": {
-      "title": "Otrzymano wniosek B2B",
-      "bannerTitle": "Weryfikacja w toku",
-      "bannerText": "Nasz zespół aktualnie analizuje dostarczoną dokumentację i informacje o firmie. Proces ten zazwyczaj trwa do 48 godzin.",
-      "text": "Po zweryfikowaniu danych powiadomimy Cię e-mailem, a Twoje konto zostanie w pełni aktywowane z dostępem do cen B2B i profesjonalnych narzędzi.",
-      "footerNote": "W międzyczasie, jeśli masz pilne pytania, śmiało odpowiedz na ten e-mail."
+      "title": "Konto B2B utworzone",
+      "greeting": "Witaj",
+      "thankYou": "Dziękujemy za rejestrację konta B2B w Tigo Energy SHOP. Cieszymy się, że jesteś z nami!",
+      "bannerTitle": "Twoje konto jest gotowe!",
+      "bannerText": "Twoje konto B2B jest teraz aktywne. Możesz od razu rozpocząć zakupy i korzystać z cen B2B oraz profesjonalnych narzędzi.",
+      "text": "Po prostu zaloguj się na swoje konto, aby przeglądać naszą pełną ofertę produktów, uzyskać dostęp do cen B2B i składać zamówienia.",
+      "footerNote": "Jeśli masz pytania, odpowiedz na tego e-maila."
     },
     "passwordReset": {
       "title": "Zresetuj swoje hasło",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Przejrzyj swoje dane",
         "editDetails": "Edytuj dane",
-        "terms": "Akceptuję Regulamin i Politykę dopuszczalnego użytkowania.",
-        "privacy": "Przyjmuję do wiadomości Politykę prywatności i rozumiem, jak przetwarzane są moje dane.",
+        "terms": "Akceptuję <terms>Regulamin</terms> i <aup>Politykę dopuszczalnego użytkowania</aup>.",
+        "privacy": "Przyjmuję do wiadomości <privacy>Politykę prywatności</privacy> i rozumiem, jak przetwarzane są moje dane.",
         "newsletter": "Zapisz mnie do newslettera, aby otrzymywać nowości i aktualizacje.",
         "marketing": "Zgadzam się na otrzymywanie informacji o cenach promocyjnych i ofertach specjalnych.",
         "authorized": "Potwierdzam, że jestem upoważniony przez firmę do dokonania rejestracji w jej imieniu.",
-        "legitimate": "To jest legalnie działający podmiot gospodarczy.",
+        "legitimate": "Firma jest prawnie aktywna i nie jest objęta żadnym postępowaniem upadłościowym ani podobnym.",
         "confirmCreate": "Potwierdź i utwórz konto",
         "creating": "Tworzenie konta..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Nie znaleziono tokena resetowania. Użyj linku z e-maila.",
       "expireNote": "Linki do resetowania wygasają po 1 godzinie lub mogą być użyte tylko raz. Poproś o nowy link.",
       "pwdPlaceholder": "Min. 6 znaków"
+    },
+    "welcomePage": {
+      "greeting": "Witaj, {name}!",
+      "verified": "Konto zweryfikowane",
+      "message": "Twój adres e-mail został zweryfikowany, a konto jest aktywne. Teraz możesz kupować produkty Tigo w <highlight>najlepszych cenach w Europie</highlight>.",
+      "shopNow": "Kup teraz",
+      "orGoTo": "Lub przejdź do swojego",
+      "dashboard": "Panelu"
     }
   },
   "cookieConsent": {

@@ -328,6 +328,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             sendCount={(order as any).order_send_count || 0}
             orderTotal={order.total || 0}
             amountPaid={(order as any).amount_paid || 0}
+            modificationUnlocked={order.modification_unlocked || false}
           />
         </div>
       </div>

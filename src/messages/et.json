@@ -378,11 +378,13 @@
       "footerNote": "Tere tulemast! Ootame koostööd teie päikeseenergia projektide raames."
     },
     "b2bApplication": {
-      "title": "B2B avaldus kätte saadud",
-      "bannerTitle": "Kinnitamine on pooleli",
-      "bannerText": "Meie meeskond vaatab praegu läbi teie dokumentatsiooni ja ettevõtte teavet. See protsess võtab tavaliselt kuni 48 tundi.",
-      "text": "Kui teie andmed on kinnitatud, teavitame teid e-posti teel ja teie konto on täielikult töökorras koos juurdepääsuga B2B hindadele ja professionaalsetele tööriistadele.",
-      "footerNote": "Kui teil on vahepeal kiireid küsimusi, võite julgelt sellele e-kirjale vastata."
+      "title": "B2B konto loodud",
+      "greeting": "Tere",
+      "thankYou": "Täname, et registreerisite B2B konto Tigo Energy SHOP-is. Meil on hea meel, et olete meiega!",
+      "bannerTitle": "Teie konto on valmis!",
+      "bannerText": "Teie B2B konto on nüüd aktiivne. Saate kohe alustada ostlemist ning kasutada B2B hindu ja professionaalseid tööriistu.",
+      "text": "Lihtsalt logige oma kontole sisse, et sirvida meie täielikku tootevalikut, pääseda ligi B2B hindadele ja esitada tellimusi.",
+      "footerNote": "Küsimuste korral vastake julgelt sellele e-kirjale."
     },
     "passwordReset": {
       "title": "Lähtestage oma parool",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Vaadake oma andmed üle",
         "editDetails": "Muuda andmeid",
-        "terms": "Nõustun kasutustingimuste ja vastuvõetava kasutamise poliitikaga.",
-        "privacy": "Kinnitan, et olen tutvunud privaatsuspoliitikaga ja mõistan oma andmete töötlemist.",
+        "terms": "Nõustun <terms>kasutustingimuste</terms> ja <aup>vastuvõetava kasutamise poliitikaga</aup>.",
+        "privacy": "Kinnitan, et olen tutvunud <privacy>privaatsuspoliitikaga</privacy> ja mõistan oma andmete töötlemist.",
         "newsletter": "Liituge meie uudiskirjaga värskete uudiste saamiseks.",
         "marketing": "Nõustun saama reklaampakkumisi ja erisoodustusi.",
         "authorized": "Kinnitan, et olen ettevõtte poolt volitatud nende nimel registreeruma.",
-        "legitimate": "Tegemist on seadusliku äriüksusega.",
+        "legitimate": "Ettevõte on juriidiliselt aktiivne ega ole pankroti- ega muus sarnases menetluses.",
         "confirmCreate": "Kinnita ja loo konto",
         "creating": "Konto loomine..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Lähtestamistõendit ei leitud. Palun kasutage e-kirjas olevat linki.",
       "expireNote": "Lähtestamise lingid aeguvad 1 tunni pärast või neid saab kasutada ainult üks kord. Palun taotlege uut linki.",
       "pwdPlaceholder": "Vähemalt 6 märki"
+    },
+    "welcomePage": {
+      "greeting": "Tere tulemast, {name}!",
+      "verified": "Konto kinnitatud",
+      "message": "Teie e-posti aadress on kinnitatud ja teie konto on nüüd aktiivne. Nüüd saate osta Tigo tooteid <highlight>Euroopa parimate hindadega</highlight>.",
+      "shopNow": "Osta kohe",
+      "orGoTo": "Või minge oma",
+      "dashboard": "Juhtpaneelile"
     }
   },
   "cookieConsent": {

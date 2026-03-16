@@ -378,11 +378,13 @@
       "footerNote": "Vitajte na palube! Tešíme sa na podporu vašich solárnych projektov."
     },
     "b2bApplication": {
-      "title": "Žiadosť o B2B účet prijatá",
-      "bannerTitle": "Prebieha overovanie",
-      "bannerText": "Náš tím aktuálne kontroluje vašu dokumentáciu a firemné informácie. Tento proces zvyčajne trvá do 48 hodín.",
-      "text": "Hneď ako budú vaše informácie overené, budeme vás informovať e-mailom a váš účet bude plne funkčný s prístupom k B2B cenám a profesionálnym nástrojom.",
-      "footerNote": "Medzitým, ak máte nejaké naliehavé otázky, neváhajte odpovedať na tento e-mail."
+      "title": "B2B účet vytvorený",
+      "greeting": "Dobrý deň",
+      "thankYou": "Ďakujeme za registráciu B2B účtu v Tigo Energy SHOP. Sme radi, že ste s nami!",
+      "bannerTitle": "Váš účet je pripravený!",
+      "bannerText": "Váš B2B účet je teraz aktívny. Môžete okamžite začať nakupovať a využívať B2B ceny a profesionálne nástroje.",
+      "text": "Jednoducho sa prihláste do svojho účtu, prezrite si našu kompletnú ponuku produktov, pristúpte k B2B cenám a zadávajte objednávky.",
+      "footerNote": "Ak máte otázky, neváhajte odpovedať na tento e-mail."
     },
     "passwordReset": {
       "title": "Obnovenie hesla",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Skontrolujte svoje údaje",
         "editDetails": "Upraviť údaje",
-        "terms": "Súhlasím s obchodnými podmienkami a zásadami prijateľného používania.",
-        "privacy": "Beriem na vedomie Zásady ochrany osobných údajov a chápem, ako sú moje údaje spracovávané.",
+        "terms": "Súhlasím s <terms>obchodnými podmienkami</terms> a <aup>zásadami prijateľného používania</aup>.",
+        "privacy": "Beriem na vedomie <privacy>Zásady ochrany osobných údajov</privacy> a chápem, ako sú moje údaje spracovávané.",
         "newsletter": "Prihlásiť sa na odber nášho newslettera pre najnovšie správy a aktualizácie.",
         "marketing": "Súhlasím so zasielaním akciových cien a špeciálnych ponúk.",
         "authorized": "Potvrdzujem, že som spoločnosť autorizovala na registráciu v jej mene.",
-        "legitimate": "Jedná sa o legitimný podnikateľský subjekt.",
+        "legitimate": "Spoločnosť je právne aktívna a nie je v žiadnom insolvenčnom alebo obdobnom konaní.",
         "confirmCreate": "Potvrdiť a vytvoriť účet",
         "creating": "Vytváranie účtu..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Nenašiel sa žiadny token na obnovenie. Použite prosím odkaz na obnovenie z e-mailu.",
       "expireNote": "Odkazy na obnovenie vypršia po 1 hodine alebo sa dajú použiť iba raz. Vyžiadajte si prosím nový odkaz.",
       "pwdPlaceholder": "Min. 6 znakov"
+    },
+    "welcomePage": {
+      "greeting": "Vitajte, {name}!",
+      "verified": "Účet overený",
+      "message": "Váš e-mail bol overený a váš účet je teraz aktívny. Teraz môžete nakupovať produkty Tigo za <highlight>najlepšie ceny v Európe</highlight>.",
+      "shopNow": "Nakupovať",
+      "orGoTo": "Alebo prejdite na svoj",
+      "dashboard": "Panel"
     }
   },
   "cookieConsent": {

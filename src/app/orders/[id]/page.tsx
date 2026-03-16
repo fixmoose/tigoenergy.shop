@@ -8,11 +8,12 @@ import { useCart } from '@/contexts/CartContext'
 import { Order, OrderItem } from '@/types/database'
 import ContactSupportModal from '@/components/orders/ContactSupportModal'
 import { submitSupportRequest } from '@/app/actions/support'
+import { modifyOrder } from '@/app/actions/order-modify'
 
 export default function OrderDetailsPage() {
     const params = useParams()
     const router = useRouter()
-    const { addItem } = useCart()
+    const { addItem, clearCart } = useCart()
     const orderId = params.id as string
 
     const [order, setOrder] = useState<Order | null>(null)
@@ -21,6 +22,7 @@ export default function OrderDetailsPage() {
     const [error, setError] = useState<string | null>(null)
     const [buyAgainLoading, setBuyAgainLoading] = useState(false)
     const [cancelling, setCancelling] = useState(false)
+    const [modifying, setModifying] = useState(false)
     const [isHeaderSummaryVisible, setIsHeaderSummaryVisible] = useState(false)
     const [supportModal, setSupportModal] = useState<{ isOpen: boolean, type: 'shipping' | 'return' | 'general' }>({
         isOpen: false,
@@ -140,6 +142,39 @@ export default function OrderDetailsPage() {
         }
     }
 
+    const handleModifyOrder = async () => {
+        if (!order) return
+        if (!confirm('Your order will be converted back to a cart so you can add or remove items, change shipping, etc. Continue?')) return
+
+        setModifying(true)
+        try {
+            const result = await modifyOrder(order.id)
+            if (!result.success) {
+                alert(result.error || 'Failed to modify order')
+                return
+            }
+
+            // Clear existing cart, then add order items
+            await clearCart()
+            for (const item of result.items || []) {
+                await addItem(item)
+            }
+
+            // Store modification info in sessionStorage for banners
+            sessionStorage.setItem('modifying_order', JSON.stringify({
+                orderNumber: result.originalOrderNumber,
+                orderId: order.id,
+            }))
+
+            router.push('/cart')
+        } catch (err) {
+            console.error('Error modifying order:', err)
+            alert('Failed to modify order. Please try again.')
+        } finally {
+            setModifying(false)
+        }
+    }
+
     useEffect(() => {
         const handleScroll = () => {
             // Show sticky bar when user scrolls past the main order title (approx 200px)
@@ -182,6 +217,9 @@ export default function OrderDetailsPage() {
     // Cancellation Logic (Pending orders only, no time window)
     const now = new Date()
     const isCancellable = order.status === 'pending' && !order.confirmed_at
+
+    // Modification Logic (pending + not confirmed, or admin-unlocked)
+    const canModify = (order.status === 'pending' && !order.confirmed_at) || order.modification_unlocked === true
 
     const isDelivered = order.status === 'delivered'
 
@@ -368,6 +406,20 @@ export default function OrderDetailsPage() {
                                 </button>
                                 <div className="flex flex-col items-end gap-1">
                                     <div className="flex flex-wrap items-center gap-3">
+                                        {canModify && (
+                                            <button
+                                                onClick={handleModifyOrder}
+                                                disabled={modifying}
+                                                className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-200 rounded-xl text-xs font-bold text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 shadow-sm disabled:opacity-50"
+                                            >
+                                                {modifying ? (
+                                                    <span className="animate-spin rounded-full h-3 w-3 border-2 border-blue-600 border-t-transparent"></span>
+                                                ) : (
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                )}
+                                                Modify Order
+                                            </button>
+                                        )}
                                         {isCancellable && (
                                             <button
                                                 onClick={handleCancelOrder}

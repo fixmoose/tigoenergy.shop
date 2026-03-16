@@ -114,7 +114,7 @@
     "total": "Skupaj",
     "items": "Izdelki ({count})",
     "includesVat": "Vključuje DDV ({rate}%)",
-    "secureCheckout": "Varna blagajna",
+    "secureCheckout": "Blagajna",
     "saveCartForLater": "Shrani košarico",
     "clearCart": "Izprazni košarico",
     "saveCart": "Shrani košarico",
@@ -129,7 +129,7 @@
     "b2bOnlyNotice": "Cene veljajo samo za B2B. Za nadaljevanje se morate registrirati ali prijaviti kot B2B podjetje."
   },
   "checkout": {
-    "secureCheckout": "Varna blagajna",
+    "secureCheckout": "Blagajna",
     "contactInfo": "Kontaktni podatki",
     "emailAddress": "E-postni naslov",
     "phoneNumber": "Telefonska številka",
@@ -155,6 +155,7 @@
     "vat": "DDV ({rate}%)",
     "free": "BREZPLAČNO",
     "placeOrder": "Oddaj naročilo",
+    "backToCart": "Vrni se v košarico",
     "processing": "Obdelava...",
     "termsAgree": "Strinjam se s",
     "termsConditions": "Splošnimi pogoji",
@@ -164,8 +165,10 @@
     "newsletterSubscribe": "Naročite se na novice za solarne posodobitve in ekskluzivne ponudbe.",
     "b2bNote": "B2B naročilo: Prikazane so neto cene. Lahko velja obrnjeno davčno breme.",
     "pricesIncludeVat": "Cene vključujejo {rate}% DDV.",
-    "requiredFields": "Izpolnite vsa obvezna polja",
+    "requiredFields": "Manjkajo obvezni podatki. Preverite spodaj označena polja.",
     "requiredFieldsDesc": "Polja z rdečim robom so obvezna.",
+    "verifyEmailFirst": "Najprej preverite svoj e-poštni naslov.",
+    "selectShippingMethod": "Izberite način dostave.",
     "noShippingMethods": "Za vašo izbiro ni na voljo nobena metoda dostave.",
     "newAddress": "+ Nov naslov",
     "comingSoon": "Kmalu na voljo",
@@ -197,7 +200,11 @@
     "selectCountry": "Izberite državo",
     "poNumber": "Naročilnica (P.O.)",
     "poNumberOptional": "neobvezno",
-    "poNumberPlaceholder": "npr. PO-2024-001 ali ime posla"
+    "poNumberPlaceholder": "npr. PO-2024-001 ali ime posla",
+    "paymentWiseLabel": "Hitro plačilo (Wise, ApplePay, kreditne in debetne kartice)",
+    "paymentWiseDesc": "Plačajte takoj prek Wise strani.",
+    "paymentInvoiceLabel": "SEPA/SWIFT bančno nakazilo",
+    "paymentInvoiceDesc": "Predplačilo prek SEPA/Wire nakazila. Predračun bo izdan po oddaji naročila. Blago bo odposlano po potrditvi plačila."
   },
   "subcategories": {
     "Optimization": "Optimizacija",
@@ -380,11 +387,13 @@
       "footerNote": "Dobrodošli! Veselimo se sodelovanja pri vaših solarnih projektih."
     },
     "b2bApplication": {
-      "title": "B2B prijava prejeta",
-      "bannerTitle": "Preverjanje v teku",
-      "bannerText": "Naša ekipa trenutno pregleduje vašo dokumentacijo in podatke o podjetju. Ta postopek običajno traja do 48 ur.",
-      "text": "Ko bodo vaši podatki preverjeni, vas bomo obvestili po e-pošti in vaš račun bo popolnoma operativen z dostopom do B2B cen in profesionalnih orodij.",
-      "footerNote": "Če imate vmes kakršna koli nujna vprašanja, lahko odgovorite na to e-pošto."
+      "title": "B2B račun ustvarjen",
+      "greeting": "Pozdravljeni",
+      "thankYou": "Hvala, da ste registrirali B2B račun pri Tigo Energy SHOP. Veseli smo, da ste z nami!",
+      "bannerTitle": "Vaš račun je pripravljen!",
+      "bannerText": "Vaš B2B račun je zdaj aktiven. Takoj lahko začnete z nakupovanjem in uživate v B2B cenah ter profesionalnih orodjih.",
+      "text": "Preprosto se prijavite v svoj račun, preglejte celotno ponudbo izdelkov, dostopajte do B2B cen in oddajte naročila.",
+      "footerNote": "Če imate kakršna koli vprašanja, lahko odgovorite na to e-pošto."
     },
     "passwordReset": {
       "title": "Ponastavitev gesla",
@@ -494,12 +503,12 @@
       "agreements": {
         "reviewInfo": "Pregled vaših podatkov",
         "editDetails": "Uredi podatke",
-        "terms": "Strinjam se s splošnimi pogoji in politiko sprejemljive uporabe.",
-        "privacy": "Potrjujem seznanjenost s politiko zasebnosti in razumem, kako se obdelujejo moji podatki.",
+        "terms": "Strinjam se s <terms>splošnimi pogoji</terms> in <aup>politiko sprejemljive uporabe</aup>.",
+        "privacy": "Potrjujem seznanjenost s <privacy>politiko zasebnosti</privacy> in razumem, kako se obdelujejo moji podatki.",
         "newsletter": "Naročite se na e-novice za najnovejše novice in posodobitve.",
         "marketing": "Strinjam se s prejemanjem promocijskih ponudb in posebnih ugodnosti.",
         "authorized": "Potrjujem, da sem pooblaščen s strani podjetja za registracijo v njegovem imenu.",
-        "legitimate": "To je zakonit poslovni subjekt.",
+        "legitimate": "Podjetje je zakonsko aktivno in ni v nobenem stečajnem ali podobnem postopku.",
         "confirmCreate": "Potrdi in ustvari račun",
         "creating": "Ustvarjanje računa..."
       },
@@ -563,6 +572,14 @@
       "noToken": "Žeton za ponastavitev ni bil najden. Prosimo, uporabite povezavo iz vašega e-poštnega sporočila.",
       "expireNote": "Povezave za ponastavitev potečejo po 1 uri ali pa jih je mogoče uporabiti le enkrat. Prosimo, zahtevajte novo povezavo.",
       "pwdPlaceholder": "Najmanj 6 znakov"
+    },
+    "welcomePage": {
+      "greeting": "Dobrodošli, {name}!",
+      "verified": "Račun potrjen",
+      "message": "Vaš e-poštni naslov je bil potrjen in vaš račun je zdaj aktiven. Zdaj lahko kupujete izdelke Tigo po <highlight>najboljših cenah v Evropi</highlight>.",
+      "shopNow": "Začni z nakupovanjem",
+      "orGoTo": "Ali pojdite na svojo",
+      "dashboard": "Nadzorno ploščo"
     }
   },
   "staticPages": {

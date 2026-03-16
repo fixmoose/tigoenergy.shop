@@ -378,11 +378,13 @@
       "footerNote": "Laipni lūdzam! Mēs ar nepacietību gaidām iespēju atbalstīt jūsu saules enerģijas projektus."
     },
     "b2bApplication": {
-      "title": "B2B pieteikums saņemts",
-      "bannerTitle": "Notiek pārbaude",
-      "bannerText": "Mūsu komanda šobrīd pārbauda jūsu dokumentāciju un uzņēmuma informāciju. Šis process parasti aizņem līdz 48 stundām.",
-      "text": "Tiklīdz jūsu informācija tiks apstiprināta, mēs jūs informēsim pa e-pastu, un jūsu konts būs pilnībā operatīvs ar piekļuvi B2B cenām un profesionāliem rīkiem.",
-      "footerNote": "Tikmēr, ja jums ir kādi steidzami jautājumi, droši atbildiet uz šo e-pastu."
+      "title": "B2B konts izveidots",
+      "greeting": "Sveiki",
+      "thankYou": "Paldies, ka reģistrējāt B2B kontu Tigo Energy SHOP. Mēs priecājamies, ka esat ar mums!",
+      "bannerTitle": "Jūsu konts ir gatavs!",
+      "bannerText": "Jūsu B2B konts tagad ir aktīvs. Jūs varat nekavējoties sākt iepirkties un izmantot B2B cenas un profesionālos rīkus.",
+      "text": "Vienkārši piesakieties savā kontā, lai pārlūkotu mūsu pilno produktu klāstu, piekļūtu B2B cenām un veiktu pasūtījumus.",
+      "footerNote": "Ja jums ir jautājumi, droši atbildiet uz šo e-pastu."
     },
     "passwordReset": {
       "title": "Atiestatiet savu paroli",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Pārskatiet savu informāciju",
         "editDetails": "Labot datus",
-        "terms": "Es piekrītu Noteikumiem un nosacījumiem un Pieņemamas lietošanas politikai.",
-        "privacy": "Es apstiprinu Privātuma politiku un saprotu, kā tiek apstrādāti mani dati.",
+        "terms": "Es piekrītu <terms>Noteikumiem un nosacījumiem</terms> un <aup>Pieņemamas lietošanas politikai</aup>.",
+        "privacy": "Es apstiprinu <privacy>Privātuma politiku</privacy> un saprotu, kā tiek apstrādāti mani dati.",
         "newsletter": "Abonējiet mūsu ziņu izdevumu jaunākajām ziņām.",
         "marketing": "Es piekrītu saņemt reklāmas un īpašos piedāvājumus.",
         "authorized": "Es apstiprinu, ka uzņēmums mani ir pilnvarojis reģistrēties tā vārdā.",
-        "legitimate": "Šī ir likumīga uzņēmējdarbības vienība.",
+        "legitimate": "Uzņēmums ir juridiski aktīvs un neatrodas bankrota vai līdzīgā procesā.",
         "confirmCreate": "Apstiprināt un izveidot kontu",
         "creating": "Izveido kontu..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Atiestatīšanas marķieris netika atrasts. Lūdzu, izmantojiet saiti e-pastā.",
       "expireNote": "Atiestatīšanas saites ir derīgas 1 stundu vai tās var izmantot tikai vienreiz. Lūdzu, pieprasiet jaunu saiti.",
       "pwdPlaceholder": "Minimāli 6 rakstzīmes"
+    },
+    "welcomePage": {
+      "greeting": "Laipni lūdzam, {name}!",
+      "verified": "Konts apstiprināts",
+      "message": "Jūsu e-pasts ir apstiprināts un jūsu konts tagad ir aktīvs. Tagad varat iegādāties Tigo produktus par <highlight>labākajām cenām Eiropā</highlight>.",
+      "shopNow": "Iepirkties tagad",
+      "orGoTo": "Vai dodieties uz savu",
+      "dashboard": "Vadības paneli"
     }
   },
   "cookieConsent": {

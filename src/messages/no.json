@@ -378,11 +378,13 @@
       "footerNote": "Velkommen om bord! Vi ser frem til å støtte dine solprosjekter."
     },
     "b2bApplication": {
-      "title": "B2B-søknad mottatt",
-      "bannerTitle": "Verifisering pågår",
-      "bannerText": "Teamet vårt vurderer for øyeblikket dokumentasjonen og firmainformasjonen din. Denne prosessen tar vanligvis opptil 48 timer.",
-      "text": "Når informasjonen din er verifisert, vil vi varsle deg via e-post, og kontoen din vil bli fullt operativ med tilgang til B2B-priser og profesjonelle verktøy.",
-      "footerNote": "I mellomtiden, hvis du har presserende spørsmål, er det bare å svare på denne e-posten."
+      "title": "B2B-konto opprettet",
+      "greeting": "Hei",
+      "thankYou": "Takk for at du registrerte en B2B-konto hos Tigo Energy SHOP. Vi er glade for å ha deg med!",
+      "bannerTitle": "Kontoen din er klar!",
+      "bannerText": "Din B2B-konto er nå aktiv. Du kan begynne å handle umiddelbart og nyte B2B-priser og profesjonelle verktøy.",
+      "text": "Logg inn på kontoen din for å bla gjennom hele produktutvalget vårt, få tilgang til B2B-prisene dine og legge inn bestillinger.",
+      "footerNote": "Har du spørsmål, svar gjerne på denne e-posten."
     },
     "passwordReset": {
       "title": "Tilbakestill passordet ditt",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Se over informasjonen din",
         "editDetails": "Rediger detaljer",
-        "terms": "Jeg godtar vilkårene og reglene for akseptabel bruk.",
-        "privacy": "Jeg bekrefter personvernreglene og forstår hvordan dataene mine behandles.",
+        "terms": "Jeg godtar <terms>vilkårene</terms> og <aup>reglene for akseptabel bruk</aup>.",
+        "privacy": "Jeg bekrefter <privacy>personvernreglene</privacy> og forstår hvordan dataene mine behandles.",
         "newsletter": "Abonner på vårt nyhetsbrev for de siste nyhetene.",
         "marketing": "Jeg samtykker i å motta kampanjepriser og spesialtilbud.",
         "authorized": "Jeg bekrefter at jeg er autorisert av selskapet til å registrere på deres vegne.",
-        "legitimate": "Dette er en legitim forretningsenhet.",
+        "legitimate": "Selskapet er juridisk aktivt og er ikke under konkurs- eller lignende behandling.",
         "confirmCreate": "Bekreft og opprett konto",
         "creating": "Oppretter konto..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Ingen tilbakestillingstoken funnet. Vennligst bruk lenken fra e-posten din.",
       "expireNote": "Tilbakestillingslenker utløper etter 1 time eller kan bare brukes én gang. Vennligst be om en ny lenke.",
       "pwdPlaceholder": "Min. 6 tegn"
+    },
+    "welcomePage": {
+      "greeting": "Velkommen, {name}!",
+      "verified": "Konto bekreftet",
+      "message": "E-postadressen din er bekreftet og kontoen din er nå aktiv. Du kan nå handle Tigo-produkter til de <highlight>beste prisene i Europa</highlight>.",
+      "shopNow": "Handle nå",
+      "orGoTo": "Eller gå til ditt",
+      "dashboard": "Dashbord"
     }
   },
   "cookieConsent": {

@@ -218,8 +218,11 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             // Language - from user preference (defaults to 'en' if not provided)
             language: (rawData.language as string) || 'en',
 
-            // Terms agreement
-            terms_agreed_at: new Date().toISOString()
+            // Order modification tracking
+            ...(rawData.original_order_id ? {
+                original_order_id: rawData.original_order_id as string,
+                is_modification: true,
+            } : {}),
         }
 
         const { data: order, error: orderError } = await supabase

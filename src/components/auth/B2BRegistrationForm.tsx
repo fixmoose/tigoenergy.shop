@@ -691,11 +691,11 @@ export default function B2BRegistrationForm() {
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.terms} onChange={e => setFormData(prev => ({ ...prev, terms: e.target.checked }))} />
-                            <span>{t('agreements.terms')}</span>
+                            <span>{t.rich('agreements.terms', { terms: (chunks) => <a href="/terms" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a>, aup: (chunks) => <a href="/terms#acceptable-use" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a> })}</span>
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded" checked={formData.privacy} onChange={e => setFormData(prev => ({ ...prev, privacy: e.target.checked }))} />
-                            <span>{t('agreements.privacy')}</span>
+                            <span>{t.rich('agreements.privacy', { privacy: (chunks) => <a href="/privacy" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a> })}</span>
                         </label>
                         <div className="border-t pt-2 mt-2">
                             <label className="flex items-start gap-3 cursor-pointer">
@@ -767,11 +767,11 @@ export default function B2BRegistrationForm() {
                     <div className="p-4 rounded-xl text-xs text-gray-600 space-y-3 bg-blue-50/30 border border-blue-100">
                         <label className="flex items-start gap-3 cursor-pointer group">
                             <input id="b2b-terms" name="terms" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.terms} onChange={e => setFormData(prev => ({ ...prev, terms: e.target.checked }))} />
-                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.terms')}</span>
+                            <span className="group-hover:text-gray-900 transition-colors">{t.rich('agreements.terms', { terms: (chunks) => <a href="/terms" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a>, aup: (chunks) => <a href="/terms#acceptable-use" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a> })}</span>
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer group">
                             <input id="b2b-privacy" name="privacy" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.privacy} onChange={e => setFormData(prev => ({ ...prev, privacy: e.target.checked }))} />
-                            <span className="group-hover:text-gray-900 transition-colors">{t('agreements.privacy')}</span>
+                            <span className="group-hover:text-gray-900 transition-colors">{t.rich('agreements.privacy', { privacy: (chunks) => <a href="/privacy" target="_blank" className="text-blue-600 underline hover:text-blue-800">{chunks}</a> })}</span>
                         </label>
                         <label className="flex items-start gap-3 cursor-pointer group">
                             <input id="b2b-auth" name="authorized" type="checkbox" className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300" checked={formData.authorized} onChange={e => setFormData(prev => ({ ...prev, authorized: e.target.checked }))} />

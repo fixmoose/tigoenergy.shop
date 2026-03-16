@@ -13,7 +13,8 @@ import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 
 export default function Header() {
-  const { count, subtotal, items, openDrawer } = useCart()
+  const { count, subtotal, items, openDrawer, lastAddedAt } = useCart()
+  const [cartBounce, setCartBounce] = useState(false)
   const { currentCurrency, setCurrency, formatPrice } = useCurrency()
   const { market, currentLanguage, setLanguage } = useMarket()
   const t = useTranslations('header')
@@ -67,6 +68,14 @@ export default function Header() {
     }
     return () => window.removeEventListener('click', handleClickOutside)
   }, [showSuggestions])
+
+  // Animate cart icon when item is added
+  useEffect(() => {
+    if (lastAddedAt === 0) return
+    setCartBounce(true)
+    const timer = setTimeout(() => setCartBounce(false), 600)
+    return () => clearTimeout(timer)
+  }, [lastAddedAt])
 
   // Handle scroll effect
   useEffect(() => {
@@ -434,12 +443,12 @@ export default function Header() {
               {/* Cart Wrapper with Hover */}
               <div className="relative group z-50">
                 <Link href="/cart" className="flex flex-col items-center cursor-pointer">
-                  <div className="relative">
+                  <div className={`relative transition-transform ${cartBounce ? 'animate-cart-bounce' : ''}`}>
                     <svg className="w-7 h-7 text-green-50 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     {count > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-green-600 shadow-sm">
+                      <span className={`absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-green-600 shadow-sm transition-transform ${cartBounce ? 'scale-125' : ''}`}>
                         {count}
                       </span>
                     )}

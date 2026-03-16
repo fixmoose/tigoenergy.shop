@@ -378,11 +378,13 @@
       "footerNote": "Sveiki atvykę! Laukiame bendradarbiavimo įgyvendinant jūsų saulės energijos projektus."
     },
     "b2bApplication": {
-      "title": "B2B paraiška gauta",
-      "bannerTitle": "Vykdomas patikrinimas",
-      "bannerText": "Mūsų komanda šiuo metu peržiūri jūsų dokumentus ir įmonės informaciją. Šis procesas paprastai trunka iki 48 valandų.",
-      "text": "Kai jūsų informacija bus patvirtinta, informuosime jus el. paštu ir jūsų paskyra bus visiškai operatyvi su prieiga prie B2B kainų ir profesionalių įrankių.",
-      "footerNote": "Tuo tarpu, jei turite skubių klausimų, nedvejodami atsakykite į šį el. laišką."
+      "title": "B2B paskyra sukurta",
+      "greeting": "Sveiki",
+      "thankYou": "Dėkojame, kad užsiregistravote B2B paskyrą Tigo Energy SHOP. Džiaugiamės, kad esate su mumis!",
+      "bannerTitle": "Jūsų paskyra paruošta!",
+      "bannerText": "Jūsų B2B paskyra dabar aktyvi. Galite iš karto pradėti apsipirkti ir naudotis B2B kainomis bei profesionaliais įrankiais.",
+      "text": "Tiesiog prisijunkite prie savo paskyros, kad peržiūrėtumėte visą mūsų produktų asortimentą, pasiektumėte B2B kainas ir pateiktumėte užsakymus.",
+      "footerNote": "Jei turite klausimų, drąsiai atsakykite į šį el. laišką."
     },
     "passwordReset": {
       "title": "Iš naujo nustatykite slaptažodį",
@@ -569,12 +571,12 @@
       "agreements": {
         "reviewInfo": "Peržiūrėkite savo informaciją",
         "editDetails": "Keisti duomenis",
-        "terms": "Sutinku su taisyklėmis ir sąlygomis bei priimtino naudojimo politika.",
-        "privacy": "Patvirtinu, kad susipažinau su privatumo politika ir suprantu, kaip tvarkomi mano duomenys.",
+        "terms": "Sutinku su <terms>taisyklėmis ir sąlygomis</terms> bei <aup>priimtino naudojimo politika</aup>.",
+        "privacy": "Patvirtinu, kad susipažinau su <privacy>privatumo politika</privacy> ir suprantu, kaip tvarkomi mano duomenys.",
         "newsletter": "Prenumeruokite mūsų naujienlaiškį, kad gautumėte naujausias žinias.",
         "marketing": "Sutinku gauti reklaminius pasiūlymus ir specialias nuolaidas.",
         "authorized": "Patvirtinu, kad įmonė mane įgaliojo registruotis jos vardu.",
-        "legitimate": "Tai yra teisėtas verslo subjektas.",
+        "legitimate": "Įmonė yra teisiškai aktyvi ir nėra jokiame bankroto ar panašiame procese.",
         "confirmCreate": "Patvirtinti ir sukurti paskyrą",
         "creating": "Kuriama paskyra..."
       },
@@ -638,6 +640,14 @@
       "noToken": "Nustatymo raktas nerastas. Naudokite nuorodą iš el. laiško.",
       "expireNote": "Nustatymo nuorodos galioja 1 valandą arba gali būti panaudotos tik vieną kartą. Prašykite naujos nuorodos.",
       "pwdPlaceholder": "Bent 6 simboliai"
+    },
+    "welcomePage": {
+      "greeting": "Sveiki, {name}!",
+      "verified": "Paskyra patvirtinta",
+      "message": "Jūsų el. paštas buvo patvirtintas ir jūsų paskyra dabar aktyvi. Dabar galite pirkti Tigo produktus <highlight>geriausiomis kainomis Europoje</highlight>.",
+      "shopNow": "Pirkti dabar",
+      "orGoTo": "Arba eikite į savo",
+      "dashboard": "Valdymo skydelį"
     }
   },
   "cookieConsent": {

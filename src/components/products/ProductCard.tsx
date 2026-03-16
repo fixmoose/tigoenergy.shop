@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useState } from 'react'
 import type { Product } from '@/types/database'
 import { useCart } from '@/contexts/CartContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
@@ -19,6 +20,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
   const productName = getLocalizedName(product, currentLanguage.code) || ''
   const image = product.images && product.images.length ? product.images[0] : null
   const displayPrice = pricing?.isDiscounted ? pricing.discountedPrice : product.price_eur
+  const [justAdded, setJustAdded] = useState(false)
 
   // Logic for Stock Status
   const isAvailableToOrder = product.stock_status === 'available_to_order'
@@ -39,7 +41,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (canAddToCart) {
+    if (canAddToCart && !justAdded) {
       addItem({
         product_id: product.id,
         sku: product.sku,
@@ -49,6 +51,8 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
         weight_kg: product.weight_kg,
         image_url: image ?? undefined,
       })
+      setJustAdded(true)
+      setTimeout(() => setJustAdded(false), 1200)
     }
   }
 
@@ -159,15 +163,23 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
             <button
               onClick={handleAddToCart}
               disabled={!canAddToCart}
-              className={`p-2 rounded-lg transition-colors ${canAddToCart
-                ? 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              className={`p-2 rounded-lg transition-all duration-300 ${justAdded
+                ? 'bg-green-500 text-white scale-110'
+                : canAddToCart
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               title={canAddToCart ? 'Add to cart' : 'Not available'}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+              {justAdded ? (
+                <svg className="w-5 h-5 animate-add-to-cart-check" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              )}
             </button>
           </div>
         </div>

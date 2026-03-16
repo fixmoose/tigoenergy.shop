@@ -26,6 +26,7 @@ interface CartContextValue {
   open: boolean
   openDrawer: () => void
   closeDrawer: () => void
+  lastAddedAt: number
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined)
@@ -41,6 +42,7 @@ const LOCAL_KEY = 'cart_local_v1'
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CartState>({ items: [], cartId: null, isB2B: false })
   const [open, setOpen] = useState(false)
+  const [lastAddedAt, setLastAddedAt] = useState(0)
 
   const [showRestorePrompt, setShowRestorePrompt] = useState(false)
 
@@ -166,6 +168,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     else next[idx] = { ...next[idx], quantity: (next[idx].quantity || 0) + item.quantity, total_price: (next[idx].unit_price || item.unit_price) * ((next[idx].quantity || 0) + item.quantity) }
     setState({ ...state, items: next })
     savePersistent(next)
+    setLastAddedAt(Date.now())
 
     // Call API add
     try {
@@ -259,6 +262,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     open,
     openDrawer: () => setOpen(true),
     closeDrawer: () => setOpen(false),
+    lastAddedAt,
   }
 
   return (

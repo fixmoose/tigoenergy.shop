@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
+import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
 
 interface AdminOrderActionsProps {
@@ -19,9 +20,10 @@ interface AdminOrderActionsProps {
     sendCount?: number
     orderTotal?: number
     amountPaid?: number
+    modificationUnlocked?: boolean
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0 }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -229,6 +231,37 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     <div className="flex items-center gap-2 text-sm text-green-700 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                         <span>✓</span> Order Confirmed {confirmedAt && `at ${new Date(confirmedAt).toLocaleString()}`}
                     </div>
+
+                    {/* Unlock for Customer Modification */}
+                    {modificationUnlocked ? (
+                        <div className="flex items-center gap-2 text-sm text-amber-700 font-medium bg-amber-50 px-3 py-2 rounded-lg border border-amber-100">
+                            <span>🔓</span> Unlocked for customer modification
+                        </div>
+                    ) : (
+                        <button
+                            onClick={async () => {
+                                if (!confirm('Allow the customer to modify this order? They will be able to convert it back to a cart and re-order.')) return
+                                setLoading(true)
+                                try {
+                                    const res = await adminUnlockOrder(orderId)
+                                    if (res.success) {
+                                        alert('Order unlocked for modification.')
+                                        router.refresh()
+                                    } else {
+                                        alert('Failed: ' + res.error)
+                                    }
+                                } catch (err: any) {
+                                    alert('Failed: ' + err.message)
+                                } finally {
+                                    setLoading(false)
+                                }
+                            }}
+                            disabled={loading}
+                            className="w-full py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl font-bold text-sm hover:bg-amber-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                            <span>🔓</span> Unlock for Customer Modification
+                        </button>
+                    )}
 
                     {/* Send to Client */}
                     <div className="pt-1 space-y-2">
