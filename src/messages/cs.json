@@ -528,7 +528,7 @@
         "firstName": "Jméno",
         "lastName": "Příjmení",
         "dob": "Datum narození",
-        "occupation": "Povolání (volitelné)",
+        "occupation": "Pracovní pozice (Nepovinné)",
         "address": "Ulice a číslo",
         "address2": "Číslo bytu, p. o. box atd. (volitelné)",
         "city": "Město",
@@ -545,6 +545,8 @@
         "jobTitle": "Pracovní pozice",
         "businessType": "Typ podnikání",
         "truckAccess": "Může k vašemu skladu/kanceláři přijet velký nákladní automobil/dodávka pro doručení palet?",
+        "truckYes": "Ano, přístupné",
+        "truckNo": "Ne, nepřístupné",
         "email": "Email",
         "mobilePhone": "Mobilní telefon",
         "code": "Ověřovací kód"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registrace úspěšná! Vítejte v Tigo Energy.",
         "viesLocked": "Tato adresa je uzamčena — musí odpovídat vaší registraci VIES a bude uvedena na všech oficiálních fakturách.",
         "addShipping": "Přidat samostatnou doručovací adresu (volitelné)",
-        "addBilling": "Přidat samostatnou fakturační adresu (volitelné)"
+        "addBilling": "Přidat samostatnou fakturační adresu (nepovinné). Všechny faktury jsou zasílány e-mailem tak jako tak."
       },
       "agreements": {
         "reviewInfo": "Zkontrolujte své údaje",
@@ -619,7 +621,8 @@
         "mobilePhone": "+420 601 234 567",
         "vat": "např. CZ12345678",
         "taxId": "DIČ / reg. č.",
-        "select": "Vyberte..."
+        "select": "Vyberte...",
+        "occupation": "Ředitel, Vedoucí nákupu, ..."
       },
       "vat": "DIČ",
       "businessTypes": {

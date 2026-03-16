@@ -24,6 +24,23 @@ const MARKET_PHONE_CODES: Record<string, string> = {
     BE: '+32',
     NL: '+31',
     GB: '+44',
+    SE: '+46',
+    DK: '+45',
+    NO: '+47',
+    PT: '+351',
+    RS: '+381',
+    MK: '+389',
+    ME: '+382',
+    BG: '+359',
+    LV: '+371',
+    LT: '+370',
+    EE: '+372',
+}
+
+/** Find which known prefix (if any) the phone value starts with, longest match first */
+function detectPhonePrefix(phone: string): string | null {
+    const sorted = Object.values(MARKET_PHONE_CODES).sort((a, b) => b.length - a.length)
+    return sorted.find(p => phone.startsWith(p)) || null
 }
 
 // Steps: 
@@ -181,13 +198,30 @@ export default function B2CRegistrationForm() {
         }
     }
 
+    // Normalize phone: prepend market prefix if user typed a local number (e.g. 051766308 → +386 51766308)
+    const normalizePhone = (raw: string): string => {
+        let phone = raw.trim()
+        if (phone.startsWith('+')) return phone // already international
+        // Strip leading zero for local numbers
+        if (phone.startsWith('0')) phone = phone.slice(1)
+        // Detect market and prepend code
+        const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : ''
+        const code = MARKET_PHONE_CODES[marketKey] || MARKET_PHONE_CODES[formData.country]
+        if (code) return code + ' ' + phone
+        return raw // can't determine prefix, send as-is
+    }
+
     // STEP 2: Phone Handlers
     const handleSendPhoneCode = async () => {
         setLoading(true)
         setError('')
         try {
+            const normalized = normalizePhone(formData.phone)
+            if (normalized !== formData.phone) {
+                setFormData(prev => ({ ...prev, phone: normalized }))
+            }
             const res = await fetch('/api/validate/phone', {
-                method: 'POST', body: JSON.stringify({ phone: formData.phone })
+                method: 'POST', body: JSON.stringify({ phone: normalized })
             })
             const data = await res.json()
             if (data.success) {
@@ -379,13 +413,11 @@ export default function B2CRegistrationForm() {
                             value={formData.phone}
                             onChange={e => {
                                 let val = e.target.value
-                                const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : 'SHOP'
-                                const code = MARKET_PHONE_CODES[marketKey]
-
-                                if (code && val.startsWith(code)) {
-                                    const rest = val.slice(code.length).trim()
+                                const prefix = detectPhonePrefix(val)
+                                if (prefix) {
+                                    const rest = val.slice(prefix.length).trim()
                                     if (rest.startsWith('0')) {
-                                        val = code + ' ' + rest.slice(1)
+                                        val = prefix + ' ' + rest.slice(1)
                                     }
                                 }
                                 setFormData({ ...formData, phone: val })
@@ -468,7 +500,7 @@ export default function B2CRegistrationForm() {
                     </div>
                     <div className="space-y-1">
                         <label htmlFor="reg-occ" className="text-xs font-medium text-gray-500">{t('labels.occupation')}</label>
-                        <input id="reg-occ" name="occupation" className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formData.occupation} onChange={e => setFormData(prev => ({ ...prev, occupation: e.target.value }))} />
+                        <input id="reg-occ" name="occupation" placeholder={t('placeholders.occupation')} className="w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" value={formData.occupation} onChange={e => setFormData(prev => ({ ...prev, occupation: e.target.value }))} />
                     </div>
                     <div className="md:col-span-2 pt-2 flex gap-3">
                         <button type="button" onClick={() => setStep(2)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">{t('buttons.back')}</button>

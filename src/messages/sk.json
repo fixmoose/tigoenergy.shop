@@ -528,7 +528,7 @@
         "firstName": "Meno",
         "lastName": "Priezvisko",
         "dob": "Dátum narodenia",
-        "occupation": "Povolanie (voliteľné)",
+        "occupation": "Pracovná pozícia (Nepovinné)",
         "address": "Ulica a číslo",
         "address2": "Číslo bytu, p. o. box atď. (voliteľné)",
         "city": "Mesto",
@@ -545,6 +545,8 @@
         "jobTitle": "Pracovná pozícia",
         "businessType": "Typ podnikania",
         "truckAccess": "Môže k vášmu skladu/kancelárii prísť veľký nákladný automobil/dodávka pre doručenie paliet?",
+        "truckYes": "Áno, prístupné",
+        "truckNo": "Nie, neprístupné",
         "email": "Email",
         "mobilePhone": "Mobilný telefón",
         "code": "Overovací kód"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registrácia úspešná! Vitajte v Tigo Energy.",
         "viesLocked": "Táto adresa je uzamknutá — musí zodpovedať vašej registrácii VIES a objaví sa na všetkých oficiálnych faktúrach.",
         "addShipping": "Pridať samostatnú doručovaciu adresu (voliteľné)",
-        "addBilling": "Pridať samostatnú fakturačnú adresu (voliteľné)"
+        "addBilling": "Pridať samostatnú fakturačnú adresu (nepovinné). Všetky faktúry sú zasielané e-mailom tak či tak."
       },
       "agreements": {
         "reviewInfo": "Skontrolujte svoje údaje",
@@ -619,7 +621,8 @@
         "mobilePhone": "+421 901 234 567",
         "vat": "napr. SK1234567890",
         "taxId": "IČ DPH / reg. č.",
-        "select": "Vyberte..."
+        "select": "Vyberte...",
+        "occupation": "Riaditeľ, Vedúci nákupu, ..."
       },
       "vat": "IČ DPH",
       "businessTypes": {

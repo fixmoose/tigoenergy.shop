@@ -451,7 +451,7 @@
         "firstName": "Ime",
         "lastName": "Prezime",
         "dob": "Datum rođenja",
-        "occupation": "Zanimanje (neobavezno)",
+        "occupation": "Radno mjesto (neobvezno)",
         "address": "Adresa (ulica i broj)",
         "address2": "Dodatak adresi (neobavezno)",
         "city": "Grad",
@@ -468,6 +468,8 @@
         "jobTitle": "Radno mjesto",
         "businessType": "Vrsta tvrtke",
         "truckAccess": "Može li veliki kamion/kombi pristupiti vašem skladištu/uredu za dostavu paleta?",
+        "truckYes": "Da, dostupno",
+        "truckNo": "Ne, nije dostupno",
         "email": "Email",
         "mobilePhone": "Mobitel",
         "code": "Kod za provjeru"
@@ -497,7 +499,7 @@
         "registrationSuccess": "Registracija uspješna! Dobrodošli u Tigo Energy.",
         "viesLocked": "Ova adresa je zaključana — mora odgovarati vašoj VIES registraciji i pojavit će se na svim službenim računima.",
         "addShipping": "Dodaj posebnu adresu za dostavu (neobavezno)",
-        "addBilling": "Dodaj posebnu adresu za račun (neobavezno)"
+        "addBilling": "Dodaj posebnu adresu za slanje računa (neobvezno). Sve račune ćete primiti putem elektronske pošte u svakom slučaju."
       },
       "agreements": {
         "reviewInfo": "Pregledajte svoje podatke",
@@ -542,7 +544,8 @@
         "mobilePhone": "+385 91 123 4567",
         "vat": "npr. HR12345678901",
         "taxId": "OIB / registracijski br.",
-        "select": "Odaberite..."
+        "select": "Odaberite...",
+        "occupation": "Direktor, Voditelj nabave, Prokurist, ..."
       },
       "vat": "PDV broj",
       "businessTypes": {

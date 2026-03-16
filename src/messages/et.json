@@ -528,7 +528,7 @@
         "firstName": "Eesnimi",
         "lastName": "Perekonnanimi",
         "dob": "Sünnikuupäev",
-        "occupation": "Amet (valikuline)",
+        "occupation": "Ametinimetus (Valikuline)",
         "address": "Tänav ja maja number",
         "address2": "Korter, postkast jne (valikuline)",
         "city": "Linn",
@@ -545,6 +545,8 @@
         "jobTitle": "Ametinimetus",
         "businessType": "Ettevõtte tüüp",
         "truckAccess": "Kas suur veok/kaubik pääseb teie laole/kontorile palettide tarnimiseks juurde?",
+        "truckYes": "Jah, ligipääsetav",
+        "truckNo": "Ei, pole ligipääsetav",
         "email": "Email",
         "mobilePhone": "Mobiiltelefon",
         "code": "Kinnituskood"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registreerimine õnnestus! Tere tulemast Tigo Energy juurde.",
         "viesLocked": "See aadress on lukustatud — see peab vastama teie VIES registreeringule ja kuvatakse kõigil ametlikel arvetel.",
         "addShipping": "Lisa eraldi tarneaadress (vabatahtlik)",
-        "addBilling": "Lisa eraldi arveaadress (vabatahtlik)"
+        "addBilling": "Lisa eraldi arveldusaadress (valikuline). Kõik arved saadetakse igal juhul e-postiga."
       },
       "agreements": {
         "reviewInfo": "Vaadake oma andmed üle",
@@ -619,7 +621,8 @@
         "mobilePhone": "+372 5123 4567",
         "vat": "nt. EE123456789",
         "taxId": "KM-number / reg.nr.",
-        "select": "Vali..."
+        "select": "Vali...",
+        "occupation": "Direktor, Ostujuht, ..."
       },
       "vat": "KM-number",
       "businessTypes": {

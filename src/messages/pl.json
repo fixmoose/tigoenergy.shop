@@ -528,7 +528,7 @@
         "firstName": "Imię",
         "lastName": "Nazwisko",
         "dob": "Data urodzenia",
-        "occupation": "Zawód (opcjonalnie)",
+        "occupation": "Stanowisko (Opcjonalnie)",
         "address": "Ulica i numer",
         "address2": "Lokal, biuro itp. (opcjonalnie)",
         "city": "Miasto",
@@ -545,6 +545,8 @@
         "jobTitle": "Stanowisko",
         "businessType": "Typ działalności",
         "truckAccess": "Czy duża ciężarówka/furgonetka może dojechać do Państwa magazynu/biura w celu dostawy paletowej?",
+        "truckYes": "Tak, dostępne",
+        "truckNo": "Nie, niedostępne",
         "email": "Email",
         "mobilePhone": "Telefon komórkowy",
         "code": "Kod weryfikacyjny"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Rejestracja udana! Witamy w Tigo Energy.",
         "viesLocked": "Ten adres jest zablokowany — musi odpowiadać Twojej rejestracji VIES i będzie widoczny na wszystkich oficjalnych fakturach.",
         "addShipping": "Dodaj osobny adres dostawy (opcjonalnie)",
-        "addBilling": "Dodaj osobny adres rozliczeniowy (opcjonalnie)"
+        "addBilling": "Dodaj osobny adres do faktur (opcjonalnie). Wszystkie faktury są wysyłane e-mailem niezależnie od tego."
       },
       "agreements": {
         "reviewInfo": "Przejrzyj swoje dane",
@@ -619,7 +621,8 @@
         "mobilePhone": "+48 512 345 678",
         "vat": "np. PL1234567890",
         "taxId": "NIP / nr rejestracyjny",
-        "select": "Wybierz..."
+        "select": "Wybierz...",
+        "occupation": "Dyrektor, Kierownik zakupów, ..."
       },
       "vat": "Numer VAT",
       "businessTypes": {

@@ -528,7 +528,7 @@
         "firstName": "Vārds",
         "lastName": "Uzvārds",
         "dob": "Dzimšanas datums",
-        "occupation": "Nodarbošanās (pēc izvēles)",
+        "occupation": "Amats (Neobligāts)",
         "address": "Iela un numurs",
         "address2": "Dzīvoklis, birojs utt. (pēc izvēles)",
         "city": "Pilsēta",
@@ -545,6 +545,8 @@
         "jobTitle": "Amats",
         "businessType": "Biznesa veids",
         "truckAccess": "Vai liela kravas automašīna var piekļūt jūsu noliktavai/birojam palešu piegādei?",
+        "truckYes": "Jā, pieejams",
+        "truckNo": "Nē, nav pieejams",
         "email": "E-pasts",
         "mobilePhone": "Mobilais tālrunis",
         "code": "Verifikācijas kods"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Reģistrācija veiksmīga! Laipni lūdzam Tigo Energy.",
         "viesLocked": "Šī adrese ir bloķēta — tai jāatbilst jūsu VIES reģistrācijai un tā parādīsies visos oficiālajos rēķinos.",
         "addShipping": "Pievienot atsevišķu piegādes adresi (pēc izvēles)",
-        "addBilling": "Pievienot atsevišķu rēķina adresi (pēc izvēles)"
+        "addBilling": "Pievienot atsevišķu rēķina adresi (neobligāts). Visi rēķini tiek sūtīti pa e-pastu jebkurā gadījumā."
       },
       "agreements": {
         "reviewInfo": "Pārskatiet savu informāciju",
@@ -619,7 +621,8 @@
         "mobilePhone": "+371 2123 4567",
         "vat": "piem. LV12345678901",
         "taxId": "PVN / reģ. nr.",
-        "select": "Izvēlēties..."
+        "select": "Izvēlēties...",
+        "occupation": "Direktors, Iepirkumu vadītājs, ..."
       },
       "vat": "PVN numurs",
       "businessTypes": {

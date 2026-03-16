@@ -528,7 +528,7 @@
         "firstName": "Keresztnév",
         "lastName": "Vezetéknév",
         "dob": "Születési dátum",
-        "occupation": "Foglalkozás (opcionális)",
+        "occupation": "Munkakör (Opcionális)",
         "address": "Utca és házszám",
         "address2": "Emelet, ajtó, postafiók stb. (opcionális)",
         "city": "Város",
@@ -545,6 +545,8 @@
         "jobTitle": "Beosztás",
         "businessType": "Üzleti típus",
         "truckAccess": "Egy nagy teherautó/furgon be tud hajtani raktárába/irodájába raklapos szállításhoz?",
+        "truckYes": "Igen, megközelíthető",
+        "truckNo": "Nem, nem megközelíthető",
         "email": "Email",
         "mobilePhone": "Mobiltelefon",
         "code": "Ellenőrző kód"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Sikeres regisztráció! Üdvözöljük a Tigo Energy-nél.",
         "viesLocked": "Ez a cím zárolva van — meg kell egyeznie a VIES regisztrációjával, és megjelenik az összes hivatalos számlán.",
         "addShipping": "Külön szállítási cím hozzáadása (opcionális)",
-        "addBilling": "Külön számlázási cím hozzáadása (opcionális)"
+        "addBilling": "Külön számlázási cím hozzáadása (opcionális). Minden számlát e-mailben küldünk mindenképp."
       },
       "agreements": {
         "reviewInfo": "Információk áttekintése",
@@ -619,7 +621,8 @@
         "mobilePhone": "+36 20 123 4567",
         "vat": "pl. HU12345678",
         "taxId": "Adószám / cégj. sz.",
-        "select": "Kiválasztás..."
+        "select": "Kiválasztás...",
+        "occupation": "Igazgató, Beszerzési vezető, ..."
       },
       "vat": "ÁFA szám",
       "businessTypes": {

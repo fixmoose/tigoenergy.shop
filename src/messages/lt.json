@@ -528,7 +528,7 @@
         "firstName": "Vardas",
         "lastName": "Pavardė",
         "dob": "Gimimo data",
-        "occupation": "Pareigos (pasirinktinai)",
+        "occupation": "Pareigos (Neprivaloma)",
         "address": "Gatvė ir namo numeris",
         "address2": "Butas, korpusas ir t. t. (pasirinktinai)",
         "city": "Miestas",
@@ -545,6 +545,8 @@
         "jobTitle": "Pareigų pavadinimas",
         "businessType": "Verslo tipas",
         "truckAccess": "Ar didelis sunkvežimis / furgonas gali privažiuoti prie jūsų sandėlio / biuro padėklams pristatyti?",
+        "truckYes": "Taip, prieinamas",
+        "truckNo": "Ne, neprieinamas",
         "email": "El. paštas",
         "mobilePhone": "Mobilusis telefonas",
         "code": "Patvirtinimo kodas"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registracija sėkminga! Sveiki atvykę į Tigo Energy.",
         "viesLocked": "Šis adresas yra užrakintas — jis turi atitikti jūsų VIES registraciją ir bus rodomas visuose oficialiuose sąskaitose.",
         "addShipping": "Pridėti atskirą pristatymo adresą (neprivaloma)",
-        "addBilling": "Pridėti atskirą sąskaitos adresą (neprivaloma)"
+        "addBilling": "Pridėti atskirą sąskaitų adresą (neprivaloma). Visos sąskaitos siunčiamos el. paštu bet kokiu atveju."
       },
       "agreements": {
         "reviewInfo": "Peržiūrėkite savo informaciją",
@@ -619,7 +621,8 @@
         "mobilePhone": "+370 612 34567",
         "vat": "pvz. LT123456789",
         "taxId": "PVM / reg. nr.",
-        "select": "Pasirinkti..."
+        "select": "Pasirinkti...",
+        "occupation": "Direktorius, Pirkimų vadovas, ..."
       },
       "vat": "PVM kodas",
       "businessTypes": {

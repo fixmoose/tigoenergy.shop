@@ -48,6 +48,23 @@ const MARKET_PHONE_CODES: Record<string, string> = {
     BE: '+32',
     NL: '+31',
     GB: '+44',
+    SE: '+46',
+    DK: '+45',
+    NO: '+47',
+    PT: '+351',
+    RS: '+381',
+    MK: '+389',
+    ME: '+382',
+    BG: '+359',
+    LV: '+371',
+    LT: '+370',
+    EE: '+372',
+}
+
+/** Find which known prefix (if any) the phone value starts with, longest match first */
+function detectPhonePrefix(phone: string): string | null {
+    const sorted = Object.values(MARKET_PHONE_CODES).sort((a, b) => b.length - a.length)
+    return sorted.find(p => phone.startsWith(p)) || null
 }
 
 
@@ -260,9 +277,24 @@ export default function B2BRegistrationForm() {
         }
     }
 
+    // Normalize phone: prepend market prefix if user typed a local number (e.g. 051766308 → +386 51766308)
+    const normalizePhone = (raw: string): string => {
+        let phone = raw.trim()
+        if (phone.startsWith('+')) return phone
+        if (phone.startsWith('0')) phone = phone.slice(1)
+        const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : ''
+        const code = MARKET_PHONE_CODES[marketKey] || MARKET_PHONE_CODES[formData.country]
+        if (code) return code + ' ' + phone
+        return raw
+    }
+
     const handleSendPhoneCode = async () => {
         setLoading(true); setError('')
-        const res = await fetch('/api/validate/phone', { method: 'POST', body: JSON.stringify({ phone: formData.phone }) })
+        const normalized = normalizePhone(formData.phone)
+        if (normalized !== formData.phone) {
+            setFormData(prev => ({ ...prev, phone: normalized }))
+        }
+        const res = await fetch('/api/validate/phone', { method: 'POST', body: JSON.stringify({ phone: normalized }) })
         const data = await res.json()
         setLoading(false)
         if (data.success) {
@@ -525,13 +557,26 @@ export default function B2BRegistrationForm() {
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded-lg border">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 text-blue-600" checked={formData.commercialAccess} onChange={e => setFormData({ ...formData, commercialAccess: e.target.checked })} />
-                            <span className="text-xs font-medium">{t('labels.commercialAccess')}</span>
-                        </label>
-                        <p className="text-[10px] text-gray-500 mt-1 ml-7">
+                        <p className="text-xs font-medium mb-2">{t('labels.commercialAccess')}</p>
+                        <p className="text-[10px] text-gray-500 mb-3">
                             {t('labels.truckAccess')}
                         </p>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, commercialAccess: true })}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${formData.commercialAccess === true ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
+                            >
+                                {t('labels.truckYes')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, commercialAccess: false })}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${formData.commercialAccess === false ? 'border-red-400 bg-red-50 text-red-600' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
+                            >
+                                {t('labels.truckNo')}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex gap-3 pt-2">
@@ -617,13 +662,11 @@ export default function B2BRegistrationForm() {
                                 value={formData.phone}
                                 onChange={e => {
                                     let val = e.target.value
-                                    const marketKey = typeof window !== 'undefined' ? getMarketKeyFromHostname(window.location.hostname) : 'SHOP'
-                                    const code = MARKET_PHONE_CODES[marketKey]
-
-                                    if (code && val.startsWith(code)) {
-                                        const rest = val.slice(code.length).trim()
+                                    const prefix = detectPhonePrefix(val)
+                                    if (prefix) {
+                                        const rest = val.slice(prefix.length).trim()
                                         if (rest.startsWith('0')) {
-                                            val = code + ' ' + rest.slice(1)
+                                            val = prefix + ' ' + rest.slice(1)
                                         }
                                     }
                                     setFormData(prev => ({ ...prev, phone: val }))

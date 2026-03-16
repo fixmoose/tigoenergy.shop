@@ -460,7 +460,7 @@
         "firstName": "Ime",
         "lastName": "Priimek",
         "dob": "Datum rojstva",
-        "occupation": "Poklic (neobvezno)",
+        "occupation": "Delovno mesto (neobvezno)",
         "address": "Naslov (ulica in hišna številka)",
         "address2": "Dodatek k naslovu (neobvezno)",
         "city": "Mesto",
@@ -477,6 +477,8 @@
         "jobTitle": "Delovno mesto",
         "businessType": "Vrsta podjetja",
         "truckAccess": "Ali lahko velik tovornjak/kombi dostopi do vašega skladišča/pisarne za dostavo palet?",
+        "truckYes": "Da, dostop je mogoč",
+        "truckNo": "Ne, ni dostopa",
         "email": "E-pošta",
         "mobilePhone": "Mobilni telefon",
         "code": "Koda za preverjanje"
@@ -506,7 +508,7 @@
         "registrationSuccess": "Registracija uspešna! Dobrodošli v Tigo Energy.",
         "viesLocked": "Ta naslov je zaklenjen — mora ustrezati vaši VIES registraciji in bo naveden na vseh uradnih računih.",
         "addShipping": "Dodaj ločen naslov za dostavo (neobvezno)",
-        "addBilling": "Dodaj ločen naslov za račun (neobvezno)"
+        "addBilling": "Dodaj poseben naslov za pošiljanje računov (neobvezno). Vse račune boste prejeli preko elektronske pošte tako ali tako."
       },
       "agreements": {
         "reviewInfo": "Pregled vaših podatkov",
@@ -551,7 +553,8 @@
         "mobilePhone": "+386 41 123 456",
         "vat": "npr. SI12345678",
         "taxId": "Davčna / registrska št.",
-        "select": "Izberite..."
+        "select": "Izberite...",
+        "occupation": "Direktor, Vodja nabave, Prokurist, ..."
       },
       "vat": "Številka DDV",
       "businessTypes": {

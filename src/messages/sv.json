@@ -528,7 +528,7 @@
         "firstName": "First Name",
         "lastName": "Last Name",
         "dob": "Date of Birth",
-        "occupation": "Occupation (Optional)",
+        "occupation": "Befattning (Valfritt)",
         "address": "Street Address",
         "address2": "Suite, Apt, PO, etc. (Optional)",
         "city": "City",
@@ -545,6 +545,8 @@
         "jobTitle": "Job Title",
         "businessType": "Type of Business",
         "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?",
+        "truckYes": "Ja, tillgängligt",
+        "truckNo": "Nej, inte tillgängligt",
         "email": "Email",
         "mobilePhone": "Mobiltelefon",
         "code": "Verifieringskod"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registrering klar! Välkommen till Tigo Energy.",
         "viesLocked": "Den här adressen är låst — den måste stämma med din VIES-registrering och kommer att visas på alla officiella fakturor.",
         "addShipping": "Lägg till separat leveransadress (valfritt)",
-        "addBilling": "Lägg till separat faktureringsadress (valfritt)"
+        "addBilling": "Lägg till separat faktureringsadress (valfritt). Alla fakturor skickas via e-post oavsett."
       },
       "agreements": {
         "reviewInfo": "Review Your Information",
@@ -619,7 +621,8 @@
         "mobilePhone": "+46 70 123 45 67",
         "vat": "t.ex. SE123456789001",
         "taxId": "Org.nr / reg.nr.",
-        "select": "Välj..."
+        "select": "Välj...",
+        "occupation": "Direktör, Inköpschef, ..."
       },
       "vat": "Momsnummer",
       "businessTypes": {

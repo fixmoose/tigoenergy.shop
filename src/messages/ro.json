@@ -528,7 +528,7 @@
         "firstName": "Prenume",
         "lastName": "Nume",
         "dob": "Data nașterii",
-        "occupation": "Ocupație (Opțional)",
+        "occupation": "Funcția (Opțional)",
         "address": "Adresa de domiciliu",
         "address2": "Apartament, suită, etc. (Opțional)",
         "city": "Oraș",
@@ -545,6 +545,8 @@
         "jobTitle": "Funcție",
         "businessType": "Tip de afacere",
         "truckAccess": "Poate un camion/furgonetă mare să acceseze depozitul/biroul dvs. pentru livrarea paletului?",
+        "truckYes": "Da, accesibil",
+        "truckNo": "Nu, inaccesibil",
         "email": "Email",
         "mobilePhone": "Telefon mobil",
         "code": "Cod de verificare"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Înregistrare reușită! Bun venit la Tigo Energy.",
         "viesLocked": "Această adresă este blocată — trebuie să corespundă înregistrării dvs. VIES și va apărea pe toate facturile oficiale.",
         "addShipping": "Adăugați o adresă de livrare separată (opțional)",
-        "addBilling": "Adăugați o adresă de facturare separată (opțional)"
+        "addBilling": "Adăugați o adresă de facturare separată (opțional). Toate facturile sunt trimise prin e-mail oricum."
       },
       "agreements": {
         "reviewInfo": "Revizuiți-vă informațiile",
@@ -619,7 +621,8 @@
         "mobilePhone": "+40 721 234 567",
         "vat": "ex. RO12345678",
         "taxId": "CUI / nr. înregistrare",
-        "select": "Selectați..."
+        "select": "Selectați...",
+        "occupation": "Director, Manager achiziții, ..."
       },
       "vat": "Cod TVA",
       "businessTypes": {

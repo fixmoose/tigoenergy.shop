@@ -528,7 +528,7 @@
         "firstName": "Fornavn",
         "lastName": "Etternavn",
         "dob": "Fødselsdato",
-        "occupation": "Yrke (valgfritt)",
+        "occupation": "Stilling (Valgfritt)",
         "address": "Gateadresse",
         "address2": "Suite, leilighet osv. (valgfritt)",
         "city": "By",
@@ -545,6 +545,8 @@
         "jobTitle": "Stillingstittel",
         "businessType": "Type bedrift",
         "truckAccess": "Kan en stor lastebil/varebil få tilgang til lageret/kontoret ditt for pallelevering?",
+        "truckYes": "Ja, tilgjengelig",
+        "truckNo": "Nei, ikke tilgjengelig",
         "email": "E-post",
         "mobilePhone": "Mobiltelefon",
         "code": "Bekreftelseskode"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registrering vellykket! Velkommen til Tigo Energy.",
         "viesLocked": "Denne adressen er låst — den må stemme med din VIES-registrering og vil vises på alle offisielle fakturaer.",
         "addShipping": "Legg til separat leveringsadresse (valgfritt)",
-        "addBilling": "Legg til separat faktureringsadresse (valgfritt)"
+        "addBilling": "Legg til separat fakturaadresse (valgfritt). Alle fakturaer sendes via e-post uansett."
       },
       "agreements": {
         "reviewInfo": "Se over informasjonen din",
@@ -619,7 +621,8 @@
         "mobilePhone": "+47 400 12 345",
         "vat": "f.eks. NO123456789MVA",
         "taxId": "Org.nr / reg.nr.",
-        "select": "Velg..."
+        "select": "Velg...",
+        "occupation": "Direktør, Innkjøpssjef, ..."
       },
       "vat": "MVA-nummer",
       "businessTypes": {

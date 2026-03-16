@@ -528,7 +528,7 @@
         "firstName": "Voornaam",
         "lastName": "Achternaam",
         "dob": "Geboortedatum",
-        "occupation": "Beroep (optioneel)",
+        "occupation": "Functietitel (Optioneel)",
         "address": "Straat en huisnummer",
         "address2": "Suite, appartement, etc. (optioneel)",
         "city": "Plaats",
@@ -545,6 +545,8 @@
         "jobTitle": "Functietitel",
         "businessType": "Type bedrijf",
         "truckAccess": "Kan een grote vrachtwagen/bus uw magazijn/kantoor bereiken voor palletlevering?",
+        "truckYes": "Ja, toegankelijk",
+        "truckNo": "Nee, niet toegankelijk",
         "email": "Email",
         "mobilePhone": "Mobiele telefoon",
         "code": "Verificatiecode"
@@ -574,7 +576,7 @@
         "registrationSuccess": "Registratie geslaagd! Welkom bij Tigo Energy.",
         "viesLocked": "Dit adres is vergrendeld — het moet overeenkomen met uw VIES-registratie en verschijnt op alle officiële facturen.",
         "addShipping": "Apart afleveradres toevoegen (optioneel)",
-        "addBilling": "Apart factuuradres toevoegen (optioneel)"
+        "addBilling": "Apart factuuradres toevoegen (optioneel). Alle facturen worden sowieso per e-mail verzonden."
       },
       "agreements": {
         "reviewInfo": "Controleer uw gegevens",
@@ -619,7 +621,8 @@
         "mobilePhone": "+31 6 12345678",
         "vat": "bijv. NL123456789B01",
         "taxId": "BTW-nr. / registratienr.",
-        "select": "Selecteren..."
+        "select": "Selecteren...",
+        "occupation": "Directeur, Inkoopleider, ..."
       },
       "vat": "BTW-nummer",
       "businessTypes": {

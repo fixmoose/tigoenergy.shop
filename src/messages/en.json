@@ -462,7 +462,7 @@
         "firstName": "First Name",
         "lastName": "Last Name",
         "dob": "Date of Birth",
-        "occupation": "Occupation (Optional)",
+        "occupation": "Job Title (Optional)",
         "address": "Street Address",
         "address2": "Suite, Apt, PO, etc. (Optional)",
         "city": "City",
@@ -479,6 +479,8 @@
         "jobTitle": "Job Title",
         "businessType": "Type of Business",
         "truckAccess": "Can a large truck/van access your warehouse/office for pallet delivery?",
+        "truckYes": "Yes, accessible",
+        "truckNo": "No, not accessible",
         "email": "Email",
         "mobilePhone": "Mobile Phone",
         "code": "Verification Code"
@@ -508,7 +510,7 @@
         "registrationSuccess": "Registration successful! Welcome to Tigo Energy.",
         "viesLocked": "This address is locked — it must match your VIES registration and will appear on all official invoices.",
         "addShipping": "Add separate shipping address (optional)",
-        "addBilling": "Add separate billing address (optional)"
+        "addBilling": "Add a separate address for receiving invoices (optional). All invoices are sent via email regardless."
       },
       "agreements": {
         "reviewInfo": "Review Your Information",
@@ -553,7 +555,8 @@
         "mobilePhone": "+1 234 567 8900",
         "vat": "e.g. DE123456789",
         "taxId": "Tax ID / Registration No.",
-        "select": "Select..."
+        "select": "Select...",
+        "occupation": "Director, Procurement Manager, ..."
       },
       "vat": "VAT Number",
       "businessTypes": {
