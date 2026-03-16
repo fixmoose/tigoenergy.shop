@@ -57,12 +57,8 @@ export function seoMiddleware(request: NextRequest) {
     response.headers.set('x-market-currency', market.currency)
     response.headers.set('x-market-locale', market.locale)
 
-    // 301 redirect www → non-www (canonical domain)
-    if (host.startsWith('www.')) {
-        const newUrl = new URL(url)
-        newUrl.host = host.replace('www.', '')
-        return NextResponse.redirect(newUrl, 301)
-    }
+    // NOTE: www → non-www redirect is handled by Vercel's domain configuration.
+    // Do NOT add it here — it causes redirect loops / 404s on Vercel.
 
 
 
