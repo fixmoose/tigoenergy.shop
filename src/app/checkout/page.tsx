@@ -750,7 +750,7 @@ export default function CheckoutPage() {
                                 <div>
                                     <h3 className="font-bold text-red-800">{error || t('requiredFields')}</h3>
                                     {invalidFields.length > 0 && (
-                                        <p className="text-sm text-red-600">{t('requiredFieldsDesc')}</p>
+                                        <p className="text-sm text-red-600">{t('requiredFieldsDesc')} [{invalidFields.join(', ')}]</p>
                                     )}
                                 </div>
                             </div>
