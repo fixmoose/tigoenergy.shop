@@ -81,40 +81,14 @@ export async function loadSavedCart(savedCartId: string) {
         throw new Error("You must be logged in to load a saved cart")
     }
 
-    // 1. Fetch Saved Items
-    const { data: savedItems, error: savedError } = await supabase
-        .from('saved_cart_items')
-        .select('*')
-        .eq('saved_cart_id', savedCartId)
+    const newItems = await fetchSavedCartItems(supabase, savedCartId)
 
-    if (savedError || !savedItems) {
-        throw new Error("Failed to fetch saved cart items")
-    }
-
-    // 2. Map to CartItem format
-    // Note: We trust the saved snapshot data (price, etc.) or should we refetch?
-    // User expectation for "Saved Cart" is usually restoring the state. 
-    // However, prices might change. For a B2B PO, maybe they expect the price at that time?
-    // But for a dynamic shop, prices should be current.
-    // Let's use the saved data effectively, but ideally we would check live prices. 
-    // For now, simple restoration.
-    const newItems = (savedItems as any[]).map((item: any) => ({
-        product_id: item.product_id,
-        sku: item.sku || '',
-        name: item.name || 'Unknown Product',
-        quantity: item.quantity,
-        unit_price: item.unit_price || 0,
-        image_url: item.image_url || undefined,
-        total_price: (item.unit_price || 0) * item.quantity
-    }))
-
-    // 3. Overwrite Active Cart
-    // Find User Cart
+    // Overwrite Active Cart
     const { data: existingCart } = await supabase
         .from('carts')
         .select('id')
         .eq('user_id', user.id)
-        .single() // Might be null
+        .single()
 
     if (existingCart) {
         const { error } = await supabase
@@ -133,4 +107,77 @@ export async function loadSavedCart(savedCartId: string) {
 
     revalidatePath('/cart')
     return { success: true }
+}
+
+export async function mergeSavedCart(savedCartId: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        throw new Error("You must be logged in to merge a saved cart")
+    }
+
+    const savedItems = await fetchSavedCartItems(supabase, savedCartId)
+
+    // Fetch current active cart
+    const { data: existingCart } = await supabase
+        .from('carts')
+        .select('id, items')
+        .eq('user_id', user.id)
+        .single()
+
+    const currentItems: any[] = (existingCart?.items as any[]) || []
+
+    // Merge: if same product_id or sku exists, add quantities; otherwise append
+    const merged = [...currentItems]
+    for (const item of savedItems) {
+        const existing = merged.find(
+            (m: any) => (m.product_id && m.product_id === item.product_id) || (m.sku && m.sku === item.sku)
+        )
+        if (existing) {
+            existing.quantity += item.quantity
+            existing.total_price = (existing.unit_price || 0) * existing.quantity
+        } else {
+            merged.push(item)
+        }
+    }
+
+    if (existingCart) {
+        const { error } = await supabase
+            .from('carts')
+            .update({ items: merged, updated_at: new Date().toISOString() })
+            .eq('id', existingCart.id)
+
+        if (error) throw new Error("Failed to merge into active cart")
+    } else {
+        const { error } = await supabase
+            .from('carts')
+            .insert({ user_id: user.id, items: merged })
+
+        if (error) throw new Error("Failed to create active cart")
+    }
+
+    revalidatePath('/cart')
+    return { success: true }
+}
+
+async function fetchSavedCartItems(supabase: any, savedCartId: string) {
+    const { data: savedItems, error: savedError } = await supabase
+        .from('saved_cart_items')
+        .select('*')
+        .eq('saved_cart_id', savedCartId)
+
+    if (savedError || !savedItems) {
+        throw new Error("Failed to fetch saved cart items")
+    }
+
+    return (savedItems as any[]).map((item: any) => ({
+        product_id: item.product_id,
+        sku: item.sku || '',
+        name: item.name || 'Unknown Product',
+        quantity: item.quantity,
+        unit_price: item.unit_price || 0,
+        image_url: item.image_url || undefined,
+        total_price: (item.unit_price || 0) * item.quantity
+    }))
 }

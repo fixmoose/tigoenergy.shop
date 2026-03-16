@@ -754,6 +754,10 @@
     "shippingInquiry": "Tarnepäring",
     "returnInquiry": "Tagastuspäring",
     "contactSupport": "Võta ühendust toega",
-    "poNumber": "Tell. nr."
+    "poNumber": "Tell. nr.",
+    "paymentTerms": "Maksetingimused",
+    "paymentTermsPrepayment": "Makse nõutav enne tarnimist/kättesaamist.",
+    "paymentTermsNet30": "Makse {days} päeva jooksul arve kuupäevast.",
+    "paymentDueDate": "Maksetähtaeg: {date}"
   }
 }

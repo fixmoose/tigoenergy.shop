@@ -754,6 +754,10 @@
     "shippingInquiry": "Piegādes jautājums",
     "returnInquiry": "Atgriešanas jautājums",
     "contactSupport": "Sazināties ar atbalstu",
-    "poNumber": "Pas. nr."
+    "poNumber": "Pas. nr.",
+    "paymentTerms": "Apmaksas nosacījumi",
+    "paymentTermsPrepayment": "Apmaksa nepieciešama pirms piegādes/saņemšanas.",
+    "paymentTermsNet30": "Apmaksa {days} dienu laikā no rēķina datuma.",
+    "paymentDueDate": "Apmaksas termiņš: {date}"
   }
 }

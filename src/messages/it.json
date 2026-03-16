@@ -754,6 +754,10 @@
     "shippingInquiry": "Domanda sulla spedizione",
     "returnInquiry": "Domanda sul reso",
     "contactSupport": "Contatta assistenza",
-    "poNumber": "N. ordine"
+    "poNumber": "N. ordine",
+    "paymentTerms": "Condizioni di pagamento",
+    "paymentTermsPrepayment": "Pagamento obbligatorio prima della consegna/ritiro.",
+    "paymentTermsNet30": "Pagamento entro {days} giorni dalla data della fattura.",
+    "paymentDueDate": "Scadenza: {date}"
   }
 }

@@ -426,12 +426,42 @@ export async function adminSendOrderToClientAction(orderId: string) {
 export async function confirmOrderAction(orderId: string) {
     const supabase = await createAdminClient()
 
+    // Fetch order first to get customer_id
+    const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('customer_id')
+        .eq('id', orderId)
+        .single()
+
+    // Fetch customer payment terms
+    let paymentTerms = 'prepayment'
+    let paymentTermsDays = 0
+    let paymentDueDate: string | null = null
+
+    if (existingOrder?.customer_id) {
+        const { data: customer } = await supabase
+            .from('customers')
+            .select('payment_terms, payment_terms_days')
+            .eq('id', existingOrder.customer_id)
+            .single()
+
+        if (customer?.payment_terms === 'net30') {
+            paymentTerms = 'net30'
+            paymentTermsDays = customer.payment_terms_days || 30
+            const due = new Date()
+            due.setDate(due.getDate() + paymentTermsDays)
+            paymentDueDate = due.toISOString().split('T')[0]
+        }
+    }
+
     // 1. Update Status
     const { data: order, error } = await supabase
         .from('orders')
         .update({
             status: 'processing',
-            confirmed_at: new Date().toISOString()
+            confirmed_at: new Date().toISOString(),
+            payment_terms: paymentTerms,
+            payment_due_date: paymentDueDate
         })
         .eq('id', orderId)
         .select()

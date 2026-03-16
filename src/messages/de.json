@@ -755,6 +755,10 @@
     "shippingInquiry": "Versandanfrage",
     "returnInquiry": "Rücksendeanfrage",
     "contactSupport": "Support kontaktieren",
-    "poNumber": "Bestellnr."
+    "poNumber": "Bestellnr.",
+    "paymentTerms": "Zahlungsbedingungen",
+    "paymentTermsPrepayment": "Zahlung vor Lieferung/Abholung erforderlich.",
+    "paymentTermsNet30": "Zahlung innerhalb von {days} Tagen nach Rechnungsdatum.",
+    "paymentDueDate": "Fälligkeitsdatum: {date}"
   }
 }

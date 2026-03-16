@@ -114,21 +114,12 @@ export default function MyOrders({ user, customer }: Props) {
                                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">{t('totalAmount')}</p>
                                     <p className="text-lg font-bold text-gray-900">{order.currency} {order.total.toFixed(2)}</p>
                                 </div>
-                                {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' ? (
-                                    <Link
-                                        href={`/orders/${order.id}`}
-                                        className="bg-amber-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-amber-600 transition-all shadow-sm hover:shadow-md"
-                                    >
-                                        {t('payNow')}
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        href={`/orders/${order.id}`}
-                                        className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
-                                    >
-                                        {t('viewDetails')}
-                                    </Link>
-                                )}
+                                <Link
+                                    href={`/orders/${order.id}`}
+                                    className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
+                                >
+                                    {t('viewDetails')}
+                                </Link>
                             </div>
                         </div>
                     ))}

@@ -144,6 +144,9 @@ export interface Customer {
 
   internal_notes?: string | null
 
+  payment_terms?: string | null
+  payment_terms_days?: number | null
+
   created_at?: string | null
   updated_at?: string | null
 }
@@ -246,6 +249,11 @@ export interface Order {
 
   cancelled_at?: string | null
   terms_agreed_at?: string | null
+
+  // Payment terms
+  payment_terms?: string | null
+  payment_due_date?: string | null
+  overdue_reminder_sent_at?: string | null
 
   // Order modification
   modification_unlocked?: boolean

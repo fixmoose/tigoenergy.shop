@@ -751,6 +751,10 @@
     "shippingInquiry": "Упит о испоруци",
     "returnInquiry": "Упит о повраћају",
     "contactSupport": "Контактирајте подршку",
-    "poNumber": "Бр. нар."
+    "poNumber": "Бр. нар.",
+    "paymentTerms": "Услови плаћања",
+    "paymentTermsPrepayment": "Обавезно плаћање пре испоруке/преузимања.",
+    "paymentTermsNet30": "Плаћање у року од {days} дана од датума фактуре.",
+    "paymentDueDate": "Рок плаћања: {date}"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { SavedCart } from '@/types/database'
-import { getSavedCarts, deleteSavedCart, loadSavedCart } from '@/app/actions/cart_actions'
+import { getSavedCarts, deleteSavedCart, loadSavedCart, mergeSavedCart } from '@/app/actions/cart_actions'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -40,6 +40,21 @@ export default function SavedCartsList() {
             window.location.reload() // Simple way to refresh context
         } catch (e) {
             alert('Failed to load cart')
+            console.error(e)
+        } finally {
+            setActionLoading(null)
+        }
+    }
+
+    const handleMerge = async (cart: SavedCart) => {
+        if (!confirm(`Add items from "${cart.name}" to your current cart?`)) return
+
+        setActionLoading(cart.id)
+        try {
+            await mergeSavedCart(cart.id)
+            window.location.reload()
+        } catch (e) {
+            alert('Failed to merge cart')
             console.error(e)
         } finally {
             setActionLoading(null)
@@ -88,6 +103,13 @@ export default function SavedCartsList() {
                                 className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
                             >
                                 {actionLoading === cart.id ? 'Loading...' : 'Load Cart'}
+                            </button>
+                            <button
+                                onClick={() => handleMerge(cart)}
+                                disabled={!!actionLoading}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
+                            >
+                                {actionLoading === cart.id ? 'Merging...' : 'Add to Cart'}
                             </button>
                             <button
                                 onClick={() => handleDelete(cart)}

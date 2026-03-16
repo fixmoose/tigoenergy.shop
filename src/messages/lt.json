@@ -754,6 +754,10 @@
     "shippingInquiry": "Pristatymo užklausa",
     "returnInquiry": "Grąžinimo užklausa",
     "contactSupport": "Susisiekti su palaikymu",
-    "poNumber": "Užs. nr."
+    "poNumber": "Užs. nr.",
+    "paymentTerms": "Mokėjimo sąlygos",
+    "paymentTermsPrepayment": "Mokėjimas privalomas prieš pristatymą/atsiėmimą.",
+    "paymentTermsNet30": "Mokėjimas per {days} dienų nuo sąskaitos datos.",
+    "paymentDueDate": "Mokėjimo terminas: {date}"
   }
 }

@@ -754,6 +754,10 @@
     "shippingInquiry": "Întrebare despre livrare",
     "returnInquiry": "Întrebare despre returnare",
     "contactSupport": "Contactați suportul",
-    "poNumber": "Nr. com."
+    "poNumber": "Nr. com.",
+    "paymentTerms": "Condiții de plată",
+    "paymentTermsPrepayment": "Plata obligatorie înainte de livrare/ridicare.",
+    "paymentTermsNet30": "Plata în termen de {days} zile de la data facturii.",
+    "paymentDueDate": "Data scadentă: {date}"
   }
 }

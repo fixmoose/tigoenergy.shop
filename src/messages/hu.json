@@ -754,6 +754,10 @@
     "shippingInquiry": "Szállítási kérdés",
     "returnInquiry": "Visszaküldési kérdés",
     "contactSupport": "Ügyfélszolgálat",
-    "poNumber": "Rend.sz."
+    "poNumber": "Rend.sz.",
+    "paymentTerms": "Fizetési feltételek",
+    "paymentTermsPrepayment": "Fizetés szükséges a szállítás/átvétel előtt.",
+    "paymentTermsNet30": "Fizetés {days} napon belül a számla dátumától.",
+    "paymentDueDate": "Fizetési határidő: {date}"
   }
 }

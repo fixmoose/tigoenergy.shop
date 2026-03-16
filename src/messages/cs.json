@@ -754,6 +754,10 @@
     "shippingInquiry": "Dotaz na dopravu",
     "returnInquiry": "Dotaz na vrácení",
     "contactSupport": "Kontaktovat podporu",
-    "poNumber": "Č. obj."
+    "poNumber": "Č. obj.",
+    "paymentTerms": "Platební podmínky",
+    "paymentTermsPrepayment": "Platba požadována před doručením/vyzvednutím.",
+    "paymentTermsNet30": "Splatnost do {days} dnů od data faktury.",
+    "paymentDueDate": "Datum splatnosti: {date}"
   }
 }

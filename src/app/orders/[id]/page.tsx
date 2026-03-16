@@ -365,6 +365,21 @@ export default function OrderDetailsPage() {
                                         <p className="text-2xl font-black text-gray-900">{order.currency} {order.total.toFixed(2)}</p>
                                     </div>
                                 </div>
+
+                                {/* Payment Terms Notice */}
+                                <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+                                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('paymentTerms')}</p>
+                                    {(order as any).payment_terms === 'net30' ? (
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">{t('paymentTermsNet30', { days: (order as any).payment_terms_days || 30 })}</p>
+                                            {(order as any).payment_due_date && (
+                                                <p className="text-xs text-amber-700 font-semibold mt-1">{t('paymentDueDate', { date: new Date((order as any).payment_due_date).toLocaleDateString() })}</p>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm font-bold text-gray-900">{t('paymentTermsPrepayment')}</p>
+                                    )}
+                                </div>
                             </div>
                         )}
 

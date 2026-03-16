@@ -754,6 +754,10 @@
     "shippingInquiry": "Verzendvraag",
     "returnInquiry": "Retourvraag",
     "contactSupport": "Contact opnemen met support",
-    "poNumber": "Bestelnr."
+    "poNumber": "Bestelnr.",
+    "paymentTerms": "Betalingsvoorwaarden",
+    "paymentTermsPrepayment": "Betaling vereist vóór levering/afhaling.",
+    "paymentTermsNet30": "Betaling binnen {days} dagen na factuurdatum.",
+    "paymentDueDate": "Vervaldatum: {date}"
   }
 }

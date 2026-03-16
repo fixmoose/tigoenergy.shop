@@ -754,6 +754,10 @@
     "shippingInquiry": "Questão sobre envio",
     "returnInquiry": "Questão sobre devolução",
     "contactSupport": "Contactar suporte",
-    "poNumber": "N.º enc."
+    "poNumber": "N.º enc.",
+    "paymentTerms": "Condições de pagamento",
+    "paymentTermsPrepayment": "Pagamento obrigatório antes da entrega/recolha.",
+    "paymentTermsNet30": "Pagamento em {days} dias a partir da data da fatura.",
+    "paymentDueDate": "Data de vencimento: {date}"
   }
 }

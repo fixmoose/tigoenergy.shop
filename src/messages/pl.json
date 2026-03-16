@@ -754,6 +754,10 @@
     "shippingInquiry": "Zapytanie o dostawę",
     "returnInquiry": "Zapytanie o zwrot",
     "contactSupport": "Skontaktuj się z obsługą",
-    "poNumber": "Nr zam."
+    "poNumber": "Nr zam.",
+    "paymentTerms": "Warunki płatności",
+    "paymentTermsPrepayment": "Płatność wymagana przed dostawą/odbiorem.",
+    "paymentTermsNet30": "Płatność w ciągu {days} dni od daty faktury.",
+    "paymentDueDate": "Termin płatności: {date}"
   }
 }

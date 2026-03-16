@@ -946,6 +946,10 @@
     "shippingInquiry": "Shipping Inquiry",
     "returnInquiry": "Return Inquiry",
     "contactSupport": "Contact Support",
-    "poNumber": "P.O."
+    "poNumber": "P.O.",
+    "paymentTerms": "Payment Terms",
+    "paymentTermsPrepayment": "Payment required before delivery/pickup.",
+    "paymentTermsNet30": "Payment due within {days} days of invoice date.",
+    "paymentDueDate": "Due date: {date}"
   }
 }

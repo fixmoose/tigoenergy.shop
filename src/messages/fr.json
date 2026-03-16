@@ -754,6 +754,10 @@
     "shippingInquiry": "Question sur la livraison",
     "returnInquiry": "Question sur le retour",
     "contactSupport": "Contacter le support",
-    "poNumber": "N° commande"
+    "poNumber": "N° commande",
+    "paymentTerms": "Conditions de paiement",
+    "paymentTermsPrepayment": "Paiement requis avant livraison/retrait.",
+    "paymentTermsNet30": "Paiement dû sous {days} jours à compter de la date de facturation.",
+    "paymentDueDate": "Date d'échéance : {date}"
   }
 }

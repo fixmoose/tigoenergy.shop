@@ -939,6 +939,10 @@
     "shippingInquiry": "Vprašanje o dostavi",
     "returnInquiry": "Vprašanje o vračilu",
     "contactSupport": "Kontaktiraj podporo",
-    "poNumber": "Nabavni nalog"
+    "poNumber": "Nabavni nalog",
+    "paymentTerms": "Plačilni pogoji",
+    "paymentTermsPrepayment": "Obvezno plačilo pred dostavo/prevzemom.",
+    "paymentTermsNet30": "Plačilo po dobavnici, rok plačila je {days} dni.",
+    "paymentDueDate": "Rok plačila: {date}"
   }
 }

@@ -754,6 +754,10 @@
     "shippingInquiry": "Consulta de envío",
     "returnInquiry": "Consulta de devolución",
     "contactSupport": "Contactar soporte",
-    "poNumber": "N.º pedido"
+    "poNumber": "N.º pedido",
+    "paymentTerms": "Condiciones de pago",
+    "paymentTermsPrepayment": "Pago obligatorio antes de la entrega/recogida.",
+    "paymentTermsNet30": "Pago a {days} días desde la fecha de factura.",
+    "paymentDueDate": "Fecha de vencimiento: {date}"
   }
 }

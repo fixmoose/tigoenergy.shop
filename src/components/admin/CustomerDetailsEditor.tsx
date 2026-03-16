@@ -19,7 +19,9 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
         email: customer.email || '',
         phone: customer.phone || '',
         company_name: customer.company_name || '',
-        vat_id: customer.vat_id || ''
+        vat_id: customer.vat_id || '',
+        payment_terms: customer.payment_terms || 'prepayment',
+        payment_terms_days: customer.payment_terms_days ?? 0
     })
 
     const handleSave = async () => {
@@ -192,6 +194,52 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                     )}
                     {!isEditing && customer.vat_validated_at && (
                         <p className="text-[10px] text-gray-400 mt-0.5">Validated: {new Date(customer.vat_validated_at).toLocaleDateString()}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Payment Terms</label>
+                    {isEditing ? (
+                        <div className="space-y-2">
+                            <select
+                                value={formData.payment_terms}
+                                onChange={e => {
+                                    const val = e.target.value
+                                    setFormData({
+                                        ...formData,
+                                        payment_terms: val,
+                                        payment_terms_days: val === 'net30' ? 30 : 0
+                                    })
+                                }}
+                                className="w-full text-sm font-bold text-gray-900 border border-gray-200 rounded-lg px-2 py-1.5 focus:border-blue-500 outline-none"
+                            >
+                                <option value="prepayment">Prepayment (before delivery)</option>
+                                <option value="net30">Net 30 days</option>
+                            </select>
+                            {formData.payment_terms === 'net30' && (
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[10px] font-bold text-gray-500">Days:</label>
+                                    <input
+                                        type="number"
+                                        value={formData.payment_terms_days}
+                                        onChange={e => setFormData({ ...formData, payment_terms_days: parseInt(e.target.value) || 0 })}
+                                        min={1}
+                                        max={120}
+                                        className="w-20 text-sm font-bold text-gray-900 border border-gray-200 rounded-lg px-2 py-1 focus:border-blue-500 outline-none"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            {(customer.payment_terms || 'prepayment') === 'prepayment' ? (
+                                <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100">Prepayment</span>
+                            ) : (
+                                <span className="text-xs font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-100">
+                                    Net {customer.payment_terms_days || 30} days
+                                </span>
+                            )}
+                        </div>
                     )}
                 </div>
 

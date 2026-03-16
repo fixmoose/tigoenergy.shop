@@ -754,6 +754,10 @@
     "shippingInquiry": "Запитване за доставка",
     "returnInquiry": "Запитване за връщане",
     "contactSupport": "Свържете се с поддръжката",
-    "poNumber": "Пор. №"
+    "poNumber": "Пор. №",
+    "paymentTerms": "Условия за плащане",
+    "paymentTermsPrepayment": "Задължително плащане преди доставка/получаване.",
+    "paymentTermsNet30": "Плащане в срок от {days} дни от датата на фактурата.",
+    "paymentDueDate": "Краен срок: {date}"
   }
 }

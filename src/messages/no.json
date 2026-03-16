@@ -754,6 +754,10 @@
     "shippingInquiry": "Fraktforespørsel",
     "returnInquiry": "Returforespørsel",
     "contactSupport": "Kontakt support",
-    "poNumber": "Ordrenr."
+    "poNumber": "Ordrenr.",
+    "paymentTerms": "Betalingsbetingelser",
+    "paymentTermsPrepayment": "Betaling kreves før levering/henting.",
+    "paymentTermsNet30": "Betaling innen {days} dager fra fakturadato.",
+    "paymentDueDate": "Forfallsdato: {date}"
   }
 }

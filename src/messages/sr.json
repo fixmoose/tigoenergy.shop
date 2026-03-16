@@ -754,6 +754,10 @@
     "shippingInquiry": "Upit o isporuci",
     "returnInquiry": "Upit o povraćaju",
     "contactSupport": "Kontaktirajte podršku",
-    "poNumber": "Br. nar."
+    "poNumber": "Br. nar.",
+    "paymentTerms": "Uslovi plaćanja",
+    "paymentTermsPrepayment": "Obavezno plaćanje pre isporuke/preuzimanja.",
+    "paymentTermsNet30": "Plaćanje u roku od {days} dana od datuma fakture.",
+    "paymentDueDate": "Rok plaćanja: {date}"
   }
 }
