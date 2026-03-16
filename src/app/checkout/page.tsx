@@ -574,6 +574,7 @@ export default function CheckoutPage() {
         }
 
         if (missing.length > 0) {
+            console.log('Missing required fields:', missing, 'formData:', Object.fromEntries(missing.map(f => [f, formData[f as keyof typeof formData]])))
             setInvalidFields(missing)
             setError(t('requiredFields'))
 
