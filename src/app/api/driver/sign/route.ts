@@ -38,8 +38,7 @@ export async function POST(req: NextRequest) {
 
     let signatureUrl = ''
     if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage.from('invoices').getPublicUrl(filePath)
-        signatureUrl = publicUrl
+        signatureUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(filePath)}`
     }
 
     // 3. Update delivery token

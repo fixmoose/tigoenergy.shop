@@ -17,6 +17,9 @@ interface AdminOrderActionsProps {
     packingSlipUrl?: string | null
     shippingLabelUrl?: string | null
     invoiceUrl?: string | null
+    trackingNumber?: string | null
+    trackingUrl?: string | null
+    shippingCarrier?: string | null
     customerEmail?: string | null
     sendCount?: number
     orderTotal?: number
@@ -88,7 +91,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -101,13 +104,19 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const [payments, setPayments] = useState<OrderPayment[]>([])
     const [paymentsLoaded, setPaymentsLoaded] = useState(false)
     const [driverEmail, setDriverEmail] = useState('')
-    const [showDriverForm, setShowDriverForm] = useState(false)
+    const [savedDrivers, setSavedDrivers] = useState<{ id: string; name: string; email: string; phone: string }[]>([])
     const router = useRouter()
     const supabase = createClient()
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000)
         return () => clearInterval(timer)
+    }, [])
+
+    useEffect(() => {
+        supabase.from('drivers').select('id, name, email, phone').order('name').then(({ data }) => {
+            if (data) setSavedDrivers(data)
+        })
     }, [])
 
     const creationDate = createdAt ? new Date(createdAt) : null
@@ -128,11 +137,13 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const isPaid = paymentStatus === 'paid'
     const isShipped = status === 'shipped'
     const isDelivered = status === 'delivered' || status === 'completed'
+    const isPickup = shippingCarrier === 'Personal Pick-up'
 
     const getCurrentStep = (): FlowStep => {
         if (isPending && !confirmedAt) return 'confirm'
         if (!isPaid) return 'payment'
         if (!packingSlipUrl) return 'packing'
+        if (isPickup && !isDelivered) return 'delivered' // Pickup skips shipping
         if (!isShipped && !isDelivered) return 'shipping'
         if (isShipped && !isDelivered) return 'delivered'
         return 'invoice'
@@ -189,7 +200,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             const filePath = `orders/${orderId}/${fileName}`
             const { error: uploadError } = await supabase.storage.from('invoices').upload(filePath, file)
             if (uploadError) throw uploadError
-            const { data: { publicUrl } } = supabase.storage.from('invoices').getPublicUrl(filePath)
+            // Use API route URL instead of public URL (bucket may not be public)
+            const publicUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(filePath)}`
             const updates: any = {}
             if (type === 'invoice') { updates.invoice_url = publicUrl; updates.invoice_created_at = new Date().toISOString() }
             else if (type === 'packing_slip') { updates.packing_slip_url = publicUrl }
@@ -435,11 +447,17 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 </StepCard>
 
                 {/* Step 5: Shipping */}
-                <StepCard step="shipping" currentStep={currentStep} title="Shipping" subtitle="Create DPD label & notify customer" icon="5" color="red">
+                <StepCard step="shipping" currentStep={currentStep} title={isPickup ? 'Shipping / Pickup' : 'Shipping'} subtitle={isPickup ? 'Pickup order — convert to delivery if needed' : 'Create DPD label & notify customer'} icon="5" color="red">
                     <div className="space-y-2">
+                        {isPickup && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                                <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1">Osebni prevzem</p>
+                                <p className="text-[10px] text-blue-600">Customer selected pickup. To switch to delivery, click below.</p>
+                            </div>
+                        )}
                         <button onClick={() => handleShipOrder('DPD')} disabled={loading}
                             className="w-full py-2.5 bg-red-600 text-white rounded-lg font-bold text-sm hover:bg-red-700 transition disabled:opacity-50">
-                            {loading ? 'Processing...' : 'Process DPD Label'}
+                            {loading ? 'Processing...' : isPickup ? 'Convert to DPD Delivery' : 'Process DPD Label'}
                         </button>
                         {shippingLabelUrl && (
                             <a href={shippingLabelUrl} target="_blank" className="block text-center text-[10px] font-bold text-red-600 hover:underline">View Label PDF</a>
@@ -448,51 +466,101 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 </StepCard>
 
                 {/* Step 6: Delivery */}
-                <StepCard step="delivered" currentStep={currentStep} title="Delivery" subtitle="Confirm delivery by DPD, driver portal, or manually" icon="6" color="green">
-                    <div className="space-y-2">
-                        <button onClick={handleMarkDelivered} disabled={loading}
-                            className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
-                            {loading ? 'Processing...' : 'Mark as Delivered (Manual)'}
-                        </button>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                            <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or send to driver</span></div>
-                        </div>
-
-                        {!showDriverForm ? (
-                            <button onClick={() => setShowDriverForm(true)}
-                                className="w-full py-2 bg-slate-700 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition">
-                                Send Dobavnica to Driver
-                            </button>
-                        ) : (
-                            <div className="bg-white border border-slate-200 rounded-lg p-3 space-y-2">
-                                <p className="text-[10px] font-bold text-slate-500 uppercase">Driver will receive a link to collect signature digitally</p>
-                                <input
-                                    type="email"
-                                    value={driverEmail}
-                                    onChange={e => setDriverEmail(e.target.value)}
-                                    placeholder="driver@email.com"
-                                    className="w-full border rounded px-3 py-2 text-sm"
-                                />
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={async () => {
-                                            if (!driverEmail) { alert('Enter driver email'); return }
-                                            setLoading(true)
-                                            try {
-                                                const res = await adminSendDeliveryToDriverAction(orderId, driverEmail)
-                                                if (res.success) { alert('Delivery link sent to driver!'); setShowDriverForm(false) }
-                                                else { alert('Failed: ' + res.error) }
-                                            } catch (err: any) { alert('Failed: ' + err.message) }
-                                            finally { setLoading(false) }
-                                        }}
-                                        disabled={loading}
-                                        className="flex-1 py-2 bg-slate-700 text-white rounded text-xs font-bold hover:bg-slate-800 disabled:opacity-50"
-                                    >{loading ? 'Sending...' : 'Send Link'}</button>
-                                    <button onClick={() => setShowDriverForm(false)} className="px-3 py-2 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
+                <StepCard step="delivered" currentStep={currentStep} title={isPickup ? 'Pickup' : 'Delivery'} subtitle={
+                    isPickup ? 'Mark as picked up or convert to delivery'
+                    : shippingCarrier === 'DPD' ? 'DPD tracking — auto-delivers & invoices on confirmation'
+                    : 'Send dobavnica to driver or confirm manually'
+                } icon="6" color="green">
+                    <div className="space-y-3">
+                        {/* Pickup: prominent pickup button + option to add delivery */}
+                        {isPickup && (
+                            <>
+                                <button onClick={handleMarkDelivered} disabled={loading}
+                                    className="w-full py-2.5 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Mark as Picked Up'}
+                                </button>
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or add delivery</span></div>
                                 </div>
+                                <button onClick={() => handleShipOrder('DPD')} disabled={loading}
+                                    className="w-full py-2 bg-red-600 text-white rounded-lg font-bold text-xs hover:bg-red-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Convert to DPD Delivery'}
+                                </button>
+                            </>
+                        )}
+
+                        {/* DPD tracking info */}
+                        {!isPickup && shippingCarrier === 'DPD' && trackingNumber && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1.5">
+                                <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">DPD Tracking</p>
+                                <p className="text-sm font-mono text-red-900">{trackingNumber}</p>
+                                {trackingUrl && (
+                                    <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
+                                        className="inline-block text-xs font-bold text-red-600 hover:underline">
+                                        Track on DPD &rarr;
+                                    </a>
+                                )}
+                                <p className="text-[10px] text-red-500">Delivery status is checked automatically. Invoice will be issued when DPD confirms delivery.</p>
                             </div>
+                        )}
+
+                        {/* Driver delivery — for non-DPD, non-pickup */}
+                        {!isPickup && shippingCarrier !== 'DPD' && (
+                            <div className="bg-white border border-slate-200 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Send Dobavnica to Driver</p>
+                                <p className="text-[10px] text-slate-400">Driver receives a link to view the delivery note and collect signature digitally.</p>
+                                {savedDrivers.length > 0 && (
+                                    <select
+                                        value={savedDrivers.some(d => d.email === driverEmail) ? driverEmail : '__custom'}
+                                        onChange={e => setDriverEmail(e.target.value === '__custom' ? '' : e.target.value)}
+                                        className="w-full border rounded px-3 py-2 text-sm bg-white"
+                                    >
+                                        <option value="__custom">Other (type email)</option>
+                                        {savedDrivers.map(d => (
+                                            <option key={d.id} value={d.email}>{d.name} ({d.email})</option>
+                                        ))}
+                                    </select>
+                                )}
+                                {(!savedDrivers.some(d => d.email === driverEmail)) && (
+                                    <input
+                                        type="email"
+                                        value={driverEmail}
+                                        onChange={e => setDriverEmail(e.target.value)}
+                                        placeholder="driver@email.com"
+                                        className="w-full border rounded px-3 py-2 text-sm"
+                                    />
+                                )}
+                                <button
+                                    onClick={async () => {
+                                        if (!driverEmail) { alert('Enter driver email'); return }
+                                        setLoading(true)
+                                        try {
+                                            const res = await adminSendDeliveryToDriverAction(orderId, driverEmail)
+                                            if (res.success) { alert('Delivery link sent to driver!') }
+                                            else { alert('Failed: ' + res.error) }
+                                        } catch (err: any) { alert('Failed: ' + err.message) }
+                                        finally { setLoading(false) }
+                                    }}
+                                    disabled={loading || !driverEmail}
+                                    className="w-full py-2 bg-slate-700 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition disabled:opacity-50"
+                                >{loading ? 'Sending...' : 'Send Dobavnica Link'}</button>
+                            </div>
+                        )}
+
+                        {!isPickup && (
+                            <>
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">{shippingCarrier === 'DPD' ? 'or override' : 'or'}</span></div>
+                                </div>
+
+                                {/* Manual confirmation — secondary/override path */}
+                                <button onClick={handleMarkDelivered} disabled={loading}
+                                    className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Mark as Delivered (Manual)'}
+                                </button>
+                            </>
                         )}
                     </div>
                 </StepCard>

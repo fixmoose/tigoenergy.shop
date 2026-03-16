@@ -23,6 +23,14 @@ export interface DPDShipmentResponse {
     pl_number?: string[];
 }
 
+export interface DPDParcelStatus {
+    parcel_number: string;
+    status: string;          // e.g. 'delivered', 'in_transit', 'out_for_delivery'
+    status_description?: string;
+    delivered_at?: string;
+    [key: string]: any;      // DPD may return additional fields
+}
+
 export interface OrderItem {
     sku: string;
     name?: string;
@@ -36,13 +44,22 @@ export interface Parcel {
 }
 
 /**
- * Splits a street string into street name and house number for DPD
+ * Splits a street string into street name and house number for DPD.
+ * DPD rPropNum field has a max of 8 characters (ES-339).
+ * If the house number exceeds 8 chars, the overflow is appended to the street.
  */
 export function splitStreetAndNumber(address: string) {
     if (!address) return { street: '', number: '' };
     const match = address.trim().match(/^(.*?)\s+((?:\d+[a-zA-Z/]*)|(?:\d+.*))$/);
     if (match) {
-        return { street: match[1].trim(), number: match[2].trim() };
+        let street = match[1].trim();
+        let number = match[2].trim();
+        // DPD rPropNum max 8 chars — move overflow to street
+        if (number.length > 8) {
+            street = `${street} ${number}`;
+            number = number.slice(0, 8);
+        }
+        return { street, number };
     }
     return { street: address.trim(), number: '' };
 }
@@ -214,6 +231,29 @@ export class DPDService {
         if (!response.ok) {
             const text = await response.text();
             throw new Error(`DPD API error (${response.status}): ${text}`);
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * Get parcel status from DPD EasyShip.
+     * Returns status info for one or more parcel numbers.
+     */
+    async getParcelStatus(parcelNumbers: string[]): Promise<DPDParcelStatus[]> {
+        const url = new URL(`${this.baseUrl}/status`);
+        url.searchParams.append('parcels', parcelNumbers.join(','));
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            headers: {
+                'Authorization': this.authHeader
+            }
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`DPD Status error (${response.status}): ${text}`);
         }
 
         return await response.json();

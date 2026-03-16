@@ -90,6 +90,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           packingSlipUrl={order.packing_slip_url}
           shippingLabelUrl={order.shipping_label_url}
           invoiceUrl={order.invoice_url}
+          trackingNumber={order.tracking_number}
+          trackingUrl={order.tracking_url}
+          shippingCarrier={order.shipping_carrier}
           customerEmail={order.customer_email}
           sendCount={(order as any).order_send_count || 0}
           orderTotal={order.total || 0}

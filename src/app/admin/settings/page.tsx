@@ -16,6 +16,13 @@ type Category = {
     image_url?: string
 }
 
+type Driver = {
+    id: string
+    name: string
+    email: string
+    phone: string
+}
+
 export default function SettingsPage() {
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
@@ -29,6 +36,12 @@ export default function SettingsPage() {
     const [inviteEmail, setInviteEmail] = useState('')
     const [currentUser, setCurrentUser] = useState<any>(null)
 
+    // Drivers State
+    const [drivers, setDrivers] = useState<Driver[]>([])
+    const [driversLoading, setDriversLoading] = useState(true)
+    const [driverForm, setDriverForm] = useState({ name: '', email: '', phone: '' })
+    const [editingDriver, setEditingDriver] = useState<Driver | null>(null)
+
     const supabase = createClient()
     const router = useRouter()
 
@@ -36,6 +49,7 @@ export default function SettingsPage() {
         fetchCategories()
         fetchAdmins()
         fetchCurrentUser()
+        fetchDrivers()
     }, [])
 
     async function fetchCurrentUser() {
@@ -86,6 +100,34 @@ export default function SettingsPage() {
             alert('Error deleting admin: ' + err.message)
         }
         setAdminsLoading(false)
+    }
+
+    async function fetchDrivers() {
+        setDriversLoading(true)
+        const { data } = await supabase.from('drivers').select('*').order('name')
+        setDrivers(data || [])
+        setDriversLoading(false)
+    }
+
+    async function handleSaveDriver(e: React.FormEvent) {
+        e.preventDefault()
+        if (!driverForm.name || !driverForm.email) return
+        if (editingDriver) {
+            const { error } = await supabase.from('drivers').update(driverForm).eq('id', editingDriver.id)
+            if (error) { alert('Error: ' + error.message); return }
+        } else {
+            const { error } = await supabase.from('drivers').insert([driverForm])
+            if (error) { alert('Error: ' + error.message); return }
+        }
+        setDriverForm({ name: '', email: '', phone: '' })
+        setEditingDriver(null)
+        fetchDrivers()
+    }
+
+    async function handleDeleteDriver(id: string) {
+        if (!confirm('Remove this driver?')) return
+        await supabase.from('drivers').delete().eq('id', id)
+        fetchDrivers()
     }
 
     async function fetchCategories() {
@@ -343,6 +385,63 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
+            </div>
+
+            {/* Drivers Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+                    <h3 className="text-lg font-bold text-gray-800">Drivers</h3>
+                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers. Their email is used for verification at the /driver portal.</p>
+                </div>
+                <div className="p-6 space-y-4">
+                    <form onSubmit={handleSaveDriver} className="flex flex-wrap gap-2 items-end">
+                        <div className="flex-1 min-w-[140px]">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Name</label>
+                            <input value={driverForm.name} onChange={e => setDriverForm({ ...driverForm, name: e.target.value })}
+                                placeholder="Full name" className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" required />
+                        </div>
+                        <div className="flex-1 min-w-[180px]">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Email</label>
+                            <input type="email" value={driverForm.email} onChange={e => setDriverForm({ ...driverForm, email: e.target.value })}
+                                placeholder="driver@email.com" className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" required />
+                        </div>
+                        <div className="flex-1 min-w-[140px]">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Phone</label>
+                            <input type="tel" value={driverForm.phone} onChange={e => setDriverForm({ ...driverForm, phone: e.target.value })}
+                                placeholder="+386 ..." className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div className="flex gap-2">
+                            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
+                                {editingDriver ? 'Update' : 'Add Driver'}
+                            </button>
+                            {editingDriver && (
+                                <button type="button" onClick={() => { setEditingDriver(null); setDriverForm({ name: '', email: '', phone: '' }) }}
+                                    className="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+                            )}
+                        </div>
+                    </form>
+
+                    <div className="space-y-2">
+                        {driversLoading ? (
+                            <div className="text-center py-4 text-gray-400 text-sm">Loading drivers...</div>
+                        ) : drivers.length === 0 ? (
+                            <div className="text-center py-4 text-gray-400 text-sm italic">No drivers added yet.</div>
+                        ) : drivers.map(d => (
+                            <div key={d.id} className="flex justify-between items-center p-3 border rounded-lg group hover:border-blue-200 transition-colors">
+                                <div className="min-w-0">
+                                    <span className="text-sm font-bold text-gray-800">{d.name}</span>
+                                    <div className="text-xs text-gray-500">{d.email}{d.phone ? ` · ${d.phone}` : ''}</div>
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => { setEditingDriver(d); setDriverForm({ name: d.name, email: d.email, phone: d.phone }) }}
+                                        className="text-xs text-blue-600 hover:underline font-bold">Edit</button>
+                                    <button onClick={() => handleDeleteDriver(d.id)}
+                                        className="text-xs text-red-500 hover:underline font-bold">Remove</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* Banking Section */}

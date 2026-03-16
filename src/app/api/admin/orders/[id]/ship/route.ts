@@ -87,13 +87,12 @@ export async function POST(
                         })
 
                     if (!uploadError) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('invoices')
-                            .getPublicUrl(filePath)
+                        // Use API route URL instead of public URL (bucket may not be public)
+                        const storageUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(filePath)}`
 
                         await supabase
                             .from('orders')
-                            .update({ shipping_label_url: publicUrl })
+                            .update({ shipping_label_url: storageUrl })
                             .eq('id', id)
                     }
                 } catch (labelErr) {

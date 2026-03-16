@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/payment-overdue",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/dpd-tracking",
+      "schedule": "0 17 * * *"
     }
   ]
 }
