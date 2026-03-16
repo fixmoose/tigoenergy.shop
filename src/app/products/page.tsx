@@ -10,10 +10,15 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getCustomerPricingData, calculateEffectivePrice, type EffectivePrice } from '@/lib/db/pricing'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }): Promise<Metadata> {
   const headersList = await headers()
   const marketKey = headersList.get('x-market-key') || 'SHOP'
   const market = getMarketFromKey(marketKey)
+  const params = await searchParams
+
+  // If the URL has query parameters (filters, pagination), tell search engines
+  // to use the clean /products canonical and not index this filtered variant.
+  const hasQueryParams = params && Object.keys(params).length > 0
 
   return {
     title: `Products | Tigo Energy ${market.countryName}`,
@@ -22,6 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: buildCanonicalUrl(marketKey, '/products'),
       languages: buildHreflangAlternates('/products'),
     },
+    ...(hasQueryParams && {
+      robots: { index: false, follow: true },
+    }),
   }
 }
 

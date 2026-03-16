@@ -2,7 +2,6 @@ import type { MetadataRoute } from 'next'
 import { headers } from 'next/headers'
 import { createAdminClient } from '@/lib/supabase/server'
 import { MARKET_DOMAINS } from '@/lib/utils/seo'
-import { PRODUCT_CATEGORIES } from '@/lib/constants/categories'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600 // Cache for 1 hour
@@ -27,13 +26,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${baseUrl}/cookies`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.1 },
     ]
 
-    // Category pages from constants
-    const categoryPages: MetadataRoute.Sitemap = Object.values(PRODUCT_CATEGORIES).map(cat => ({
-        url: `${baseUrl}/products?category=${cat.slug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.8,
-    }))
+    // NOTE: Category pages (/products?category=...) are NOT included in the sitemap.
+    // Google discovers them via internal links. Including query-param URLs here
+    // conflicts with the canonical (which strips params), causing
+    // "Blocked by robots.txt" warnings in Search Console.
 
     // Dynamic product pages
     const supabase = await createAdminClient()
@@ -50,5 +46,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }))
 
-    return [...staticPages, ...categoryPages, ...productPages]
+    return [...staticPages, ...productPages]
 }
