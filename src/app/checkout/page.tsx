@@ -275,6 +275,8 @@ export default function CheckoutPage() {
                         shipping_postal_code: shippingPostal,
                         shipping_country: shippingCountry,
                         vat_id: customerData.vat_id || user.user_metadata?.vat_id || '',
+                        billing_first_name: customerData.first_name || user.user_metadata?.first_name || '',
+                        billing_last_name: customerData.last_name || user.user_metadata?.last_name || '',
                         billing_street: billingStreet,
                         billing_city: billingCity,
                         billing_postal_code: billingPostal,
