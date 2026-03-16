@@ -34,7 +34,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
     const isSlovenia = billingCountry === 'SI'
     const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
     const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'Delavska Hranilnica d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
+    const primaryBank = isSlovenia ? 'Delavska Hranilnica — Regular speed' : 'Wise — Faster'
 
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
@@ -98,7 +98,7 @@ export async function adminSendOrderForPaymentAction(orderId: string) {
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
       <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
-      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">${order.order_number}</td>
+      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}</td>
     </tr></table>
     <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
   </div>
@@ -148,7 +148,7 @@ export async function sendPaymentReminderAction(orderId: string) {
     const isSlovenia = billingCountry === 'SI'
     const primaryIban = isSlovenia ? 'SI56 6100 0002 8944 371' : 'BE55 9052 7486 2944'
     const primaryBic  = isSlovenia ? 'HDELSI22' : 'TRWIBEB1XXX'
-    const primaryBank = isSlovenia ? 'Delavska Hranilnica d.d. — Ljubljana, Slovenia' : 'Wise (TransferWise) — International'
+    const primaryBank = isSlovenia ? 'Delavska Hranilnica — Regular speed' : 'Wise — Faster'
 
     const itemsHtml = generateItemsTableHtml(orderItems || [], order.currency || '€')
     const orderLink = `${SITE_URL}/orders/${order.id}`
@@ -216,7 +216,7 @@ export async function sendPaymentReminderAction(orderId: string) {
   <div style="margin:0 48px 32px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;">
     <table style="border-collapse:collapse;font-size:11px;line-height:2;"><tr>
       <td style="color:#2563eb;padding-right:12px;font-size:9px;text-transform:uppercase;font-weight:700;">Reference</td>
-      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">${order.order_number}</td>
+      <td style="font-family:monospace;font-weight:700;color:#1d4ed8;font-size:15px;">SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}</td>
     </tr></table>
     <p style="font-size:11px;color:#3b82f6;margin:6px 0 0;">Always include the order number as payment reference so we can match your payment.</p>
   </div>

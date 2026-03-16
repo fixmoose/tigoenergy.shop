@@ -298,7 +298,7 @@ export const InvoiceDocument = ({ order, items, termsAgreedAt, language }: Invoi
                                 <View style={{ borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 4 }}>
                                     <Text style={{ fontSize: 8, color: '#4b5563', marginBottom: 2 }}>Option 2: Use Wise Quick Pay URL (ApplePay, Cards supported):</Text>
                                     <Text style={{ fontSize: 8, color: '#3b82f6', fontWeight: 'bold' }}>
-                                        {`https://wise.com/pay/business/initraenergijadoo?reference=${order.order_number}`}
+                                        {`https://wise.com/pay/business/initraenergijadoo?amount=${order.total.toFixed(2)}&currency=${order.currency || 'EUR'}&description=${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`}
                                     </Text>
                                 </View>
                                 <View style={{ borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 4 }}>
@@ -312,7 +312,7 @@ export const InvoiceDocument = ({ order, items, termsAgreedAt, language }: Invoi
                                     </View>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <Text style={{ fontSize: 8, color: '#4b5563' }}>Reference:</Text>
-                                        <Text style={{ fontSize: 8, fontWeight: 'bold' }}>{order.order_number}</Text>
+                                        <Text style={{ fontSize: 8, fontWeight: 'bold' }}>SI00 {order.order_number.replace('ETRG-ORD-', '').slice(-6)}</Text>
                                     </View>
                                 </View>
                             </View>

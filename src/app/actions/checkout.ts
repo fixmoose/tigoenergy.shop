@@ -274,7 +274,8 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 shipping_cost: `EUR ${shippingCost.toFixed(2)}`,
                 total_amount: `EUR ${grandTotal.toFixed(2)}`,
                 payment_method: String(rawData.payment_method || 'invoice'),
-                items_table: generateItemsTableHtml(orderItemsData, 'EUR')
+                items_table: generateItemsTableHtml(orderItemsData, 'EUR'),
+                reference: `SI00 ${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}`
             }
 
             // Try to get dynamic template from DB

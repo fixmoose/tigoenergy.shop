@@ -1284,8 +1284,13 @@ export async function processBankStatementAction(fileContent: string) {
                 const orderNumNormalized = order.order_number.toUpperCase().replace(/[\s-]/g, '')
                 const descNormalized = credit.description.toUpperCase().replace(/[\s-]/g, '')
 
-                // Check if order number appears in reference or description
+                // Also match SI00 payment reference format (SI00 XXXXXX — last 6 digits)
+                const orderTimestamp = order.order_number.replace('ETRG-ORD-', '')
+                const si00Normalized = `SI00${orderTimestamp.slice(-6)}`
+
+                // Check if order number or SI00 reference appears in reference or description
                 const refHasOrderNum = refNormalized.includes(orderNumNormalized) || descNormalized.includes(orderNumNormalized)
+                    || refNormalized.includes(si00Normalized) || descNormalized.includes(si00Normalized)
                 const amountMatches = Math.abs(credit.amount - remaining) < 0.02
 
                 let confidence: 'high' | 'medium' | 'low' = 'low'

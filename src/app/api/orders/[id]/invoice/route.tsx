@@ -87,7 +87,7 @@ export async function GET(
                 ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
                 : new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
             dispatch_date: order.shipped_at ? new Date(order.shipped_at).toLocaleDateString() : 'Upon payment',
-            reference: `00 2-${new Date().getFullYear().toString().slice(-2)}-${order.order_number.slice(-5)}`,
+            reference: `SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`,
             place_of_issue: 'Podsmreka'
         }
 

@@ -85,7 +85,7 @@ export async function GET(
             invoice_number: `PRF-${order.order_number}`,
             invoice_date: orderDate,
             due_date: validUntil,
-            reference: `00 2-${new Date(order.created_at).getFullYear().toString().slice(-2)}-${order.order_number.slice(-5)}`,
+            reference: `SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`,
             place_of_issue: 'Podsmreka',
             dispatch_date: 'Upon payment',
         }

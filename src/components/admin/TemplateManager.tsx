@@ -80,7 +80,7 @@ const PREVIEW: Record<string, string> = {
     '{storno_number}': 'ETRG-STORNO-ETRG-INV-2026-0001',
     '{invoice_date}': '6 Mar 2026',
     '{due_date}': '13 Mar 2026',
-    '{reference}': 'SI00 26-00001',
+    '{reference}': 'SI00 800000',
     '{dispatch_date}': 'Upon payment',
     '{order_number}': 'ETRG-ORD-1741258800000',
     '{order_date}': '6 Mar 2026',
