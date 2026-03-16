@@ -160,6 +160,8 @@
     "privacyAcknowledge": "și confirm",
     "privacyPolicy": "Politica de confidențialitate",
     "warrantyReturnInfo": "Înțeleg că se aplică o garanție de 1 an și o politică de returnare de 14 zile.",
+    "customsDisclaimerTitle": "Notificare privind taxele vamale și de import",
+    "customsDisclaimerBody": "Această comandă se expediază în afara Uniunii Europene. Taxele vamale, taxele de import și orice alte taxe NU sunt incluse în totalul comenzii și sunt responsabilitatea exclusivă a cumpărătorului.",
     "newsletterSubscribe": "Abonați-vă la newsletter-ul nostru pentru actualizări solare și oferte exclusive.",
     "b2bNote": "Comandă B2B: Prețuri nete afișate. Se poate aplica taxa inversă.",
     "pricesIncludeVat": "Prețurile includ {rate}% TVA.",

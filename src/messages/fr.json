@@ -160,6 +160,8 @@
     "privacyAcknowledge": "et reconnais la",
     "privacyPolicy": "Politique de confidentialite",
     "warrantyReturnInfo": "Je comprends qu'une garantie d'un an et une politique de retour de 14 jours s'appliquent.",
+    "customsDisclaimerTitle": "Avis sur les droits de douane et taxes d'importation",
+    "customsDisclaimerBody": "Cette commande est expédiée hors de l'Union européenne. Les droits de douane, taxes d'importation et autres frais imposés par les autorités douanières de votre pays ne sont PAS inclus dans le total et sont à la charge exclusive de l'acheteur.",
     "newsletterSubscribe": "S'abonner a notre newsletter pour des mises a jour solaires et des offres exclusives.",
     "b2bNote": "Commande B2B : Prix nets affiches. L'autoliquidation de la TVA peut s'appliquer.",
     "pricesIncludeVat": "Les prix incluent {rate}% de TVA.",

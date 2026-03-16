@@ -160,6 +160,8 @@
     "privacyAcknowledge": "un atzīstu",
     "privacyPolicy": "privātuma politiku",
     "warrantyReturnInfo": "Es saprotu, ka tiek piemērota 1 gada garantija un 14 dienu atgriešanas politika.",
+    "customsDisclaimerTitle": "Paziņojums par muitas un importa nodevām",
+    "customsDisclaimerBody": "Šis pasūtījums tiek sūtīts ārpus Eiropas Savienības. Muitas nodokļi, importa nodokļi un citas nodevas NAV iekļautas pasūtījuma kopsummā un ir tikai pircēja atbildība.",
     "newsletterSubscribe": "Abonējiet mūsu jaunumu vēstuli, lai saņemtu saules enerģijas jaunumus un ekskluzīvus piedāvājumus.",
     "b2bNote": "B2B pasūtījums: Rādītas neto cenas. Var tikt piemērota PVN reversā maksāšana.",
     "pricesIncludeVat": "Cenās iekļauts {rate}% PVN.",

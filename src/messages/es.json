@@ -160,6 +160,8 @@
     "privacyAcknowledge": "y reconozco la",
     "privacyPolicy": "Politica de Privacidad",
     "warrantyReturnInfo": "Entiendo que se aplica una garantia de 1 anio y una politica de devolucion de 14 dias.",
+    "customsDisclaimerTitle": "Aviso sobre aranceles aduaneros e impuestos de importación",
+    "customsDisclaimerBody": "Este pedido se envía fuera de la Unión Europea. Los aranceles aduaneros, impuestos de importación y otros cargos NO están incluidos en el total del pedido y son responsabilidad exclusiva del comprador.",
     "newsletterSubscribe": "Suscribirse al boletin para actualizaciones solares y ofertas exclusivas.",
     "b2bNote": "Pedido B2B: Se muestran precios netos. Puede aplicarse la inversion del sujeto pasivo.",
     "pricesIncludeVat": "Los precios incluyen {rate}% de IVA.",

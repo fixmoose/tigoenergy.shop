@@ -160,6 +160,8 @@
     "privacyAcknowledge": "ja tunnistan",
     "privacyPolicy": "privaatsuspoliitikat",
     "warrantyReturnInfo": "Mõistan, et kehtib 1-aastane garantii ja 14-päevane tagastuspoliitika.",
+    "customsDisclaimerTitle": "Teade tolli- ja imporditasude kohta",
+    "customsDisclaimerBody": "See tellimus saadetakse väljaspool Euroopa Liitu. Tollimaksud, imporditasud ja muud tasud EI OLE tellimuse kogusummas ja on ainult ostja vastutus.",
     "newsletterSubscribe": "Telli meie uudiskiri päikeseenergia uudiste ja eksklusiivpakkumiste saamiseks.",
     "b2bNote": "B2B tellimus: Näidatud on netohinnad. Võib kehtida käibemaksu pöördmaksustamine.",
     "pricesIncludeVat": "Hinnad sisaldavad {rate}% käibemaksu.",

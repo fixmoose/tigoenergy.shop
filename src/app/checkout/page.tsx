@@ -19,6 +19,18 @@ const COUNTRIES = Object.values(MARKETS)
     .map(m => ({ code: m.country, name: m.countryName }))
     .sort((a, b) => a.name.localeCompare(b.name))
 
+// Normalize country: convert full names (e.g. "SLOVENIA") to 2-letter codes ("SI")
+const COUNTRY_NAME_TO_CODE: Record<string, string> = Object.fromEntries(
+    COUNTRIES.flatMap(c => [
+        [c.name.toUpperCase(), c.code],
+        [c.code, c.code],  // passthrough for already-correct codes
+    ])
+)
+function normalizeCountryCode(val: string): string {
+    if (!val) return val
+    return COUNTRY_NAME_TO_CODE[val.toUpperCase()] || val
+}
+
 const COUNTRY_PREFIXES: Record<string, string> = {
     'SI': '+386',
     'DE': '+49',
@@ -242,14 +254,14 @@ export default function CheckoutPage() {
                     const shippingStreet = defaultShipping?.street || meta.company_address || meta.street || ''
                     const shippingCity = defaultShipping?.city || meta.city || ''
                     const shippingPostal = defaultShipping?.postalCode || meta.postal_code || meta.postalCode || ''
-                    const shippingCountry = defaultShipping?.country || meta.country || ''
+                    const shippingCountry = normalizeCountryCode(defaultShipping?.country || meta.country || '')
 
                     // For B2B: billing is always VIES address; for B2C: billing = shipping
                     const billingSource = customerData.is_b2b && viesAddress ? viesAddress : null
                     const billingStreet = billingSource?.street || shippingStreet
                     const billingCity = billingSource?.city || shippingCity
                     const billingPostal = billingSource?.postalCode || shippingPostal
-                    const billingCountry = billingSource?.country || shippingCountry
+                    const billingCountry = normalizeCountryCode(billingSource?.country || shippingCountry)
 
                     setFormData(prev => ({
                         ...prev,
@@ -540,7 +552,7 @@ export default function CheckoutPage() {
             shipping_street: address.street,
             shipping_city: address.city,
             shipping_postal_code: address.postalCode,
-            shipping_country: address.country,
+            shipping_country: normalizeCountryCode(address.country),
         }))
     }
 

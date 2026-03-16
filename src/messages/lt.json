@@ -160,6 +160,8 @@
     "privacyAcknowledge": "ir patvirtinu",
     "privacyPolicy": "Privatumo politiką",
     "warrantyReturnInfo": "Suprantu, kad taikoma 1 metų garantija ir 14 dienų grąžinimo politika.",
+    "customsDisclaimerTitle": "Pranešimas apie muitus ir importo mokesčius",
+    "customsDisclaimerBody": "Šis užsakymas siunčiamas už Europos Sąjungos ribų. Muitai, importo mokesčiai ir kiti mokesčiai NĖRA įtraukti į užsakymo sumą ir yra tik pirkėjo atsakomybė.",
     "newsletterSubscribe": "Prenumeruokite mūsų naujienlaiškį, kad gautumėte saulės energijos naujienas ir išskirtinius pasiūlymus.",
     "b2bNote": "B2B užsakymas: Rodomos kainos be PVM. Gali būti taikomas atvirkštinis PVM apmokestinimas.",
     "pricesIncludeVat": "Kainos įskaičiuotos {rate}% PVM.",

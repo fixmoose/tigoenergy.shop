@@ -160,6 +160,8 @@
     "privacyAcknowledge": "e prendo atto della",
     "privacyPolicy": "Informativa sulla Privacy",
     "warrantyReturnInfo": "Comprendo che si applicano una garanzia di 1 anno e una politica di reso di 14 giorni.",
+    "customsDisclaimerTitle": "Avviso su dazi doganali e tasse d'importazione",
+    "customsDisclaimerBody": "Questo ordine viene spedito al di fuori dell'Unione Europea. I dazi doganali, le tasse di importazione e qualsiasi altra tassa imposta dall'autorità doganale del vostro paese NON sono inclusi nel totale dell'ordine e sono a carico esclusivo dell'acquirente.",
     "newsletterSubscribe": "Iscriviti alla nostra newsletter per aggiornamenti solari e offerte esclusive.",
     "b2bNote": "Ordine B2B: Prezzi netti mostrati. Potrebbe applicarsi il reverse charge.",
     "pricesIncludeVat": "I prezzi includono {rate}% di IVA.",

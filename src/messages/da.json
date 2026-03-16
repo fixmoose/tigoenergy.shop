@@ -160,6 +160,8 @@
     "privacyAcknowledge": "og anerkender",
     "privacyPolicy": "Privatlivspolitik",
     "warrantyReturnInfo": "Jeg forstår, at en 1-års garanti og en 14-dages returpolitik gælder.",
+    "customsDisclaimerTitle": "Meddelelse om told og importafgifter",
+    "customsDisclaimerBody": "Denne ordre sendes uden for Den Europæiske Union. Told, importafgifter og andre gebyrer er IKKE inkluderet i ordretotalen og er udelukkende købers ansvar.",
     "newsletterSubscribe": "Abonner på vores nyhedsbrev for solopdateringer og eksklusive tilbud.",
     "b2bNote": "B2B ordre: Nettopriser vist. Omvendt momsafregning kan gælde.",
     "pricesIncludeVat": "Priserne inkluderer {rate}% moms.",

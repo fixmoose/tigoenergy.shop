@@ -160,6 +160,8 @@
     "privacyAcknowledge": "och bekräftar",
     "privacyPolicy": "integritetspolicyn",
     "warrantyReturnInfo": "Jag förstår att 1 års garanti och 14 dagars returrätt gäller.",
+    "customsDisclaimerTitle": "Information om tullar och importavgifter",
+    "customsDisclaimerBody": "Denna beställning skickas utanför Europeiska unionen. Tullar, importskatter och andra avgifter ingår INTE i ordertotalen och är helt köparens ansvar.",
     "newsletterSubscribe": "Prenumerera på vårt nyhetsbrev för solenergiuppdateringar och exklusiva erbjudanden.",
     "b2bNote": "B2B-beställning: Nettopriser visas. Omvänd moms kan tillämpas.",
     "pricesIncludeVat": "Priserna inkluderar {rate}% moms.",

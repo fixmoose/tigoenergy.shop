@@ -163,6 +163,8 @@
     "privacyAcknowledge": "in potrjujem",
     "privacyPolicy": "Politiko zasebnosti",
     "warrantyReturnInfo": "Razumem, da veljata 1-letna garancija in 14-dnevna politika vračil le, kjer je to določeno z zakonom za B2C stranke.",
+    "customsDisclaimerTitle": "Obvestilo o carinah in uvoznih dajatvah",
+    "customsDisclaimerBody": "To naročilo se pošilja izven Evropske unije. Carinske dajatve, uvozni davki in morebitni drugi stroški, ki jih zaračuna carinski organ vaše države, NISO vključeni v skupno ceno naročila in so izključno odgovornost kupca. Pred oddajo naročila se obrnite na lokalni carinski organ za informacije o veljavnih stroških. Če dostava ne uspe zaradi neplačanih carinskih dajatev in se blago vrne k nam, se zaračuna strošek obdelave vračila.",
     "newsletterSubscribe": "Naročite se na novice za solarne posodobitve in ekskluzivne ponudbe.",
     "b2bNote": "B2B naročilo: Prikazane so neto cene. Lahko velja obrnjeno davčno breme.",
     "pricesIncludeVat": "Cene vključujejo {rate}% DDV.",

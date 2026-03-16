@@ -160,6 +160,8 @@
     "privacyAcknowledge": "i przyjmuję do wiadomości",
     "privacyPolicy": "Politykę prywatności",
     "warrantyReturnInfo": "Rozumiem, że obowiązuje roczna gwarancja i 14-dniowa polityka zwrotów.",
+    "customsDisclaimerTitle": "Informacja o cłach i podatkach importowych",
+    "customsDisclaimerBody": "To zamówienie jest wysyłane poza Unię Europejską. Cła, podatki importowe i inne opłaty NIE są wliczone w cenę zamówienia i są wyłączną odpowiedzialnością kupującego.",
     "newsletterSubscribe": "Zapisz się do naszego newslettera, aby otrzymywać informacje o energii słonecznej i ekskluzywne oferty.",
     "b2bNote": "Zamówienie B2B: Wyświetlane ceny netto. Może mieć zastosowanie odwrotne obciążenie VAT.",
     "pricesIncludeVat": "Ceny zawierają {rate}% VAT.",

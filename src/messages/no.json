@@ -160,6 +160,8 @@
     "privacyAcknowledge": "og bekrefter",
     "privacyPolicy": "Personvernreglene",
     "warrantyReturnInfo": "Jeg forstår at 1 års garanti og 14 dagers returrett gjelder.",
+    "customsDisclaimerTitle": "Informasjon om toll og importavgifter",
+    "customsDisclaimerBody": "Denne bestillingen sendes utenfor EU. Toll, importavgifter og andre gebyrer er IKKE inkludert i ordretotalen og er utelukkende kjøpers ansvar.",
     "newsletterSubscribe": "Abonner på vårt nyhetsbrev for soloppdateringer og eksklusive tilbud.",
     "b2bNote": "B2B-bestilling: Nettopriser vist. Omvendt MVA-avgift kan gjelde.",
     "pricesIncludeVat": "Prisene inkluderer {rate}% MVA.",

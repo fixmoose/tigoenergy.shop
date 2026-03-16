@@ -160,6 +160,8 @@
     "privacyAcknowledge": "a beru na vědomí",
     "privacyPolicy": "Zásady ochrany osobních údajů",
     "warrantyReturnInfo": "Chápu, že platí 1letá záruka a 14denní možnost vrácení.",
+    "customsDisclaimerTitle": "Upozornění na cla a dovozní poplatky",
+    "customsDisclaimerBody": "Tato objednávka je odesílána mimo Evropskou unii. Cla, dovozní daně a další poplatky NEJSOU zahrnuty v celkové ceně a jsou výhradní odpovědností kupujícího.",
     "newsletterSubscribe": "Přihlaste se k odběru našeho newsletteru pro solární novinky a exkluzivní nabídky.",
     "b2bNote": "B2B objednávka: Zobrazeny čisté ceny. Může platit přenesení daňové povinnosti.",
     "pricesIncludeVat": "Ceny zahrnují {rate}% DPH.",

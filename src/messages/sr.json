@@ -160,6 +160,8 @@
     "privacyAcknowledge": "i prihvatam",
     "privacyPolicy": "Politiku privatnosti",
     "warrantyReturnInfo": "Razumem da važi garancija od 1 godine i politika povraćaja od 14 dana.",
+    "customsDisclaimerTitle": "Obaveštenje o carinama i uvoznim dažbinama",
+    "customsDisclaimerBody": "Ova porudžbina se šalje van Evropske unije. Carine, uvozni porezi i druge dažbine NISU uključeni u ukupan iznos i isključiva su odgovornost kupca.",
     "newsletterSubscribe": "Pretplatite se na naš bilten za solarne novosti i ekskluzivne ponude.",
     "b2bNote": "B2B porudžbina: Prikazane su neto cene. Obrnuto oporezivanje PDV-a može se primeniti.",
     "pricesIncludeVat": "Cene uključuju {rate}% PDV.",

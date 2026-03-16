@@ -160,6 +160,8 @@
     "privacyAcknowledge": "és tudomásul veszem az",
     "privacyPolicy": "adatvédelmi szabályzatot",
     "warrantyReturnInfo": "Tudomásul veszem, hogy 1 év garancia és 14 napos visszaküldési jog vonatkozik a rendelésre.",
+    "customsDisclaimerTitle": "Tájékoztató a vámokról és behozatali illetékekről",
+    "customsDisclaimerBody": "Ez a rendelés az Európai Unión kívülre kerül kiszállításra. A vámok, behozatali adók és egyéb díjak NINCSENEK benne a rendelés végösszegében, és kizárólag a vevő felelőssége.",
     "newsletterSubscribe": "Iratkozzon fel hírlevelünkre napenergia hírekért és exkluzív ajánlatokért.",
     "b2bNote": "B2B rendelés: Nettó árak láthatók. Fordított adózás alkalmazható.",
     "pricesIncludeVat": "Az árak {rate}% ÁFÁ-t tartalmaznak.",
