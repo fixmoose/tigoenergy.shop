@@ -239,6 +239,50 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         if (itemsError) throw new Error(itemsError.message)
 
+        // 6b. Save shipping address to customer's address book (if logged in)
+        if (customerId) {
+            try {
+                const { data: existingCustomer } = await supabase
+                    .from('customers')
+                    .select('addresses')
+                    .eq('id', customerId)
+                    .single()
+
+                const currentAddresses: any[] = (existingCustomer?.addresses as any[]) || []
+                const shippingAddr = {
+                    street: rawData.shipping_street || '',
+                    city: rawData.shipping_city || '',
+                    postalCode: rawData.shipping_postal_code || '',
+                    country: rawData.shipping_country || '',
+                }
+
+                // Only add if this address doesn't already exist
+                const alreadyExists = currentAddresses.some((a: any) =>
+                    a.street === shippingAddr.street &&
+                    a.city === shippingAddr.city &&
+                    a.postalCode === shippingAddr.postalCode &&
+                    a.country === shippingAddr.country
+                )
+
+                if (!alreadyExists && shippingAddr.street) {
+                    const newAddress = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        label: currentAddresses.length === 0 ? 'Home' : 'Shipping',
+                        ...shippingAddr,
+                        street2: rawData.shipping_street2 || '',
+                        isDefaultShipping: currentAddresses.length === 0,
+                        isDefaultBilling: currentAddresses.length === 0,
+                    }
+                    await supabase
+                        .from('customers')
+                        .update({ addresses: [...currentAddresses, newAddress] })
+                        .eq('id', customerId)
+                }
+            } catch (addrErr) {
+                console.error('Failed to save address to customer profile:', addrErr)
+            }
+        }
+
         // 7. Determine Business Flow (Proforma vs Invoice)
         const isHighVolume = totalWeight > 500 || subtotal > 2500
         const isBankTransfer = rawData.payment_method === 'bank_transfer'

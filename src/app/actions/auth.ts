@@ -38,6 +38,36 @@ export async function registerUserAction(formData: any) {
         const user = userData.user
         if (!user) throw new Error('Failed to create user')
 
+        // Build addresses array and save to customers table
+        const addresses: any[] = []
+        if (address || city) {
+            addresses.push({
+                id: Math.random().toString(36).substr(2, 9),
+                label: 'Home',
+                street: address || '',
+                street2: address2 || '',
+                city: city || '',
+                postalCode: postalCode || '',
+                country: country || '',
+                isDefaultShipping: true,
+                isDefaultBilling: true,
+            })
+        }
+
+        // Upsert customer row — guarantees the row exists with correct data
+        const b2cPayload: any = {
+            id: user.id,
+            email,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            phone: phone || null,
+            customer_type: 'b2c',
+        }
+        if (addresses.length > 0) b2cPayload.addresses = addresses
+        await supabase
+            .from('customers')
+            .upsert(b2cPayload, { onConflict: 'id' })
+
         const headersList = await headers()
         const marketKey = headersList.get('x-market-key') || 'SHOP'
         const market = getMarketFromKey(marketKey)
@@ -151,26 +181,22 @@ export async function registerB2BUserAction(formData: any) {
             })
         }
 
-        // Update customers table: core B2B fields + addresses
-        // Retry up to 3 times in case the trigger hasn't created the row yet
-        for (let attempt = 0; attempt < 3; attempt++) {
-            if (attempt > 0) await new Promise(r => setTimeout(r, 500))
-            const updatePayload: any = {
-                company_name: companyName || null,
-                vat_id: vatNumber || null,
-                customer_type: 'b2b',
-                is_b2b: true,
-                first_name: firstName || null,
-                last_name: lastName || null,
-                phone: phone || null,
-            }
-            if (addresses.length > 0) updatePayload.addresses = addresses
-            const { error: profileErr } = await supabase
-                .from('customers')
-                .update(updatePayload)
-                .eq('id', user.id)
-            if (!profileErr) break
+        // Upsert customer row — guarantees the row exists with correct data
+        const b2bPayload: any = {
+            id: user.id,
+            email,
+            company_name: companyName || null,
+            vat_id: vatNumber || null,
+            customer_type: 'b2b',
+            is_b2b: true,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            phone: phone || null,
         }
+        if (addresses.length > 0) b2bPayload.addresses = addresses
+        await supabase
+            .from('customers')
+            .upsert(b2bPayload, { onConflict: 'id' })
 
         const headersList = await headers()
         const marketKey = headersList.get('x-market-key') || 'SHOP'
