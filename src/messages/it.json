@@ -673,5 +673,14 @@
     "title": "I tuoi diritti sui dati (GDPR)",
     "description": "Ai sensi del GDPR, hai il diritto di accedere, esportare ed eliminare i tuoi dati personali in qualsiasi momento.",
     "downloadData": "Scarica i miei dati (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Ordine confermato!",
+    "subtitle": "Grazie per il tuo acquisto. Il tuo ordine è stato effettuato con successo.",
+    "orderNumber": "Numero ordine",
+    "confirmationEmail": "Ti abbiamo inviato un'e-mail di conferma.",
+    "shippingNotice": "Ti avviseremo quando il tuo ordine verrà spedito.",
+    "continueShopping": "Continua lo shopping",
+    "viewOrders": "I miei ordini"
   }
 }

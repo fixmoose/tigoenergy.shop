@@ -673,5 +673,14 @@
     "title": "Vos droits sur les données (RGPD)",
     "description": "En vertu du RGPD, vous avez le droit d'accéder, d'exporter et de supprimer vos données personnelles à tout moment.",
     "downloadData": "Télécharger mes données (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Commande confirmée !",
+    "subtitle": "Merci pour votre achat. Votre commande a été passée avec succès.",
+    "orderNumber": "Numéro de commande",
+    "confirmationEmail": "Nous vous avons envoyé un e-mail de confirmation.",
+    "shippingNotice": "Nous vous informerons lorsque votre commande sera expédiée.",
+    "continueShopping": "Continuer vos achats",
+    "viewOrders": "Voir mes commandes"
   }
 }

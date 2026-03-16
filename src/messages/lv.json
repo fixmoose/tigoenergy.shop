@@ -673,5 +673,14 @@
     "title": "Jūsu datu tiesības (VDAR)",
     "description": "Saskaņā ar VDAR jums ir tiesības jebkurā laikā piekļūt saviem personas datiem, tos eksportēt un dzēst.",
     "downloadData": "Lejupielādēt manus datus (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Pasūtījums apstiprināts!",
+    "subtitle": "Paldies par pirkumu. Jūsu pasūtījums ir veiksmīgi iesniegts.",
+    "orderNumber": "Pasūtījuma numurs",
+    "confirmationEmail": "Esam nosūtījuši jums apstiprinājuma e-pastu.",
+    "shippingNotice": "Mēs jūs informēsim, kad jūsu pasūtījums tiks nosūtīts.",
+    "continueShopping": "Turpināt iepirkties",
+    "viewOrders": "Mani pasūtījumi"
   }
 }

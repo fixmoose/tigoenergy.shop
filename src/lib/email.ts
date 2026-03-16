@@ -52,7 +52,7 @@ export async function sendEmail({
             subject,
             from_email: fromEmail,
             ...(fromName && { from_name: fromName }),
-            ...(skipUnsubscribe && { skip_unsubscribe: 1 }),
+            // Note: skip_unsubscribe requires UniOne 'allow_skip_unsubscribe' flag — disabled
         },
     }
 

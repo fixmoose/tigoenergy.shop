@@ -674,5 +674,14 @@
     "title": "Ihre Datenschutzrechte (DSGVO)",
     "description": "Gemäß DSGVO haben Sie das Recht, Ihre persönlichen Daten jederzeit einzusehen, zu exportieren und zu löschen.",
     "downloadData": "Meine Daten herunterladen (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Bestellung bestätigt!",
+    "subtitle": "Vielen Dank für Ihren Einkauf. Ihre Bestellung wurde erfolgreich aufgegeben.",
+    "orderNumber": "Bestellnummer",
+    "confirmationEmail": "Wir haben Ihnen eine Bestätigungs-E-Mail gesendet.",
+    "shippingNotice": "Wir benachrichtigen Sie, wenn Ihre Bestellung versandt wird.",
+    "continueShopping": "Weiter einkaufen",
+    "viewOrders": "Meine Bestellungen"
   }
 }

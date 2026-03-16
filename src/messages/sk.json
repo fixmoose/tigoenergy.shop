@@ -673,5 +673,14 @@
     "title": "Vaše práva na údaje (GDPR)",
     "description": "Podľa GDPR máte právo kedykoľvek pristupovať k svojim osobným údajom, exportovať ich a mazať.",
     "downloadData": "Stiahnuť moje údaje (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Objednávka potvrdená!",
+    "subtitle": "Ďakujeme za nákup. Vaša objednávka bola úspešne zadaná.",
+    "orderNumber": "Číslo objednávky",
+    "confirmationEmail": "Poslali sme vám potvrdzovací e-mail.",
+    "shippingNotice": "Upozorníme vás, keď bude vaša objednávka odoslaná.",
+    "continueShopping": "Pokračovať v nákupe",
+    "viewOrders": "Moje objednávky"
   }
 }

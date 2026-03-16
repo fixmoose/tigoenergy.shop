@@ -673,5 +673,14 @@
     "title": "Uw gegevensrechten (AVG)",
     "description": "Op grond van de AVG heeft u het recht om uw persoonsgegevens te allen tijde in te zien, te exporteren en te verwijderen.",
     "downloadData": "Mijn gegevens downloaden (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Bestelling bevestigd!",
+    "subtitle": "Bedankt voor uw aankoop. Uw bestelling is succesvol geplaatst.",
+    "orderNumber": "Bestelnummer",
+    "confirmationEmail": "We hebben u een bevestigingsmail gestuurd.",
+    "shippingNotice": "We laten u weten wanneer uw bestelling wordt verzonden.",
+    "continueShopping": "Verder winkelen",
+    "viewOrders": "Mijn bestellingen"
   }
 }

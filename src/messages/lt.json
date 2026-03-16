@@ -673,5 +673,14 @@
     "title": "Jūsų duomenų teisės (BDAR)",
     "description": "Pagal BDAR turite teisę bet kada pasiekti, eksportuoti ir ištrinti savo asmens duomenis.",
     "downloadData": "Atsisiųsti mano duomenis (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Užsakymas patvirtintas!",
+    "subtitle": "Dėkojame už pirkinį. Jūsų užsakymas sėkmingai pateiktas.",
+    "orderNumber": "Užsakymo numeris",
+    "confirmationEmail": "Išsiuntėme jums patvirtinimo el. laišką.",
+    "shippingNotice": "Pranešime, kai jūsų užsakymas bus išsiųstas.",
+    "continueShopping": "Tęsti apsipirkimą",
+    "viewOrders": "Mano užsakymai"
   }
 }

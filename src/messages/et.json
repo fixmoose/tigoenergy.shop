@@ -673,5 +673,14 @@
     "title": "Teie andmeõigused (GDPR)",
     "description": "GDPR alusel on teil õigus igal ajal oma isikuandmetele juurde pääseda, neid eksportida ja kustutada.",
     "downloadData": "Laadi alla minu andmed (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Tellimus kinnitatud!",
+    "subtitle": "Täname ostu eest. Teie tellimus on edukalt esitatud.",
+    "orderNumber": "Tellimuse number",
+    "confirmationEmail": "Saatsime teile kinnitusmeili.",
+    "shippingNotice": "Teavitame teid, kui teie tellimus saadetakse.",
+    "continueShopping": "Jätka ostlemist",
+    "viewOrders": "Minu tellimused"
   }
 }

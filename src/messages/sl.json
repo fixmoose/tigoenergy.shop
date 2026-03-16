@@ -858,5 +858,14 @@
     "title": "Vaše pravice do podatkov (GDPR)",
     "description": "Po GDPR imate pravico do dostopa, izvoza in brisanja vaših osebnih podatkov kadar koli.",
     "downloadData": "Prenesi moje podatke (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Naročilo potrjeno!",
+    "subtitle": "Hvala za nakup pri nas. Vaše naročilo je bilo uspešno oddano.",
+    "orderNumber": "Številka naročila",
+    "confirmationEmail": "Poslali smo vam potrditveno e-pošto.",
+    "shippingNotice": "Obvestili vas bomo, ko bo vaše naročilo odposlano.",
+    "continueShopping": "Nadaljuj z nakupovanjem",
+    "viewOrders": "Poglej moja naročila"
   }
 }

@@ -673,5 +673,14 @@
     "title": "Dine datarettigheter (GDPR)",
     "description": "I henhold til GDPR har du rett til å få tilgang til, eksportere og slette dine personopplysninger når som helst.",
     "downloadData": "Last ned mine data (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Bestilling bekreftet!",
+    "subtitle": "Takk for handelen. Bestillingen din er lagt inn.",
+    "orderNumber": "Bestillingsnummer",
+    "confirmationEmail": "Vi har sendt deg en bekreftelsese-post.",
+    "shippingNotice": "Vi varsler deg når bestillingen din sendes.",
+    "continueShopping": "Fortsett å handle",
+    "viewOrders": "Mine bestillinger"
   }
 }

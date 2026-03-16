@@ -673,5 +673,14 @@
     "title": "Az Ön adatjogai (GDPR)",
     "description": "A GDPR értelmében Önnek joga van bármikor hozzáférni, exportálni és törölni személyes adatait.",
     "downloadData": "Adataim letöltése (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Rendelés megerősítve!",
+    "subtitle": "Köszönjük a vásárlást. Rendelése sikeresen leadásra került.",
+    "orderNumber": "Rendelésszám",
+    "confirmationEmail": "Megerősítő e-mailt küldtünk Önnek.",
+    "shippingNotice": "Értesítjük, amikor rendelése feladásra kerül.",
+    "continueShopping": "Vásárlás folytatása",
+    "viewOrders": "Rendeléseim"
   }
 }

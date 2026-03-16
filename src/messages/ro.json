@@ -673,5 +673,14 @@
     "title": "Drepturile dvs. privind datele (GDPR)",
     "description": "Conform GDPR, aveți dreptul de a accesa, exporta și șterge datele dvs. personale în orice moment.",
     "downloadData": "Descarcă datele mele (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Comandă confirmată!",
+    "subtitle": "Mulțumim pentru achiziție. Comanda dvs. a fost plasată cu succes.",
+    "orderNumber": "Număr comandă",
+    "confirmationEmail": "V-am trimis un e-mail de confirmare.",
+    "shippingNotice": "Vă vom notifica când comanda dvs. va fi expediată.",
+    "continueShopping": "Continuă cumpărăturile",
+    "viewOrders": "Comenzile mele"
   }
 }

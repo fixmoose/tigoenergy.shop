@@ -673,5 +673,14 @@
     "title": "Twoje prawa do danych (RODO)",
     "description": "Na mocy RODO masz prawo do dostępu, eksportowania i usuwania swoich danych osobowych w dowolnym momencie.",
     "downloadData": "Pobierz moje dane (JSON)"
+  },
+  "orderSuccess": {
+    "title": "Zamówienie potwierdzone!",
+    "subtitle": "Dziękujemy za zakupy. Twoje zamówienie zostało pomyślnie złożone.",
+    "orderNumber": "Numer zamówienia",
+    "confirmationEmail": "Wysłaliśmy e-mail z potwierdzeniem.",
+    "shippingNotice": "Powiadomimy Cię, gdy zamówienie zostanie wysłane.",
+    "continueShopping": "Kontynuuj zakupy",
+    "viewOrders": "Moje zamówienia"
   }
 }

@@ -3,10 +3,12 @@
 import React from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 export default function OrderSuccessPage() {
     const params = useParams()
     const orderId = params.orderId
+    const t = useTranslations('orderSuccess')
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4 pt-20">
@@ -23,21 +25,21 @@ export default function OrderSuccessPage() {
                 </div>
 
                 <div className="p-8 pb-12">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('title')}</h1>
                     <p className="text-gray-500 mb-6">
-                        Thank you for shopping with us. Your order has been placed successfully.
+                        {t('subtitle')}
                     </p>
 
                     <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-8">
-                        <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Order Number</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">{t('orderNumber')}</div>
                         <div className="text-xl font-mono font-bold text-green-700 select-all">{typeof orderId === 'string' ? orderId.substring(0, 8).toUpperCase() : orderId}</div>
                         <div className="text-[10px] text-gray-400 mt-1 font-mono">{orderId}</div>
                     </div>
 
                     <div className="space-y-4">
                         <p className="text-sm text-gray-600">
-                            We've sent a confirmation email to your inbox.<br />
-                            We'll notify you when your order ships.
+                            {t('confirmationEmail')}<br />
+                            {t('shippingNotice')}
                         </p>
 
                         <div className="pt-6 flex flex-col gap-3">
@@ -45,13 +47,13 @@ export default function OrderSuccessPage() {
                                 href="/products"
                                 className="btn w-full bg-green-600 hover:bg-green-700 text-white font-bold border-none h-12 rounded-xl shadow-lg shadow-green-200"
                             >
-                                Continue Shopping
+                                {t('continueShopping')}
                             </Link>
                             <Link
                                 href="/dashboard#orders"
                                 className="btn btn-ghost w-full text-gray-500 hover:text-gray-700 font-medium"
                             >
-                                View My Orders
+                                {t('viewOrders')}
                             </Link>
                         </div>
                     </div>
