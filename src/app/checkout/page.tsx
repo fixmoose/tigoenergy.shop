@@ -244,7 +244,10 @@ export default function CheckoutPage() {
                     .single()
 
                 if (customerData) {
-                    const addresses: SavedAddress[] = customerData.addresses || []
+                    const addresses: SavedAddress[] = (customerData.addresses || []).map((a: SavedAddress) => ({
+                        ...a,
+                        country: normalizeCountryCode(a.country),
+                    }))
                     setSavedAddresses(addresses)
                     const defaultShipping = addresses.find(a => a.isDefaultShipping)
                     const viesAddress = addresses.find(a => a.isViesAddress)
@@ -752,7 +755,7 @@ export default function CheckoutPage() {
                                 <div>
                                     <h3 className="font-bold text-red-800">{error || t('requiredFields')}</h3>
                                     {invalidFields.length > 0 && (
-                                        <p className="text-sm text-red-600">{t('requiredFieldsDesc')} [{invalidFields.join(', ')}]</p>
+                                        <p className="text-sm text-red-600">{t('requiredFieldsDesc')}</p>
                                     )}
                                 </div>
                             </div>

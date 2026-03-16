@@ -301,7 +301,15 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
             const formatAddress = (addr: any) => {
                 if (!addr) return 'N/A'
-                return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
+                const lines = [
+                    [addr.first_name, addr.last_name].filter(Boolean).join(' '),
+                    addr.company || '',
+                    addr.street || addr.line1 || '',
+                    addr.street2 || '',
+                    `${addr.postal_code || ''} ${addr.city || ''}`.trim(),
+                    addr.country || '',
+                ].filter(Boolean)
+                return lines.join('<br>')
             }
 
             const emailData: Record<string, string> = {
