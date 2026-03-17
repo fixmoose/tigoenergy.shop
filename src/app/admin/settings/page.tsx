@@ -21,6 +21,7 @@ type Driver = {
     name: string
     email: string
     phone: string
+    is_warehouse?: boolean
 }
 
 export default function SettingsPage() {
@@ -387,11 +388,11 @@ export default function SettingsPage() {
 
             </div>
 
-            {/* Drivers Section */}
+            {/* Drivers & Warehouse Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                    <h3 className="text-lg font-bold text-gray-800">Drivers</h3>
-                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers. Their email is used for verification at the /driver portal.</p>
+                    <h3 className="text-lg font-bold text-gray-800">Drivers & Warehouse</h3>
+                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers and warehouse workers. Toggle warehouse to show quick-send buttons on orders.</p>
                 </div>
                 <div className="p-6 space-y-4">
                     <form onSubmit={handleSaveDriver} className="flex flex-wrap gap-2 items-end">
@@ -412,7 +413,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex gap-2">
                             <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">
-                                {editingDriver ? 'Update' : 'Add Driver'}
+                                {editingDriver ? 'Update' : 'Add'}
                             </button>
                             {editingDriver && (
                                 <button type="button" onClick={() => { setEditingDriver(null); setDriverForm({ name: '', email: '', phone: '' }) }}
@@ -423,20 +424,41 @@ export default function SettingsPage() {
 
                     <div className="space-y-2">
                         {driversLoading ? (
-                            <div className="text-center py-4 text-gray-400 text-sm">Loading drivers...</div>
+                            <div className="text-center py-4 text-gray-400 text-sm">Loading...</div>
                         ) : drivers.length === 0 ? (
-                            <div className="text-center py-4 text-gray-400 text-sm italic">No drivers added yet.</div>
+                            <div className="text-center py-4 text-gray-400 text-sm italic">No drivers or warehouse workers added yet.</div>
                         ) : drivers.map(d => (
                             <div key={d.id} className="flex justify-between items-center p-3 border rounded-lg group hover:border-blue-200 transition-colors">
-                                <div className="min-w-0">
-                                    <span className="text-sm font-bold text-gray-800">{d.name}</span>
-                                    <div className="text-xs text-gray-500">{d.email}{d.phone ? ` · ${d.phone}` : ''}</div>
+                                <div className="min-w-0 flex items-center gap-3">
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-bold text-gray-800">{d.name}</span>
+                                            {d.is_warehouse && (
+                                                <span className="text-[9px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded font-bold uppercase">Warehouse</span>
+                                            )}
+                                        </div>
+                                        <div className="text-xs text-gray-500">{d.email}{d.phone ? ` · ${d.phone}` : ''}</div>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => { setEditingDriver(d); setDriverForm({ name: d.name, email: d.email, phone: d.phone }) }}
-                                        className="text-xs text-blue-600 hover:underline font-bold">Edit</button>
-                                    <button onClick={() => handleDeleteDriver(d.id)}
-                                        className="text-xs text-red-500 hover:underline font-bold">Remove</button>
+                                <div className="flex items-center gap-3">
+                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!d.is_warehouse}
+                                            onChange={async (e) => {
+                                                const { error } = await supabase.from('drivers').update({ is_warehouse: e.target.checked }).eq('id', d.id)
+                                                if (!error) fetchDrivers()
+                                            }}
+                                            className="w-3.5 h-3.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                        />
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Warehouse</span>
+                                    </label>
+                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => { setEditingDriver(d); setDriverForm({ name: d.name, email: d.email, phone: d.phone }) }}
+                                            className="text-xs text-blue-600 hover:underline font-bold">Edit</button>
+                                        <button onClick={() => handleDeleteDriver(d.id)}
+                                            className="text-xs text-red-500 hover:underline font-bold">Remove</button>
+                                    </div>
                                 </div>
                             </div>
                         ))}

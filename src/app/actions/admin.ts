@@ -1646,6 +1646,32 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
             attachments,
         })
 
+        // Log this send to the order's warehouse_send_log
+        try {
+            const { data: currentOrder } = await supabase
+                .from('orders')
+                .select('warehouse_send_log')
+                .eq('id', orderId)
+                .single()
+
+            // Look up name from drivers table
+            const { data: driver } = await supabase
+                .from('drivers')
+                .select('name')
+                .eq('email', warehouseEmail)
+                .single()
+
+            const log = Array.isArray(currentOrder?.warehouse_send_log) ? currentOrder.warehouse_send_log : []
+            log.push({ email: warehouseEmail, name: driver?.name || warehouseEmail.split('@')[0], sentAt: new Date().toISOString() })
+
+            await supabase
+                .from('orders')
+                .update({ warehouse_send_log: log })
+                .eq('id', orderId)
+        } catch (logErr) {
+            console.error('Failed to log warehouse send:', logErr)
+        }
+
         revalidatePath(`/admin/orders/${orderId}`)
         return { success: true }
     } catch (err: any) {
