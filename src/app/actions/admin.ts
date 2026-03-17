@@ -1541,3 +1541,79 @@ export async function adminSendDeliveryToDriverAction(orderId: string, driverEma
         return { success: false, error: err.message }
     }
 }
+
+/**
+ * Send packing slip and shipping label to warehouse worker via email
+ */
+export async function adminSendToWarehouseAction(orderId: string, warehouseEmail: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select('order_number, customer_email, company_name, shipping_address, packing_slip_url, shipping_label_url')
+            .eq('id', orderId)
+            .single()
+
+        if (orderError || !order) throw new Error('Order not found')
+
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
+        const customerName = order.shipping_address
+            ? `${order.shipping_address.first_name || ''} ${order.shipping_address.last_name || ''}`.trim()
+            : order.customer_email
+        const shippingAddr = order.shipping_address
+            ? `${order.shipping_address.street || ''}, ${order.shipping_address.postal_code || ''} ${order.shipping_address.city || ''}, ${order.shipping_address.country || ''}`
+            : 'N/A'
+
+        const packingSlipLink = order.packing_slip_url
+            ? (order.packing_slip_url.startsWith('http') ? order.packing_slip_url : `${siteUrl}${order.packing_slip_url}`)
+            : null
+        const shippingLabelLink = order.shipping_label_url
+            ? (order.shipping_label_url.startsWith('http') ? order.shipping_label_url : `${siteUrl}${order.shipping_label_url}`)
+            : null
+
+        const docLinks = [
+            packingSlipLink ? `<a href="${packingSlipLink}" style="display:inline-block;background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;margin-right:8px;">Packing Slip</a>` : '',
+            shippingLabelLink ? `<a href="${shippingLabelLink}" style="display:inline-block;background:#dc2626;color:#fff;padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;">Shipping Label</a>` : '',
+        ].filter(Boolean).join('\n')
+
+        const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
+<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+  <div style="background:#1a2b3c;padding:24px 32px;color:#fff;">
+    <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
+    <h1 style="font-size:20px;font-weight:300;margin:0;">Warehouse — Order to Process</h1>
+  </div>
+  <div style="padding:24px 32px;">
+    <p style="color:#374151;font-size:14px;">Please process the following order:</p>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0;">
+      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">Order</p>
+      <p style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111;">#${order.order_number}</p>
+      <p style="margin:0 0 4px;font-size:12px;color:#6b7280;">Ship to</p>
+      <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111;">${customerName}${order.company_name ? ` (${order.company_name})` : ''}</p>
+      <p style="margin:0;font-size:13px;color:#6b7280;">${shippingAddr}</p>
+    </div>
+    <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Documents:</p>
+    <div style="margin:16px 0;">
+      ${docLinks || '<p style="color:#9ca3af;font-size:13px;">No documents attached yet.</p>'}
+    </div>
+    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Sent from Tigo Energy admin panel</p>
+  </div>
+</div></body></html>`
+
+        await sendEmail({
+            to: warehouseEmail,
+            subject: `Warehouse: Process Order #${order.order_number}`,
+            html,
+            orderId,
+            emailType: 'warehouse_order',
+        })
+
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminSendToWarehouseAction:', err)
+        return { success: false, error: err.message }
+    }
+}

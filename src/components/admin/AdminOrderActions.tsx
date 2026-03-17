@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
@@ -107,6 +107,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const [paymentsLoaded, setPaymentsLoaded] = useState(false)
     const [driverEmail, setDriverEmail] = useState('')
     const [savedDrivers, setSavedDrivers] = useState<{ id: string; name: string; email: string; phone: string }[]>([])
+    const [warehouseEmail, setWarehouseEmail] = useState('')
+    const [showWarehouseSend, setShowWarehouseSend] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -626,7 +628,17 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             {/* Uploaded Documents */}
             {(invoiceUrl || packingSlipUrl || shippingLabelUrl) && (
                 <div className="mt-4 border-t pt-3">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Documents</div>
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Documents</div>
+                        {(packingSlipUrl || shippingLabelUrl) && (
+                            <button
+                                onClick={() => setShowWarehouseSend(!showWarehouseSend)}
+                                className="text-[10px] font-bold text-orange-600 hover:text-orange-800 uppercase tracking-wider px-2 py-1 rounded hover:bg-orange-50 transition"
+                            >
+                                {showWarehouseSend ? 'Close' : 'Send to Warehouse'}
+                            </button>
+                        )}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                         {invoiceUrl && (
                             <a href={invoiceUrl} target="_blank" rel="noopener noreferrer"
@@ -650,6 +662,44 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             </a>
                         )}
                     </div>
+
+                    {/* Send to Warehouse */}
+                    {showWarehouseSend && (
+                        <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-3 space-y-2">
+                            <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider">Send Documents to Warehouse</p>
+                            <p className="text-[10px] text-orange-600">Packing slip and shipping label will be emailed with order &amp; shipping details.</p>
+                            <input
+                                type="email"
+                                value={warehouseEmail}
+                                onChange={e => setWarehouseEmail(e.target.value)}
+                                placeholder="warehouse@email.com"
+                                className="w-full border border-orange-200 rounded px-3 py-2 text-sm bg-white outline-none focus:border-orange-400"
+                            />
+                            <button
+                                onClick={async () => {
+                                    if (!warehouseEmail) { alert('Enter warehouse email'); return }
+                                    setLoading(true)
+                                    try {
+                                        const res = await adminSendToWarehouseAction(orderId, warehouseEmail)
+                                        if (res.success) {
+                                            alert('Sent to warehouse!')
+                                            setShowWarehouseSend(false)
+                                        } else {
+                                            alert('Failed: ' + res.error)
+                                        }
+                                    } catch (err: any) {
+                                        alert('Failed: ' + err.message)
+                                    } finally {
+                                        setLoading(false)
+                                    }
+                                }}
+                                disabled={loading || !warehouseEmail}
+                                className="w-full py-2 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 transition disabled:opacity-50"
+                            >
+                                {loading ? 'Sending...' : 'Send to Warehouse'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
