@@ -7,6 +7,12 @@ if (!process.env.UNIONE_API_KEY) {
     console.warn('UNIONE_API_KEY is not set — emails will not be sent.')
 }
 
+interface EmailAttachment {
+    type: string       // MIME type, e.g. 'application/pdf'
+    name: string       // filename
+    content: string    // base64-encoded content
+}
+
 interface SendEmailParams {
     from?: string
     to: string
@@ -17,6 +23,7 @@ interface SendEmailParams {
     skipUnsubscribe?: boolean
     orderId?: string
     emailType?: string
+    attachments?: EmailAttachment[]
 }
 
 export async function sendEmail({
@@ -29,6 +36,7 @@ export async function sendEmail({
     skipUnsubscribe = false,
     orderId,
     emailType,
+    attachments,
 }: SendEmailParams) {
     const apiKey = process.env.UNIONE_API_KEY
     if (!apiKey) {
@@ -52,7 +60,13 @@ export async function sendEmail({
             subject,
             from_email: fromEmail,
             ...(fromName && { from_name: fromName }),
-            // Note: skip_unsubscribe requires UniOne 'allow_skip_unsubscribe' flag — disabled
+            ...(attachments && attachments.length > 0 && {
+                attachments: attachments.map(a => ({
+                    type: a.type,
+                    name: a.name,
+                    content: a.content,
+                }))
+            }),
         },
     }
 

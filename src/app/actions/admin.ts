@@ -1567,17 +1567,41 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
             ? `${order.shipping_address.street || ''}, ${order.shipping_address.postal_code || ''} ${order.shipping_address.city || ''}, ${order.shipping_address.country || ''}`
             : 'N/A'
 
-        const packingSlipLink = order.packing_slip_url
-            ? (order.packing_slip_url.startsWith('http') ? order.packing_slip_url : `${siteUrl}${order.packing_slip_url}`)
-            : null
-        const shippingLabelLink = order.shipping_label_url
-            ? (order.shipping_label_url.startsWith('http') ? order.shipping_label_url : `${siteUrl}${order.shipping_label_url}`)
-            : null
+        // Download PDFs from Supabase storage and prepare as attachments
+        const attachments: { type: string; name: string; content: string }[] = []
 
-        const docLinks = [
-            packingSlipLink ? `<a href="${packingSlipLink}" style="display:inline-block;background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;margin-right:8px;">Packing Slip</a>` : '',
-            shippingLabelLink ? `<a href="${shippingLabelLink}" style="display:inline-block;background:#dc2626;color:#fff;padding:10px 20px;border-radius:6px;font-weight:700;font-size:13px;text-decoration:none;">Shipping Label</a>` : '',
-        ].filter(Boolean).join('\n')
+        const downloadFromStorage = async (url: string, filename: string) => {
+            try {
+                // URLs look like /api/storage?bucket=invoices&path=orders/xxx/file.pdf
+                const urlParams = new URL(url, 'http://localhost')
+                const bucket = urlParams.searchParams.get('bucket') || 'invoices'
+                const filePath = urlParams.searchParams.get('path')
+                if (!filePath) return
+
+                const { data, error } = await supabase.storage.from(bucket).download(filePath)
+                if (error || !data) {
+                    console.error(`Failed to download ${filePath}:`, error)
+                    return
+                }
+                const buffer = Buffer.from(await data.arrayBuffer())
+                attachments.push({
+                    type: 'application/pdf',
+                    name: filename,
+                    content: buffer.toString('base64'),
+                })
+            } catch (err) {
+                console.error(`Error downloading attachment ${filename}:`, err)
+            }
+        }
+
+        if (order.packing_slip_url) {
+            await downloadFromStorage(order.packing_slip_url, `packing_slip_${order.order_number}.pdf`)
+        }
+        if (order.shipping_label_url) {
+            await downloadFromStorage(order.shipping_label_url, `shipping_label_${order.order_number}.pdf`)
+        }
+
+        const attachedDocs = attachments.map(a => a.name).join(', ')
 
         const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
@@ -1594,10 +1618,9 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
       <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111;">${customerName}${order.company_name ? ` (${order.company_name})` : ''}</p>
       <p style="margin:0;font-size:13px;color:#6b7280;">${shippingAddr}</p>
     </div>
-    <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Documents:</p>
-    <div style="margin:16px 0;">
-      ${docLinks || '<p style="color:#9ca3af;font-size:13px;">No documents attached yet.</p>'}
-    </div>
+    <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Documents attached:</p>
+    <p style="color:#374151;font-size:13px;">${attachedDocs || 'No documents available.'}</p>
+    <p style="color:#6b7280;font-size:12px;margin-top:8px;">Print the attached PDFs and process this order for shipping.</p>
     <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Sent from Tigo Energy admin panel</p>
   </div>
 </div></body></html>`
@@ -1608,6 +1631,7 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
             html,
             orderId,
             emailType: 'warehouse_order',
+            attachments,
         })
 
         revalidatePath(`/admin/orders/${orderId}`)
