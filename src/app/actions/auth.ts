@@ -155,7 +155,7 @@ export async function registerB2BUserAction(formData: any) {
                 country: normalizeCountryCode(country || ''),
                 isViesAddress: true,
                 isDefaultBilling: !extraBillingAddress,
-                isDefaultShipping: !extraShippingAddress,
+                isDefaultShipping: false,
             })
         }
         if (extraShippingAddress?.street) {

@@ -26,6 +26,8 @@ interface CustomerSnippet {
     phone: string | null
     is_b2b: boolean
     addresses?: any[]
+    payment_terms?: string | null
+    payment_terms_days?: number | null
 }
 
 export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceMode = false }: { onClose: () => void, onCreated: () => void, isInvoiceMode?: boolean }) {
@@ -60,6 +62,8 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
     const [paymentMethod, setPaymentMethod] = useState('IBAN')
     const [billingSame, setBillingSame] = useState(true)
     const [pickupInPerson, setPickupInPerson] = useState(false)
+    const [shippingAddrMode, setShippingAddrMode] = useState<'manual' | string>('manual') // 'manual' or address id
+    const [billingAddrMode, setBillingAddrMode] = useState<'manual' | string>('manual')
 
     const [shippingAddress, setShippingAddress] = useState({
         street: '',
@@ -76,6 +80,17 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
         postal_code: '',
         country: 'SI'
     })
+
+    // Helper to normalize customer address to order format
+    const normalizeAddr = (a: any) => ({
+        street: a.street || '',
+        street2: a.street2 || '',
+        city: a.city || '',
+        postal_code: a.postalCode || a.postal_code || '',
+        country: (a.country || 'SI').toUpperCase()
+    })
+
+    const customerAddresses = (selectedCustomer as any)?.addresses as any[] | undefined
 
     // Product Search
     const [productSearch, setProductSearch] = useState('')
@@ -281,32 +296,39 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                             company_name: customer.company_name || '',
                                                             vat_id: customer.vat_id || '',
                                                             phone: customer.phone || '',
-                                                            is_b2b: !!customer.is_b2b
+                                                            is_b2b: !!customer.is_b2b,
+                                                            addresses: customer.addresses || [],
                                                         })
                                                         setCustomerSearch('')
                                                         setCustomerResults([])
 
-                                                        // Normalize address fields (customer addresses use postalCode, orders use postal_code)
-                                                        const normalizeAddr = (a: any) => ({
-                                                            street: a.street || '',
-                                                            street2: a.street2 || '',
-                                                            city: a.city || '',
-                                                            postal_code: a.postalCode || a.postal_code || '',
-                                                            country: (a.country || 'SI').toUpperCase()
-                                                        })
+                                                        // Auto-set Net30 payment method if customer has net30 terms
+                                                        if (customer.payment_terms === 'net30') {
+                                                            setPaymentMethod('NET30')
+                                                        }
 
                                                         // Try saved customer addresses first
-                                                        const shipAddr = customer.addresses?.find((a: any) => a.isDefaultShipping) || customer.addresses?.[0]
+                                                        // For shipping: prefer non-VIES default shipping, then any non-VIES address, then fallback to first
+                                                        const shipAddr = customer.addresses?.find((a: any) => a.isDefaultShipping && !a.isViesAddress)
+                                                            || customer.addresses?.find((a: any) => !a.isViesAddress)
+                                                            || customer.addresses?.find((a: any) => a.isDefaultShipping)
+                                                            || customer.addresses?.[0]
+                                                        // For billing: prefer VIES address for B2B, otherwise default billing
+                                                        const billAddr = customer.is_b2b
+                                                            ? (customer.addresses?.find((a: any) => a.isViesAddress) || customer.addresses?.find((a: any) => a.isDefaultBilling))
+                                                            : customer.addresses?.find((a: any) => a.isDefaultBilling && !a.isDefaultShipping)
                                                         if (shipAddr) {
                                                             setShippingAddress(normalizeAddr(shipAddr))
-                                                            const billAddr = customer.addresses?.find((a: any) => a.isDefaultBilling && !a.isDefaultShipping)
-                                                            if (billAddr) {
+                                                            setShippingAddrMode(shipAddr.id || 'manual')
+                                                            if (billAddr && billAddr !== shipAddr) {
                                                                 setBillingAddress(normalizeAddr(billAddr))
+                                                                setBillingAddrMode(billAddr.id || 'manual')
                                                                 setBillingSame(false)
                                                             } else {
                                                                 setBillingSame(true)
                                                             }
                                                         } else {
+                                                            setShippingAddrMode('manual')
                                                             // Fallback: use latest order's shipping address
                                                             const res = await getCustomerLatestOrderAction(customer.id)
                                                             if (res.success && res.data?.shipping_address) {
@@ -425,87 +447,147 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                     </div>
                                 )}
 
-                                <div className={`grid grid-cols-2 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 ${pickupInPerson ? 'opacity-40 pointer-events-none' : ''}`}>
-                                    <div className="col-span-2">
-                                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Street Address</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Shipping Street"
-                                            value={shippingAddress.street}
-                                            onChange={e => setShippingAddress({ ...shippingAddress, street: e.target.value })}
-                                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
-                                        />
-                                    </div>
-                                    <div className="col-span-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Address line 2"
-                                            value={shippingAddress.street2}
-                                            onChange={e => setShippingAddress({ ...shippingAddress, street2: e.target.value })}
-                                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="City"
-                                            value={shippingAddress.city}
-                                            onChange={e => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="Postal"
-                                            value={shippingAddress.postal_code}
-                                            onChange={e => setShippingAddress({ ...shippingAddress, postal_code: e.target.value })}
-                                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
-                                        />
-                                    </div>
-                                    <div className="col-span-2">
-                                        <select
-                                            value={shippingAddress.country}
-                                            onChange={e => {
-                                                const country = e.target.value
-                                                setShippingAddress({ ...shippingAddress, country })
-                                                // Sync market context if not manually overridden or just for better defaults
-                                                const region = allRegions.find(r => r.country === country)
-                                                if (region) {
-                                                    setMarket(region.key.toLowerCase())
-                                                }
-                                            }}
-                                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
-                                        >
-                                            <option value="">-- Select Country --</option>
-                                            {allRegions.map(r => (
-                                                <option key={r.country} value={r.country}>{r.countryName}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                <div className={`space-y-3 ${pickupInPerson ? 'opacity-40 pointer-events-none' : ''}`}>
+                                    {/* Shipping address selector */}
+                                    {customerAddresses && customerAddresses.length > 0 && (
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Shipping Address</label>
+                                            <select
+                                                value={shippingAddrMode}
+                                                onChange={e => {
+                                                    const val = e.target.value
+                                                    setShippingAddrMode(val)
+                                                    if (val !== 'manual') {
+                                                        const addr = customerAddresses.find((a: any) => a.id === val)
+                                                        if (addr) {
+                                                            setShippingAddress(normalizeAddr(addr))
+                                                            const region = allRegions.find(r => r.country === (addr.country || '').toUpperCase())
+                                                            if (region) setMarket(region.key.toLowerCase())
+                                                        }
+                                                    } else {
+                                                        setShippingAddress({ street: '', street2: '', city: '', postal_code: '', country: 'SI' })
+                                                    }
+                                                }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 appearance-none"
+                                            >
+                                                {customerAddresses.map((a: any) => (
+                                                    <option key={a.id} value={a.id}>
+                                                        {a.label || 'Address'}{a.isViesAddress ? ' (VIES/Invoice)' : ''}{a.isDefaultShipping ? ' ★' : ''} — {a.street}, {a.city} {a.postalCode || a.postal_code} {a.country}
+                                                    </option>
+                                                ))}
+                                                <option value="manual">Enter new address manually</option>
+                                            </select>
+                                        </div>
+                                    )}
 
-                                    <div className="col-span-2 flex items-center gap-3 mt-4 pt-4 border-t border-slate-200/60">
-                                        <input
-                                            type="checkbox"
-                                            id="billing_same"
-                                            checked={billingSame}
-                                            onChange={e => setBillingSame(e.target.checked)}
-                                            className="w-4 h-4 text-orange-600 rounded cursor-pointer"
-                                        />
-                                        <label htmlFor="billing_same" className="text-xs font-bold text-slate-600 select-none cursor-pointer uppercase">Billing same as shipping</label>
+                                    <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                                        <div className="col-span-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Street Address</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Shipping Street"
+                                                value={shippingAddress.street}
+                                                onChange={e => { setShippingAddress({ ...shippingAddress, street: e.target.value }); setShippingAddrMode('manual') }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Address line 2"
+                                                value={shippingAddress.street2}
+                                                onChange={e => { setShippingAddress({ ...shippingAddress, street2: e.target.value }); setShippingAddrMode('manual') }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="text"
+                                                placeholder="City"
+                                                value={shippingAddress.city}
+                                                onChange={e => { setShippingAddress({ ...shippingAddress, city: e.target.value }); setShippingAddrMode('manual') }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="text"
+                                                placeholder="Postal"
+                                                value={shippingAddress.postal_code}
+                                                onChange={e => { setShippingAddress({ ...shippingAddress, postal_code: e.target.value }); setShippingAddrMode('manual') }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <select
+                                                value={shippingAddress.country}
+                                                onChange={e => {
+                                                    const country = e.target.value
+                                                    setShippingAddress({ ...shippingAddress, country })
+                                                    setShippingAddrMode('manual')
+                                                    const region = allRegions.find(r => r.country === country)
+                                                    if (region) setMarket(region.key.toLowerCase())
+                                                }}
+                                                className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
+                                            >
+                                                <option value="">-- Select Country --</option>
+                                                {allRegions.map(r => (
+                                                    <option key={r.country} value={r.country}>{r.countryName}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="col-span-2 flex items-center gap-3 mt-4 pt-4 border-t border-slate-200/60">
+                                            <input
+                                                type="checkbox"
+                                                id="billing_same"
+                                                checked={billingSame}
+                                                onChange={e => setBillingSame(e.target.checked)}
+                                                className="w-4 h-4 text-orange-600 rounded cursor-pointer"
+                                            />
+                                            <label htmlFor="billing_same" className="text-xs font-bold text-slate-600 select-none cursor-pointer uppercase">Billing same as shipping</label>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {!billingSame && (
                                     <div className="bg-orange-50/30 p-4 rounded-2xl border border-orange-100 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <h4 className="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Billing Address Override</h4>
+
+                                        {/* Billing address selector */}
+                                        {customerAddresses && customerAddresses.length > 0 && (
+                                            <div>
+                                                <select
+                                                    value={billingAddrMode}
+                                                    onChange={e => {
+                                                        const val = e.target.value
+                                                        setBillingAddrMode(val)
+                                                        if (val !== 'manual') {
+                                                            const addr = customerAddresses.find((a: any) => a.id === val)
+                                                            if (addr) setBillingAddress(normalizeAddr(addr))
+                                                        } else {
+                                                            setBillingAddress({ street: '', street2: '', city: '', postal_code: '', country: 'SI' })
+                                                        }
+                                                    }}
+                                                    className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-orange-500 appearance-none"
+                                                >
+                                                    {customerAddresses.map((a: any) => (
+                                                        <option key={a.id} value={a.id}>
+                                                            {a.label || 'Address'}{a.isViesAddress ? ' (VIES/Invoice)' : ''}{a.isDefaultBilling ? ' ★' : ''} — {a.street}, {a.city} {a.postalCode || a.postal_code} {a.country}
+                                                        </option>
+                                                    ))}
+                                                    <option value="manual">Enter new address manually</option>
+                                                </select>
+                                            </div>
+                                        )}
+
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="col-span-2">
                                                 <input
                                                     type="text"
                                                     placeholder="Billing Street"
                                                     value={billingAddress.street}
-                                                    onChange={e => setBillingAddress({ ...billingAddress, street: e.target.value })}
+                                                    onChange={e => { setBillingAddress({ ...billingAddress, street: e.target.value }); setBillingAddrMode('manual') }}
                                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
                                                 />
                                             </div>
@@ -514,7 +596,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                     type="text"
                                                     placeholder="City"
                                                     value={billingAddress.city}
-                                                    onChange={e => setBillingAddress({ ...billingAddress, city: e.target.value })}
+                                                    onChange={e => { setBillingAddress({ ...billingAddress, city: e.target.value }); setBillingAddrMode('manual') }}
                                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
                                                 />
                                             </div>
@@ -523,14 +605,14 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                     type="text"
                                                     placeholder="Postal"
                                                     value={billingAddress.postal_code}
-                                                    onChange={e => setBillingAddress({ ...billingAddress, postal_code: e.target.value })}
+                                                    onChange={e => { setBillingAddress({ ...billingAddress, postal_code: e.target.value }); setBillingAddrMode('manual') }}
                                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none"
                                                 />
                                             </div>
                                             <div className="col-span-2">
                                                 <select
                                                     value={billingAddress.country}
-                                                    onChange={e => setBillingAddress({ ...billingAddress, country: e.target.value })}
+                                                    onChange={e => { setBillingAddress({ ...billingAddress, country: e.target.value }); setBillingAddrMode('manual') }}
                                                     className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg outline-none appearance-none"
                                                 >
                                                     <option value="">-- Select Country --</option>
@@ -743,6 +825,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                     <option value="IBAN">IBAN Bank Transfer</option>
                                     <option value="WISE">Quick Pay (Wise/Card)</option>
                                     <option value="CASH">Cash on Delivery</option>
+                                    <option value="NET30">Net 30 (Invoice)</option>
                                 </select>
                             </div>
 

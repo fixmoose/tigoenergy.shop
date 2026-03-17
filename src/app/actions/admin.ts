@@ -153,7 +153,7 @@ export async function adminCreateCustomerAction(formData: any) {
                 country: formData.vies_country || '',
                 isViesAddress: true,
                 isDefaultBilling: true,
-                isDefaultShipping: true,
+                isDefaultShipping: false,
             })
         }
 
@@ -978,7 +978,11 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 shipping_cost: shipCost,
                 market: order.market || 'de',
                 language: 'en',
-                payment_method: order.payment_method || 'IBAN',
+                payment_method: order.payment_method === 'NET30' ? 'IBAN' : (order.payment_method || 'IBAN'),
+                payment_terms: order.payment_method === 'NET30' ? 'net30' : null,
+                payment_due_date: order.payment_method === 'NET30'
+                    ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                    : null,
                 is_b2b: customer.is_b2b || false,
                 internal_notes: order.internal_notes || null,
                 delivery_country: order.shipping_address?.country || 'DE',
