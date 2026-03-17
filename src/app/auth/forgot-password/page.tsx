@@ -23,8 +23,9 @@ export default function ForgotPasswordPage() {
 
         try {
             await executeRecaptcha('FORGOT_PASSWORD')
+            const origin = window.location.origin.replace('://www.', '://')
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/auth/reset-password`,
+                redirectTo: `${origin}/auth/reset-password`,
             })
 
             if (error) throw error
