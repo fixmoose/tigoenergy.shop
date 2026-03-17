@@ -4,8 +4,9 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmail, renderTemplate, getEmailTranslations, notifyAdmins } from '@/lib/email'
 import { headers } from 'next/headers'
-import { getMarketFromKey } from '@/lib/constants/markets'
+import { getMarketFromKey, getDomainForMarket } from '@/lib/constants/markets'
 import { normalizeCountryCode } from '@/lib/normalize-country'
+import { verifyRecaptcha } from '@/lib/recaptcha'
 
 export async function registerUserAction(formData: any) {
     try {
@@ -239,5 +240,61 @@ export async function registerB2BUserAction(formData: any) {
     } catch (err: any) {
         console.error('Error in registerB2BUserAction:', err)
         return { success: false, error: err.message || 'An unexpected error occurred' }
+    }
+}
+
+/**
+ * Customer-facing forgot password — generates link via generateLink + sends localized email
+ */
+export async function requestPasswordResetAction(email: string, recaptchaToken: string) {
+    try {
+        // Verify reCAPTCHA
+        const captcha = await verifyRecaptcha(recaptchaToken, 'FORGOT_PASSWORD')
+        if (!captcha.success) {
+            return { success: false, error: captcha.error || 'reCAPTCHA verification failed' }
+        }
+
+        const supabase = await createAdminClient()
+
+        // Determine locale from request headers
+        const headersList = await headers()
+        const marketKey = headersList.get('x-market-key') || 'SHOP'
+        const market = getMarketFromKey(marketKey)
+        const preferredLang = headersList.get('x-preferred-language')
+        const locale = (preferredLang && market.availableLanguages.includes(preferredLang))
+            ? preferredLang
+            : market.defaultLanguage
+
+        // Determine the correct domain for the reset link
+        const domain = getDomainForMarket(marketKey)
+        const siteUrl = `https://${domain}`
+
+        // Generate recovery link
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email,
+            options: { redirectTo: `${siteUrl}/auth/reset-password` }
+        })
+
+        if (linkError) {
+            // Don't reveal whether the email exists — always return success
+            console.error('generateLink error:', linkError.message)
+            return { success: true }
+        }
+
+        const hashedToken = linkData.properties.hashed_token
+        const resetLink = `${siteUrl}/auth/reset-password?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
+
+        // Send localized email using our template
+        const translations = await getEmailTranslations(locale)
+        const subject = translations.email?.passwordReset?.title || 'Reset Your Password'
+        const html = await renderTemplate('password-reset', { reset_link: resetLink }, locale)
+        await sendEmail({ to: email, subject, html, emailType: 'password_reset' })
+
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in requestPasswordResetAction:', err)
+        // Don't reveal internal errors to the user
+        return { success: true }
     }
 }

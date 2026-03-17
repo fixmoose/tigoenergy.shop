@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useTranslations } from 'next-intl'
+import { requestPasswordResetAction } from '@/app/actions/auth'
 
 export default function ForgotPasswordPage() {
     const t = useTranslations('auth.forgotPassword')
@@ -12,7 +12,6 @@ export default function ForgotPasswordPage() {
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const supabase = createClient()
     const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
     const handleRequestReset = async (e: React.FormEvent) => {
@@ -22,15 +21,15 @@ export default function ForgotPasswordPage() {
         setMessage(null)
 
         try {
-            await executeRecaptcha('FORGOT_PASSWORD')
-            const origin = window.location.origin.replace('://www.', '://')
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${origin}/auth/reset-password`,
-            })
+            const token = await executeRecaptcha('FORGOT_PASSWORD')
+            const res = await requestPasswordResetAction(email, token)
 
-            if (error) throw error
-
-            setMessage(t('success'))
+            if (!res.success) {
+                setError(res.error || t('error'))
+                resetRecaptcha()
+            } else {
+                setMessage(t('success'))
+            }
         } catch (error: any) {
             setError(error.message)
             resetRecaptcha()

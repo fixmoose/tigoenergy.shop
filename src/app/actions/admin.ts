@@ -4,7 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { sendEmail, renderTemplate } from '@/lib/email'
+import { sendEmail, renderTemplate, getEmailTranslations } from '@/lib/email'
 import { MARKETS, getDomainForMarket } from '@/lib/constants/markets'
 import { TRANSLATION_MAP, applyTemplateTranslation, ALL_APP_LANGUAGES } from '@/lib/template-translations'
 
@@ -430,51 +430,9 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         const hashedToken = linkData.properties.hashed_token
         const resetLink = `${siteUrl}/auth/reset-password?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
 
-        const subjectMap: Record<string, string> = {
-            sl: 'Zahteva za ponastavitev gesla',
-            de: 'Anforderung zum Zurücksetzen des Passworts',
-            it: 'Richiesta di reimpostazione della password',
-            fr: 'Demande de réinitialisation du mot de passe',
-            hr: 'Zahtjev za poništavanje lozinke',
-            cs: 'Žádost o obnovení hesla',
-            pl: 'Prośba o reset hasła',
-            nl: 'Verzoek om wachtwoord opnieuw in te stellen',
-            pt: 'Pedido de redefinição de senha',
-            es: 'Solicitud de restablecimiento de contraseña',
-        }
-        const buttonMap: Record<string, string> = {
-            sl: 'Ponastavi geslo',
-            de: 'Passwort zurücksetzen',
-            it: 'Reimposta la password',
-            fr: 'Réinitialiser le mot de passe',
-            hr: 'Poništi lozinku',
-            cs: 'Obnovit heslo',
-            pl: 'Zresetuj hasło',
-            nl: 'Wachtwoord opnieuw instellen',
-            pt: 'Redefinir senha',
-            es: 'Restablecer contraseña',
-        }
-        const subject = subjectMap[locale] || 'Password Reset Request'
-        const buttonText = buttonMap[locale] || 'Reset Password'
-
-        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-body{font-family:Arial,sans-serif;color:#1a1a1a;background:#f9f9f9;margin:0;padding:0}
-.wrap{max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5}
-.hdr{background:#1a2b3c;padding:32px;color:#fff}.hdr h1{margin:0;font-size:22px;font-weight:900}
-.hdr p{margin:6px 0 0;color:#9ca3af;font-size:13px}.bd{padding:32px}
-.cta{display:inline-block;background:#1a2b3c;color:#fff;padding:14px 28px;border-radius:10px;font-weight:900;font-size:14px;text-decoration:none}
-.link-box{background:#f3f4f6;border-radius:8px;padding:12px 16px;font-family:monospace;font-size:11px;word-break:break-all;color:#374151;margin-top:16px}
-</style></head><body><div class="wrap">
-<div class="hdr"><h1>Password Reset</h1><p>A request was made to reset your account password.</p></div>
-<div class="bd">
-<p style="font-size:14px;color:#374151;margin-bottom:24px">Click the button below to set a new password. This link expires in 1 hour.</p>
-<div style="text-align:center;margin:28px 0"><a href="${resetLink}" class="cta">${buttonText}</a></div>
-<p style="font-size:12px;color:#6b7280">If the button doesn't work, copy and paste this link into your browser:</p>
-<div class="link-box">${resetLink}</div>
-<div style="padding-top:20px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;margin-top:24px">
-<p>If you didn't request this, you can safely ignore this email.</p>
-<p>Questions? <a href="mailto:support@tigoenergy.shop" style="color:#4b5563">support@tigoenergy.shop</a></p>
-</div></div></div></body></html>`
+        const translations = await getEmailTranslations(locale)
+        const subject = translations.email?.passwordReset?.title || 'Reset Your Password'
+        const html = await renderTemplate('password-reset', { reset_link: resetLink }, locale)
 
         await sendEmail({
             to: emailToReset,
