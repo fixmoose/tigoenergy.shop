@@ -421,16 +421,16 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'recovery',
             email: emailToReset,
-            options: { redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password` }
+            options: { redirectTo: `${siteUrl}/auth/reset-password` }
         })
 
         if (linkError) throw linkError
         // Rewrite the action_link to ensure redirect_to points to the correct domain
-        // (Supabase redirects with a PKCE code that must go through /auth/callback first)
+        // (Supabase may use its configured Site URL instead of our redirectTo)
         let resetLink = linkData.properties.action_link as string
         try {
             const linkUrl = new URL(resetLink)
-            linkUrl.searchParams.set('redirect_to', `${siteUrl}/auth/callback?next=/auth/reset-password`)
+            linkUrl.searchParams.set('redirect_to', `${siteUrl}/auth/reset-password`)
             resetLink = linkUrl.toString()
         } catch { /* keep original link if URL parsing fails */ }
 
@@ -946,15 +946,15 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                 const { data: linkData } = await supabase.auth.admin.generateLink({
                     type: 'recovery',
                     email: customer.email,
-                    options: { redirectTo: `${setupSiteUrl}/auth/callback?next=/auth/reset-password` }
+                    options: { redirectTo: `${setupSiteUrl}/auth/reset-password` }
                 });
 
                 if (linkData?.properties?.action_link) {
-                    // Rewrite redirect_to to go through /auth/callback for PKCE code exchange
+                    // Rewrite redirect_to to the correct domain
                     let setupLink = linkData.properties.action_link as string
                     try {
                         const linkUrl = new URL(setupLink)
-                        linkUrl.searchParams.set('redirect_to', `${setupSiteUrl}/auth/callback?next=/auth/reset-password`)
+                        linkUrl.searchParams.set('redirect_to', `${setupSiteUrl}/auth/reset-password`)
                         setupLink = linkUrl.toString()
                     } catch { /* keep original */ }
 
