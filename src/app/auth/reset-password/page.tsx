@@ -19,36 +19,60 @@ export default function ResetPasswordPage() {
   const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event that fires when Supabase
-    // processes the recovery token from the URL hash fragment.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-        if (session) {
-          setSessionReady(true)
-          setError('')
+    const init = async () => {
+      // Sign out any existing session (e.g. admin) so it doesn't interfere
+      await supabase.auth.signOut()
+
+      // Check for token_hash in query params (admin-triggered reset)
+      const urlParams = new URLSearchParams(window.location.search)
+      const tokenHash = urlParams.get('token_hash')
+      const queryType = urlParams.get('type')
+
+      if (tokenHash && queryType === 'recovery') {
+        // Exchange the hashed token for a session via verifyOtp
+        const { data, error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'recovery',
+        })
+
+        if (verifyError || !data.session) {
+          setError(t('noToken'))
+          return
         }
-      }
-    })
 
-    // Also check if a session already exists (e.g. page refresh after token exchange)
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
+        window.history.replaceState(null, '', window.location.pathname)
         setSessionReady(true)
+        return
       }
-    })
 
-    // Timeout: if no session after 5 seconds, the token is likely expired/invalid
-    const timeout = setTimeout(() => {
-      setSessionReady(prev => {
-        if (!prev) setError(t('noToken'))
-        return prev
-      })
-    }, 5000)
+      // Check for access_token in hash fragment (customer forgot-password flow)
+      const hash = window.location.hash
+      const hashParams = new URLSearchParams(hash.replace('#', ''))
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
+      const hashType = hashParams.get('type')
 
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timeout)
+      if (accessToken && hashType === 'recovery') {
+        const { data, error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || '',
+        })
+
+        if (sessionError || !data.session) {
+          setError(t('noToken'))
+          return
+        }
+
+        window.history.replaceState(null, '', window.location.pathname)
+        setSessionReady(true)
+        return
+      }
+
+      // No valid recovery token found
+      setError(t('noToken'))
     }
+
+    init()
   }, [supabase.auth, t])
 
   const handleResetPassword = async (e: React.FormEvent) => {

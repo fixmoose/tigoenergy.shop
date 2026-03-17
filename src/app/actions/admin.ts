@@ -425,14 +425,10 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         })
 
         if (linkError) throw linkError
-        // Rewrite the action_link to ensure redirect_to points to the correct domain
-        // (Supabase may use its configured Site URL instead of our redirectTo)
-        let resetLink = linkData.properties.action_link as string
-        try {
-            const linkUrl = new URL(resetLink)
-            linkUrl.searchParams.set('redirect_to', `${siteUrl}/auth/reset-password`)
-            resetLink = linkUrl.toString()
-        } catch { /* keep original link if URL parsing fails */ }
+        // Build a direct link to our site using the hashed_token, bypassing
+        // Supabase's /auth/v1/verify redirect which falls back to Site URL (localhost).
+        const hashedToken = linkData.properties.hashed_token
+        const resetLink = `${siteUrl}/auth/reset-password?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
 
         const subjectMap: Record<string, string> = {
             sl: 'Zahteva za ponastavitev gesla',
@@ -949,14 +945,9 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                     options: { redirectTo: `${setupSiteUrl}/auth/reset-password` }
                 });
 
-                if (linkData?.properties?.action_link) {
-                    // Rewrite redirect_to to the correct domain
-                    let setupLink = linkData.properties.action_link as string
-                    try {
-                        const linkUrl = new URL(setupLink)
-                        linkUrl.searchParams.set('redirect_to', `${setupSiteUrl}/auth/reset-password`)
-                        setupLink = linkUrl.toString()
-                    } catch { /* keep original */ }
+                if (linkData?.properties?.hashed_token) {
+                    // Build direct link using hashed_token, bypassing Supabase's redirect
+                    const setupLink = `${setupSiteUrl}/auth/reset-password?token_hash=${encodeURIComponent(linkData.properties.hashed_token)}&type=recovery`
 
                     const setupLocale = order.language || 'en';
                     const welcomeHtml = await renderTemplate('admin-account-setup', {
