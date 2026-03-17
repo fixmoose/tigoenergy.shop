@@ -25,6 +25,8 @@ export interface DocumentData {
     dispatch_date?: string
     place_of_issue?: string
     reference?: string
+    delivery_note_number?: string
+    delivery_date?: string
     // Proforma localized labels
     proforma_title?: string
     proforma_subtitle?: string
@@ -183,9 +185,10 @@ export function generatePackingItemsTableHtml(items: any[]) {
     return html;
 }
 
-export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false, headers?: { no?: string; description?: string; sku?: string; qty?: string; unitPrice?: string; amount?: string }) {
+export function generateItemsTableHtml(items: any[], currency: string = '€', rowsOnly: boolean = false, headers?: { no?: string; description?: string; sku?: string; qty?: string; unitPrice?: string; amount?: string; cnCode?: string }) {
     let html = '';
     const h = headers || {};
+    const cnLabel = h.cnCode || 'CN Code';
 
     if (!rowsOnly) {
         html += `<table style="width:100%;border-collapse:collapse;font-size:11px;">
@@ -210,7 +213,7 @@ export function generateItemsTableHtml(items: any[], currency: string = '€', r
                 <td style="padding:16px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
                 <td style="padding:16px 12px;vertical-align:top;">
                     <div style="font-size:12px;font-weight:600;color:#1a2b3c;">${item.product_name}</div>
-                    <div style="font-size:9px;color:#9ca3af;margin-top:2px;">CN Code: ${item.cn_code || '85414300'}</div>
+                    <div style="font-size:9px;color:#9ca3af;margin-top:2px;">${cnLabel}: ${item.cn_code || '85414300'}</div>
                 </td>
                 <td style="padding:16px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
                 <td style="padding:16px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
