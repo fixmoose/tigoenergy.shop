@@ -1164,6 +1164,12 @@ export async function adminRecordPaymentAction(
         if (newPaymentStatus === 'paid') {
             updates.paid_at = new Date().toISOString()
         }
+        // If Net30, also set payment terms on the order
+        if (paymentMethod === 'net30') {
+            updates.payment_method = 'IBAN'
+            updates.payment_terms = 'net30'
+            updates.payment_due_date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        }
 
         const { error: updateErr } = await supabase
             .from('orders')
@@ -1177,6 +1183,26 @@ export async function adminRecordPaymentAction(
     } catch (err: any) {
         console.error('Error in adminRecordPaymentAction:', err)
         return { success: false, error: err.message || 'Failed to record payment' }
+    }
+}
+
+/**
+ * Update shipping address on an existing order
+ */
+export async function adminUpdateOrderShippingAddressAction(orderId: string, shippingAddress: any) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        const supabase = await createAdminClient()
+        const { error } = await supabase
+            .from('orders')
+            .update({ shipping_address: shippingAddress })
+            .eq('id', orderId)
+        if (error) throw error
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error updating shipping address:', err)
+        return { success: false, error: err.message || 'Failed to update shipping address' }
     }
 }
 

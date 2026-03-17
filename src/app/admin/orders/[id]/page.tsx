@@ -5,6 +5,7 @@ import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
 import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'
 import OrderEmailHistory from '@/components/admin/OrderEmailHistory'
+import EditableShippingAddress from '@/components/admin/EditableShippingAddress'
 
 const TRANSACTION_TYPES: Record<string, { label: string; color: string }> = {
   domestic: { label: 'Domestic (SI)', color: 'bg-slate-100 text-slate-700' },
@@ -40,6 +41,17 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
     .from('order_items')
     .select('*')
     .eq('order_id', id) as { data: OrderItem[] | null; error: any }
+
+  // Fetch customer's saved addresses for address selector
+  let customerAddresses: any[] = []
+  if (order.customer_id) {
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('addresses')
+      .eq('id', order.customer_id)
+      .single()
+    customerAddresses = customer?.addresses || []
+  }
 
   const complianceTotals = (items || []).reduce(
     (acc, item) => {
@@ -98,6 +110,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           orderTotal={order.total || 0}
           amountPaid={(order as any).amount_paid || 0}
           modificationUnlocked={order.modification_unlocked || false}
+          paymentTerms={(order as any).payment_terms || null}
+          paymentDueDate={(order as any).payment_due_date || null}
         />
       </div>
 
@@ -295,20 +309,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
-            <h3 className="font-semibold text-slate-800 mb-3">Shipping Address</h3>
-            {order.shipping_address ? (
-              <div className="text-sm text-slate-600 space-y-1">
-                <p className="font-medium text-slate-800">
-                  {order.shipping_address.first_name} {order.shipping_address.last_name}
-                </p>
-                {order.shipping_address.company && <p>{order.shipping_address.company}</p>}
-                <p>{order.shipping_address.street}</p>
-                <p>{order.shipping_address.postal_code} {order.shipping_address.city}</p>
-                <p className="font-medium">{order.shipping_address.country}</p>
-              </div>
-            ) : (
-              <p className="text-slate-400 text-sm">No address</p>
-            )}
+            <EditableShippingAddress
+              orderId={order.id}
+              address={order.shipping_address}
+              customerAddresses={customerAddresses}
+            />
           </div>
 
           {order.tracking_number && (

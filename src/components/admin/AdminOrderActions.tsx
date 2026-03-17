@@ -25,6 +25,8 @@ interface AdminOrderActionsProps {
     orderTotal?: number
     amountPaid?: number
     modificationUnlocked?: boolean
+    paymentTerms?: string | null
+    paymentDueDate?: string | null
 }
 
 type FlowStep = 'received' | 'confirm' | 'payment' | 'packing' | 'shipping' | 'delivered' | 'invoice' | 'done'
@@ -91,7 +93,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -386,6 +388,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 </div>
                                 <select value={payMethod} onChange={e => setPayMethod(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs">
                                     <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="net30">Net 30 (Invoice)</option>
                                     <option value="wise">Wise</option>
                                     <option value="stripe">Stripe</option>
                                     <option value="cash">Cash</option>
@@ -409,6 +412,42 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                     >{loading ? 'Saving...' : 'Confirm'}</button>
                                     <button onClick={() => setShowPaymentForm(false)} className="px-3 py-1.5 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
                                 </div>
+                            </div>
+                        )}
+
+                        {paymentStatus !== 'paid' && (
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Mark as Net30? Order will be treated as "paid on terms" so the flow can continue. Payment due in 30 days.')) return
+                                    setLoading(true)
+                                    try {
+                                        const { error } = await supabase
+                                            .from('orders')
+                                            .update({
+                                                payment_method: 'IBAN',
+                                                payment_terms: 'net30',
+                                                payment_due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                                                payment_status: 'paid',
+                                            })
+                                            .eq('id', orderId)
+                                        if (error) throw error
+                                        router.refresh()
+                                    } catch (err: any) {
+                                        alert('Failed: ' + err.message)
+                                    } finally {
+                                        setLoading(false)
+                                    }
+                                }}
+                                disabled={loading}
+                                className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50"
+                            >
+                                Net 30 — Ship Now, Pay Later
+                            </button>
+                        )}
+
+                        {paymentTerms === 'net30' && paymentDueDate && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-800">
+                                Net 30 — Payment due by <strong>{new Date(paymentDueDate).toLocaleDateString('en-GB')}</strong>
                             </div>
                         )}
 
