@@ -5,10 +5,32 @@ import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sendEmail, renderTemplate } from '@/lib/email'
-import { MARKETS } from '@/lib/constants/markets'
+import { MARKETS, getDomainForMarket } from '@/lib/constants/markets'
 import { TRANSLATION_MAP, applyTemplateTranslation, ALL_APP_LANGUAGES } from '@/lib/template-translations'
 
 const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL || ''
+
+/**
+ * Resolve the correct tigoenergy.* site URL for a customer,
+ * based on their most recent order's shipping country.
+ * Falls back to tigoenergy.shop if no order/country is found.
+ */
+async function getSiteUrlForCustomer(supabase: any, customerId: string): Promise<string> {
+    const { data: order } = await supabase
+        .from('orders')
+        .select('shipping_address')
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+    const country = (order?.shipping_address as any)?.country?.toUpperCase()
+    if (country) {
+        const domain = getDomainForMarket(country)
+        return `https://${domain}`
+    }
+    return process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
+}
 
 /**
  * Checks if the current user is an admin (cookie-based)
@@ -357,11 +379,23 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         let emailToReset: string
         let locale = 'en'
 
+        let customerId: string | null = null
+
         if (isEmail) {
-            // Email passed directly — no DB lookup needed
+            // Email passed directly — look up customer ID for domain resolution
             emailToReset = identifier
+            const { data: cust } = await supabase
+                .from('customers')
+                .select('id, preferred_language')
+                .eq('email', identifier)
+                .maybeSingle()
+            if (cust) {
+                customerId = cust.id
+                locale = cust.preferred_language || 'en'
+            }
         } else {
             // UUID passed — try customers table first, fall back to Supabase Auth
+            customerId = identifier
             const { data: customer } = await supabase
                 .from('customers')
                 .select('id, email, preferred_language')
@@ -379,8 +413,10 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
             }
         }
 
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL
-        if (!siteUrl) throw new Error('Site configuration error')
+        // Resolve the correct domain based on the customer's shipping country
+        const siteUrl = customerId
+            ? await getSiteUrlForCustomer(supabase, customerId)
+            : (process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop')
 
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'recovery',
@@ -389,7 +425,14 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
         })
 
         if (linkError) throw linkError
-        const resetLink = linkData.properties.action_link
+        // Rewrite the action_link to ensure redirect_to points to the correct domain
+        // (Supabase may use its configured Site URL instead of our redirectTo)
+        let resetLink = linkData.properties.action_link as string
+        try {
+            const linkUrl = new URL(resetLink)
+            linkUrl.searchParams.set('redirect_to', `${siteUrl}/auth/reset-password`)
+            resetLink = linkUrl.toString()
+        } catch { /* keep original link if URL parsing fails */ }
 
         const subjectMap: Record<string, string> = {
             sl: 'Zahteva za ponastavitev gesla',
@@ -897,18 +940,28 @@ export async function adminCreateOrderWithCustomerAction(payload: {
 
             // Send Password Setup Email
             try {
-                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+                const country = order.shipping_address.country?.toUpperCase()
+                const setupDomain = getDomainForMarket(country || order.market || 'SHOP')
+                const setupSiteUrl = `https://${setupDomain}`
                 const { data: linkData } = await supabase.auth.admin.generateLink({
                     type: 'recovery',
                     email: customer.email,
-                    options: { redirectTo: `${siteUrl}/auth/reset-password` }
+                    options: { redirectTo: `${setupSiteUrl}/auth/reset-password` }
                 });
 
                 if (linkData?.properties?.action_link) {
+                    // Rewrite redirect_to to the correct domain
+                    let setupLink = linkData.properties.action_link as string
+                    try {
+                        const linkUrl = new URL(setupLink)
+                        linkUrl.searchParams.set('redirect_to', `${setupSiteUrl}/auth/reset-password`)
+                        setupLink = linkUrl.toString()
+                    } catch { /* keep original */ }
+
                     const setupLocale = order.language || 'en';
                     const welcomeHtml = await renderTemplate('admin-account-setup', {
                         name: `${customer.first_name} ${customer.last_name}`,
-                        setup_link: linkData.properties.action_link
+                        setup_link: setupLink
                     }, setupLocale);
 
                     const setupSubjectMap: Record<string, string> = {

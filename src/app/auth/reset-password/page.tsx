@@ -11,6 +11,7 @@ export default function ResetPasswordPage() {
   const commonT = useTranslations('auth.register.errors')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [sessionReady, setSessionReady] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
@@ -18,14 +19,36 @@ export default function ResetPasswordPage() {
   const { recaptchaRef, resetRecaptcha, execute: executeRecaptcha } = useRecaptcha()
 
   useEffect(() => {
-    // Check if we have a session (from the reset link)
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (!data.session) {
-        setError(t('noToken'))
+    // Listen for the PASSWORD_RECOVERY event that fires when Supabase
+    // processes the recovery token from the URL hash fragment.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        if (session) {
+          setSessionReady(true)
+          setError('')
+        }
       }
+    })
+
+    // Also check if a session already exists (e.g. page refresh after token exchange)
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setSessionReady(true)
+      }
+    })
+
+    // Timeout: if no session after 5 seconds, the token is likely expired/invalid
+    const timeout = setTimeout(() => {
+      setSessionReady(prev => {
+        if (!prev) setError(t('noToken'))
+        return prev
+      })
+    }, 5000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
     }
-    checkSession()
   }, [supabase.auth, t])
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -46,6 +69,8 @@ export default function ResetPasswordPage() {
         setError(err.message)
       } else {
         setMessage(t('success'))
+        // Sign out so the user logs in with the new password
+        await supabase.auth.signOut()
         setTimeout(() => {
           router.push('/auth/login')
         }, 2000)
@@ -57,6 +82,18 @@ export default function ResetPasswordPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show a loading state while waiting for the recovery token to be processed
+  if (!sessionReady && !error) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100 text-center">
+          <div className="w-8 h-8 border-3 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-gray-500">{t('subtitle')}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
