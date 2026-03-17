@@ -247,9 +247,12 @@ export default function CheckoutPage() {
                     const addresses: SavedAddress[] = (customerData.addresses || []).map((a: SavedAddress) => ({
                         ...a,
                         country: normalizeCountryCode(a.country),
+                        // VIES addresses must never be default shipping
+                        isDefaultShipping: a.isViesAddress ? false : a.isDefaultShipping,
                     }))
                     setSavedAddresses(addresses)
-                    const defaultShipping = addresses.find(a => a.isDefaultShipping)
+                    const defaultShipping = addresses.find(a => a.isDefaultShipping && !a.isViesAddress)
+                        || addresses.find(a => !a.isViesAddress)
                     const viesAddress = addresses.find(a => a.isViesAddress)
 
                     // Fallback to user_metadata for address fields when no saved addresses
