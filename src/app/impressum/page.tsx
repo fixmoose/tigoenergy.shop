@@ -3,11 +3,15 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { useMarket } from '@/contexts/MarketContext'
 
 export default function ImpressumPage() {
     const t = useTranslations('staticPages.impressum')
+    const { market } = useMarket()
     const [emailRevealed, setEmailRevealed] = useState(false)
     const email = "support@tigoenergy.shop"
+    const localSites = ['si', 'hr']
+    const companyWebsite = localSites.includes(market.country) ? 'initraenergija.si' : 'initraenergija.com'
 
     return (
         <div className="min-h-screen bg-gray-50 py-12">
@@ -48,7 +52,7 @@ export default function ImpressumPage() {
                                     </button>
                                 )}
                             </div>
-                            <p>Website: <a href="https://tigoenergy.shop" className="text-green-600 hover:text-green-700">tigoenergy.shop</a></p>
+                            <p>Website: <a href={`https://${companyWebsite}`} className="text-green-600 hover:text-green-700">{companyWebsite}</a></p>
                         </div>
                     </section>
 
