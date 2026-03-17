@@ -304,6 +304,7 @@ export default function AccountingReportPage() {
                                                             {record.status}
                                                         </span>
                                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${record.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                            record.payment_status === 'net30' ? 'bg-blue-50 text-blue-700 border-blue-100' :
                                                             'bg-amber-50 text-amber-700 border-amber-100'
                                                             }`}>
                                                             {record.payment_status}

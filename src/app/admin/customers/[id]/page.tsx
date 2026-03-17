@@ -104,7 +104,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 ) : (
                   <div className="divide-y divide-gray-50">
                     {orders.map((order: any) => {
-                      const needsProcessing = order.payment_status === 'paid' && !['delivered', 'shipped', 'cancelled'].includes(order.status || '')
+                      const needsProcessing = (order.payment_status === 'paid' || order.payment_status === 'net30') && !['delivered', 'shipped', 'cancelled'].includes(order.status || '')
                       return (
                         <div key={order.id} className="p-6 hover:bg-gray-50/50 transition-colors group relative">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -152,7 +152,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                           <CustomerOrderActions
                             orderId={order.id}
                             orderNumber={order.order_number}
-                            isPaid={order.payment_status === 'paid'}
+                            isPaid={order.payment_status === 'paid' || order.payment_status === 'net30'}
                             hasLabel={!!order.shipping_label_url}
                           />
                         </div>

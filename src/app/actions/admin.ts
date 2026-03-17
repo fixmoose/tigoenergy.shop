@@ -1567,38 +1567,50 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
             ? `${order.shipping_address.street || ''}, ${order.shipping_address.postal_code || ''} ${order.shipping_address.city || ''}, ${order.shipping_address.country || ''}`
             : 'N/A'
 
-        // Download PDFs from Supabase storage and prepare as attachments
+        // Download PDFs and prepare as attachments
         const attachments: { type: string; name: string; content: string }[] = []
 
-        const downloadFromStorage = async (url: string, filename: string) => {
+        const downloadPdf = async (url: string, filename: string) => {
             try {
-                // URLs look like /api/storage?bucket=invoices&path=orders/xxx/file.pdf
-                const urlParams = new URL(url, 'http://localhost')
-                const bucket = urlParams.searchParams.get('bucket') || 'invoices'
-                const filePath = urlParams.searchParams.get('path')
-                if (!filePath) return
+                const parsed = new URL(url, siteUrl)
 
-                const { data, error } = await supabase.storage.from(bucket).download(filePath)
-                if (error || !data) {
-                    console.error(`Failed to download ${filePath}:`, error)
+                // Case 1: Storage URL like /api/storage?bucket=invoices&path=...
+                if (parsed.pathname === '/api/storage' && parsed.searchParams.get('path')) {
+                    const bucket = parsed.searchParams.get('bucket') || 'invoices'
+                    const filePath = parsed.searchParams.get('path')!
+                    const { data, error } = await supabase.storage.from(bucket).download(filePath)
+                    if (error || !data) {
+                        console.error(`Failed to download from storage ${filePath}:`, error)
+                        return
+                    }
+                    const buffer = Buffer.from(await data.arrayBuffer())
+                    attachments.push({ type: 'application/pdf', name: filename, content: buffer.toString('base64') })
                     return
                 }
-                const buffer = Buffer.from(await data.arrayBuffer())
-                attachments.push({
-                    type: 'application/pdf',
-                    name: filename,
-                    content: buffer.toString('base64'),
+
+                // Case 2: API route URL like /api/orders/{id}/packing-slip — fetch with admin cookie
+                const fullUrl = url.startsWith('http') ? url : `${siteUrl}${url}`
+                const cookieStore = await cookies()
+                const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ')
+                const res = await fetch(fullUrl, {
+                    headers: { 'Cookie': cookieHeader },
                 })
+                if (!res.ok) {
+                    console.error(`Failed to fetch ${fullUrl}: ${res.status}`)
+                    return
+                }
+                const buffer = Buffer.from(await res.arrayBuffer())
+                attachments.push({ type: 'application/pdf', name: filename, content: buffer.toString('base64') })
             } catch (err) {
                 console.error(`Error downloading attachment ${filename}:`, err)
             }
         }
 
         if (order.packing_slip_url) {
-            await downloadFromStorage(order.packing_slip_url, `packing_slip_${order.order_number}.pdf`)
+            await downloadPdf(order.packing_slip_url, `packing_slip_${order.order_number}.pdf`)
         }
         if (order.shipping_label_url) {
-            await downloadFromStorage(order.shipping_label_url, `shipping_label_${order.order_number}.pdf`)
+            await downloadPdf(order.shipping_label_url, `shipping_label_${order.order_number}.pdf`)
         }
 
         const attachedDocs = attachments.map(a => a.name).join(', ')

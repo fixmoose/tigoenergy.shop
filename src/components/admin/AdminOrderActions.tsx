@@ -138,7 +138,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const isWithin2h = diffHours < 2
     const isPending = status === 'pending'
     const isConfirmed = !!confirmedAt || status !== 'pending'
-    const isPaid = paymentStatus === 'paid'
+    const isPaid = paymentStatus === 'paid' || paymentStatus === 'net30'
     const isShipped = status === 'shipped'
     const isDelivered = status === 'delivered' || status === 'completed'
     const isPickup = shippingCarrier === 'Personal Pick-up'
@@ -298,10 +298,11 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     <div className="space-y-2">
                         <div className={`rounded-lg px-3 py-2 text-xs font-medium flex justify-between items-center ${
                             paymentStatus === 'paid' ? 'bg-green-100 border border-green-200 text-green-800' :
+                            paymentStatus === 'net30' ? 'bg-blue-100 border border-blue-200 text-blue-800' :
                             paymentStatus === 'partially_paid' ? 'bg-amber-100 border border-amber-200 text-amber-800' :
                             'bg-red-100 border border-red-200 text-red-700'
                         }`}>
-                            <span>{paymentStatus === 'paid' ? '&#10003; Paid' : paymentStatus === 'partially_paid' ? '&#9680; Partial' : '&#9675; Unpaid'}</span>
+                            <span>{paymentStatus === 'paid' ? '&#10003; Paid' : paymentStatus === 'net30' ? '&#9711; Net 30' : paymentStatus === 'partially_paid' ? '&#9680; Partial' : '&#9675; Unpaid'}</span>
                             <span className="font-bold">&euro;{(amountPaid || 0).toFixed(2)} / &euro;{(orderTotal || 0).toFixed(2)}</span>
                         </div>
 
@@ -320,7 +321,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             >
                                 Send to Client{sendCount > 0 && <span className="ml-1 bg-indigo-800 text-indigo-200 text-[9px] px-1.5 py-0.5 rounded-full">&times;{sendCount}</span>}
                             </button>
-                            {paymentStatus !== 'paid' && (
+                            {paymentStatus !== 'paid' && paymentStatus !== 'net30' && (
                                 <button
                                     onClick={async () => {
                                         if (!confirm('Send payment request email?')) return
@@ -334,7 +335,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             )}
                         </div>
 
-                        {paymentStatus !== 'paid' && !showPaymentForm && (
+                        {paymentStatus !== 'paid' && paymentStatus !== 'net30' && !showPaymentForm && (
                             <button
                                 onClick={() => {
                                     setPayAmount(((orderTotal || 0) - (amountPaid || 0)).toFixed(2))
@@ -417,7 +418,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             </div>
                         )}
 
-                        {paymentStatus !== 'paid' && (
+                        {paymentStatus !== 'paid' && paymentStatus !== 'net30' && (
                             <button
                                 onClick={async () => {
                                     if (!confirm('Mark as Net30? Order will be treated as "paid on terms" so the flow can continue. Payment due in 30 days.')) return
@@ -429,7 +430,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                 payment_method: 'IBAN',
                                                 payment_terms: 'net30',
                                                 payment_due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                                                payment_status: 'paid',
+                                                payment_status: 'net30',
                                             })
                                             .eq('id', orderId)
                                         if (error) throw error

@@ -168,7 +168,7 @@ export const AccountingReportPDF = ({ orders, summary, period }: AccountingRepor
                             </View>
                             <View style={[styles.tableCol, styles.colStatus]}>
                                 <Text style={{ fontSize: 7 }}>{order.status.toUpperCase()}</Text>
-                                <Text style={{ fontSize: 7, color: order.payment_status === 'paid' ? '#10b981' : '#f59e0b' }}>
+                                <Text style={{ fontSize: 7, color: order.payment_status === 'paid' ? '#10b981' : order.payment_status === 'net30' ? '#3b82f6' : '#f59e0b' }}>
                                     {order.payment_status.toUpperCase()}
                                 </Text>
                             </View>

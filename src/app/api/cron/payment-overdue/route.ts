@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         .from('orders')
         .select('id, order_number, customer_email, payment_due_date')
         .eq('payment_terms', 'net30')
-        .in('payment_status', ['unpaid', 'pending'])
+        .in('payment_status', ['unpaid', 'pending', 'net30'])
         .not('status', 'eq', 'cancelled')
         .lte('payment_due_date', today)
         .is('overdue_reminder_sent_at', null)
