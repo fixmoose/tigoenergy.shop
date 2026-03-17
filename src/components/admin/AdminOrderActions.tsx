@@ -27,7 +27,7 @@ interface AdminOrderActionsProps {
     modificationUnlocked?: boolean
 }
 
-type FlowStep = 'received' | 'confirm' | 'payment' | 'packing' | 'shipping' | 'delivered' | 'invoice'
+type FlowStep = 'received' | 'confirm' | 'payment' | 'packing' | 'shipping' | 'delivered' | 'invoice' | 'done'
 
 function StepCard({ step, currentStep, children, title, subtitle, icon, color }: {
     step: FlowStep
@@ -38,7 +38,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     icon: string
     color: string
 }) {
-    const stepOrder: FlowStep[] = ['received', 'confirm', 'payment', 'packing', 'shipping', 'delivered', 'invoice']
+    const stepOrder: FlowStep[] = ['received', 'confirm', 'payment', 'packing', 'shipping', 'delivered', 'invoice', 'done']
     const stepIdx = stepOrder.indexOf(step)
     const currentIdx = stepOrder.indexOf(currentStep)
     const isCompleted = stepIdx < currentIdx
@@ -146,7 +146,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
         if (isPickup && !isDelivered) return 'delivered' // Pickup skips shipping
         if (!isShipped && !isDelivered) return 'shipping'
         if (isShipped && !isDelivered) return 'delivered'
-        return 'invoice'
+        if (!invoiceUrl) return 'invoice'
+        return 'done'
     }
 
     const currentStep = getCurrentStep()

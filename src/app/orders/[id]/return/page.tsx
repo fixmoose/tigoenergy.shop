@@ -6,20 +6,22 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Order, OrderItem } from '@/types/database'
 import { requestReturn } from '@/app/actions/returns'
+import { useTranslations } from 'next-intl'
 
 type ReturnReason = 'found_cheaper' | 'damaged' | 'not_as_described' | 'changed_mind' | 'other'
 
-const REASONS: { value: ReturnReason; label: string; requirePhoto?: boolean }[] = [
-    { value: 'found_cheaper', label: 'Found at a lower price elsewhere' },
-    { value: 'damaged', label: 'Broken/Damaged on arrival', requirePhoto: true },
-    { value: 'not_as_described', label: 'Item not as described' },
-    { value: 'changed_mind', label: 'Changed my mind' },
-    { value: 'other', label: 'Other reasonable option' },
+const REASON_KEYS: { value: ReturnReason; key: string; requirePhoto?: boolean }[] = [
+    { value: 'found_cheaper', key: 'reasonCheaper' },
+    { value: 'damaged', key: 'reasonDamaged', requirePhoto: true },
+    { value: 'not_as_described', key: 'reasonNotAsDescribed' },
+    { value: 'changed_mind', key: 'reasonChangedMind' },
+    { value: 'other', key: 'reasonOther' },
 ]
 
 export default function ReturnFlowPage() {
     const params = useParams()
     const router = useRouter()
+    const t = useTranslations('returnFlow')
     const orderId = params.id as string
     const supabase = createClient()
 
@@ -27,12 +29,9 @@ export default function ReturnFlowPage() {
     const [items, setItems] = useState<OrderItem[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
-    const [step, setStep] = useState(1) // 1: Selection, 2: Reason/Evidence, 3: Success
+    const [step, setStep] = useState(1)
 
-    // Step 1: Selection
     const [selectedItems, setSelectedItems] = useState<Record<string, number>>({})
-
-    // Step 2: Reason & Evidence
     const [reason, setReason] = useState<ReturnReason | ''>('')
     const [customerNotes, setCustomerNotes] = useState('')
     const [files, setFiles] = useState<File[]>([])
@@ -46,18 +45,13 @@ export default function ReturnFlowPage() {
             const { data: itemsData } = await supabase.from('order_items').select('*, products(images)').eq('order_id', orderId)
 
             if (orderData) {
-                if (orderData.is_b2b) {
-                    router.push(`/orders/${orderId}`)
-                    return
-                }
                 setOrder(orderData)
             }
             if (itemsData) {
                 setItems(itemsData)
-                // Default select all if no selection yet
                 const initialSelection: Record<string, number> = {}
                 itemsData.forEach(item => {
-                    initialSelection[item.id] = 0 // Start with 0 selected
+                    initialSelection[item.id] = 0
                 })
                 setSelectedItems(initialSelection)
             }
@@ -125,13 +119,13 @@ export default function ReturnFlowPage() {
             }))
 
         if (selectedItemsList.length === 0) {
-            alert('Please select at least one item to return.')
+            alert(t('alertSelectItem'))
             return
         }
 
-        const reasonObj = REASONS.find(r => r.value === reason)
+        const reasonObj = REASON_KEYS.find(r => r.value === reason)
         if (reasonObj?.requirePhoto && files.length === 0) {
-            alert('Please upload a photo as evidence for damaged items.')
+            alert(t('alertUploadPhoto'))
             return
         }
 
@@ -156,7 +150,7 @@ export default function ReturnFlowPage() {
             }
         } catch (err) {
             console.error('Submission error:', err)
-            alert('Something went wrong. Please try again.')
+            alert(t('alertError'))
         } finally {
             setSubmitting(false)
         }
@@ -170,7 +164,7 @@ export default function ReturnFlowPage() {
         )
     }
 
-    if (!order) return <div className="p-20 text-center">Order not found.</div>
+    if (!order) return <div className="p-20 text-center">{t('orderNotFound')}</div>
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -178,10 +172,10 @@ export default function ReturnFlowPage() {
                 <div className="mb-8">
                     <Link href={`/orders/${orderId}`} className="text-sm font-bold text-gray-500 hover:text-green-600 flex items-center gap-2 mb-4">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                        Back to Order
+                        {t('backToOrder')}
                     </Link>
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Easy Returns</h1>
-                    <p className="text-gray-500 font-medium mt-1">Order #{order.order_number}</p>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">{t('title')}</h1>
+                    <p className="text-gray-500 font-medium mt-1">{t('orderNumber', { number: order.order_number })}</p>
                 </div>
 
                 {/* Stepper */}
@@ -198,9 +192,9 @@ export default function ReturnFlowPage() {
                     {step === 1 && (
                         <div className="p-8">
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-black text-gray-900">Select Items to Return</h3>
+                                <h3 className="text-xl font-black text-gray-900">{t('selectItems')}</h3>
                                 <button onClick={toggleAll} className="text-xs font-black text-green-600 uppercase tracking-widest hover:underline">
-                                    {Object.values(selectedItems).every((q, i) => q === items[i].quantity) ? 'Deselect All' : 'Select All'}
+                                    {Object.values(selectedItems).every((q, i) => q === items[i].quantity) ? t('deselectAll') : t('selectAll')}
                                 </button>
                             </div>
                             <div className="space-y-4 mb-8">
@@ -238,33 +232,33 @@ export default function ReturnFlowPage() {
                                 disabled={Object.values(selectedItems).every(q => q === 0)}
                                 className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-600 transition shadow-xl disabled:opacity-50 disabled:hover:bg-gray-900"
                             >
-                                Continue to Reason
+                                {t('continueToReason')}
                             </button>
                         </div>
                     )}
 
                     {step === 2 && (
                         <div className="p-8">
-                            <h3 className="text-xl font-black text-gray-900 mb-6">Return Reason</h3>
+                            <h3 className="text-xl font-black text-gray-900 mb-6">{t('returnReason')}</h3>
 
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Why are you returning these?</label>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{t('whyReturning')}</label>
                                     <select
                                         value={reason}
                                         onChange={(e) => setReason(e.target.value as ReturnReason)}
                                         className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-green-500 outline-none"
                                     >
-                                        <option value="">Select a reason...</option>
-                                        {REASONS.map(r => (
-                                            <option key={r.value} value={r.value}>{r.label}</option>
+                                        <option value="">{t('selectReason')}</option>
+                                        {REASON_KEYS.map(r => (
+                                            <option key={r.value} value={r.value}>{t(r.key)}</option>
                                         ))}
                                     </select>
                                 </div>
 
                                 {reason === 'damaged' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Evidence Photos (Required)</label>
+                                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('evidencePhotos')}</label>
                                         <div
                                             onClick={() => fileInputRef.current?.click()}
                                             className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-green-400 hover:bg-green-50/30 transition cursor-pointer group"
@@ -272,7 +266,7 @@ export default function ReturnFlowPage() {
                                             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-100 transition">
                                                 <svg className="w-6 h-6 text-gray-400 group-hover:text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                                             </div>
-                                            <p className="text-sm font-bold text-gray-500">Click to upload photos of the damage</p>
+                                            <p className="text-sm font-bold text-gray-500">{t('uploadPhotos')}</p>
                                             <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple accept="image/*" className="hidden" />
                                         </div>
 
@@ -284,7 +278,7 @@ export default function ReturnFlowPage() {
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); removeFile(i); }}
                                                             className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
-                                                        >×</button>
+                                                        >&times;</button>
                                                     </div>
                                                 ))}
                                             </div>
@@ -293,12 +287,12 @@ export default function ReturnFlowPage() {
                                 )}
 
                                 <div>
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Additional Notes (Optional)</label>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{t('additionalNotes')}</label>
                                     <textarea
                                         value={customerNotes}
                                         onChange={(e) => setCustomerNotes(e.target.value)}
                                         className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-medium text-gray-900 h-32 outline-none focus:ring-2 focus:ring-green-500"
-                                        placeholder="Tell us more about the issue..."
+                                        placeholder={t('notesPlaceholder')}
                                     ></textarea>
                                 </div>
 
@@ -308,24 +302,32 @@ export default function ReturnFlowPage() {
                                             <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-black text-orange-800 uppercase tracking-widest mb-1">Return Policy Reminder</h4>
+                                            <h4 className="text-sm font-black text-orange-800 uppercase tracking-widest mb-1">{t('policyTitle')}</h4>
                                             <ul className="text-xs text-orange-700 font-medium space-y-1 list-disc pl-4">
-                                                <li>Original shipping charges are non-refundable.</li>
-                                                <li>You are responsible for shipping items back to Slovenia.</li>
-                                                <li>Refunds are processed within 14 days of receipt in good condition.</li>
+                                                <li>{t('policyShipping')}</li>
+                                                <li>{t('policyReturn')}</li>
+                                                <li>{t('policyRefund')}</li>
                                             </ul>
+                                            {order?.is_b2b && (
+                                                <div className="mt-3 bg-red-50 border border-red-200 rounded-xl p-3">
+                                                    <p className="text-xs font-bold text-red-700">{t('b2bWarning')}</p>
+                                                </div>
+                                            )}
+                                            <div className="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                                                <p className="text-xs text-slate-600 font-medium">{t('policy48h')}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex gap-4">
-                                    <button onClick={() => setStep(1)} className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black uppercase tracking-widest hover:bg-gray-200 transition">Back</button>
+                                    <button onClick={() => setStep(1)} className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black uppercase tracking-widest hover:bg-gray-200 transition">{t('back')}</button>
                                     <button
                                         onClick={handleSubmit}
                                         disabled={submitting || !reason || (reason === 'damaged' && files.length === 0)}
                                         className="flex-[2] py-4 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-700 transition shadow-xl shadow-green-100 disabled:opacity-50"
                                     >
-                                        {submitting ? 'Submitting...' : 'Complete Return'}
+                                        {submitting ? t('submitting') : t('completeReturn')}
                                     </button>
                                 </div>
                             </div>
@@ -337,30 +339,30 @@ export default function ReturnFlowPage() {
                             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                             </div>
-                            <h3 className="text-3xl font-black text-gray-900 mb-4">Return Requested</h3>
-                            <p className="text-gray-500 font-medium mb-8">Please follow the instructions below to complete your return.</p>
+                            <h3 className="text-3xl font-black text-gray-900 mb-4">{t('returnRequested')}</h3>
+                            <p className="text-gray-500 font-medium mb-8">{t('followInstructions')}</p>
 
                             <div className="bg-gray-50 text-left p-8 rounded-3xl border border-gray-100 mb-8 space-y-6">
                                 <div>
-                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">1. Package your items</h4>
+                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t('step1Title')}</h4>
                                     <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                                        Place the items in their original packaging. Ensure they are well protected to avoid damage during transit.
+                                        {t('step1Desc')}
                                     </p>
                                 </div>
                                 <div>
-                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">2. Attach the Return Slip</h4>
+                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t('step2Title')}</h4>
                                     <p className="text-sm text-gray-600 font-medium mb-4 leading-relaxed">
-                                        Download and print the return slip below and put it inside the package.
+                                        {t('step2Desc')}
                                     </p>
                                     <button
                                         onClick={() => window.print()}
                                         className="btn btn-sm bg-white border-gray-200 text-gray-700 font-bold px-4 hover:bg-gray-50 shadow-sm"
                                     >
-                                        Download Return Slip (PDF)
+                                        {t('downloadSlip')}
                                     </button>
                                 </div>
                                 <div>
-                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">3. Ship to</h4>
+                                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t('step3Title')}</h4>
                                     <div className="bg-white p-4 rounded-xl border border-gray-200 font-bold text-gray-900 text-sm">
                                         Initra Energija<br />
                                         Podsmreka 59A<br />
@@ -374,7 +376,7 @@ export default function ReturnFlowPage() {
                                 href="/dashboard"
                                 className="inline-block px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-600 transition"
                             >
-                                Back to Dashboard
+                                {t('backToDashboard')}
                             </Link>
                         </div>
                     )}

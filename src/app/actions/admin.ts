@@ -305,13 +305,29 @@ export async function adminDeleteCustomerAction(id: string) {
 
         const supabase = await createAdminClient()
 
-        // 1. Delete from Supabase Auth
+        // 1. Get all orders for this customer
+        const { data: orders } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('customer_id', id)
+
+        // 2. Delete order-related data
+        if (orders && orders.length > 0) {
+            const orderIds = orders.map(o => o.id)
+            await supabase.from('order_items').delete().in('order_id', orderIds)
+            await supabase.from('order_payments').delete().in('order_id', orderIds)
+            await supabase.from('order_returns').delete().in('order_id', orderIds)
+            await supabase.from('delivery_tokens').delete().in('order_id', orderIds)
+            await supabase.from('orders').delete().eq('customer_id', id)
+        }
+
+        // 3. Delete from Supabase Auth
         const { error: authError } = await supabase.auth.admin.deleteUser(id)
         if (authError) {
             console.error('Error deleting auth user:', authError)
         }
 
-        // 2. Delete from customers table
+        // 4. Delete from customers table
         const { error: dbError } = await supabase
             .from('customers')
             .delete()
@@ -1072,7 +1088,7 @@ export async function issueOrderInvoiceAction(orderId: string) {
                 invoice_created_at: new Date().toISOString(),
                 // Simulate a PDF URL for now - in production this would be a real signed URL
                 invoice_url: `/api/orders/${orderId}/invoice?download=1`,
-                status: order.status === 'pending' ? 'processing' : order.status
+                status: 'completed'
             })
             .eq('id', orderId);
 
