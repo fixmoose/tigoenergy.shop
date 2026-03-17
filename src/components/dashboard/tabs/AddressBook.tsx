@@ -96,10 +96,11 @@ export default function AddressBook({ customer }: Props) {
 
     const handleSetDefaultShipping = async (id: string) => {
         const target = addresses.find(a => a.id === id)
-        if (target?.isViesAddress) return // VIES addresses cannot be default shipping
+        const hasNonVies = addresses.some(a => !a.isViesAddress)
+        if (target?.isViesAddress && hasNonVies) return // VIES can't be default shipping if other addresses exist
         const updatedAddresses = addresses.map(a => ({
             ...a,
-            isDefaultShipping: a.id === id && !a.isViesAddress,
+            isDefaultShipping: a.id === id,
         }))
         const { error } = await supabase
             .from('customers')
@@ -169,7 +170,7 @@ export default function AddressBook({ customer }: Props) {
                         </div>
 
                         <div className="mt-4 flex gap-2 flex-wrap">
-                            {!addr.isViesAddress && (
+                            {(!addr.isViesAddress || !addresses.some(a => !a.isViesAddress)) && (
                             <button
                                 onClick={() => handleSetDefaultShipping(addr.id)}
                                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
