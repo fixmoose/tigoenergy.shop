@@ -242,7 +242,7 @@ export class DPDService {
      */
     async getParcelStatus(parcelNumbers: string[]): Promise<DPDParcelStatus[]> {
         const url = new URL(`${this.baseUrl}/status`);
-        url.searchParams.append('parcels', parcelNumbers.join(','));
+        url.searchParams.append('parcel_number', parcelNumbers.join(','));
 
         // Try GET first (DPD EasyShip status endpoint may require GET)
         let response = await fetch(url.toString(), {
