@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { adminUpdateOrderItem, adminRemoveOrderItem, adminAddOrderItem } from '@/app/actions/order-modify'
+import { adminUpdateOrderItem, adminRemoveOrderItem, adminAddOrderItem, adminUpdateShippingCost } from '@/app/actions/order-modify'
 import { searchProductsAction } from '@/app/actions/products'
 import type { OrderItem } from '@/types/database'
 
@@ -40,6 +40,8 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
     const [addQty, setAddQty] = useState('1')
     const [addPrice, setAddPrice] = useState('')
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
+    const [editingShipping, setEditingShipping] = useState(false)
+    const [editShippingCost, setEditShippingCost] = useState('')
 
     const startEdit = (item: OrderItem) => {
         setEditingItem(item.id)
@@ -374,7 +376,50 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                     <tr>
                         <td className="px-6 py-3 text-slate-500">Shipping</td>
                         <td colSpan={invoiceIssued ? 3 : 4} className="text-right px-4 py-3 text-slate-600">
-                            {formatCurrency(shippingCost)}
+                            {editingShipping ? (
+                                <div className="flex items-center justify-end gap-2">
+                                    <span className="text-slate-400 text-sm">&euro;</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={editShippingCost}
+                                        onChange={e => setEditShippingCost(e.target.value)}
+                                        className="w-24 border rounded px-2 py-1 text-sm text-right"
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={async () => {
+                                            const cost = parseFloat(editShippingCost)
+                                            if (isNaN(cost) || cost < 0) { alert('Invalid shipping cost'); return }
+                                            setSaving(true)
+                                            try {
+                                                const res = await adminUpdateShippingCost(orderId, cost)
+                                                if (res.success) { setEditingShipping(false); router.refresh() }
+                                                else { alert('Failed: ' + res.error) }
+                                            } finally { setSaving(false) }
+                                        }}
+                                        disabled={saving}
+                                        className="text-green-600 hover:text-green-800 font-bold text-xs disabled:opacity-50"
+                                    >{saving ? '...' : 'Save'}</button>
+                                    <button onClick={() => setEditingShipping(false)} className="text-slate-400 hover:text-slate-600 text-xs">Cancel</button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-end gap-2">
+                                    {formatCurrency(shippingCost)}
+                                    {!invoiceIssued && (
+                                        <button
+                                            onClick={() => { setEditShippingCost(String(shippingCost)); setEditingShipping(true) }}
+                                            className="text-blue-500 hover:text-blue-700"
+                                            title="Edit shipping cost"
+                                        >
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </td>
                         <td></td>
                     </tr>

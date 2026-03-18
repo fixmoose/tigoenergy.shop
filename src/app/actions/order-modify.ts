@@ -98,6 +98,46 @@ export async function adminUnlockOrder(orderId: string): Promise<{ success: bool
 }
 
 /**
+ * Admin action: Update shipping cost on an order.
+ */
+export async function adminUpdateShippingCost(
+  orderId: string,
+  shippingCost: number
+): Promise<{ success: boolean; error?: string }> {
+  const cookieStore = await cookies()
+  if (cookieStore.get('tigo-admin')?.value !== '1') {
+    return { success: false, error: 'Not authorized' }
+  }
+
+  const supabase = await createAdminClient()
+
+  // Get current order for recalc
+  const { data: order } = await supabase
+    .from('orders')
+    .select('subtotal, vat_rate, vat_id, transaction_type')
+    .eq('id', orderId)
+    .single()
+
+  if (!order) return { success: false, error: 'Order not found' }
+
+  const subtotal = order.subtotal || 0
+  const vatRate = order.vat_rate || 0
+  // B2B EU = reverse charge, no VAT
+  const isReverseCharge = !!(order.vat_id && order.transaction_type === 'eu')
+  const vatAmount = isReverseCharge ? 0 : subtotal * vatRate
+  const total = subtotal + shippingCost + vatAmount
+
+  const { error } = await supabase
+    .from('orders')
+    .update({ shipping_cost: shippingCost, vat_amount: vatAmount, total })
+    .eq('id', orderId)
+
+  if (error) return { success: false, error: error.message }
+
+  return { success: true }
+}
+
+/**
  * Recalculate order totals from items and update the order row.
  */
 async function recalcOrderTotals(supabase: any, orderId: string) {
@@ -110,13 +150,15 @@ async function recalcOrderTotals(supabase: any, orderId: string) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('vat_rate, shipping_cost')
+    .select('vat_rate, shipping_cost, vat_id, transaction_type')
     .eq('id', orderId)
     .single()
 
   const vatRate = order?.vat_rate || 0
   const shippingCost = order?.shipping_cost || 0
-  const vatAmount = subtotal * (vatRate / 100)
+  // B2B EU = reverse charge, no VAT
+  const isReverseCharge = !!(order?.vat_id && order?.transaction_type === 'eu')
+  const vatAmount = isReverseCharge ? 0 : subtotal * vatRate
   const total = subtotal + shippingCost + vatAmount
 
   await supabase
