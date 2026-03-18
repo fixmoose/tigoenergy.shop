@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
@@ -729,10 +729,34 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 {/* Step 7: Invoice & Compliance */}
                 <StepCard step="invoice" currentStep={currentStep} title="Invoice & Compliance" subtitle="Issue invoice, trigger OEEE / Intrastat" icon="7" color="purple">
                     <div className="space-y-2">
-                        <button onClick={handleIssueInvoice} disabled={loading}
-                            className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700 transition disabled:opacity-50">
-                            {loading ? 'Wait...' : 'Issue Official Invoice'}
-                        </button>
+                        {!invoiceUrl ? (
+                            <button onClick={handleIssueInvoice} disabled={loading}
+                                className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700 transition disabled:opacity-50">
+                                {loading ? 'Wait...' : 'Issue Official Invoice'}
+                            </button>
+                        ) : (
+                            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-xs text-green-800 font-medium">
+                                &#10003; Invoice issued
+                            </div>
+                        )}
+                        {invoiceUrl && (
+                            <button
+                                onClick={async () => {
+                                    if (!confirm(`Send invoice to ${customerEmail}?`)) return
+                                    setLoading(true)
+                                    try {
+                                        const res = await adminSendInvoiceEmailAction(orderId)
+                                        if (res.success) { alert('Invoice email sent!'); router.refresh() }
+                                        else { alert('Failed: ' + res.error) }
+                                    } catch (err: any) { alert('Failed: ' + err.message) }
+                                    finally { setLoading(false) }
+                                }}
+                                disabled={loading}
+                                className="w-full py-2 bg-indigo-600 text-white rounded-lg font-bold text-xs hover:bg-indigo-700 transition disabled:opacity-50"
+                            >
+                                {loading ? 'Sending...' : 'Email Invoice to Customer'}
+                            </button>
+                        )}
                         <p className="text-[10px] text-slate-500">After invoice: OEEE (SI domestic) or Intrastat (EU) triggered automatically.</p>
                     </div>
                 </StepCard>

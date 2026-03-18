@@ -67,8 +67,8 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
             id: 'delivery_note',
             label: 'Delivery Note',
             description: 'Shipping label & tracking ready',
-            isCompleted: !!order.shipping_label_url || !!order.tracking_number,
-            isActive: !!order.packing_slip_url && !order.shipping_label_url,
+            isCompleted: !!order.shipping_label_url || !!order.tracking_number || order.status === 'delivered' || order.status === 'completed',
+            isActive: !!order.packing_slip_url && !order.shipping_label_url && !order.tracking_number && order.status !== 'delivered' && order.status !== 'completed',
             date: order.shipped_at,
             icon: '🚚'
         },
@@ -77,7 +77,7 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
             label: 'Invoice',
             description: 'Financial document issued',
             isCompleted: !!order.invoice_url,
-            isActive: !!order.shipping_label_url && !order.invoice_url,
+            isActive: (!!order.shipping_label_url || !!order.tracking_number || order.status === 'delivered' || order.status === 'completed') && !order.invoice_url,
             icon: '📄'
         }
     ]

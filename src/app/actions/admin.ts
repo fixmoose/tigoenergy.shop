@@ -1179,6 +1179,103 @@ export async function issueOrderInvoiceAction(orderId: string) {
 }
 
 /**
+ * Send invoice email to customer with PDF attached
+ */
+export async function adminSendInvoiceEmailAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+        const { data: order, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single()
+
+        if (error || !order) throw new Error('Order not found')
+        if (!order.invoice_number) throw new Error('Invoice not issued yet')
+
+        const locale = order.language || 'en'
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
+        const invoiceUrl = `${siteUrl}/api/orders/${orderId}/invoice?download=1`
+
+        // Fetch the invoice PDF to attach
+        const pdfRes = await fetch(invoiceUrl)
+        if (!pdfRes.ok) throw new Error('Failed to generate invoice PDF')
+        const pdfBuffer = Buffer.from(await pdfRes.arrayBuffer())
+        const pdfBase64 = pdfBuffer.toString('base64')
+
+        const customerName = (order.billing_address as any)?.first_name
+            || (order.shipping_address as any)?.first_name
+            || order.customer_email
+
+        const subjectMap: Record<string, string> = {
+            sl: `Račun ${order.invoice_number} — Naročilo #${order.order_number}`,
+            hr: `Račun ${order.invoice_number} — Narudžba #${order.order_number}`,
+            de: `Rechnung ${order.invoice_number} — Bestellung #${order.order_number}`,
+        }
+        const subject = subjectMap[locale] || `Invoice ${order.invoice_number} — Order #${order.order_number}`
+
+        const greetingMap: Record<string, string> = {
+            sl: 'Pozdravljeni', hr: 'Poštovani', de: 'Sehr geehrte/r',
+        }
+        const greeting = greetingMap[locale] || 'Dear'
+
+        const bodyMap: Record<string, string> = {
+            sl: `V priponki vam pošiljamo račun <strong>${order.invoice_number}</strong> za naročilo <strong>#${order.order_number}</strong>.`,
+            hr: `U prilogu vam šaljemo račun <strong>${order.invoice_number}</strong> za narudžbu <strong>#${order.order_number}</strong>.`,
+            de: `Anbei erhalten Sie die Rechnung <strong>${order.invoice_number}</strong> für Bestellung <strong>#${order.order_number}</strong>.`,
+        }
+        const bodyText = bodyMap[locale] || `Please find attached your invoice <strong>${order.invoice_number}</strong> for order <strong>#${order.order_number}</strong>.`
+
+        const regardsMap: Record<string, string> = {
+            sl: 'S spoštovanjem', hr: 'S poštovanjem', de: 'Mit freundlichen Grüßen',
+        }
+        const regards = regardsMap[locale] || 'Best regards'
+
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Inter',-apple-system,sans-serif;background:#f9fafb;margin:0;padding:0;">
+<div style="max-width:600px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
+    <div style="background:#7c3aed;padding:5px 0;text-align:center;">
+        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" style="height:20px;width:auto;display:block;margin:0 auto;">
+    </div>
+    <div style="padding:40px 30px;">
+        <div style="text-align:center;font-size:48px;margin-bottom:20px;">📄</div>
+        <p>${greeting} ${customerName},</p>
+        <p>${bodyText}</p>
+        <div style="background:#f3f4f6;border-radius:8px;padding:16px 20px;margin:24px 0;">
+            <p style="margin:0;font-size:14px;color:#374151;"><strong>${order.invoice_number}</strong></p>
+            <p style="margin:4px 0 0;font-size:12px;color:#6b7280;">${order.order_number} &bull; ${new Date(order.invoice_created_at).toLocaleDateString(locale === 'sl' ? 'sl-SI' : locale === 'de' ? 'de-DE' : locale === 'hr' ? 'hr-HR' : 'en-GB')}</p>
+        </div>
+        <p style="font-size:13px;color:#6b7280;">${regards},<br><strong>Initra Energija d.o.o.</strong></p>
+    </div>
+    <div style="background:#f3f4f6;padding:20px 30px;text-align:center;font-size:12px;color:#6b7280;">
+        <p style="margin:0;"><a href="mailto:support@tigoenergy.shop" style="color:#7c3aed;text-decoration:none;">support@tigoenergy.shop</a> | <a href="https://tigoenergy.shop" style="color:#7c3aed;text-decoration:none;">tigoenergy.shop</a></p>
+    </div>
+</div></body></html>`
+
+        await sendEmail({
+            to: order.customer_email,
+            subject,
+            html,
+            skipUnsubscribe: true,
+            orderId,
+            emailType: 'invoice_sent',
+            attachments: [{
+                type: 'application/pdf',
+                name: `${order.invoice_number}.pdf`,
+                content: pdfBase64,
+            }],
+        })
+
+        revalidatePath(`/admin/orders/${orderId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminSendInvoiceEmailAction:', err)
+        return { success: false, error: err.message || 'Failed to send invoice email' }
+    }
+}
+
+/**
  * Record a payment against an order (supports partial/multiple payments)
  */
 export async function adminRecordPaymentAction(
