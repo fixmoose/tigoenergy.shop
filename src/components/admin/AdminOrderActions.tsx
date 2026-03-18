@@ -480,10 +480,6 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             </div>
                         )}
 
-                        <a href={`/api/orders/${orderId}/proforma`} target="_blank" rel="noopener noreferrer"
-                            className="block w-full py-1.5 text-center bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">
-                            Download Proforma
-                        </a>
                     </div>
                 </StepCard>
 
@@ -516,20 +512,69 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 </StepCard>
 
                 {/* Step 5: Shipping */}
-                <StepCard step="shipping" currentStep={currentStep} title={isPickup ? 'Shipping / Pickup' : 'Shipping'} subtitle={isPickup ? 'Pickup order — convert to delivery if needed' : 'Create DPD label & notify customer'} icon="5" color="red">
+                <StepCard step="shipping" currentStep={currentStep} title={isPickup ? 'Pickup' : 'Shipping'} subtitle={isPickup ? 'Skip shipping or convert to delivery' : 'DPD, own delivery, or manual'} icon="5" color="red">
                     <div className="space-y-2">
-                        {isPickup && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                                <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1">Osebni prevzem</p>
-                                <p className="text-[10px] text-blue-600">Customer selected pickup. To switch to delivery, click below.</p>
-                            </div>
-                        )}
-                        <button onClick={() => handleShipOrder('DPD')} disabled={loading}
-                            className="w-full py-2.5 bg-red-600 text-white rounded-lg font-bold text-sm hover:bg-red-700 transition disabled:opacity-50">
-                            {loading ? 'Processing...' : isPickup ? 'Convert to DPD Delivery' : 'Process DPD Label'}
-                        </button>
-                        {shippingLabelUrl && (
-                            <a href={shippingLabelUrl} target="_blank" className="block text-center text-[10px] font-bold text-red-600 hover:underline">View Label PDF</a>
+                        {isPickup ? (
+                            <>
+                                <button onClick={async () => {
+                                    setLoading(true)
+                                    try {
+                                        const { error } = await supabase.from('orders').update({
+                                            status: 'shipped',
+                                            shipping_carrier: 'Personal Pick-up',
+                                            shipped_at: new Date().toISOString(),
+                                        }).eq('id', orderId)
+                                        if (error) throw error
+                                        router.refresh()
+                                    } catch { alert('Failed') } finally { setLoading(false) }
+                                }} disabled={loading}
+                                    className="w-full py-2.5 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Skip to Pickup'}
+                                </button>
+                                <p className="text-[10px] text-slate-400 text-center">Customer picks up — no shipping needed</p>
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                                    <div className="relative flex justify-center"><span className="bg-red-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or convert to delivery</span></div>
+                                </div>
+                                <button onClick={() => handleShipOrder('DPD')} disabled={loading}
+                                    className="w-full py-2 bg-red-600 text-white rounded-lg font-bold text-xs hover:bg-red-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Convert to DPD Delivery'}
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => handleShipOrder('DPD')} disabled={loading}
+                                    className="w-full py-2.5 bg-red-600 text-white rounded-lg font-bold text-sm hover:bg-red-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Process DPD Label'}
+                                </button>
+                                {shippingLabelUrl && (
+                                    <a href={shippingLabelUrl} target="_blank" className="block text-center text-[10px] font-bold text-red-600 hover:underline">View Label PDF</a>
+                                )}
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
+                                    <div className="relative flex justify-center"><span className="bg-red-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or manual</span></div>
+                                </div>
+                                <button onClick={async () => {
+                                    const carrier = prompt('Enter carrier name (e.g. Own Delivery, GLS, Pošta Slovenije):')
+                                    if (!carrier) return
+                                    const tracking = prompt('Tracking number (optional):') || ''
+                                    setLoading(true)
+                                    try {
+                                        const { error } = await supabase.from('orders').update({
+                                            status: 'shipped',
+                                            shipping_carrier: carrier,
+                                            tracking_number: tracking || null,
+                                            shipped_at: new Date().toISOString(),
+                                        }).eq('id', orderId)
+                                        if (error) throw error
+                                        alert(`Marked as shipped via ${carrier}`)
+                                        router.refresh()
+                                    } catch { alert('Failed') } finally { setLoading(false) }
+                                }} disabled={loading}
+                                    className="w-full py-2 bg-slate-600 text-white rounded-lg font-bold text-xs hover:bg-slate-700 transition disabled:opacity-50">
+                                    {loading ? 'Processing...' : 'Own Delivery / Manual Ship'}
+                                </button>
+                            </>
                         )}
                     </div>
                 </StepCard>
@@ -693,18 +738,30 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 </StepCard>
             </div>
 
-            {/* Uploaded Documents */}
-            {(invoiceUrl || packingSlipUrl || shippingLabelUrl) && (
-                <div className="mt-4 border-t pt-3">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Documents</div>
+            {/* Documents — always visible: proforma, order confirmation, invoice */}
+            <div className="mt-4 border-t pt-3">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Documents</div>
+                <div className="flex flex-wrap gap-2">
+                    <a href={`/api/orders/${orderId}/proforma`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-[10px] font-bold hover:bg-amber-100 transition">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Predračun / Proforma
+                    </a>
+                    {invoiceUrl && (
+                        <a href={invoiceUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[10px] font-bold hover:bg-purple-100 transition">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            Invoice
+                        </a>
+                    )}
+                </div>
+            </div>
+
+            {/* Warehouse Documents — packing slip, label, send buttons */}
+            {(packingSlipUrl || shippingLabelUrl) && (
+                <div className="mt-3 border-t pt-3">
+                    <div className="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-2">Warehouse</div>
                     <div className="flex flex-wrap gap-2">
-                        {invoiceUrl && (
-                            <a href={invoiceUrl} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[10px] font-bold hover:bg-purple-100 transition">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                Invoice
-                            </a>
-                        )}
                         {packingSlipUrl && (
                             <a href={packingSlipUrl} target="_blank" rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition">
@@ -722,89 +779,87 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                     </div>
 
                     {/* Warehouse Quick-Send Buttons */}
-                    {(packingSlipUrl || shippingLabelUrl) && (
-                        <div className="mt-3 space-y-2">
-                            {warehouseMembers.length > 0 && (
-                                <div className="flex flex-wrap gap-2">
-                                    {warehouseMembers.map(wm => {
-                                        const sendCount = warehouseSendLog.filter(l => l.email === wm.email).length
-                                        return (
-                                            <button
-                                                key={wm.id}
-                                                onClick={async () => {
-                                                    setLoading(true)
-                                                    try {
-                                                        const res = await adminSendToWarehouseAction(orderId, wm.email)
-                                                        if (res.success) {
-                                                            alert(`Sent to ${wm.name}!`)
-                                                            router.refresh()
-                                                        } else {
-                                                            alert('Failed: ' + res.error)
-                                                        }
-                                                    } catch (err: any) {
-                                                        alert('Failed: ' + err.message)
-                                                    } finally {
-                                                        setLoading(false)
+                    <div className="mt-3 space-y-2">
+                        {warehouseMembers.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {warehouseMembers.map(wm => {
+                                    const sendCount = warehouseSendLog.filter(l => l.email === wm.email).length
+                                    return (
+                                        <button
+                                            key={wm.id}
+                                            onClick={async () => {
+                                                setLoading(true)
+                                                try {
+                                                    const res = await adminSendToWarehouseAction(orderId, wm.email)
+                                                    if (res.success) {
+                                                        alert(`Sent to ${wm.name}!`)
+                                                        router.refresh()
+                                                    } else {
+                                                        alert('Failed: ' + res.error)
                                                     }
-                                                }}
-                                                disabled={loading}
-                                                className="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg text-xs font-bold hover:bg-orange-100 transition disabled:opacity-50"
-                                            >
-                                                Send to {wm.name}
-                                                {sendCount > 0 && (
-                                                    <span className="bg-orange-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">{sendCount}</span>
-                                                )}
-                                            </button>
-                                        )
-                                    })}
-                                </div>
-                            )}
-
-                            {/* Custom email send */}
-                            <button
-                                onClick={() => setShowWarehouseSend(!showWarehouseSend)}
-                                className="text-[10px] font-bold text-orange-500 hover:text-orange-700 uppercase tracking-wider"
-                            >
-                                {showWarehouseSend ? 'Cancel' : 'Send to custom email...'}
-                            </button>
-
-                            {showWarehouseSend && (
-                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 space-y-2">
-                                    <input
-                                        type="email"
-                                        value={warehouseEmail}
-                                        onChange={e => setWarehouseEmail(e.target.value)}
-                                        placeholder="warehouse@email.com"
-                                        className="w-full border border-orange-200 rounded px-3 py-2 text-sm bg-white outline-none focus:border-orange-400"
-                                    />
-                                    <button
-                                        onClick={async () => {
-                                            if (!warehouseEmail) { alert('Enter warehouse email'); return }
-                                            setLoading(true)
-                                            try {
-                                                const res = await adminSendToWarehouseAction(orderId, warehouseEmail)
-                                                if (res.success) {
-                                                    alert('Sent to warehouse!')
-                                                    setShowWarehouseSend(false)
-                                                    router.refresh()
-                                                } else {
-                                                    alert('Failed: ' + res.error)
+                                                } catch (err: any) {
+                                                    alert('Failed: ' + err.message)
+                                                } finally {
+                                                    setLoading(false)
                                                 }
-                                            } catch (err: any) {
-                                                alert('Failed: ' + err.message)
-                                            } finally {
-                                                setLoading(false)
+                                            }}
+                                            disabled={loading}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-50 text-orange-700 border border-orange-200 rounded-lg text-xs font-bold hover:bg-orange-100 transition disabled:opacity-50"
+                                        >
+                                            Send to {wm.name}
+                                            {sendCount > 0 && (
+                                                <span className="bg-orange-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">{sendCount}</span>
+                                            )}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
+
+                        {/* Custom email send */}
+                        <button
+                            onClick={() => setShowWarehouseSend(!showWarehouseSend)}
+                            className="text-[10px] font-bold text-orange-500 hover:text-orange-700 uppercase tracking-wider"
+                        >
+                            {showWarehouseSend ? 'Cancel' : 'Send to custom email...'}
+                        </button>
+
+                        {showWarehouseSend && (
+                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 space-y-2">
+                                <input
+                                    type="email"
+                                    value={warehouseEmail}
+                                    onChange={e => setWarehouseEmail(e.target.value)}
+                                    placeholder="warehouse@email.com"
+                                    className="w-full border border-orange-200 rounded px-3 py-2 text-sm bg-white outline-none focus:border-orange-400"
+                                />
+                                <button
+                                    onClick={async () => {
+                                        if (!warehouseEmail) { alert('Enter warehouse email'); return }
+                                        setLoading(true)
+                                        try {
+                                            const res = await adminSendToWarehouseAction(orderId, warehouseEmail)
+                                            if (res.success) {
+                                                alert('Sent to warehouse!')
+                                                setShowWarehouseSend(false)
+                                                router.refresh()
+                                            } else {
+                                                alert('Failed: ' + res.error)
                                             }
-                                        }}
-                                        disabled={loading || !warehouseEmail}
-                                        className="w-full py-2 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 transition disabled:opacity-50"
-                                    >
-                                        {loading ? 'Sending...' : 'Send'}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                        } catch (err: any) {
+                                            alert('Failed: ' + err.message)
+                                        } finally {
+                                            setLoading(false)
+                                        }
+                                    }}
+                                    disabled={loading || !warehouseEmail}
+                                    className="w-full py-2 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700 transition disabled:opacity-50"
+                                >
+                                    {loading ? 'Sending...' : 'Send'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
