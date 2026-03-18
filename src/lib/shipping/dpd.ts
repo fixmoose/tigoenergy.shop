@@ -244,12 +244,23 @@ export class DPDService {
         const url = new URL(`${this.baseUrl}/status`);
         url.searchParams.append('parcels', parcelNumbers.join(','));
 
-        const response = await fetch(url.toString(), {
-            method: 'POST',
+        // Try GET first (DPD EasyShip status endpoint may require GET)
+        let response = await fetch(url.toString(), {
+            method: 'GET',
             headers: {
                 'Authorization': this.authHeader
             }
         });
+
+        // Fallback to POST if GET returns 405
+        if (response.status === 405) {
+            response = await fetch(url.toString(), {
+                method: 'POST',
+                headers: {
+                    'Authorization': this.authHeader
+                }
+            });
+        }
 
         if (!response.ok) {
             const text = await response.text();
