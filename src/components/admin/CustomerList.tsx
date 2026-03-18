@@ -205,7 +205,10 @@ export default function CustomerList({ customers }: CustomerListProps) {
         try {
             const res = await adminResetCustomerPasswordAction(email)
             if (res.success) {
-                alert('Password reset email sent.')
+                const copyLink = res.resetLink
+                    ? `\n\nIf they didn't receive it, copy this link and send directly:\n${res.resetLink}\n\n(expires in 1 hour)`
+                    : ''
+                alert('Password reset email sent.' + copyLink)
             } else {
                 alert('Error: ' + res.error)
             }
@@ -288,7 +291,10 @@ export default function CustomerList({ customers }: CustomerListProps) {
         try {
             const result = await adminResetCustomerPasswordAction(createdCustomer.email)
             if (result.success) {
-                alert('Welcome email with password reset link sent!')
+                const copyLink = result.resetLink
+                    ? `\n\nIf they didn't receive it, copy this link:\n${result.resetLink}\n\n(expires in 1 hour)`
+                    : ''
+                alert('Welcome email with password reset link sent!' + copyLink)
             } else {
                 alert(result.error || 'Failed to send welcome email')
             }

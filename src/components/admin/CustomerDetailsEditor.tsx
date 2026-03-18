@@ -13,6 +13,8 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [resetLink, setResetLink] = useState<string | null>(null)
+    const [linkCopied, setLinkCopied] = useState(false)
     const [formData, setFormData] = useState({
         first_name: customer.first_name || '',
         last_name: customer.last_name || '',
@@ -68,11 +70,15 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                                 onClick={async () => {
                                     if (!confirm('Send password reset email to this customer?')) return
                                     setLoading(true)
+                                    setResetLink(null)
                                     try {
                                         const { adminResetCustomerPasswordAction } = await import('@/app/actions/admin')
                                         const res = await adminResetCustomerPasswordAction(customer.id)
-                                        if (res.success) alert('Reset email sent successfully!')
-                                        else alert('Failed: ' + (res.error || 'Unknown error'))
+                                        if (res.success) {
+                                            setResetLink(res.resetLink || null)
+                                        } else {
+                                            alert('Failed: ' + (res.error || 'Unknown error'))
+                                        }
                                     } catch (err: any) {
                                         alert('Error: ' + err.message)
                                     } finally {
@@ -110,6 +116,32 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                     )}
                 </div>
             </div>
+
+            {resetLink && (
+                <div className="mx-8 mt-6 p-3 bg-green-50 border border-green-200 rounded-xl">
+                    <p className="text-xs font-bold text-green-800 mb-2">Reset email sent! If customer didn't receive it, copy the link below and send it directly:</p>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="text"
+                            readOnly
+                            value={resetLink}
+                            className="flex-1 text-[11px] text-gray-700 bg-white border border-green-200 rounded-lg px-2 py-1.5 font-mono"
+                            onClick={e => (e.target as HTMLInputElement).select()}
+                        />
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(resetLink)
+                                setLinkCopied(true)
+                                setTimeout(() => setLinkCopied(false), 2000)
+                            }}
+                            className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 whitespace-nowrap"
+                        >
+                            {linkCopied ? 'Copied!' : 'Copy Link'}
+                        </button>
+                    </div>
+                    <p className="text-[10px] text-green-600 mt-1">Link expires in 1 hour</p>
+                </div>
+            )}
 
             <div className="p-8 space-y-6">
                 <div className="grid grid-cols-2 gap-4">

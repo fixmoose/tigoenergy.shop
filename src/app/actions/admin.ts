@@ -508,7 +508,7 @@ export async function adminResetCustomerPasswordAction(identifier: string) {
             emailType: 'password_reset',
         })
 
-        return { success: true }
+        return { success: true, resetLink }
     } catch (err: any) {
         console.error('Error in adminResetCustomerPasswordAction:', err)
         return { success: false, error: err.message || 'Failed to trigger password reset' }

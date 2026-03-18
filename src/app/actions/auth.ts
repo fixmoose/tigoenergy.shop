@@ -246,7 +246,7 @@ export async function registerB2BUserAction(formData: any) {
 /**
  * Customer-facing forgot password — generates link via generateLink + sends localized email
  */
-export async function requestPasswordResetAction(email: string, recaptchaToken: string) {
+export async function requestPasswordResetAction(email: string, recaptchaToken: string): Promise<{ success: boolean; error?: string }> {
     try {
         // Verify reCAPTCHA — but don't block password reset if it fails,
         // since this action always returns success regardless of email existence
