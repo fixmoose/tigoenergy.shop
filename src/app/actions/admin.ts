@@ -1188,7 +1188,7 @@ export async function adminSendInvoiceEmailAction(orderId: string) {
         const supabase = await createAdminClient()
         const { data: order, error } = await supabase
             .from('orders')
-            .select('*')
+            .select('*, order_items(*)')
             .eq('id', orderId)
             .single()
 
@@ -1196,16 +1196,11 @@ export async function adminSendInvoiceEmailAction(orderId: string) {
         if (!order.invoice_number) throw new Error('Invoice not issued yet')
 
         const locale = order.language || 'en'
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
-        const invoiceUrl = `${siteUrl}/api/orders/${orderId}/invoice?download=1`
 
-        // Fetch the invoice PDF to attach (pass admin cookie for auth)
-        const pdfRes = await fetch(invoiceUrl, {
-            headers: { Cookie: 'tigo-admin=1' },
-        })
-        if (!pdfRes.ok) throw new Error('Failed to generate invoice PDF')
-        const pdfBuffer = Buffer.from(await pdfRes.arrayBuffer())
-        const pdfBase64 = pdfBuffer.toString('base64')
+        // Generate PDF directly using shared libs
+        const { generateInvoicePdf } = await import('@/lib/invoice-pdf')
+        const pdfBuffer = await generateInvoicePdf(order, supabase)
+        const pdfBase64 = Buffer.from(pdfBuffer).toString('base64')
 
         const customerName = (order.billing_address as any)?.first_name
             || (order.shipping_address as any)?.first_name
