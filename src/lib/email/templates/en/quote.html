@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote / Offer</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: #16a34a;
+            padding: 5px 0;
+            text-align: center;
+        }
+
+        .logo {
+            height: 20px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 20px;
+        }
+
+        .order-meta {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .meta-label {
+            color: #6b7280;
+        }
+
+        .meta-value {
+            color: #111;
+            font-weight: 600;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #f3f4f6;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #111;
+            display: block;
+        }
+
+        .total-row td {
+            padding: 8px 12px;
+            border: none;
+        }
+
+        .total-label {
+            text-align: right;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .total-value {
+            text-align: right;
+            color: #111;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .cta-box {
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+            border: 1px solid #bbf7d0;
+        }
+
+        .cta-box p {
+            margin: 0 0 20px;
+            color: #166534;
+            font-size: 15px;
+        }
+
+        .button {
+            display: inline-block;
+            background: #16a34a;
+            color: #ffffff !important;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .expire-note {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .footer {
+            background: #f3f4f6;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer a {
+            color: #3ba140;
+            text-decoration: none;
+        }
+
+        .divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 24px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" class="logo">
+        </div>
+        <div class="content">
+            <h1 class="title">Quote for You</h1>
+            <p>Hello {{name}},</p>
+            <p>We have prepared a quote for you. Please review the details below and click the button to accept.</p>
+
+            <div class="order-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Quote Number</span>
+                    <span class="meta-value">{{quote_number}}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date</span>
+                    <span class="meta-value">{{quote_date}}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Valid Until</span>
+                    <span class="meta-value">{{expires_date}}</span>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{order_items}}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2" class="total-label" style="padding-top: 12px;">Total Amount (incl. VAT)</td>
+                        <td class="total-value" style="padding-top: 12px; color: #16a34a;">{{total_amount}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="cta-box">
+                <p>Ready to proceed? Click below to review and accept this quote.</p>
+                <a href="{{accept_url}}" class="button">View & Accept Quote</a>
+                <p class="expire-note">This quote is valid until {{expires_date}}</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <p>Best regards,<br>The Tigo Energy Team</p>
+        </div>
+        <div class="footer">
+            <p><strong>Initra Energija d.o.o.</strong></p>
+            <p>Dolenjska cesta 242, 1000 Ljubljana, SI</p>
+            <p><a href="mailto:support@tigoenergy.shop">support@tigoenergy.shop</a> | <a
+                    href="https://tigoenergy.shop">tigoenergy.shop</a></p>
+            <p>&copy; 2026 Tigo Energy SHOP. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

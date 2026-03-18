@@ -215,8 +215,11 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
             market: market.key,
 
-            // Language - from user preference (defaults to 'en' if not provided)
-            language: (rawData.language as string) || 'en',
+            // Language - from user preference via middleware header
+            language: (rawData.language as string)
+                || (headersList.get('x-preferred-language') && market.availableLanguages.includes(headersList.get('x-preferred-language')!) ? headersList.get('x-preferred-language')! : null)
+                || market.defaultLanguage
+                || 'en',
 
             // Order modification tracking
             ...(rawData.original_order_id ? {
@@ -294,7 +297,12 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         const documentType = isProformaFlow ? 'proforma_invoice' : 'order_confirmation'
 
         // 8. Send Confirmation Email (fire-and-forget — don't block checkout)
-        const orderLanguage = (rawData.language as string) || market.defaultLanguage || 'en'
+        // Use actual user locale from middleware header (same source as i18n.ts)
+        const preferredLang = headersList.get('x-preferred-language')
+        const orderLanguage = (rawData.language as string)
+            || (preferredLang && market.availableLanguages.includes(preferredLang) ? preferredLang : null)
+            || market.defaultLanguage
+            || 'en'
         try {
             const { renderDatabaseTemplate } = await import('@/lib/email')
             const { generateItemsTableHtml } = await import('@/lib/document-service')
@@ -335,9 +343,15 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             const dbHtml = await renderDatabaseTemplate(documentType, emailData, orderLanguage)
 
             let finalHtml = ''
+            const subjectLabels: Record<string, { proforma: string; confirmation: string }> = {
+                sl: { proforma: 'Predračun', confirmation: 'Potrditev naročila' },
+                hr: { proforma: 'Predračun', confirmation: 'Potvrda narudžbe' },
+                de: { proforma: 'Proforma-Rechnung', confirmation: 'Bestellbestätigung' },
+            }
+            const subj = subjectLabels[orderLanguage] || { proforma: 'Proforma Invoice', confirmation: 'Order Confirmation' }
             let finalSubject = isProformaFlow
-                ? (orderLanguage === 'sl' ? `Predračun — #${order.order_number}` : `Proforma Invoice — #${order.order_number}`)
-                : (orderLanguage === 'sl' ? `Potrditev naročila — #${order.order_number}` : `Order Confirmation — #${order.order_number}`)
+                ? `${subj.proforma} — #${order.order_number}`
+                : `${subj.confirmation} — #${order.order_number}`
 
             const isExportOrder = orderPayload.transaction_type === 'export'
 

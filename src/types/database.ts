@@ -393,6 +393,52 @@ export interface CustomerPricingSchema {
   created_at?: string | null
 }
 
+export interface Quote {
+  id: string
+  quote_number: string
+  token: string
+  customer_id?: string | null
+  customer_email: string
+  customer_phone?: string | null
+  company_name?: string | null
+  vat_id?: string | null
+  is_b2b?: boolean
+  shipping_address?: any
+  billing_address?: any
+  subtotal: number
+  shipping_cost: number
+  vat_rate: number
+  vat_amount: number
+  total: number
+  currency?: string | null
+  market: string
+  language: string
+  status: 'draft' | 'sent' | 'viewed' | 'accepted' | 'expired' | 'declined'
+  expires_at: string
+  sent_at?: string | null
+  viewed_at?: string | null
+  accepted_at?: string | null
+  order_id?: string | null
+  internal_notes?: string | null
+  created_by?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  items?: QuoteItem[]
+}
+
+export interface QuoteItem {
+  id: string
+  quote_id: string
+  product_id?: string | null
+  sku: string
+  product_name: string
+  quantity: number
+  unit_price: number
+  total_price: number
+  weight_kg?: number | null
+  created_at?: string | null
+}
+
 export interface CustomerCustomPricing {
   id: string
   customer_id: string
