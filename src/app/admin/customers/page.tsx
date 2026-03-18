@@ -10,7 +10,7 @@ export default async function AdminCustomersPage() {
   let error: any = null
 
   const result = await (supabase.from('customers') as any)
-    .select('*, orders(market, shipping_address, delivery_country)')
+    .select('*, orders(market, shipping_address, delivery_country), quotes(id, status, expires_at)')
     .order('created_at', { ascending: false })
     .limit(200)
 

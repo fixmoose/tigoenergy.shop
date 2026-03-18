@@ -32,7 +32,14 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
   // Fetch Orders (detailed history)
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, order_number, invoice_number, invoice_url, packing_slip_url, shipping_label_url, created_at, status, payment_status, fulfillment_status, total, currency, payment_method, confirmed_at, paid_at')
+    .select('id, order_number, invoice_number, invoice_url, packing_slip_url, shipping_label_url, created_at, status, payment_status, fulfillment_status, total, currency, payment_method, confirmed_at, paid_at, payment_terms, payment_due_date')
+    .eq('customer_id', id)
+    .order('created_at', { ascending: false })
+
+  // Fetch Quotes
+  const { data: quotes } = await supabase
+    .from('quotes')
+    .select('id, quote_number, created_at, status, total, currency, expires_at, order_id')
     .eq('customer_id', id)
     .order('created_at', { ascending: false })
 
@@ -86,7 +93,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                 <div>
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Order History</h3>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Orders</h3>
                   <p className="text-sm font-bold text-gray-900 mt-0.5">Sales & Status tracking</p>
                 </div>
                 <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-green-600 border border-green-100 uppercase tracking-widest">
@@ -104,7 +111,11 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 ) : (
                   <div className="divide-y divide-gray-50">
                     {orders.map((order: any) => {
-                      const needsProcessing = (order.payment_status === 'paid' || order.payment_status === 'net30') && !['delivered', 'shipped', 'cancelled'].includes(order.status || '')
+                      const needsProcessing = (order.payment_status === 'paid' || order.payment_status === 'net30') && !['delivered', 'shipped', 'cancelled', 'completed'].includes(order.status || '') && !order.invoice_url
+                      const dueDate = order.payment_due_date ? new Date(order.payment_due_date) : null
+                      const daysUntilDue = dueDate ? Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null
+                      const isNet30 = order.payment_terms === 'net30' || order.payment_status === 'net30'
+                      const showDueCountdown = isNet30 && order.invoice_url && order.payment_status !== 'paid' && daysUntilDue !== null
                       return (
                         <div key={order.id} className="p-6 hover:bg-gray-50/50 transition-colors group relative">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -119,6 +130,21 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                                 {needsProcessing && (
                                   <span className="flex items-center gap-1 text-[10px] font-black text-orange-600 bg-orange-50 border border-orange-100 px-2 py-0.5 rounded-full uppercase tracking-widest animate-pulse">
                                     Needs Processing
+                                  </span>
+                                )}
+                                {showDueCountdown && (
+                                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border uppercase tracking-widest ${
+                                    daysUntilDue! < 0
+                                      ? 'text-red-700 bg-red-50 border-red-200'
+                                      : daysUntilDue! <= 7
+                                        ? 'text-amber-700 bg-amber-50 border-amber-200'
+                                        : 'text-blue-700 bg-blue-50 border-blue-200'
+                                  }`}>
+                                    {daysUntilDue! < 0
+                                      ? `Overdue ${Math.abs(daysUntilDue!)}d`
+                                      : daysUntilDue === 0
+                                        ? 'Due today'
+                                        : `Due in ${daysUntilDue}d`}
                                   </span>
                                 )}
                               </div>
@@ -162,6 +188,65 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 )}
               </div>
             </section>
+
+            {/* Quotes Section */}
+            {quotes && quotes.length > 0 && (
+              <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                  <div>
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Quotes / Ponudbe</h3>
+                    <p className="text-sm font-bold text-gray-900 mt-0.5">Sent quotes & proposals</p>
+                  </div>
+                  <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-teal-600 border border-teal-100 uppercase tracking-widest">
+                    {quotes.length} Quotes
+                  </span>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {quotes.map((q: any) => {
+                    const isExpired = new Date(q.expires_at) < new Date() && !['accepted', 'declined'].includes(q.status)
+                    const effectiveStatus = isExpired && ['sent', 'viewed', 'draft'].includes(q.status) ? 'expired' : q.status
+                    const statusColor: Record<string, string> = {
+                      draft: 'bg-slate-50 text-slate-600 border-slate-100',
+                      sent: 'bg-blue-50 text-blue-700 border-blue-100',
+                      viewed: 'bg-yellow-50 text-yellow-700 border-yellow-100',
+                      accepted: 'bg-green-50 text-green-700 border-green-100',
+                      expired: 'bg-red-50 text-red-600 border-red-100',
+                      declined: 'bg-red-50 text-red-600 border-red-100',
+                    }
+                    return (
+                      <div key={q.id} className="p-6 hover:bg-gray-50/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-3">
+                              <Link href={`/admin/quotes/${q.id}`} className="text-lg font-black text-gray-900 hover:text-teal-600 transition-colors">
+                                {q.quote_number}
+                              </Link>
+                              <span className={`text-[10px] px-3 py-1 rounded-lg border font-black uppercase tracking-widest ${statusColor[effectiveStatus] || statusColor.draft}`}>
+                                {effectiveStatus}
+                              </span>
+                            </div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                              {new Date(q.created_at).toLocaleDateString('en-GB')} • Expires {new Date(q.expires_at).toLocaleDateString('en-GB')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <p className="text-lg font-black text-gray-900">{q.currency || '€'} {q.total?.toFixed(2)}</p>
+                            {q.order_id && (
+                              <Link href={`/admin/orders/${q.order_id}`} className="text-[10px] font-black text-green-600 bg-green-50 border border-green-100 px-2 py-1 rounded-lg hover:bg-green-100">
+                                View Order →
+                              </Link>
+                            )}
+                            <Link href={`/admin/quotes/${q.id}`} className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-teal-600 hover:border-teal-100 transition shadow-sm">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* Pricing Assignment Section */}
             <CustomerPricingAssignment

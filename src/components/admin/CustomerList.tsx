@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 type Tab = 'all' | 'guest' | 'b2c' | 'b2b'
 
 interface CustomerListProps {
-    customers: (Customer & { orders?: any[] })[]
+    customers: (Customer & { orders?: any[]; quotes?: any[] })[]
 }
 
 const MARKET_MAP: Record<string, { domain: string, flag: string }> = {
@@ -481,10 +481,11 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                 {c.email}
                                             </td>
                                             <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex flex-col gap-1">
                                                 {(c as any).orders?.length > 0 ? (
                                                     <Link
                                                         href={`/admin/customers/${c.id}/docs`}
-                                                        className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-blue-100 border border-blue-100"
+                                                        className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-blue-100 border border-blue-100 w-fit"
                                                     >
                                                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
                                                         {(c as any).orders.length} orders
@@ -492,6 +493,24 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                 ) : (
                                                     <span className="text-slate-300 text-xs">—</span>
                                                 )}
+                                                {(() => {
+                                                    const activeQuotes = ((c as any).quotes || []).filter((q: any) => {
+                                                        if (['accepted', 'declined'].includes(q.status)) return false
+                                                        if (q.status === 'draft' || q.status === 'sent' || q.status === 'viewed') {
+                                                            return new Date(q.expires_at) >= new Date()
+                                                        }
+                                                        return false
+                                                    })
+                                                    return activeQuotes.length > 0 ? (
+                                                        <Link
+                                                            href={`/admin/customers/${c.id}`}
+                                                            className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-600 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-teal-100 border border-teal-100 w-fit"
+                                                        >
+                                                            {activeQuotes.length} {activeQuotes.length === 1 ? 'quote' : 'quotes'}
+                                                        </Link>
+                                                    ) : null
+                                                })()}
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
                                                 {isDeleted ? (
