@@ -75,14 +75,21 @@ function getMarketInfo(customer: any) {
         }
     }
 
-    // 2. Try to get from orders
+    // 2. Try delivery country from latest order (most accurate)
     const latestOrder = customer.orders?.[0]
-    if (latestOrder?.market && MARKET_MAP[latestOrder.market.toLowerCase()]) {
-        return MARKET_MAP[latestOrder.market.toLowerCase()]
+    if (latestOrder?.delivery_country) {
+        const dc = latestOrder.delivery_country.toLowerCase()
+        if (MARKET_MAP[dc]) return MARKET_MAP[dc]
     }
 
-    // 3. Try shipping address country
-    const shippingAddr = customer.addresses?.find((a: any) => a.type === 'shipping') || customer.addresses?.[0]
+    // 3. Try shipping address country from latest order
+    if (latestOrder?.shipping_address?.country) {
+        const sc = latestOrder.shipping_address.country.toLowerCase()
+        if (MARKET_MAP[sc]) return MARKET_MAP[sc]
+    }
+
+    // 4. Try saved addresses
+    const shippingAddr = customer.addresses?.find((a: any) => a.isDefaultShipping) || customer.addresses?.find((a: any) => !a.isViesAddress) || customer.addresses?.[0]
     const country = shippingAddr?.country?.toLowerCase()
     if (country && MARKET_MAP[country]) {
         return MARKET_MAP[country]
@@ -446,7 +453,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <div className={`font-medium transition-colors ${isDeleted ? 'text-slate-400 line-through' : 'text-slate-900 group-hover:text-blue-600'}`}>
-                                                                {c.first_name} {c.last_name}
+                                                                {c.company_name || `${c.first_name} ${c.last_name}`}
                                                             </div>
                                                             {((c as any).b2b_customer_prices?.length > 0) && (
                                                                 <span className="bg-blue-50 text-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-100 flex items-center gap-1" title="Custom pricing set up for this user">
@@ -455,7 +462,9 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-500 font-medium">{marketInfo.domain}</div>
+                                                        {c.company_name && (c.first_name || c.last_name) && (
+                                                            <div className="text-xs text-slate-500">{c.first_name} {c.last_name}</div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </td>
