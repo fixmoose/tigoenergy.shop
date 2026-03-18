@@ -43,7 +43,7 @@ function getLabels(lang: string) {
  * Order must include order_items relation.
  * Supabase client is used to fetch payment records.
  */
-export async function generateInvoicePdf(order: any, supabase: any): Promise<ArrayBuffer> {
+export async function generateInvoicePdf(order: any, supabase: any): Promise<Uint8Array> {
     const { data: payments } = await supabase
         .from('order_payments')
         .select('*')
