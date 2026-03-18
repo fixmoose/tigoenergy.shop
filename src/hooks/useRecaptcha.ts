@@ -81,18 +81,27 @@ export function useRecaptcha() {
                 return
             }
 
+            // Timeout to prevent hanging forever if reCAPTCHA fails silently
+            // (e.g. domain not registered, script blocked, network issue)
+            const timeout = setTimeout(() => {
+                reject(new Error('reCAPTCHA timed out — please refresh and try again'))
+            }, 8000)
+
             if (typeof window !== 'undefined' && window.grecaptcha) {
                 window.grecaptcha.ready(async () => {
                     try {
                         const token = await window.grecaptcha.execute(siteKey, { action })
+                        clearTimeout(timeout)
                         setToken(token)
                         resolve(token)
                     } catch (err) {
+                        clearTimeout(timeout)
                         console.error('reCAPTCHA execution failed:', err)
                         reject(err)
                     }
                 })
             } else {
+                clearTimeout(timeout)
                 reject(new Error('reCAPTCHA not ready'))
             }
         })

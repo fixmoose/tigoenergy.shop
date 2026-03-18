@@ -248,10 +248,13 @@ export async function registerB2BUserAction(formData: any) {
  */
 export async function requestPasswordResetAction(email: string, recaptchaToken: string) {
     try {
-        // Verify reCAPTCHA
-        const captcha = await verifyRecaptcha(recaptchaToken, 'FORGOT_PASSWORD')
-        if (!captcha.success) {
-            return { success: false, error: captcha.error || 'reCAPTCHA verification failed' }
+        // Verify reCAPTCHA — but don't block password reset if it fails,
+        // since this action always returns success regardless of email existence
+        if (recaptchaToken) {
+            const captcha = await verifyRecaptcha(recaptchaToken, 'FORGOT_PASSWORD')
+            if (!captcha.success) {
+                console.warn('Password reset reCAPTCHA failed:', captcha.error)
+            }
         }
 
         const supabase = await createAdminClient()

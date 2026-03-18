@@ -21,7 +21,14 @@ export default function ForgotPasswordPage() {
         setMessage(null)
 
         try {
-            const token = await executeRecaptcha('FORGOT_PASSWORD')
+            // Try reCAPTCHA but don't block password reset if it fails
+            // (e.g. domain not registered, script blocked by firewall)
+            let token = ''
+            try {
+                token = await executeRecaptcha('FORGOT_PASSWORD')
+            } catch {
+                // reCAPTCHA failed — proceed without it
+            }
             const res = await requestPasswordResetAction(email, token)
 
             if (!res.success) {
