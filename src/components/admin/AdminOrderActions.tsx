@@ -691,7 +691,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                                 ? 'bg-yellow-100 text-yellow-700'
                                                                 : 'bg-slate-100 text-slate-600'
                                                     }`}>
-                                                        {p.statusInfo || p.status_description || p.status || 'Unknown'}
+                                                        {p.statusInfo || p.status_description || p.status || 'Awaiting pickup'}
                                                     </span>
                                                 </div>
                                                 {(p.statusInfo || p.status_description) && p.status && p.status !== p.statusInfo && (
@@ -702,6 +702,9 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                 )}
                                                 {p.depot && (
                                                     <p className="text-[10px] text-slate-400 mt-0.5">Depot: {p.depot}</p>
+                                                )}
+                                                {p.raw_response && (
+                                                    <pre className="text-[9px] text-slate-400 mt-1 whitespace-pre-wrap break-all">{JSON.stringify(p.raw_response, null, 1)}</pre>
                                                 )}
                                             </div>
                                         ))}
