@@ -432,7 +432,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                     <th className="px-4 py-3">Customer</th>
                                     <th className="px-4 py-3">Status</th>
                                     <th className="px-4 py-3">Email</th>
-                                    <th className="px-4 py-3">Docs</th>
+                                    <th className="px-4 py-3">Library</th>
                                     <th className="px-4 py-3 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -480,20 +480,17 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                             <td className="px-4 py-3 text-slate-600">
                                                 {c.email}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                {pendingDocs > 0 ? (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            setDocsModal({ isOpen: true, customerId: c.id })
-                                                        }}
-                                                        className="inline-flex items-center gap-1.5 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-orange-200"
+                                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                                {(c as any).orders?.length > 0 ? (
+                                                    <Link
+                                                        href={`/admin/customers/${c.id}/docs`}
+                                                        className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold hover:bg-blue-100 border border-blue-100"
                                                     >
-                                                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                                                        {pendingDocs} Pending Review
-                                                    </button>
+                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
+                                                        {(c as any).orders.length} orders
+                                                    </Link>
                                                 ) : (
-                                                    <span className="text-slate-400 text-xs">-</span>
+                                                    <span className="text-slate-300 text-xs">—</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
