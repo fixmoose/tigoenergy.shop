@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
 import { DPDService } from '@/lib/shipping/dpd'
 
 /**
@@ -13,25 +13,19 @@ export async function GET(
 ) {
     const { id: orderId } = await params
 
-    // Auth check — must be admin
-    const userSupabase = await createClient()
-    const { data: { user } } = await userSupabase.auth.getUser()
-    if (!user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Auth check — must be admin (cookie or user_metadata)
+    const cookieStore = await cookies()
+    const isAdminCookie = cookieStore.get('tigo-admin')?.value === '1'
+
+    if (!isAdminCookie) {
+        const userSupabase = await createClient()
+        const { data: { user } } = await userSupabase.auth.getUser()
+        if (!user || user.user_metadata?.role !== 'admin') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        }
     }
 
     const supabase = await createAdminClient()
-
-    // Check admin role
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-    if (profile?.role !== 'admin') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
 
     // Get order tracking info
     const { data: order, error } = await supabase
