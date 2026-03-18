@@ -20,9 +20,10 @@ interface OrderListItem {
 }
 
 const TRANSACTION_TYPES: Record<string, { label: string; color: string; short: string }> = {
-  domestic: { label: 'Domestic (SI)', color: 'bg-slate-100 text-slate-700', short: 'SI' },
+  domestic: { label: 'Domestic', color: 'bg-slate-100 text-slate-700', short: 'DOM' },
+  eu: { label: 'EU', color: 'bg-blue-100 text-blue-700', short: 'EU' },
   intra_eu_distance_sale: { label: 'EU Distance Sale', color: 'bg-blue-100 text-blue-700', short: 'EU' },
-  intra_eu_service: { label: 'EU Service', color: 'bg-purple-100 text-purple-700', short: 'SVC' },
+  intra_eu_service: { label: 'EU Service', color: 'bg-purple-100 text-purple-700', short: 'EU-S' },
   export: { label: 'Export (Non-EU)', color: 'bg-amber-100 text-amber-700', short: 'EXP' },
 }
 
