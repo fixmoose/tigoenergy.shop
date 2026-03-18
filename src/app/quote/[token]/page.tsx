@@ -332,6 +332,11 @@ export default function QuoteAcceptPage() {
 
     const localeStr = lang === 'sl' ? 'sl-SI' : lang === 'hr' ? 'hr-HR' : lang === 'de' ? 'de-DE' : 'en-GB'
 
+    // Recalculate totals based on delivery method (vat_rate stored as percentage e.g. 22)
+    const effectiveShipping = delivery === 'pickup' ? 0 : quote.shipping_cost
+    const effectiveVat = (quote.subtotal + effectiveShipping) * (quote.vat_rate / 100)
+    const effectiveTotal = quote.subtotal + effectiveShipping + effectiveVat
+
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-3xl mx-auto">
@@ -392,19 +397,24 @@ export default function QuoteAcceptPage() {
                                 <span className="text-gray-500">{l.subtotal}</span>
                                 <span className="font-medium">{formatCurrency(quote.subtotal)}</span>
                             </div>
-                            {quote.shipping_cost > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">{l.shipping}</span>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">{l.shipping}</span>
+                                {delivery === 'pickup' ? (
+                                    <span className="font-medium text-green-600 line-through decoration-gray-400">
+                                        {quote.shipping_cost > 0 ? formatCurrency(quote.shipping_cost) : formatCurrency(0)}
+                                        <span className="no-underline ml-2 font-bold">{formatCurrency(0)}</span>
+                                    </span>
+                                ) : (
                                     <span className="font-medium">{formatCurrency(quote.shipping_cost)}</span>
-                                </div>
-                            )}
+                                )}
+                            </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{l.vat} ({quote.vat_rate}%)</span>
-                                <span className="font-medium">{formatCurrency(quote.vat_amount)}</span>
+                                <span className="font-medium">{formatCurrency(effectiveVat)}</span>
                             </div>
                             <div className="flex justify-between text-lg pt-2 border-t">
                                 <span className="font-bold text-gray-900">{l.grandTotal}</span>
-                                <span className="font-bold text-green-600">{formatCurrency(quote.total)}</span>
+                                <span className="font-bold text-green-600">{formatCurrency(effectiveTotal)}</span>
                             </div>
                         </div>
                     </div>
