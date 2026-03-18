@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
-import { Customer, Order } from '@/types/database'
+import { Customer, Order, Quote } from '@/types/database'
 import SavedCartsList from '@/components/cart/SavedCartsList'
 import { useTranslations } from 'next-intl'
 
@@ -12,25 +12,44 @@ interface Props {
     customer: Customer
 }
 
+const QUOTE_STATUS_STYLES: Record<string, string> = {
+    sent: 'bg-blue-100 text-blue-700',
+    viewed: 'bg-blue-100 text-blue-700',
+    accepted: 'bg-green-100 text-green-700',
+    expired: 'bg-gray-100 text-gray-500',
+    declined: 'bg-red-100 text-red-700',
+    draft: 'bg-gray-100 text-gray-500',
+}
+
 export default function MyOrders({ user, customer }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
+    const [quotes, setQuotes] = useState<Quote[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const t = useTranslations('dashboard')
 
     useEffect(() => {
-        const fetchOrders = async () => {
+        const fetchData = async () => {
             const supabase = createClient()
-            const { data } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('customer_id', user.id)
-                .order('created_at', { ascending: false })
+            const [ordersRes, quotesRes] = await Promise.all([
+                supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('customer_id', user.id)
+                    .order('created_at', { ascending: false }),
+                supabase
+                    .from('quotes')
+                    .select('*')
+                    .eq('customer_id', user.id)
+                    .neq('status', 'draft')
+                    .order('created_at', { ascending: false })
+            ])
 
-            if (data) setOrders(data)
+            if (ordersRes.data) setOrders(ordersRes.data)
+            if (quotesRes.data) setQuotes(quotesRes.data)
             setLoading(false)
         }
-        fetchOrders()
+        fetchData()
     }, [user.id])
 
     const filtered = search.trim()
@@ -41,8 +60,102 @@ export default function MyOrders({ user, customer }: Props) {
           )
         : orders
 
+    const activeQuotes = quotes.filter(q => q.status === 'sent' || q.status === 'viewed')
+
     return (
         <>
+        {/* Active Quotes */}
+        {!loading && activeQuotes.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-amber-200 overflow-hidden mb-6">
+                <div className="p-6 border-b border-amber-100 bg-amber-50/50 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg text-gray-900">{t('activeQuotes')}</h3>
+                </div>
+                <div className="divide-y divide-amber-50">
+                    {activeQuotes.map(quote => (
+                        <div key={quote.id} className="p-6 hover:bg-amber-50/30 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-amber-100 p-3 rounded-xl">
+                                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                        <span className="font-bold text-lg text-gray-900">{t('quoteLabel')} #{quote.quote_number}</span>
+                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${QUOTE_STATUS_STYLES[quote.status] || 'bg-gray-100 text-gray-500'}`}>
+                                            {quote.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium">
+                                        {t('validUntil', { date: new Date(quote.expires_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) })}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-none pt-4 md:pt-0">
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">{t('totalAmount')}</p>
+                                    <p className="text-lg font-bold text-gray-900">{quote.currency || 'EUR'} {quote.total.toFixed(2)}</p>
+                                </div>
+                                <a
+                                    href={`/quote/${quote.token}`}
+                                    className="bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-amber-700 transition-all shadow-sm hover:shadow-md"
+                                >
+                                    {t('viewQuote')}
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* All Quotes History */}
+        {!loading && quotes.length > 0 && quotes.length !== activeQuotes.length && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gray-100 text-gray-500 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg text-gray-900">{t('quoteHistory')}</h3>
+                </div>
+                <div className="divide-y divide-gray-50">
+                    {quotes.filter(q => q.status !== 'sent' && q.status !== 'viewed').map(quote => (
+                        <div key={quote.id} className="p-6 hover:bg-gray-50 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-gray-100 p-3 rounded-xl">
+                                    <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                        <span className="font-bold text-lg text-gray-900">{t('quoteLabel')} #{quote.quote_number}</span>
+                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${QUOTE_STATUS_STYLES[quote.status] || 'bg-gray-100 text-gray-500'}`}>
+                                            {quote.status}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium">
+                                        {quote.created_at && t('placedOn', { date: new Date(quote.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) })}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-none pt-4 md:pt-0">
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">{t('totalAmount')}</p>
+                                    <p className="text-lg font-bold text-gray-900">{quote.currency || 'EUR'} {quote.total.toFixed(2)}</p>
+                                </div>
+                                <a
+                                    href={`/quote/${quote.token}`}
+                                    className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
+                                >
+                                    {t('viewQuote')}
+                                </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="flex items-center gap-3">
