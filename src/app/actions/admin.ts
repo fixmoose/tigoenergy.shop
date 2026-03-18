@@ -1199,8 +1199,10 @@ export async function adminSendInvoiceEmailAction(orderId: string) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
         const invoiceUrl = `${siteUrl}/api/orders/${orderId}/invoice?download=1`
 
-        // Fetch the invoice PDF to attach
-        const pdfRes = await fetch(invoiceUrl)
+        // Fetch the invoice PDF to attach (pass admin cookie for auth)
+        const pdfRes = await fetch(invoiceUrl, {
+            headers: { Cookie: 'tigo-admin=1' },
+        })
         if (!pdfRes.ok) throw new Error('Failed to generate invoice PDF')
         const pdfBuffer = Buffer.from(await pdfRes.arrayBuffer())
         const pdfBase64 = pdfBuffer.toString('base64')
