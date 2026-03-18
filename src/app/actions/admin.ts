@@ -192,6 +192,72 @@ export async function adminCreateCustomerAction(formData: any) {
 }
 
 /**
+ * Admin reactivates a deleted customer — recreates their auth account and sends password reset.
+ */
+export async function adminReactivateCustomerAction(customerId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        // Get customer data
+        const { data: customer, error } = await supabase
+            .from('customers')
+            .select('*')
+            .eq('id', customerId)
+            .single()
+
+        if (error || !customer) throw new Error('Customer not found')
+        if (customer.account_status !== 'deleted') throw new Error('Customer is not deleted')
+
+        // Create new auth user with the same ID
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+            email: customer.email,
+            password: randomBytes(16).toString('base64url'),
+            email_confirm: true,
+            phone_confirm: true,
+            user_metadata: {
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                phone: customer.phone,
+                customer_type: customer.customer_type || 'b2c',
+            }
+        })
+
+        if (authError) throw authError
+
+        // Update customer row: set active, link to new auth user ID
+        const newUserId = authData.user.id
+        if (newUserId !== customerId) {
+            // Auth created with a new ID — update the customers row
+            await supabase.from('customers').update({
+                id: newUserId,
+                account_status: 'active',
+                updated_at: new Date().toISOString(),
+            }).eq('id', customerId)
+        } else {
+            await supabase.from('customers').update({
+                account_status: 'active',
+                updated_at: new Date().toISOString(),
+            }).eq('id', customerId)
+        }
+
+        // Send password reset email so they can set their password
+        try {
+            await adminResetCustomerPasswordAction(customer.email)
+        } catch (e) {
+            console.warn('Failed to send reset email during reactivation:', e)
+        }
+
+        revalidatePath('/admin/customers')
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adminReactivateCustomerAction:', err)
+        return { success: false, error: err.message || 'Failed to reactivate customer' }
+    }
+}
+
+/**
  * Admin verifies B2B customer (marks as VIES-verified and notifies them)
  */
 export async function adminVerifyB2BCustomerAction(customerId: string) {

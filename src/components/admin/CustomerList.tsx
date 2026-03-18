@@ -173,6 +173,25 @@ export default function CustomerList({ customers }: CustomerListProps) {
         }
     }
 
+    const handleReactivateUser = async (customerId: string, email: string) => {
+        if (!confirm(`Reactivate ${email}? This will create a new auth account and send a welcome email.`)) return
+        setLoading(true)
+        try {
+            const { adminReactivateCustomerAction } = await import('@/app/actions/admin')
+            const res = await adminReactivateCustomerAction(customerId)
+            if (res.success) {
+                alert('Customer reactivated! A password reset email has been sent.')
+                window.location.reload()
+            } else {
+                alert(res.error || 'Failed to reactivate')
+            }
+        } catch (err) {
+            alert('Failed to reactivate: ' + (err as Error).message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleResetPassword = async (email: string) => {
         if (!confirm(`Are you sure you want to send a password reset email to ${email}?`)) return
         setLoading(true)
@@ -206,10 +225,13 @@ export default function CustomerList({ customers }: CustomerListProps) {
 
     const [editData, setEditData] = useState<Partial<Customer>>({})
 
-    // Filter Logic
-    const sortedCustomers = [...customers].sort((a, b) =>
-        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-    )
+    // Filter Logic — deleted accounts always sort to bottom
+    const sortedCustomers = [...customers].sort((a, b) => {
+        const aDeleted = a.account_status === 'deleted' ? 1 : 0
+        const bDeleted = b.account_status === 'deleted' ? 1 : 0
+        if (aDeleted !== bDeleted) return aDeleted - bDeleted
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+    })
     const filteredCustomers = sortedCustomers.filter(c => {
         if (activeTab === 'all') return true
         // Guest
@@ -411,18 +433,19 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                 {filteredCustomers.map((c) => {
                                     const pendingDocs = getPendingCount(c.id)
                                     const marketInfo = getMarketInfo(c)
+                                    const isDeleted = c.account_status === 'deleted'
                                     return (
                                         <tr
                                             key={c.id}
-                                            className="hover:bg-slate-50 transition-colors cursor-pointer group"
+                                            className={`transition-colors cursor-pointer group ${isDeleted ? 'opacity-50 bg-slate-50 hover:bg-slate-100' : 'hover:bg-slate-50'}`}
                                             onClick={() => router.push(`/admin/customers/${c.id}`)}
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-lg" title={marketInfo.domain}>{marketInfo.flag}</span>
+                                                    <span className={`text-lg ${isDeleted ? 'grayscale' : ''}`} title={marketInfo.domain}>{marketInfo.flag}</span>
                                                     <div>
                                                         <div className="flex items-center gap-2">
-                                                            <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                                                            <div className={`font-medium transition-colors ${isDeleted ? 'text-slate-400 line-through' : 'text-slate-900 group-hover:text-blue-600'}`}>
                                                                 {c.first_name} {c.last_name}
                                                             </div>
                                                             {((c as any).b2b_customer_prices?.length > 0) && (
@@ -437,7 +460,9 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
-                                                {c.account_status === 'banned' ? (
+                                                {c.account_status === 'deleted' ? (
+                                                    <span className="text-xs bg-slate-200 text-slate-500 px-2 py-1 rounded font-medium">Deleted</span>
+                                                ) : c.account_status === 'banned' ? (
                                                     <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Banned</span>
                                                 ) : (
                                                     <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Active</span>
@@ -463,43 +488,62 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
-                                                {pendingDocs > 0 && (
-                                                    <button
-                                                        onClick={() => setDocsModal({ isOpen: true, customerId: c.id })}
-                                                        className="text-orange-600 hover:text-orange-800 font-medium text-xs underline"
-                                                    >
-                                                        Review
-                                                    </button>
+                                                {isDeleted ? (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleReactivateUser(c.id, c.email)}
+                                                            className="text-green-600 hover:text-green-800 font-bold text-xs bg-green-50 border border-green-200 px-2 py-1 rounded"
+                                                        >
+                                                            Reactivate
+                                                        </button>
+                                                        <Link
+                                                            href={`/admin/customers/${c.id}`}
+                                                            className="text-slate-400 hover:text-slate-600 font-medium text-xs"
+                                                        >
+                                                            Details
+                                                        </Link>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {pendingDocs > 0 && (
+                                                            <button
+                                                                onClick={() => setDocsModal({ isOpen: true, customerId: c.id })}
+                                                                className="text-orange-600 hover:text-orange-800 font-medium text-xs underline"
+                                                            >
+                                                                Review
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleResetPassword(c.email)}
+                                                            className="text-orange-600 hover:text-orange-800 font-medium text-xs whitespace-nowrap"
+                                                            title="Send Password Reset Email"
+                                                        >
+                                                            Reset Pass
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditData(c)
+                                                                setEditModal({ isOpen: true, customer: c })
+                                                            }}
+                                                            className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <Link
+                                                            href={`/admin/customers/${c.id}`}
+                                                            className="text-slate-500 hover:text-slate-800 font-medium text-xs"
+                                                        >
+                                                            Details
+                                                        </Link>
+                                                        <div className="inline-block border-l border-gray-300 mx-2 h-3 align-middle"></div>
+                                                        <button onClick={() => handleBanUser(c.id)} className="text-gray-500 hover:text-red-600 text-xs font-medium" title="Block User">
+                                                            Block
+                                                        </button>
+                                                        <button onClick={() => handleDeleteUser(c.id)} className="text-gray-400 hover:text-red-600 text-xs font-medium" title="Delete User">
+                                                            ✕
+                                                        </button>
+                                                    </>
                                                 )}
-                                                <button
-                                                    onClick={() => handleResetPassword(c.email)}
-                                                    className="text-orange-600 hover:text-orange-800 font-medium text-xs whitespace-nowrap"
-                                                    title="Send Password Reset Email"
-                                                >
-                                                    Reset Pass
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setEditData(c)
-                                                        setEditModal({ isOpen: true, customer: c })
-                                                    }}
-                                                    className="text-blue-600 hover:text-blue-800 font-medium text-xs"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <Link
-                                                    href={`/admin/customers/${c.id}`}
-                                                    className="text-slate-500 hover:text-slate-800 font-medium text-xs"
-                                                >
-                                                    Details
-                                                </Link>
-                                                <div className="inline-block border-l border-gray-300 mx-2 h-3 align-middle"></div>
-                                                <button onClick={() => handleBanUser(c.id)} className="text-gray-500 hover:text-red-600 text-xs font-medium" title="Block User">
-                                                    Block
-                                                </button>
-                                                <button onClick={() => handleDeleteUser(c.id)} className="text-gray-400 hover:text-red-600 text-xs font-medium" title="Delete User">
-                                                    ✕
-                                                </button>
                                             </td>
                                         </tr>
                                     )

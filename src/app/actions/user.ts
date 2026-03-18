@@ -10,8 +10,14 @@ export async function deleteAccount() {
         if (!user) throw new Error('Not authenticated')
 
         const adminClient = await createAdminClient()
-        const { error } = await adminClient.auth.admin.deleteUser(user.id)
 
+        // Mark customer as deleted before removing auth (so admin still sees them)
+        await adminClient.from('customers').update({
+            account_status: 'deleted',
+            updated_at: new Date().toISOString(),
+        }).eq('id', user.id)
+
+        const { error } = await adminClient.auth.admin.deleteUser(user.id)
         if (error) throw error
 
         return { success: true }
