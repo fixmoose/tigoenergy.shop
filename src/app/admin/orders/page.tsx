@@ -9,6 +9,7 @@ interface OrderListItem {
   id: string
   order_number: string
   customer_email: string
+  company_name: string | null
   status: string | null
   payment_status: string | null
   created_at: string | null
@@ -69,7 +70,7 @@ export default function AdminOrdersPage() {
     const supabase = createClient()
     const { data, error } = await supabase
       .from('orders')
-      .select('id,order_number,customer_email,status,payment_status,created_at,total,market,transaction_type,delivery_country,intrastat_reported')
+      .select('id,order_number,customer_email,company_name,status,payment_status,created_at,total,market,transaction_type,delivery_country,intrastat_reported')
       .order('created_at', { ascending: false })
       .limit(200)
 
@@ -88,15 +89,16 @@ export default function AdminOrdersPage() {
   const filteredOrders = orders.filter((o) => {
     if (statusFilter !== 'all' && o.status !== statusFilter) return false
     if (transactionFilter !== 'all' && o.transaction_type !== transactionFilter) return false
-    if (intrastatFilter === 'pending' && (o.transaction_type !== 'intra_eu_distance_sale' || o.intrastat_reported)) return false
+    if (intrastatFilter === 'pending' && (!['eu', 'intra_eu_distance_sale', 'intra_eu_service'].includes(o.transaction_type || '') || o.intrastat_reported)) return false
     if (intrastatFilter === 'reported' && !o.intrastat_reported) return false
-    if (searchQuery && !o.order_number.toLowerCase().includes(searchQuery.toLowerCase()) && !o.customer_email.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    if (searchQuery && !o.order_number.toLowerCase().includes(searchQuery.toLowerCase()) && !o.customer_email.toLowerCase().includes(searchQuery.toLowerCase()) && !(o.company_name || '').toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
   })
 
   // Orders eligible for Intrastat marking (EU distance sales not yet reported)
+  const EU_TYPES = ['eu', 'intra_eu_distance_sale', 'intra_eu_service']
   const eligibleForIntrastat = filteredOrders.filter(
-    (o) => o.transaction_type === 'intra_eu_distance_sale' && !o.intrastat_reported
+    (o) => EU_TYPES.includes(o.transaction_type || '') && !o.intrastat_reported
   )
 
   // Group counts for filters
@@ -106,7 +108,7 @@ export default function AdminOrdersPage() {
     return acc
   }, {} as Record<string, number>)
 
-  const intrastatPending = orders.filter(o => o.transaction_type === 'intra_eu_distance_sale' && !o.intrastat_reported).length
+  const intrastatPending = orders.filter(o => EU_TYPES.includes(o.transaction_type || '') && !o.intrastat_reported).length
 
   // Selection handlers
   const toggleSelect = (id: string) => {
@@ -374,7 +376,7 @@ export default function AdminOrdersPage() {
               const transactionType = TRANSACTION_TYPES[o.transaction_type || 'domestic'] || TRANSACTION_TYPES.domestic
               const statusColor = STATUS_COLORS[o.status || 'pending'] || 'bg-gray-100 text-gray-800'
               const paymentColor = PAYMENT_COLORS[o.payment_status || 'pending'] || 'bg-gray-100 text-gray-800'
-              const needsIntrastat = o.transaction_type === 'intra_eu_distance_sale' && !o.intrastat_reported
+              const needsIntrastat = EU_TYPES.includes(o.transaction_type || '') && !o.intrastat_reported
               const isSelected = selectedIds.has(o.id)
 
               return (
@@ -397,7 +399,8 @@ export default function AdminOrdersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm text-slate-600 truncate max-w-[200px]">{o.customer_email}</div>
+                    {o.company_name && <div className="text-sm font-medium text-slate-800 truncate max-w-[200px]">{o.company_name}</div>}
+                    <div className="text-sm text-slate-500 truncate max-w-[200px]">{o.customer_email}</div>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-col gap-1">
@@ -421,12 +424,14 @@ export default function AdminOrdersPage() {
                     {formatCurrency(o.total)}
                   </td>
                   <td className="text-center px-4 py-4">
-                    {o.transaction_type === 'intra_eu_distance_sale' ? (
+                    {['eu', 'intra_eu_distance_sale', 'intra_eu_service'].includes(o.transaction_type || '') ? (
                       o.intrastat_reported ? (
-                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded font-medium">✓</span>
+                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded font-medium">Reported</span>
                       ) : (
-                        <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded font-medium">Pending</span>
+                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium">Active</span>
                       )
+                    ) : o.transaction_type === 'domestic' ? (
+                      <span className="text-slate-300">-</span>
                     ) : (
                       <span className="text-slate-300">-</span>
                     )}
