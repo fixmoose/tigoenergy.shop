@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { getQuoteAction, adminSendQuoteAction, adminUpdateQuoteStatusAction, adminDeleteQuoteAction } from '@/app/actions/quotes'
+import { getQuoteAction, adminSendQuoteAction, adminUpdateQuoteStatusAction, adminDeleteQuoteAction, acceptQuoteAction } from '@/app/actions/quotes'
 
 function formatCurrency(amount: number | null | undefined) {
     if (amount == null) return '€0.00'
@@ -188,6 +188,38 @@ export default function AdminQuoteDetailPage() {
                                 className="block w-full py-2.5 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 text-sm text-center border border-green-200">
                                 View Order →
                             </Link>
+                        )}
+
+                        {['draft', 'sent', 'viewed'].includes(quote.status) && (
+                            <button
+                                onClick={async () => {
+                                    const deliveryType = confirm('Shipping delivery?\n\nOK = Use shipping address from quote\nCancel = Personal pickup (lastni prevzem)')
+                                        ? 'shipping' : 'pickup'
+                                    setActionLoading('convert')
+                                    try {
+                                        const res = await acceptQuoteAction(quote.token, {
+                                            type: deliveryType,
+                                            address: deliveryType === 'shipping' && quote.shipping_address ? {
+                                                street: quote.shipping_address.street || quote.shipping_address.line1 || '',
+                                                city: quote.shipping_address.city || '',
+                                                postal_code: quote.shipping_address.postal_code || '',
+                                                country: quote.shipping_address.country || 'SI',
+                                            } : undefined,
+                                        })
+                                        if (res.success) {
+                                            alert(`Order ${res.orderNumber} created!`)
+                                            loadQuote()
+                                        } else {
+                                            alert('Failed: ' + res.error)
+                                        }
+                                    } catch (err: any) { alert('Failed: ' + err.message) }
+                                    finally { setActionLoading('') }
+                                }}
+                                disabled={!!actionLoading}
+                                className="w-full py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 text-sm"
+                            >
+                                {actionLoading === 'convert' ? 'Converting...' : 'Convert to Order'}
+                            </button>
                         )}
 
                         {['draft', 'sent', 'viewed'].includes(quote.status) && (
