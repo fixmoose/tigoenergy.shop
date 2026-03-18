@@ -126,11 +126,12 @@ export async function adminCreateCustomerAction(formData: any) {
         const supabase = await createAdminClient()
         const { email, first_name, last_name, phone, is_b2b, customer_type, password } = formData
 
-        // 1. Create Auth User
+        // 1. Create Auth User (phone + email pre-confirmed for admin-created accounts)
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email,
             password: password || randomBytes(16).toString('base64url'),
             email_confirm: true,
+            phone_confirm: true,
             user_metadata: {
                 first_name,
                 last_name,
@@ -157,9 +158,10 @@ export async function adminCreateCustomerAction(formData: any) {
             })
         }
 
-        // 3. Update Customer Profile (DB trigger creates the row on auth.users insert;
-        //    we UPDATE with retries to ensure B2B fields + VIES address are saved)
-        const updatePayload: any = {
+        // 3. Upsert Customer Profile (DB trigger may or may not create the row;
+        //    upsert guarantees the row exists with all fields)
+        const profilePayload: any = {
+            id: authData.user.id,
             email,
             first_name,
             last_name,
@@ -170,16 +172,15 @@ export async function adminCreateCustomerAction(formData: any) {
             customer_type: is_b2b ? 'b2b' : (customer_type || 'b2c'),
             account_status: 'active',
         }
-        if (addresses.length > 0) updatePayload.addresses = addresses
+        if (addresses.length > 0) profilePayload.addresses = addresses
 
         for (let attempt = 0; attempt < 3; attempt++) {
             if (attempt > 0) await new Promise(r => setTimeout(r, 400))
             const { error: profileError } = await supabase
                 .from('customers')
-                .update(updatePayload)
-                .eq('id', authData.user.id)
+                .upsert(profilePayload, { onConflict: 'id' })
             if (!profileError) break
-            if (attempt === 2) console.warn('Profile update error:', profileError.message)
+            if (attempt === 2) console.warn('Profile upsert error:', profileError.message)
         }
 
         revalidatePath('/admin/customers')

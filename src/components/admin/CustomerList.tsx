@@ -26,24 +26,69 @@ const MARKET_MAP: Record<string, { domain: string, flag: string }> = {
     'ch': { domain: 'tigoenergy.ch', flag: '🇨🇭' },
     'be': { domain: 'tigoenergy.be', flag: '🇧🇪' },
     'uk': { domain: 'tigoenergy.org.uk', flag: '🇬🇧' },
+    'hr': { domain: 'tigoenergy.shop', flag: '🇭🇷' },
+    'cz': { domain: 'tigoenergy.shop', flag: '🇨🇿' },
+    'sk': { domain: 'tigoenergy.shop', flag: '🇸🇰' },
+    'hu': { domain: 'tigoenergy.shop', flag: '🇭🇺' },
+    'ro': { domain: 'tigoenergy.shop', flag: '🇷🇴' },
+    'bg': { domain: 'tigoenergy.shop', flag: '🇧🇬' },
+    'pt': { domain: 'tigoenergy.shop', flag: '🇵🇹' },
+    'dk': { domain: 'tigoenergy.shop', flag: '🇩🇰' },
+    'se': { domain: 'tigoenergy.shop', flag: '🇸🇪' },
+    'fi': { domain: 'tigoenergy.shop', flag: '🇫🇮' },
+    'ie': { domain: 'tigoenergy.shop', flag: '🇮🇪' },
+    'lt': { domain: 'tigoenergy.shop', flag: '🇱🇹' },
+    'lv': { domain: 'tigoenergy.shop', flag: '🇱🇻' },
+    'ee': { domain: 'tigoenergy.shop', flag: '🇪🇪' },
+    'lu': { domain: 'tigoenergy.shop', flag: '🇱🇺' },
+    'mt': { domain: 'tigoenergy.shop', flag: '🇲🇹' },
+    'cy': { domain: 'tigoenergy.shop', flag: '🇨🇾' },
+    'rs': { domain: 'tigoenergy.shop', flag: '🇷🇸' },
+    'ba': { domain: 'tigoenergy.shop', flag: '🇧🇦' },
+    'mk': { domain: 'tigoenergy.shop', flag: '🇲🇰' },
+    'me': { domain: 'tigoenergy.shop', flag: '🇲🇪' },
+    'al': { domain: 'tigoenergy.shop', flag: '🇦🇱' },
+    'no': { domain: 'tigoenergy.shop', flag: '🇳🇴' },
+    'gr': { domain: 'tigoenergy.shop', flag: '🇬🇷' },
     'global': { domain: 'tigoenergy.shop', flag: '🌍' }
 }
 
+// VAT prefix → country code (VIES uses 2-letter EU prefixes, some differ from ISO)
+const VAT_PREFIX_TO_COUNTRY: Record<string, string> = {
+    'AT': 'at', 'BE': 'be', 'BG': 'bg', 'CY': 'cy', 'CZ': 'cz',
+    'DE': 'de', 'DK': 'dk', 'EE': 'ee', 'EL': 'gr', 'ES': 'es',
+    'FI': 'fi', 'FR': 'fr', 'HR': 'hr', 'HU': 'hu', 'IE': 'ie',
+    'IT': 'it', 'LT': 'lt', 'LU': 'lu', 'LV': 'lv', 'MT': 'mt',
+    'NL': 'nl', 'PL': 'pl', 'PT': 'pt', 'RO': 'ro', 'SE': 'se',
+    'SI': 'si', 'SK': 'sk', 'GB': 'uk', 'XI': 'uk',
+    'RS': 'rs', 'BA': 'ba', 'MK': 'mk', 'ME': 'me', 'AL': 'al',
+    'NO': 'no', 'CH': 'ch',
+}
+
 function getMarketInfo(customer: any) {
-    // 1. Try to get from orders first
+    // 1. Try VAT ID prefix (most reliable for B2B)
+    if (customer.vat_id) {
+        const vatPrefix = customer.vat_id.replace(/\s/g, '').slice(0, 2).toUpperCase()
+        const vatCountry = VAT_PREFIX_TO_COUNTRY[vatPrefix]
+        if (vatCountry && MARKET_MAP[vatCountry]) {
+            return MARKET_MAP[vatCountry]
+        }
+    }
+
+    // 2. Try to get from orders
     const latestOrder = customer.orders?.[0]
     if (latestOrder?.market && MARKET_MAP[latestOrder.market.toLowerCase()]) {
         return MARKET_MAP[latestOrder.market.toLowerCase()]
     }
 
-    // 2. Try to get from shipping address country
+    // 3. Try shipping address country
     const shippingAddr = customer.addresses?.find((a: any) => a.type === 'shipping') || customer.addresses?.[0]
     const country = shippingAddr?.country?.toLowerCase()
     if (country && MARKET_MAP[country]) {
         return MARKET_MAP[country]
     }
 
-    // 3. Fallback
+    // 4. Fallback
     return MARKET_MAP['global']
 }
 
@@ -63,6 +108,8 @@ export default function CustomerList({ customers }: CustomerListProps) {
     const [loading, setLoading] = useState(false)
 
     // Admin Actions State
+    const [createdCustomer, setCreatedCustomer] = useState<{ id: string, email: string } | null>(null)
+    const [welcomeSending, setWelcomeSending] = useState(false)
     const [docsModal, setDocsModal] = useState<{ isOpen: boolean, customerId: string | null }>({ isOpen: false, customerId: null })
     const [editModal, setEditModal] = useState<{ isOpen: boolean, customer: Customer | null }>({ isOpen: false, customer: null })
     const [allDocs, setAllDocs] = useState<UploadedDoc[]>([])
@@ -181,7 +228,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
         e.preventDefault()
         setLoading(true)
         try {
-            await adminCreateCustomerAction({
+            const result = await adminCreateCustomerAction({
                 email: formData.email,
                 first_name: formData.first_name,
                 last_name: formData.last_name,
@@ -194,13 +241,32 @@ export default function CustomerList({ customers }: CustomerListProps) {
                 vies_country: formData.vies_country,
                 customer_type: formData.type === 'guest' ? 'guest' : undefined
             })
-            setIsModalOpen(false)
-            alert('Customer account created and verified.')
-            window.location.reload()
+            if (result.success && result.data?.userId) {
+                setCreatedCustomer({ id: result.data.userId, email: formData.email })
+            } else {
+                alert(result.error || 'Failed to create customer')
+            }
         } catch (error) {
             alert('Failed to create customer: ' + (error as Error).message)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleSendWelcomeEmail = async () => {
+        if (!createdCustomer) return
+        setWelcomeSending(true)
+        try {
+            const result = await adminResetCustomerPasswordAction(createdCustomer.email)
+            if (result.success) {
+                alert('Welcome email with password reset link sent!')
+            } else {
+                alert(result.error || 'Failed to send welcome email')
+            }
+        } catch {
+            alert('Failed to send welcome email')
+        } finally {
+            setWelcomeSending(false)
         }
     }
 
@@ -507,12 +573,38 @@ export default function CustomerList({ customers }: CustomerListProps) {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
                         <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-slate-800">Add New Customer</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                            <h3 className="text-lg font-bold text-slate-800">{createdCustomer ? 'Customer Created' : 'Add New Customer'}</h3>
+                            <button onClick={() => { setIsModalOpen(false); if (createdCustomer) { setCreatedCustomer(null); window.location.reload() } }} className="text-slate-400 hover:text-slate-600">
                                 ✕
                             </button>
                         </div>
 
+                        {createdCustomer ? (
+                            <div className="p-6 space-y-4">
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                                    <div className="text-3xl mb-2">&#10003;</div>
+                                    <p className="text-sm font-bold text-green-800">Customer account created and verified.</p>
+                                    <p className="text-xs text-green-600 mt-1">{createdCustomer.email}</p>
+                                    <p className="text-[10px] text-green-500 mt-1">Email & phone pre-verified. No confirmation needed.</p>
+                                </div>
+
+                                <button
+                                    onClick={handleSendWelcomeEmail}
+                                    disabled={welcomeSending}
+                                    className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold text-sm hover:bg-blue-700 transition disabled:opacity-50"
+                                >
+                                    {welcomeSending ? 'Sending...' : 'Send Welcome Email (Password Reset)'}
+                                </button>
+                                <p className="text-[10px] text-slate-400 text-center">Sends a password reset link so the customer can set their own password.</p>
+
+                                <button
+                                    onClick={() => { setCreatedCustomer(null); setIsModalOpen(false); window.location.reload() }}
+                                    className="w-full py-2 border border-slate-300 text-slate-700 rounded-lg font-medium text-sm hover:bg-slate-50"
+                                >
+                                    Done
+                                </button>
+                            </div>
+                        ) : (
                         <form onSubmit={handleCreate} className="p-6 space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Customer Type</label>
@@ -646,6 +738,7 @@ export default function CustomerList({ customers }: CustomerListProps) {
                                 </button>
                             </div>
                         </form>
+                        )}
                     </div>
                 </div>
             )}

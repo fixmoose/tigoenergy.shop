@@ -26,6 +26,8 @@ export default function OrderDetailsPage() {
     const [cancelling, setCancelling] = useState(false)
     const [modifying, setModifying] = useState(false)
     const [isHeaderSummaryVisible, setIsHeaderSummaryVisible] = useState(false)
+    const [dpdStatus, setDpdStatus] = useState<any[] | null>(null)
+    const [dpdStatusLoading, setDpdStatusLoading] = useState(false)
     const [supportModal, setSupportModal] = useState<{ isOpen: boolean, type: 'shipping' | 'return' | 'general' }>({
         isOpen: false,
         type: 'general'
@@ -233,6 +235,18 @@ export default function OrderDetailsPage() {
 
     const handleContactSupport = (type: 'shipping' | 'return' | 'general' = 'general') => {
         setSupportModal({ isOpen: true, type })
+    }
+
+    const handleCheckDpdStatus = async () => {
+        if (!orderId) return
+        setDpdStatusLoading(true)
+        try {
+            const res = await fetch(`/api/orders/${orderId}/dpd-status`)
+            const data = await res.json()
+            if (res.ok) setDpdStatus(data.parcels)
+        } catch { /* ignore */ } finally {
+            setDpdStatusLoading(false)
+        }
     }
 
     return (
@@ -755,21 +769,59 @@ export default function OrderDetailsPage() {
                                 </div>
 
                                 {order.tracking_number && (
-                                    <div className="bg-green-50 p-5 rounded-2xl border border-green-100">
+                                    <div className="bg-green-50 p-5 rounded-2xl border border-green-100 space-y-3">
                                         <div className="flex items-center gap-3 mb-2">
                                             <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                             <span className="text-[10px] font-black text-green-800 uppercase tracking-widest">{t('trackingInfo')}</span>
                                         </div>
                                         <p className="text-xs text-green-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
-                                        <a
-                                            href={order.tracking_url || '#'}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"
-                                        >
-                                            {order.tracking_number}
-                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                        </a>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <a
+                                                href={order.tracking_url || '#'}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"
+                                            >
+                                                {order.tracking_number}
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                            </a>
+                                            {order.shipping_carrier === 'DPD' && (
+                                                <button
+                                                    onClick={handleCheckDpdStatus}
+                                                    disabled={dpdStatusLoading}
+                                                    className="text-[10px] font-black text-white bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded-lg transition disabled:opacity-50 uppercase tracking-wider"
+                                                >
+                                                    {dpdStatusLoading ? '...' : t('checkLiveStatus') || 'Live Status'}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {dpdStatus && dpdStatus.length > 0 && (
+                                            <div className="space-y-2 mt-2">
+                                                {dpdStatus.map((p: any, i: number) => (
+                                                    <div key={i} className="bg-white border border-green-100 rounded-xl p-3">
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <span className="text-[10px] font-mono text-gray-400">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
+                                                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                                                (p.status || '').toLowerCase().includes('deliver') || (p.status || '').toLowerCase().includes('dostavljeno')
+                                                                    ? 'bg-green-100 text-green-700'
+                                                                    : (p.status || '').toLowerCase().includes('transit') || (p.status || '').toLowerCase().includes('prevozu')
+                                                                        ? 'bg-yellow-100 text-yellow-700'
+                                                                        : 'bg-gray-100 text-gray-600'
+                                                            }`}>
+                                                                {p.statusInfo || p.status_description || p.status || 'Unknown'}
+                                                            </span>
+                                                        </div>
+                                                        {(p.delivered_at || p.deliveryDate) && (
+                                                            <p className="text-[10px] text-green-600 mt-1 font-bold">Delivered: {p.delivered_at || p.deliveryDate}</p>
+                                                        )}
+                                                        {p.depot && (
+                                                            <p className="text-[10px] text-gray-400 mt-0.5">Depot: {p.depot}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>

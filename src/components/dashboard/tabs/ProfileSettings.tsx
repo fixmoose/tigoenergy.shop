@@ -45,6 +45,14 @@ export default function ProfileSettings({ customer }: Props) {
         website: '',
         employees: '',
     })
+    // Password change state
+    const [pwStep, setPwStep] = useState<'idle' | 'form' | 'code' | 'done'>('idle')
+    const [pwCurrentPassword, setPwCurrentPassword] = useState('')
+    const [pwNewPassword, setPwNewPassword] = useState('')
+    const [pwConfirmPassword, setPwConfirmPassword] = useState('')
+    const [pwCode, setPwCode] = useState('')
+    const [pwLoading, setPwLoading] = useState(false)
+    const [pwError, setPwError] = useState('')
 
     useEffect(() => {
         loadContacts()
@@ -171,6 +179,80 @@ export default function ProfileSettings({ customer }: Props) {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handlePasswordSendCode = async () => {
+        setPwError('')
+        if (pwNewPassword.length < 8) {
+            setPwError(t('pwMinLength') || 'Password must be at least 8 characters')
+            return
+        }
+        if (pwNewPassword !== pwConfirmPassword) {
+            setPwError(t('pwMismatch') || 'Passwords do not match')
+            return
+        }
+        setPwLoading(true)
+        try {
+            const res = await fetch('/api/account/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'send-code' }),
+            })
+            const data = await res.json()
+            if (data.success) {
+                setPwStep('code')
+            } else {
+                setPwError(data.error || 'Failed to send code')
+            }
+        } catch {
+            setPwError('Network error')
+        } finally {
+            setPwLoading(false)
+        }
+    }
+
+    const handlePasswordVerifyAndChange = async () => {
+        setPwError('')
+        if (!pwCode || pwCode.length !== 6) {
+            setPwError(t('pwInvalidCode') || 'Enter the 6-digit code')
+            return
+        }
+        setPwLoading(true)
+        try {
+            const res = await fetch('/api/account/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'verify-and-change',
+                    code: pwCode,
+                    currentPassword: pwCurrentPassword || undefined,
+                    newPassword: pwNewPassword,
+                }),
+            })
+            const data = await res.json()
+            if (data.success) {
+                setPwStep('done')
+                setPwCurrentPassword('')
+                setPwNewPassword('')
+                setPwConfirmPassword('')
+                setPwCode('')
+            } else {
+                setPwError(data.error || 'Failed to change password')
+            }
+        } catch {
+            setPwError('Network error')
+        } finally {
+            setPwLoading(false)
+        }
+    }
+
+    const resetPasswordFlow = () => {
+        setPwStep('idle')
+        setPwCurrentPassword('')
+        setPwNewPassword('')
+        setPwConfirmPassword('')
+        setPwCode('')
+        setPwError('')
     }
 
     return (
@@ -455,11 +537,128 @@ export default function ProfileSettings({ customer }: Props) {
                 </div>
 
                 <div className="pt-2 border-t mt-2">
-                    <p className="text-xs text-gray-500 mb-4">{t('accountSecurity')}</p>
+                    <p className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">{t('accountSecurity')}</p>
+
+                    {/* Change Password Section */}
+                    <div className="mb-6">
+                        {pwStep === 'idle' && (
+                            <button
+                                onClick={() => setPwStep('form')}
+                                className="text-sm font-medium text-blue-600 hover:underline"
+                            >
+                                {t('changePassword')}
+                            </button>
+                        )}
+
+                        {pwStep === 'form' && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-3 max-w-md">
+                                <p className="text-sm font-bold text-gray-800">{t('changePassword')}</p>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">{t('pwCurrent') || 'Current Password'}</label>
+                                    <input
+                                        type="password"
+                                        value={pwCurrentPassword}
+                                        onChange={e => setPwCurrentPassword(e.target.value)}
+                                        placeholder={t('pwCurrentPlaceholder') || 'Leave blank if set by admin'}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-0.5">{t('pwCurrentHint') || 'Leave blank if your account was created by admin'}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">{t('pwNew') || 'New Password'}</label>
+                                    <input
+                                        type="password"
+                                        value={pwNewPassword}
+                                        onChange={e => setPwNewPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">{t('pwConfirm') || 'Confirm New Password'}</label>
+                                    <input
+                                        type="password"
+                                        value={pwConfirmPassword}
+                                        onChange={e => setPwConfirmPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                </div>
+                                {pwError && <p className="text-xs text-red-600 font-medium">{pwError}</p>}
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        onClick={handlePasswordSendCode}
+                                        disabled={pwLoading || !pwNewPassword || !pwConfirmPassword}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50"
+                                    >
+                                        {pwLoading ? '...' : t('pwSendCode') || 'Send Verification Code'}
+                                    </button>
+                                    <button
+                                        onClick={resetPasswordFlow}
+                                        className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50"
+                                    >
+                                        {t('cancel') || 'Cancel'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {pwStep === 'code' && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 space-y-3 max-w-md">
+                                <p className="text-sm font-bold text-blue-800">{t('pwEnterCode') || 'Enter Verification Code'}</p>
+                                <p className="text-xs text-blue-600">{t('pwCodeSent') || 'A 6-digit code has been sent to your email. Enter it below to confirm the password change.'}</p>
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength={6}
+                                    value={pwCode}
+                                    onChange={e => setPwCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="000000"
+                                    className="w-full px-4 py-3 border border-blue-300 rounded-lg text-center text-2xl font-mono tracking-[0.5em] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    autoFocus
+                                />
+                                {pwError && <p className="text-xs text-red-600 font-medium">{pwError}</p>}
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        onClick={handlePasswordVerifyAndChange}
+                                        disabled={pwLoading || pwCode.length !== 6}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50"
+                                    >
+                                        {pwLoading ? '...' : t('pwVerifyChange') || 'Verify & Change Password'}
+                                    </button>
+                                    <button
+                                        onClick={handlePasswordSendCode}
+                                        disabled={pwLoading}
+                                        className="px-4 py-2 border border-blue-300 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100"
+                                    >
+                                        {t('pwResend') || 'Resend Code'}
+                                    </button>
+                                    <button
+                                        onClick={resetPasswordFlow}
+                                        className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50"
+                                    >
+                                        {t('cancel') || 'Cancel'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {pwStep === 'done' && (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-5 max-w-md">
+                                <p className="text-sm font-bold text-green-800">{t('pwChanged') || 'Password changed successfully!'}</p>
+                                <p className="text-xs text-green-600 mt-1">{t('pwChangedHint') || 'Your new password is now active. Use it next time you sign in.'}</p>
+                                <button
+                                    onClick={resetPasswordFlow}
+                                    className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition"
+                                >
+                                    {t('done') || 'Done'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex flex-wrap gap-4 items-center">
                         <button className="text-sm font-medium text-blue-600 hover:underline">{t('changeEmail')}</button>
-                        <span className="text-gray-300">|</span>
-                        <button className="text-sm font-medium text-blue-600 hover:underline">{t('changePassword')}</button>
                         <span className="text-gray-300">|</span>
                         <button
                             onClick={async () => {

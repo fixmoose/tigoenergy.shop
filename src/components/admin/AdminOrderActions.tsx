@@ -111,6 +111,9 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const [warehouseMembers, setWarehouseMembers] = useState<{ id: string; name: string; email: string }[]>([])
     const [warehouseEmail, setWarehouseEmail] = useState('')
     const [showWarehouseSend, setShowWarehouseSend] = useState(false)
+    const [dpdStatus, setDpdStatus] = useState<any[] | null>(null)
+    const [dpdStatusLoading, setDpdStatusLoading] = useState(false)
+    const [dpdStatusError, setDpdStatusError] = useState<string | null>(null)
     const router = useRouter()
     const supabase = createClient()
 
@@ -252,6 +255,24 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             const res = await adminMarkDeliveredAction(orderId)
             if (res.success) { router.refresh() } else { alert(res.error || 'Failed') }
         } catch { alert('Failed to mark as delivered') } finally { setLoading(false) }
+    }
+
+    const handleCheckDpdStatus = async () => {
+        setDpdStatusLoading(true)
+        setDpdStatusError(null)
+        try {
+            const res = await fetch(`/api/admin/orders/${orderId}/dpd-status`)
+            const data = await res.json()
+            if (!res.ok) {
+                setDpdStatusError(data.error || 'Failed to fetch status')
+            } else {
+                setDpdStatus(data.parcels)
+            }
+        } catch {
+            setDpdStatusError('Network error')
+        } finally {
+            setDpdStatusLoading(false)
+        }
     }
 
     if (status === 'cancelled') return null
@@ -589,15 +610,56 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
 
                         {/* DPD tracking info */}
                         {!isPickup && shippingCarrier === 'DPD' && trackingNumber && (
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1.5">
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2">
                                 <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">DPD Tracking</p>
                                 <p className="text-sm font-mono text-red-900">{trackingNumber}</p>
-                                {trackingUrl && (
-                                    <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
-                                        className="inline-block text-xs font-bold text-red-600 hover:underline">
-                                        Track on DPD &rarr;
-                                    </a>
+                                <div className="flex items-center gap-2">
+                                    {trackingUrl && (
+                                        <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
+                                            className="inline-block text-xs font-bold text-red-600 hover:underline">
+                                            Track on DPD &rarr;
+                                        </a>
+                                    )}
+                                    <button onClick={handleCheckDpdStatus} disabled={dpdStatusLoading}
+                                        className="text-xs font-bold text-white bg-red-600 hover:bg-red-700 px-2 py-0.5 rounded transition disabled:opacity-50">
+                                        {dpdStatusLoading ? 'Checking...' : 'Check Live Status'}
+                                    </button>
+                                </div>
+
+                                {dpdStatusError && (
+                                    <p className="text-xs text-red-600 font-medium">{dpdStatusError}</p>
                                 )}
+
+                                {dpdStatus && dpdStatus.length > 0 && (
+                                    <div className="space-y-1.5 mt-1">
+                                        {dpdStatus.map((p: any, i: number) => (
+                                            <div key={i} className="bg-white border border-red-100 rounded p-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[10px] font-mono text-slate-500">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
+                                                    <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                                                        (p.status || '').toLowerCase().includes('deliver') || (p.status || '').toLowerCase().includes('dostavljeno')
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : (p.status || '').toLowerCase().includes('transit') || (p.status || '').toLowerCase().includes('prevozu')
+                                                                ? 'bg-yellow-100 text-yellow-700'
+                                                                : 'bg-slate-100 text-slate-600'
+                                                    }`}>
+                                                        {p.statusInfo || p.status_description || p.status || 'Unknown'}
+                                                    </span>
+                                                </div>
+                                                {(p.statusInfo || p.status_description) && p.status && p.status !== p.statusInfo && (
+                                                    <p className="text-[10px] text-slate-500 mt-0.5">{p.status}</p>
+                                                )}
+                                                {(p.delivered_at || p.deliveryDate) && (
+                                                    <p className="text-[10px] text-green-600 mt-0.5">Delivered: {p.delivered_at || p.deliveryDate}</p>
+                                                )}
+                                                {p.depot && (
+                                                    <p className="text-[10px] text-slate-400 mt-0.5">Depot: {p.depot}</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                                 <p className="text-[10px] text-red-500">Delivery status is checked automatically. Invoice will be issued when DPD confirms delivery.</p>
                             </div>
                         )}
