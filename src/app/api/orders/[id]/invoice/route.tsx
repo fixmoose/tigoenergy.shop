@@ -119,7 +119,9 @@ export async function GET(
             customer_vat: order.vat_id,
             customer_phone: order.billing_address?.phone || order.shipping_address?.phone,
             billing_address: formatAddress(billing),
-            shipping_address: formatAddress(shipping),
+            shipping_address: order.shipping_carrier
+                ? `<strong>${order.shipping_carrier}</strong><br>${formatAddress(shipping)}`
+                : formatAddress(shipping),
             subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
             vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
             shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
@@ -135,7 +137,11 @@ export async function GET(
             due_date: order.invoice_created_at
                 ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale)
                 : new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale),
-            dispatch_date: order.shipped_at ? new Date(order.shipped_at).toLocaleDateString(dateLocale) : labels.uponPayment,
+            dispatch_date: order.shipped_at
+                ? new Date(order.shipped_at).toLocaleDateString(dateLocale)
+                : order.delivered_at
+                    ? new Date(order.delivered_at).toLocaleDateString(dateLocale)
+                    : labels.uponPayment,
             reference: `SI00 ${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`,
             place_of_issue: 'Podsmreka',
             // New fields for Št. Naročila & Št. Dobavnice
@@ -179,12 +185,23 @@ export async function GET(
         // Re-replace any remaining placeholders after injection
         htmlContent = replacePlaceholders(htmlContent, documentData)
 
-        // 5b. Inject payment records table if payments exist
-        if (payments && payments.length > 0) {
-            const amountPaid = payments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0)
+        // 5b. Build effective payment list (DB records, or fallback from order fields)
+        let effectivePayments = (payments && payments.length > 0) ? payments : []
+        if (effectivePayments.length === 0 && order.payment_status === 'paid' && order.paid_at) {
+            // Synthesize a payment record from order-level fields
+            effectivePayments = [{
+                payment_date: order.paid_at,
+                payment_method: order.payment_method || labels.bankTransfer,
+                reference: '-',
+                amount: order.amount_paid || order.total,
+            }]
+        }
+
+        if (effectivePayments.length > 0) {
+            const amountPaid = effectivePayments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0)
             const remaining = parseFloat(order.total || 0) - amountPaid
 
-            const paymentRows = payments.map((p: any) =>
+            const paymentRows = effectivePayments.map((p: any) =>
                 `<tr>
                     <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${new Date(p.payment_date).toLocaleDateString(dateLocale)}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.payment_method || labels.bankTransfer}</td>
@@ -216,7 +233,10 @@ export async function GET(
             ${remaining > 0.01 ? `<tr style="background:#fef3c7;">
                 <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;">${labels.balanceDue}</td>
                 <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;text-align:right;">€${remaining.toFixed(2)}</td>
-            </tr>` : ''}
+            </tr>` : `<tr style="background:#f0fdf4;">
+                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">${labels.balanceDue}</td>
+                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€0.00</td>
+            </tr>`}
         </tfoot>
     </table>
 </div>`
