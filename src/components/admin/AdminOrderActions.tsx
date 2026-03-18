@@ -265,8 +265,11 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             const data = await res.json()
             if (!res.ok) {
                 setDpdStatusError(data.error || 'Failed to fetch status')
+            } else if (!data.parcels || data.parcels.length === 0) {
+                setDpdStatusError('No tracking data returned from DPD')
             } else {
                 setDpdStatus(data.parcels)
+                console.log('DPD parcels:', data.parcels)
             }
         } catch {
             setDpdStatusError('Network error')
