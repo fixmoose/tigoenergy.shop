@@ -262,7 +262,7 @@ export default function OrderDetailsPage() {
                         <span className={`text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' || order.confirmed_at ? 'bg-green-100 text-green-700' :
                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                             }`}>
-                            {order.confirmed_at ? t('confirmed') : (order.status || t('pending'))}
+                            {order.status === 'completed' ? t('delivered') : order.status === 'delivered' ? t('delivered') : order.status === 'shipped' ? t('inTransit') : order.confirmed_at ? t('confirmed') : (order.status || t('pending'))}
                         </span>
                     </div>
 
@@ -406,7 +406,7 @@ export default function OrderDetailsPage() {
                                         order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                                         }`}>
                                         <div className={`w-2 h-2 rounded-full animate-pulse ${order.status === 'cancelled' ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                                        {order.confirmed_at ? t('orderConfirmed') : (order.status || 'Pending')}
+                                        {order.status === 'completed' ? t('delivered') : order.status === 'delivered' ? t('delivered') : order.status === 'shipped' ? t('inTransit') : order.confirmed_at ? t('orderConfirmed') : (order.status || 'Pending')}
                                     </span>
                                     {/* Tooltip */}
                                     <div className="absolute bottom-full left-0 mb-3 px-4 py-3 bg-gray-900 text-white text-[11px] rounded-xl opacity-0 group-hover/status:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl w-64 font-medium leading-relaxed scale-95 group-hover/status:scale-100 transform origin-bottom-left">

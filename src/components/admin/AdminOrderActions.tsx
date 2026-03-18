@@ -778,6 +778,25 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             Invoice
                         </a>
                     )}
+                    {invoiceUrl && (
+                        <button
+                            onClick={async () => {
+                                if (!confirm(`Send invoice email to ${customerEmail}?`)) return
+                                setLoading(true)
+                                try {
+                                    const res = await adminSendInvoiceEmailAction(orderId)
+                                    if (res.success) { alert('Invoice email sent!'); router.refresh() }
+                                    else { alert('Failed: ' + res.error) }
+                                } catch (err: any) { alert('Failed: ' + err.message) }
+                                finally { setLoading(false) }
+                            }}
+                            disabled={loading}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-bold hover:bg-indigo-100 transition disabled:opacity-50"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            {loading ? 'Sending...' : 'Email Invoice'}
+                        </button>
+                    )}
                 </div>
             </div>
 
