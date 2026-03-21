@@ -430,6 +430,8 @@ export default function Header() {
                 )}
               </div>
 
+              {/* Quick Order — shown in mobile menu only; desktop link disabled until tested */}
+
               {/* Orders (Optional, mimicking iHerb) */}
               {hasActiveOrders && (
                 <Link href="/dashboard#orders" className="hidden sm:flex flex-col items-center group cursor-pointer">
@@ -673,6 +675,14 @@ export default function Header() {
                   </div>
                 ))}
                 <div className="border-t border-gray-100 mt-4 pt-6 px-6 space-y-6">
+                  {user && (
+                    <Link href="/quick-order" className="flex items-center gap-4 text-gray-700 font-medium hover:text-green-600 transition" onClick={() => setMobileMenuOpen(false)}>
+                      <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      </div>
+                      {t('quickOrder') || 'Quick Order'}
+                    </Link>
+                  )}
                   <Link href={user ? "/dashboard" : "/auth/login"} className="flex items-center gap-4 text-gray-700 font-medium hover:text-green-600 transition" onClick={() => setMobileMenuOpen(false)}>
                     {user && !isAdmin ? (
                       <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm">

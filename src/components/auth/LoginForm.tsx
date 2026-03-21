@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useTranslations } from 'next-intl'
+import { getMarketKeyFromHostname, getDomainForMarket } from '@/lib/constants/markets'
 
 export default function LoginForm() {
     const t = useTranslations('auth.login')
@@ -34,10 +35,34 @@ export default function LoginForm() {
             const user = data.user
             if (user?.user_metadata?.role === 'admin') {
                 router.push('/admin/products')
-            } else {
-                router.push('/dashboard')
+                router.refresh()
+                return
             }
 
+            // Check if user's VAT country matches current domain — redirect if not
+            const currentMarket = getMarketKeyFromHostname(window.location.hostname)
+            if (currentMarket !== 'SHOP' && user?.id) {
+                try {
+                    const { data: customer } = await supabase
+                        .from('customers')
+                        .select('vat_id')
+                        .eq('id', user.id)
+                        .single()
+
+                    if (customer?.vat_id && customer.vat_id.length >= 4) {
+                        const vatCountry = customer.vat_id.replace(/\s/g, '').slice(0, 2).toUpperCase()
+                        if (vatCountry !== currentMarket) {
+                            const targetDomain = getDomainForMarket(vatCountry)
+                            window.location.href = `https://${targetDomain}/dashboard`
+                            return
+                        }
+                    }
+                } catch {
+                    // Non-critical — continue to dashboard on same domain
+                }
+            }
+
+            router.push('/dashboard')
             router.refresh()
         } catch (error: any) {
             setError(error.message)

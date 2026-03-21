@@ -37,6 +37,7 @@
     "orders": "Orders",
     "myAccount": "My Account",
     "myOrders": "My Orders",
+    "quickOrder": "Quick Order",
     "adminDashboard": "Admin Dashboard",
     "signOut": "Sign Out",
     "createAccount": "Create Account",
