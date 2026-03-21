@@ -70,18 +70,20 @@ const LOCALIZED_PROFORMA_TEMPLATE = `${WRAP_START}
   </div>
   <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:50%;padding:12px 16px;vertical-align:top;border-right:1px solid #f3f4f6;">
-      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{label_regular}</div>
+      <div style="font-size:10px;font-weight:700;color:#16a34a;margin-bottom:2px;">{label_faster}</div>
+      <div style="font-size:8px;color:#166534;margin-bottom:6px;">{label_faster_note}</div>
       <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
-        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
     <td style="width:50%;padding:12px 16px;vertical-align:top;">
-      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{label_faster}</div>
+      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:2px;">{label_regular}</div>
+      <div style="font-size:8px;color:#9ca3af;margin-bottom:6px;">{label_regular_note}</div>
       <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
-        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
@@ -159,7 +161,9 @@ export async function GET(
                 labelBillTo: 'Kupec', labelShipTo: 'Naslov dostave',
                 labelItems: 'Postavke', labelNo: 'Št.', labelDescription: 'Opis', labelSku: 'Artikel / SKU', labelQty: 'Kol.', labelUnitPrice: 'Cena/enoto', labelAmount: 'Znesek',
                 labelSubtotal: 'Osnova (neto)', labelShipping: 'Dostava', labelVat: 'DDV', labelTotal: 'Skupaj',
-                labelBankDetails: 'Podatki za nakazilo', labelReference: 'Referenca', labelRegular: 'Običajno', labelFaster: 'Hitrejše',
+                labelBankDetails: 'Podatki za nakazilo', labelReference: 'Referenca',
+                labelFaster: 'Hitrejše — priporočeno za takojšnji prevzem', labelFasterNote: 'Faster — recommended for immediate pickup',
+                labelRegular: 'Običajno — Delavska hranilnica', labelRegularNote: 'Knjiženje lahko traja 1+ delovni dan. Ne uporabljajte za takojšnji prevzem.\nProcessing may take 1+ business day. Do not use for immediate pickup.',
             },
             de: {
                 title: 'Proforma-Rechnung', subtitle: 'Kein Steuerdokument',
@@ -168,7 +172,9 @@ export async function GET(
                 labelBillTo: 'Rechnungsadresse', labelShipTo: 'Lieferadresse',
                 labelItems: 'Positionen', labelNo: 'Nr.', labelDescription: 'Beschreibung', labelSku: 'Artikel / SKU', labelQty: 'Menge', labelUnitPrice: 'Einzelpreis', labelAmount: 'Betrag',
                 labelSubtotal: 'Zwischensumme (netto)', labelShipping: 'Versand', labelVat: 'MwSt.', labelTotal: 'Gesamtbetrag',
-                labelBankDetails: 'Bankverbindung', labelReference: 'Referenz', labelRegular: 'Regulär', labelFaster: 'Schneller',
+                labelBankDetails: 'Bankverbindung', labelReference: 'Referenz',
+                labelFaster: 'Schneller — empfohlen für sofortige Abholung', labelFasterNote: 'Faster — recommended for immediate pickup',
+                labelRegular: 'Regulär — Delavska hranilnica', labelRegularNote: 'Buchung kann 1+ Werktag dauern. Nicht für sofortige Abholung verwenden.\nProcessing may take 1+ business day. Do not use for immediate pickup.',
             },
             hr: {
                 title: 'Predračun', subtitle: 'Nije porezni dokument',
@@ -177,7 +183,9 @@ export async function GET(
                 labelBillTo: 'Kupac', labelShipTo: 'Adresa dostave',
                 labelItems: 'Stavke', labelNo: 'Br.', labelDescription: 'Opis', labelSku: 'Artikl / SKU', labelQty: 'Kol.', labelUnitPrice: 'Jed. cijena', labelAmount: 'Iznos',
                 labelSubtotal: 'Osnovica (neto)', labelShipping: 'Dostava', labelVat: 'PDV', labelTotal: 'Ukupno',
-                labelBankDetails: 'Podaci za plaćanje', labelReference: 'Referenca', labelRegular: 'Redovno', labelFaster: 'Brže',
+                labelBankDetails: 'Podaci za plaćanje', labelReference: 'Referenca',
+                labelFaster: 'Brže — preporučeno za neposredni preuzimanje', labelFasterNote: 'Faster — recommended for immediate pickup',
+                labelRegular: 'Redovno — Delavska hranilnica', labelRegularNote: 'Knjiženje može trajati 1+ radni dan. Ne koristite za neposredni preuzimanje.\nProcessing may take 1+ business day. Do not use for immediate pickup.',
             },
             en: {
                 title: 'Proforma Invoice', subtitle: 'Not a tax document',
@@ -186,7 +194,9 @@ export async function GET(
                 labelBillTo: 'Bill To', labelShipTo: 'Ship To',
                 labelItems: 'Items & Services', labelNo: 'No.', labelDescription: 'Description', labelSku: 'Article / SKU', labelQty: 'Qty', labelUnitPrice: 'Unit Price', labelAmount: 'Amount',
                 labelSubtotal: 'Subtotal (net)', labelShipping: 'Shipping', labelVat: 'VAT', labelTotal: 'Grand Total',
-                labelBankDetails: 'Bank Transfer Details', labelReference: 'Reference', labelRegular: 'Regular speed', labelFaster: 'Faster',
+                labelBankDetails: 'Bank Transfer Details', labelReference: 'Reference',
+                labelFaster: 'Faster — recommended for immediate pickup', labelFasterNote: 'Recommended for immediate pickup orders',
+                labelRegular: 'Regular speed — Delavska hranilnica', labelRegularNote: 'Processing may take 1+ business day. Do not use for immediate pickup.',
             },
         }
         const L = docLabels[lang] || docLabels.en
@@ -238,7 +248,9 @@ export async function GET(
             label_bank_details: L.labelBankDetails,
             label_reference: L.labelReference,
             label_regular: L.labelRegular,
+            label_regular_note: L.labelRegularNote,
             label_faster: L.labelFaster,
+            label_faster_note: L.labelFasterNote,
         }
 
         // Always use built-in localized template (DB templates have broken translations)

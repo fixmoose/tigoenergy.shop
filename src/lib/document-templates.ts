@@ -62,23 +62,25 @@ export const TOTALS_SECTION = `<div style="padding:0 36px 16px;">
 
 export const BANK_SECTION = `<div style="margin:0 36px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
   <div style="padding:8px 16px;border-bottom:1px solid #e5e7eb;">
-    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Bank Transfer Details</span>
-    <span style="font-size:10px;color:#6b7280;margin-left:12px;">Reference: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
+    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">Podatki za nakazilo / Bank Transfer Details</span>
+    <span style="font-size:10px;color:#6b7280;margin-left:12px;">Referenca / Reference: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
   </div>
   <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:50%;padding:12px 16px;vertical-align:top;border-right:1px solid #f3f4f6;">
-      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">Regular speed</div>
+      <div style="font-size:10px;font-weight:700;color:#16a34a;margin-bottom:2px;">Hitrejše — priporočeno za takojšnji prevzem</div>
+      <div style="font-size:8px;color:#166534;margin-bottom:6px;">Faster — recommended for immediate pickup</div>
       <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
-        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
     <td style="width:50%;padding:12px 16px;vertical-align:top;">
-      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">Faster</div>
+      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:2px;">Običajno — Delavska hranilnica</div>
+      <div style="font-size:8px;color:#9ca3af;margin-bottom:6px;">Knjiženje lahko traja 1+ delovni dan. Ne uporabljajte za takojšnji prevzem.<br>Processing may take 1+ business day. Do not use for immediate pickup.</div>
       <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
-        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
         <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
