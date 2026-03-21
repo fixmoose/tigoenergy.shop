@@ -4,6 +4,7 @@ import ProductCard from '@/components/products/ProductCard'
 import { PRODUCT_CATEGORIES } from '@/lib/constants/categories'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
+import MobileLanding from '@/components/MobileLanding'
 
 export default async function Home() {
   let user = null
@@ -27,6 +28,12 @@ export default async function Home() {
 
   return (
     <>
+      {/* Mobile landing — Metro tiles */}
+      <MobileLanding />
+
+      {/* Desktop site — hidden on mobile */}
+      <div className="hidden lg:block">
+
       {/* Hero Section */}
       <section
         className="relative bg-cover bg-center bg-no-repeat text-white overflow-hidden"
@@ -281,6 +288,7 @@ export default async function Home() {
         </div>
       </section>
 
+      </div>{/* end hidden lg:block */}
     </>
   )
 }
