@@ -47,10 +47,10 @@ export async function GET(req: NextRequest) {
             const statuses = await dpd.getParcelStatus(parcelNumbers)
 
             // Check if ALL parcels are delivered
-            const allDelivered = statuses.length > 0 && statuses.every(s =>
-                s.status?.toLowerCase().includes('deliver') ||
-                s.status?.toLowerCase().includes('dostavljeno')
-            )
+            const allDelivered = statuses.length > 0 && statuses.every(s => {
+                const st = (s.status || '').toUpperCase()
+                return st === 'DELIVERED' || st.includes('DELIVER') || st.includes('DOSTAVLJENO')
+            })
 
             if (!allDelivered) continue
 

@@ -241,33 +241,61 @@ export class DPDService {
      * Returns status info for one or more parcel numbers.
      */
     async getParcelStatus(parcelNumbers: string[]): Promise<DPDParcelStatus[]> {
-        const url = new URL(`${this.baseUrl}/status`);
-        url.searchParams.append('parcel_number', parcelNumbers.join(','));
+        const results: DPDParcelStatus[] = [];
 
-        // Try GET first (DPD EasyShip status endpoint may require GET)
-        let response = await fetch(url.toString(), {
-            method: 'GET',
-            headers: {
-                'Authorization': this.authHeader
-            }
-        });
+        // EasyShip.si returns a flat { parcel_status: "..." } per parcel number,
+        // so we query each parcel individually
+        for (const parcelNumber of parcelNumbers) {
+            try {
+                const url = new URL(`${this.baseUrl}/status`);
+                url.searchParams.append('parcel_number', parcelNumber);
 
-        // Fallback to POST if GET returns 405
-        if (response.status === 405) {
-            response = await fetch(url.toString(), {
-                method: 'POST',
-                headers: {
-                    'Authorization': this.authHeader
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': this.authHeader
+                    }
+                });
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error(`DPD status error for ${parcelNumber} (${response.status}): ${text}`);
+                    results.push({ parcel_number: parcelNumber, status: 'unknown', status_description: `API error: ${response.status}` });
+                    continue;
                 }
-            });
+
+                const data = await response.json();
+
+                // EasyShip.si returns { parcel_status: "INBOUND" | "IN_DELIVERY" | "DELIVERED" | ... }
+                const rawStatus = data.parcel_status || data.status || 'unknown';
+
+                // Map EasyShip status codes to human-readable descriptions
+                const statusMap: Record<string, string> = {
+                    'INBOUND': 'In transit to depot',
+                    'AT_SENDING_DEPOT': 'At sending depot',
+                    'ON_THE_ROAD': 'On the road',
+                    'AT_DELIVERY_DEPOT': 'At delivery depot',
+                    'IN_DELIVERY': 'Out for delivery',
+                    'DELIVERED': 'Delivered',
+                    'NOT_DELIVERED': 'Delivery attempt failed',
+                    'PICKUP': 'Ready for pickup',
+                    'RETURNED': 'Returned to sender',
+                };
+
+                results.push({
+                    parcel_number: parcelNumber,
+                    status: rawStatus,
+                    status_description: statusMap[rawStatus] || rawStatus,
+                    delivered_at: rawStatus === 'DELIVERED' ? new Date().toISOString() : undefined,
+                    ...data,
+                });
+            } catch (err: any) {
+                console.error(`DPD status fetch failed for ${parcelNumber}:`, err);
+                results.push({ parcel_number: parcelNumber, status: 'error', status_description: err.message });
+            }
         }
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(`DPD Status error (${response.status}): ${text}`);
-        }
-
-        return await response.json();
+        return results;
     }
 
     /**

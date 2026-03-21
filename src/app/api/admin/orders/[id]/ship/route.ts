@@ -71,7 +71,7 @@ export async function POST(
 
             if (res.status === 'ok' && res.pl_number && res.pl_number.length > 0) {
                 trackingNumber = res.pl_number.join(', ') // Save all tracking numbers
-                trackingUrl = `https://tracking.dpd.de/status/en_US/parcel/${res.pl_number[0]}`
+                trackingUrl = `https://tracking.dpd.de/parcelstatus?query=${res.pl_number[0]}&locale=sl_SI`
 
                 // Get Label PDF
                 try {

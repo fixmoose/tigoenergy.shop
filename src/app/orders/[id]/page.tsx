@@ -840,13 +840,13 @@ export default function OrderDetailsPage() {
                                                         <div className="flex items-center justify-between gap-2">
                                                             <span className="text-[10px] font-mono text-gray-400">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
                                                             <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                                                                (p.status || '').toLowerCase().includes('deliver') || (p.status || '').toLowerCase().includes('dostavljeno')
+                                                                (p.status || '').toUpperCase() === 'DELIVERED'
                                                                     ? 'bg-green-100 text-green-700'
-                                                                    : (p.status || '').toLowerCase().includes('transit') || (p.status || '').toLowerCase().includes('prevozu')
+                                                                    : ['IN_DELIVERY', 'ON_THE_ROAD', 'INBOUND', 'AT_DELIVERY_DEPOT'].includes((p.status || '').toUpperCase())
                                                                         ? 'bg-yellow-100 text-yellow-700'
                                                                         : 'bg-gray-100 text-gray-600'
                                                             }`}>
-                                                                {p.statusInfo || p.status_description || p.status || 'Unknown'}
+                                                                {p.status_description || p.status || 'Unknown'}
                                                             </span>
                                                         </div>
                                                         {(p.delivered_at || p.deliveryDate) && (

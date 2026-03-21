@@ -685,13 +685,13 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[10px] font-mono text-slate-500">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
                                                     <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                                                        (p.status || '').toLowerCase().includes('deliver') || (p.status || '').toLowerCase().includes('dostavljeno')
+                                                        (p.status || '').toUpperCase() === 'DELIVERED'
                                                             ? 'bg-green-100 text-green-700'
-                                                            : (p.status || '').toLowerCase().includes('transit') || (p.status || '').toLowerCase().includes('prevozu')
+                                                            : ['IN_DELIVERY', 'ON_THE_ROAD', 'INBOUND', 'AT_DELIVERY_DEPOT'].includes((p.status || '').toUpperCase())
                                                                 ? 'bg-yellow-100 text-yellow-700'
                                                                 : 'bg-slate-100 text-slate-600'
                                                     }`}>
-                                                        {p.statusInfo || p.status_description || p.status || 'Awaiting pickup'}
+                                                        {p.status_description || p.status || 'Awaiting pickup'}
                                                     </span>
                                                 </div>
                                                 {(p.statusInfo || p.status_description) && p.status && p.status !== p.statusInfo && (

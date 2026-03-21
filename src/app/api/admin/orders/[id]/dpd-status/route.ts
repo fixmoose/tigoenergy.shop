@@ -53,27 +53,7 @@ export async function GET(
 
     try {
         const dpd = new DPDService()
-        const raw = await dpd.getParcelStatus(parcelNumbers)
-        console.log('DPD raw status response:', JSON.stringify(raw))
-
-        // Normalize: DPD may return an array, an object with parcels, or a single object
-        let parcels: any[]
-        if (Array.isArray(raw)) {
-            parcels = raw
-        } else if (raw && typeof raw === 'object') {
-            // Could be { parcels: [...] } or { parcel_number: ..., status: ... }
-            if (Array.isArray((raw as any).parcels)) {
-                parcels = (raw as any).parcels
-            } else if ((raw as any).parcel_number || (raw as any).status) {
-                parcels = [raw]
-            } else {
-                // Return the raw response so we can see what DPD actually sends
-                parcels = [{ status: 'unknown', raw_response: raw }]
-            }
-        } else {
-            parcels = [{ status: 'unknown', raw_response: String(raw) }]
-        }
-
+        const parcels = await dpd.getParcelStatus(parcelNumbers)
         return NextResponse.json({ parcels })
     } catch (err: any) {
         console.error('DPD status fetch error:', err)
