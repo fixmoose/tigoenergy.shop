@@ -6,12 +6,30 @@ import { useCurrency } from '@/contexts/CurrencyContext'
 import { useRouter } from 'next/navigation'
 import type { Product } from '@/types/database'
 
-// Short labels for the optimizer models
-const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: string; series: string }> = {
-    'TS4-A-O': { short: 'A-O', full: 'TS4-A-O', desc: 'Optimization', series: 'A' },
-    'TS4-A-F': { short: 'A-F', full: 'TS4-A-F', desc: 'Fire Safety', series: 'A' },
-    'TS4-X-O': { short: 'X-O', full: 'TS4-X-O', desc: 'Optimization (X)', series: 'X' },
-    'TS4-A-2F': { short: 'A-2F', full: 'TS4-A-2F', desc: 'Dual Fire Safety', series: 'A' },
+// ─── Metro tile colors (Windows Phone inspired) ─────────────────────────────
+const TILE_COLORS = {
+    green: 'bg-green-600',
+    teal: 'bg-teal-600',
+    blue: 'bg-blue-600',
+    indigo: 'bg-indigo-600',
+    orange: 'bg-orange-500',
+    rose: 'bg-rose-600',
+    slate: 'bg-slate-600',
+    back: 'bg-gray-400',
+}
+
+const MODEL_TILES: Record<string, { color: string; icon: string }> = {
+    'TS4-A-O': { color: TILE_COLORS.green, icon: '⚡' },
+    'TS4-A-F': { color: TILE_COLORS.orange, icon: '🔥' },
+    'TS4-X-O': { color: TILE_COLORS.blue, icon: '⚡' },
+    'TS4-A-2F': { color: TILE_COLORS.rose, icon: '🔥🔥' },
+}
+
+const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: string }> = {
+    'TS4-A-O': { short: 'A-O', full: 'TS4-A-O', desc: 'Optimization' },
+    'TS4-A-F': { short: 'A-F', full: 'TS4-A-F', desc: 'Fire Safety' },
+    'TS4-X-O': { short: 'X-O', full: 'TS4-X-O', desc: 'Optimization (X)' },
+    'TS4-A-2F': { short: 'A-2F', full: 'TS4-A-2F', desc: 'Dual Fire Safety' },
 }
 
 function classifyProduct(sku: string): string | null {
@@ -25,10 +43,39 @@ function classifyProduct(sku: string): string | null {
     return null
 }
 
-type Step = 'model' | 'qty' | 'accessories' | 'acc_qty' | 'summary'
+type Step = 'model' | 'qty' | 'accessories' | 'summary'
+
+// ─── Tile component ─────────────────────────────────────────────────────────
+function Tile({
+    color,
+    onClick,
+    disabled,
+    className = '',
+    children,
+}: {
+    color: string
+    onClick?: () => void
+    disabled?: boolean
+    className?: string
+    children: React.ReactNode
+}) {
+    return (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`${color} text-white rounded-sm p-4 flex flex-col justify-between transition-all
+                active:scale-[0.95] active:brightness-90
+                disabled:opacity-30 disabled:cursor-not-allowed
+                shadow-md hover:shadow-lg
+                ${className}`}
+        >
+            {children}
+        </button>
+    )
+}
 
 export default function QuickOrderPage() {
-    const { addItem, openDrawer, items: cartItems } = useCart()
+    const { addItem, openDrawer } = useCart()
     const { formatPrice, formatPriceNet, isB2B } = useCurrency()
     const router = useRouter()
 
@@ -42,8 +89,8 @@ export default function QuickOrderPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [quantity, setQuantity] = useState(20)
     const [selectedAccessories, setSelectedAccessories] = useState<Map<string, { product: Product; qty: number }>>(new Map())
+    const [customQty, setCustomQty] = useState(false)
 
-    // Fetch products
     useEffect(() => {
         fetch('/api/quick-order')
             .then(r => r.json())
@@ -62,7 +109,6 @@ export default function QuickOrderPage() {
     }, [])
 
     const getPrice = useCallback((p: Product, qty: number) => {
-        // Check quantity discounts
         if (p.quantity_discounts && p.quantity_discounts.length > 0) {
             const sorted = [...p.quantity_discounts].sort((a, b) => b.quantity - a.quantity)
             for (const tier of sorted) {
@@ -76,11 +122,11 @@ export default function QuickOrderPage() {
 
     const unitsPerBox = selectedProduct?.units_per_box || (classifyProduct(selectedProduct?.sku || '')?.startsWith('TS4-X') ? 18 : 20)
 
-    // Add all items to cart
+    const fmtPrice = (n: number) => isB2B ? formatPriceNet(n) : formatPrice(n)
+
     async function handleAddToCart() {
         setSubmitting(true)
         try {
-            // Add optimizer
             if (selectedProduct && quantity > 0) {
                 await addItem({
                     product_id: selectedProduct.id,
@@ -93,8 +139,6 @@ export default function QuickOrderPage() {
                     metadata: { category: selectedProduct.category, subcategory: selectedProduct.subcategory }
                 })
             }
-
-            // Add accessories
             for (const [, { product, qty }] of selectedAccessories) {
                 if (qty > 0) {
                     await addItem({
@@ -109,11 +153,10 @@ export default function QuickOrderPage() {
                     })
                 }
             }
-
             openDrawer()
             router.push('/checkout')
         } catch (err) {
-            console.error('Quick order add error:', err)
+            console.error('Quick order error:', err)
         } finally {
             setSubmitting(false)
         }
@@ -121,11 +164,10 @@ export default function QuickOrderPage() {
 
     function toggleAccessory(product: Product) {
         const next = new Map(selectedAccessories)
-        const key = product.id
-        if (next.has(key)) {
-            next.delete(key)
+        if (next.has(product.id)) {
+            next.delete(product.id)
         } else {
-            next.set(key, { product, qty: quantity }) // default to same qty as optimizer
+            next.set(product.id, { product, qty: quantity })
         }
         setSelectedAccessories(next)
     }
@@ -139,11 +181,10 @@ export default function QuickOrderPage() {
         }
     }
 
-    // Loading state
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="w-8 h-8 border-3 border-green-600 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-[100dvh] flex items-center justify-center bg-slate-900">
+                <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin" />
             </div>
         )
     }
@@ -157,92 +198,134 @@ export default function QuickOrderPage() {
     const grandTotal = optimizerTotal + accessoriesTotal
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Compact header */}
-            <div className="bg-white border-b sticky top-0 z-40">
-                <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-                    <h1 className="text-lg font-bold text-gray-900">Quick Order</h1>
-                    <StepIndicator current={step} />
+        <div className="min-h-[100dvh] bg-slate-900 flex flex-col">
+            {/* Metro header — flat, no border */}
+            <div className="px-5 pt-6 pb-2">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-light text-white tracking-wide">
+                        {step === 'model' && 'Quick Order'}
+                        {step === 'qty' && (OPTIMIZER_LABELS[classifyProduct(selectedProduct?.sku || '') || '']?.short || 'Quantity')}
+                        {step === 'accessories' && 'Accessories'}
+                        {step === 'summary' && 'Review'}
+                    </h1>
+                    <StepDots current={step} />
                 </div>
+                {step === 'model' && (
+                    <p className="text-slate-400 text-sm mt-1">Select your optimizer</p>
+                )}
             </div>
 
-            <div className="max-w-lg mx-auto px-4 py-6">
-                {/* Step 1: Select Model */}
-                {step === 'model' && (
-                    <div className="space-y-4">
-                        <p className="text-sm text-gray-500">Select optimizer model</p>
-                        <div className="grid grid-cols-2 gap-3">
-                            {Object.entries(OPTIMIZER_LABELS).map(([key, info]) => {
-                                const products = optimizers.filter(p => classifyProduct(p.sku) === key)
-                                const product = products[0]
-                                if (!product) return null
-                                const available = stockAvailable(product)
-                                const isOut = available <= 0 && product.stock_status !== 'available_to_order'
+            {/* Content area — tiles */}
+            <div className="flex-1 px-4 pb-4 pt-2 overflow-y-auto">
 
-                                return (
-                                    <button
-                                        key={key}
-                                        onClick={() => {
-                                            setSelectedProduct(product)
-                                            setStep('qty')
-                                        }}
-                                        disabled={isOut}
-                                        className={`relative p-5 rounded-xl border-2 text-left transition-all active:scale-[0.97] ${
-                                            isOut
-                                                ? 'border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed'
-                                                : 'border-gray-200 bg-white hover:border-green-500 hover:shadow-md'
-                                        }`}
-                                    >
-                                        {product.images?.[0] && (
-                                            <img
-                                                src={product.images[0]}
-                                                alt={info.full}
-                                                className="w-16 h-16 object-contain mx-auto mb-3"
-                                            />
-                                        )}
-                                        <div className="text-center">
-                                            <div className="text-xl font-bold text-gray-900">{info.short}</div>
-                                            <div className="text-xs text-gray-500 mt-0.5">{info.desc}</div>
-                                            <div className="text-sm font-semibold text-green-700 mt-2">
-                                                {isB2B ? formatPriceNet(product.b2b_price_eur || product.price_eur) : formatPrice(product.price_eur)}
-                                            </div>
-                                            {available > 0 && (
-                                                <div className="text-xs text-green-600 mt-1">{available} in stock</div>
-                                            )}
-                                            {product.stock_status === 'available_to_order' && available <= 0 && (
-                                                <div className="text-xs text-blue-600 mt-1">Available to order</div>
-                                            )}
+                {/* ═══════ STEP 1: MODEL ═══════ */}
+                {step === 'model' && (
+                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                        {Object.entries(OPTIMIZER_LABELS).map(([key, info]) => {
+                            const products = optimizers.filter(p => classifyProduct(p.sku) === key)
+                            const product = products[0]
+                            if (!product) return null
+                            const available = stockAvailable(product)
+                            const isOut = available <= 0 && product.stock_status !== 'available_to_order'
+                            const tile = MODEL_TILES[key]
+
+                            return (
+                                <Tile
+                                    key={key}
+                                    color={tile.color}
+                                    disabled={isOut}
+                                    onClick={() => {
+                                        setSelectedProduct(product)
+                                        setQuantity(product.units_per_box || 20)
+                                        setCustomQty(false)
+                                        setStep('qty')
+                                    }}
+                                    className="aspect-square"
+                                >
+                                    <div className="text-3xl">{tile.icon}</div>
+                                    <div>
+                                        <div className="text-2xl font-bold leading-tight">{info.short}</div>
+                                        <div className="text-white/70 text-xs mt-0.5">{info.desc}</div>
+                                        <div className="text-white/90 text-sm font-semibold mt-1.5">
+                                            {fmtPrice(product.b2b_price_eur || product.price_eur)}
                                         </div>
-                                    </button>
-                                )
-                            })}
-                        </div>
+                                        {available > 0 && available < 999999 && (
+                                            <div className="text-white/60 text-xs">{available} pcs</div>
+                                        )}
+                                    </div>
+                                </Tile>
+                            )
+                        })}
                     </div>
                 )}
 
-                {/* Step 2: Quantity */}
-                {step === 'qty' && selectedProduct && (
-                    <div className="space-y-6">
-                        <button onClick={() => setStep('model')} className="text-sm text-gray-500 flex items-center gap-1">
-                            <span>&larr;</span> Back
-                        </button>
+                {/* ═══════ STEP 2: QUANTITY ═══════ */}
+                {step === 'qty' && selectedProduct && !customQty && (
+                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                        {[1, 2, 5, 10].map(mult => {
+                            const n = mult * unitsPerBox
+                            return (
+                                <Tile
+                                    key={n}
+                                    color={TILE_COLORS.teal}
+                                    onClick={() => {
+                                        setQuantity(n)
+                                        setStep('accessories')
+                                    }}
+                                    className="aspect-square"
+                                >
+                                    <div className="text-4xl font-bold">{n}</div>
+                                    <div>
+                                        <div className="text-white/70 text-sm">{mult} box{mult > 1 ? 'es' : ''}</div>
+                                        <div className="text-white/90 text-sm font-semibold mt-1">
+                                            {fmtPrice(getPrice(selectedProduct, n) * n)}
+                                        </div>
+                                    </div>
+                                </Tile>
+                            )
+                        })}
 
-                        <div className="bg-white rounded-xl p-5 border shadow-sm">
-                            <div className="flex items-center gap-4 mb-4">
-                                {selectedProduct.images?.[0] && (
-                                    <img src={selectedProduct.images[0]} alt="" className="w-14 h-14 object-contain" />
-                                )}
-                                <div>
-                                    <div className="font-bold text-gray-900">{OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku) || '']?.short || selectedProduct.sku}</div>
-                                    <div className="text-xs text-gray-500">{selectedProduct.sku}</div>
-                                </div>
+                        {/* Custom qty tile */}
+                        <Tile
+                            color={TILE_COLORS.indigo}
+                            onClick={() => setCustomQty(true)}
+                            className="aspect-square"
+                        >
+                            <div className="text-3xl font-bold">#</div>
+                            <div>
+                                <div className="text-white/90 text-sm font-medium">Custom</div>
+                                <div className="text-white/60 text-xs">Enter amount</div>
                             </div>
+                        </Tile>
 
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                            <div className="flex items-center gap-2">
+                        {/* Back tile */}
+                        <Tile
+                            color={TILE_COLORS.back}
+                            onClick={() => { setStep('model'); setSelectedProduct(null) }}
+                            className="aspect-square"
+                        >
+                            <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <div className="text-white/70 text-sm">Back</div>
+                        </Tile>
+                    </div>
+                )}
+
+                {/* Custom quantity input */}
+                {step === 'qty' && selectedProduct && customQty && (
+                    <div className="max-w-lg mx-auto space-y-4">
+                        <div className="bg-slate-800 rounded-sm p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-white/70 text-sm">{unitsPerBox} per box</span>
+                                <span className="text-white/90 text-sm font-semibold">
+                                    {fmtPrice(getPrice(selectedProduct, quantity))}/pc
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setQuantity(Math.max(1, quantity - unitsPerBox))}
-                                    className="w-12 h-12 rounded-lg bg-gray-100 text-xl font-bold text-gray-700 active:bg-gray-200 flex items-center justify-center"
+                                    className="w-14 h-14 rounded-sm bg-slate-700 text-white text-2xl font-bold active:bg-slate-600 flex items-center justify-center"
                                 >
                                     −
                                 </button>
@@ -255,236 +338,232 @@ export default function QuickOrderPage() {
                                         setQuantity(isNaN(v) ? 1 : Math.max(1, v))
                                     }}
                                     onFocus={e => e.target.select()}
-                                    className="flex-1 h-12 text-center text-2xl font-bold rounded-lg border-2 border-gray-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                                    className="flex-1 h-14 text-center text-3xl font-bold bg-slate-700 text-white rounded-sm border-0 outline-none focus:ring-2 focus:ring-teal-400"
                                 />
                                 <button
                                     onClick={() => setQuantity(quantity + unitsPerBox)}
-                                    className="w-12 h-12 rounded-lg bg-gray-100 text-xl font-bold text-gray-700 active:bg-gray-200 flex items-center justify-center"
+                                    className="w-14 h-14 rounded-sm bg-slate-700 text-white text-2xl font-bold active:bg-slate-600 flex items-center justify-center"
                                 >
                                     +
                                 </button>
                             </div>
-
-                            {/* Quick qty buttons */}
-                            <div className="flex gap-2 mt-3 flex-wrap">
-                                {[unitsPerBox, unitsPerBox * 2, unitsPerBox * 5, unitsPerBox * 10].map(n => (
-                                    <button
-                                        key={n}
-                                        onClick={() => setQuantity(n)}
-                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                                            quantity === n
-                                                ? 'bg-green-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        {n} pcs
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="mt-4 flex justify-between text-sm text-gray-500">
-                                <span>{Math.ceil(quantity / unitsPerBox)} box{Math.ceil(quantity / unitsPerBox) !== 1 ? 'es' : ''} ({unitsPerBox}/box)</span>
-                                <span className="font-semibold text-gray-900">
-                                    {isB2B ? formatPriceNet(getPrice(selectedProduct, quantity)) : formatPrice(getPrice(selectedProduct, quantity))}/pc
-                                </span>
+                            <div className="text-center mt-3 text-white/50 text-sm">
+                                {Math.ceil(quantity / unitsPerBox)} box{Math.ceil(quantity / unitsPerBox) !== 1 ? 'es' : ''} &middot; {fmtPrice(getPrice(selectedProduct, quantity) * quantity)} total
                             </div>
                         </div>
 
-                        <button
-                            onClick={() => setStep('accessories')}
-                            className="w-full py-4 rounded-xl bg-green-600 text-white font-bold text-lg active:bg-green-700 transition shadow-lg"
-                        >
-                            Continue &rarr;
-                        </button>
-                    </div>
-                )}
-
-                {/* Step 3: Accessories */}
-                {step === 'accessories' && (
-                    <div className="space-y-4">
-                        <button onClick={() => setStep('qty')} className="text-sm text-gray-500 flex items-center gap-1">
-                            <span>&larr;</span> Back
-                        </button>
-
-                        <p className="text-sm text-gray-500">Need any accessories?</p>
-
-                        {accessories.length === 0 ? (
-                            <p className="text-sm text-gray-400 italic">No accessories available</p>
-                        ) : (
-                            <div className="space-y-3">
-                                {accessories.map(acc => {
-                                    const type = classifyProduct(acc.sku)
-                                    const isSelected = selectedAccessories.has(acc.id)
-                                    const available = stockAvailable(acc)
-                                    const isOut = available <= 0 && acc.stock_status !== 'available_to_order'
-
-                                    return (
-                                        <button
-                                            key={acc.id}
-                                            onClick={() => !isOut && toggleAccessory(acc)}
-                                            disabled={isOut}
-                                            className={`w-full p-4 rounded-xl border-2 text-left transition-all active:scale-[0.98] flex items-center gap-4 ${
-                                                isOut
-                                                    ? 'border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed'
-                                                    : isSelected
-                                                    ? 'border-green-500 bg-green-50 shadow-md'
-                                                    : 'border-gray-200 bg-white hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                                isSelected ? 'bg-green-600 border-green-600' : 'border-gray-300'
-                                            }`}>
-                                                {isSelected && (
-                                                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                )}
-                                            </div>
-                                            {acc.images?.[0] && (
-                                                <img src={acc.images[0]} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
-                                            )}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="font-bold text-gray-900">{type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : acc.name_en}</div>
-                                                <div className="text-xs text-gray-500">{acc.sku}</div>
-                                                {available > 0 && <div className="text-xs text-green-600">{available} in stock</div>}
-                                            </div>
-                                            <div className="text-sm font-semibold text-green-700">
-                                                {isB2B ? formatPriceNet(acc.b2b_price_eur || acc.price_eur) : formatPrice(acc.price_eur)}
-                                            </div>
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                        )}
-
-                        {/* Accessory quantities */}
-                        {selectedAccessories.size > 0 && (
-                            <div className="bg-white rounded-xl border p-4 space-y-3">
-                                <p className="text-sm font-medium text-gray-700">Accessory quantities</p>
-                                {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
-                                    const type = classifyProduct(product.sku)
-                                    return (
-                                        <div key={id} className="flex items-center gap-3">
-                                            <span className="text-sm font-medium text-gray-900 flex-1">
-                                                {type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : product.sku}
-                                            </span>
-                                            <div className="flex items-center gap-1">
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); updateAccessoryQty(id, qty - 1) }}
-                                                    className="w-9 h-9 rounded-lg bg-gray-100 text-lg font-bold active:bg-gray-200 flex items-center justify-center"
-                                                >
-                                                    −
-                                                </button>
-                                                <input
-                                                    type="number"
-                                                    inputMode="numeric"
-                                                    value={qty}
-                                                    onChange={e => {
-                                                        const v = parseInt(e.target.value)
-                                                        updateAccessoryQty(id, isNaN(v) ? 1 : v)
-                                                    }}
-                                                    onFocus={e => e.target.select()}
-                                                    onClick={e => e.stopPropagation()}
-                                                    className="w-16 h-9 text-center text-lg font-bold rounded-lg border border-gray-200 focus:border-green-500 outline-none"
-                                                />
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); updateAccessoryQty(id, qty + 1) }}
-                                                    className="w-9 h-9 rounded-lg bg-gray-100 text-lg font-bold active:bg-gray-200 flex items-center justify-center"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )}
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setStep('summary')}
-                                className="flex-1 py-4 rounded-xl bg-green-600 text-white font-bold text-lg active:bg-green-700 transition shadow-lg"
+                        <div className="grid grid-cols-2 gap-2">
+                            <Tile
+                                color={TILE_COLORS.teal}
+                                onClick={() => { setCustomQty(false); setStep('accessories') }}
+                                className="py-5"
                             >
-                                {selectedAccessories.size > 0 ? 'Review Order' : 'Skip & Review'} &rarr;
-                            </button>
+                                <div className="text-lg font-bold">Continue</div>
+                                <div className="text-white/60 text-xs">{quantity} pcs &rarr;</div>
+                            </Tile>
+                            <Tile
+                                color={TILE_COLORS.back}
+                                onClick={() => setCustomQty(false)}
+                                className="py-5"
+                            >
+                                <div className="text-lg font-bold">Preset</div>
+                                <div className="text-white/60 text-xs">&larr; boxes</div>
+                            </Tile>
                         </div>
                     </div>
                 )}
 
-                {/* Step 4: Summary */}
-                {step === 'summary' && selectedProduct && (
-                    <div className="space-y-4">
-                        <button onClick={() => setStep('accessories')} className="text-sm text-gray-500 flex items-center gap-1">
-                            <span>&larr;</span> Back
-                        </button>
+                {/* ═══════ STEP 3: ACCESSORIES ═══════ */}
+                {step === 'accessories' && (
+                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                        {accessories.map(acc => {
+                            const type = classifyProduct(acc.sku)
+                            const isSelected = selectedAccessories.has(acc.id)
+                            const available = stockAvailable(acc)
+                            const isOut = available <= 0 && acc.stock_status !== 'available_to_order'
+                            const label = type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : acc.name_en
 
-                        <div className="bg-white rounded-xl border shadow-sm divide-y">
-                            {/* Optimizer */}
-                            <div className="p-4 flex items-center gap-3">
-                                {selectedProduct.images?.[0] && (
-                                    <img src={selectedProduct.images[0]} alt="" className="w-12 h-12 object-contain" />
-                                )}
-                                <div className="flex-1">
-                                    <div className="font-bold text-gray-900">
-                                        {OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku) || '']?.short || selectedProduct.sku}
+                            return (
+                                <Tile
+                                    key={acc.id}
+                                    color={isSelected ? TILE_COLORS.green : TILE_COLORS.slate}
+                                    disabled={isOut}
+                                    onClick={() => toggleAccessory(acc)}
+                                    className="aspect-square relative"
+                                >
+                                    {isSelected && (
+                                        <div className="absolute top-2 right-2">
+                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                    {acc.images?.[0] ? (
+                                        <img src={acc.images[0]} alt="" className="w-12 h-12 object-contain brightness-0 invert opacity-80" />
+                                    ) : (
+                                        <div className="text-3xl">{type === 'CCA' ? '🔌' : '📡'}</div>
+                                    )}
+                                    <div>
+                                        <div className="text-lg font-bold leading-tight">{label}</div>
+                                        <div className="text-white/60 text-xs">{acc.sku}</div>
+                                        <div className="text-white/90 text-sm font-semibold mt-1">
+                                            {fmtPrice(acc.b2b_price_eur || acc.price_eur)}
+                                        </div>
                                     </div>
-                                    <div className="text-xs text-gray-500">{quantity} pcs &times; {isB2B ? formatPriceNet(optimizerPrice) : formatPrice(optimizerPrice)}</div>
+                                </Tile>
+                            )
+                        })}
+
+                        {/* Accessory qty adjusters if selected */}
+                        {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
+                            const type = classifyProduct(product.sku)
+                            return (
+                                <div key={`qty-${id}`} className="col-span-2 bg-slate-800 rounded-sm p-3 flex items-center gap-3">
+                                    <span className="text-white text-sm font-medium flex-1">
+                                        {type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : product.sku} qty
+                                    </span>
+                                    <button
+                                        onClick={() => updateAccessoryQty(id, qty - 1)}
+                                        className="w-10 h-10 rounded-sm bg-slate-700 text-white text-lg font-bold active:bg-slate-600 flex items-center justify-center"
+                                    >
+                                        −
+                                    </button>
+                                    <input
+                                        type="number"
+                                        inputMode="numeric"
+                                        value={qty}
+                                        onChange={e => {
+                                            const v = parseInt(e.target.value)
+                                            updateAccessoryQty(id, isNaN(v) ? 1 : v)
+                                        }}
+                                        onFocus={e => e.target.select()}
+                                        className="w-16 h-10 text-center text-lg font-bold bg-slate-700 text-white rounded-sm border-0 outline-none focus:ring-2 focus:ring-teal-400"
+                                    />
+                                    <button
+                                        onClick={() => updateAccessoryQty(id, qty + 1)}
+                                        className="w-10 h-10 rounded-sm bg-slate-700 text-white text-lg font-bold active:bg-slate-600 flex items-center justify-center"
+                                    >
+                                        +
+                                    </button>
                                 </div>
-                                <div className="font-bold text-gray-900">
-                                    {isB2B ? formatPriceNet(optimizerTotal) : formatPrice(optimizerTotal)}
+                            )
+                        })}
+
+                        {/* Skip / Continue tile */}
+                        <Tile
+                            color={TILE_COLORS.teal}
+                            onClick={() => setStep('summary')}
+                            className="aspect-square"
+                        >
+                            <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                            <div>
+                                <div className="text-lg font-bold">
+                                    {selectedAccessories.size > 0 ? 'Continue' : 'Skip'}
                                 </div>
+                                <div className="text-white/60 text-xs">Review order</div>
                             </div>
+                        </Tile>
 
-                            {/* Accessories */}
-                            {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
-                                const unitP = getPrice(product, qty)
-                                const type = classifyProduct(product.sku)
-                                return (
-                                    <div key={id} className="p-4 flex items-center gap-3">
-                                        {product.images?.[0] && (
-                                            <img src={product.images[0]} alt="" className="w-12 h-12 object-contain" />
-                                        )}
-                                        <div className="flex-1">
-                                            <div className="font-bold text-gray-900">
-                                                {type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : product.sku}
-                                            </div>
-                                            <div className="text-xs text-gray-500">{qty} pcs &times; {isB2B ? formatPriceNet(unitP) : formatPrice(unitP)}</div>
+                        {/* Back tile */}
+                        <Tile
+                            color={TILE_COLORS.back}
+                            onClick={() => setStep('qty')}
+                            className="aspect-square"
+                        >
+                            <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <div className="text-white/70 text-sm">Back</div>
+                        </Tile>
+                    </div>
+                )}
+
+                {/* ═══════ STEP 4: SUMMARY ═══════ */}
+                {step === 'summary' && selectedProduct && (
+                    <div className="max-w-lg mx-auto space-y-2">
+                        {/* Optimizer summary tile */}
+                        <div className={`${MODEL_TILES[classifyProduct(selectedProduct.sku) || '']?.color || TILE_COLORS.green} rounded-sm p-4 flex items-center gap-4`}>
+                            {selectedProduct.images?.[0] && (
+                                <img src={selectedProduct.images[0]} alt="" className="w-14 h-14 object-contain brightness-0 invert opacity-80" />
+                            )}
+                            <div className="flex-1">
+                                <div className="text-white text-xl font-bold">
+                                    {OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku) || '']?.short}
+                                </div>
+                                <div className="text-white/70 text-sm">{quantity} pcs &times; {fmtPrice(optimizerPrice)}</div>
+                            </div>
+                            <div className="text-white text-xl font-bold">{fmtPrice(optimizerTotal)}</div>
+                        </div>
+
+                        {/* Accessory summary tiles */}
+                        {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
+                            const unitP = getPrice(product, qty)
+                            const type = classifyProduct(product.sku)
+                            return (
+                                <div key={id} className={`${TILE_COLORS.slate} rounded-sm p-4 flex items-center gap-4`}>
+                                    {product.images?.[0] && (
+                                        <img src={product.images[0]} alt="" className="w-10 h-10 object-contain brightness-0 invert opacity-80" />
+                                    )}
+                                    <div className="flex-1">
+                                        <div className="text-white text-lg font-bold">
+                                            {type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : product.sku}
                                         </div>
-                                        <div className="font-bold text-gray-900">
-                                            {isB2B ? formatPriceNet(unitP * qty) : formatPrice(unitP * qty)}
-                                        </div>
+                                        <div className="text-white/70 text-sm">{qty} pcs &times; {fmtPrice(unitP)}</div>
                                     </div>
-                                )
-                            })}
+                                    <div className="text-white text-lg font-bold">{fmtPrice(unitP * qty)}</div>
+                                </div>
+                            )
+                        })}
+
+                        {/* Total bar */}
+                        <div className="bg-slate-800 rounded-sm p-4 flex justify-between items-center border border-slate-700">
+                            <span className="text-white/70 text-lg">Total</span>
+                            <span className="text-white text-2xl font-bold">{fmtPrice(grandTotal)}</span>
                         </div>
 
-                        {/* Total */}
-                        <div className="bg-white rounded-xl border p-4 flex justify-between items-center">
-                            <span className="text-lg font-bold text-gray-900">Total</span>
-                            <span className="text-xl font-bold text-green-700">
-                                {isB2B ? formatPriceNet(grandTotal) : formatPrice(grandTotal)}
-                            </span>
+                        {/* Action tiles */}
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                            <Tile
+                                color={TILE_COLORS.green}
+                                onClick={handleAddToCart}
+                                disabled={submitting}
+                                className="col-span-2 py-5"
+                            >
+                                <div className="text-xl font-bold text-center w-full">
+                                    {submitting ? 'Adding...' : 'Checkout'}
+                                </div>
+                                <div className="text-white/60 text-xs text-center w-full">Add to cart & proceed</div>
+                            </Tile>
+
+                            <Tile
+                                color={TILE_COLORS.back}
+                                onClick={() => setStep('accessories')}
+                                className="py-4"
+                            >
+                                <svg className="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                <div className="text-white/70 text-sm">Back</div>
+                            </Tile>
+
+                            <Tile
+                                color={TILE_COLORS.slate}
+                                onClick={() => {
+                                    setStep('model')
+                                    setSelectedProduct(null)
+                                    setQuantity(20)
+                                    setSelectedAccessories(new Map())
+                                }}
+                                className="py-4"
+                            >
+                                <svg className="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <div className="text-white/70 text-sm">Start Over</div>
+                            </Tile>
                         </div>
-
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={submitting}
-                            className="w-full py-4 rounded-xl bg-green-600 text-white font-bold text-lg active:bg-green-700 transition shadow-lg disabled:opacity-50"
-                        >
-                            {submitting ? 'Adding...' : 'Add to Cart & Checkout'}
-                        </button>
-
-                        <button
-                            onClick={() => {
-                                setStep('model')
-                                setSelectedProduct(null)
-                                setQuantity(20)
-                                setSelectedAccessories(new Map())
-                            }}
-                            className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-medium active:bg-gray-50 transition"
-                        >
-                            Start Over
-                        </button>
                     </div>
                 )}
             </div>
@@ -492,25 +571,18 @@ export default function QuickOrderPage() {
     )
 }
 
-function StepIndicator({ current }: { current: Step }) {
-    const steps: { key: Step; label: string }[] = [
-        { key: 'model', label: 'Model' },
-        { key: 'qty', label: 'Qty' },
-        { key: 'accessories', label: 'Add-ons' },
-        { key: 'summary', label: 'Review' },
-    ]
-
-    const currentIdx = steps.findIndex(s => s.key === current)
+function StepDots({ current }: { current: Step }) {
+    const steps: Step[] = ['model', 'qty', 'accessories', 'summary']
+    const idx = steps.indexOf(current)
 
     return (
         <div className="flex items-center gap-1.5">
             {steps.map((s, i) => (
                 <div
-                    key={s.key}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                        i <= currentIdx ? 'bg-green-600' : 'bg-gray-300'
-                    } ${i === currentIdx ? 'w-4' : ''}`}
-                    title={s.label}
+                    key={s}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i <= idx ? 'bg-teal-400' : 'bg-slate-600'
+                    } ${i === idx ? 'w-5' : 'w-1.5'}`}
                 />
             ))}
         </div>
