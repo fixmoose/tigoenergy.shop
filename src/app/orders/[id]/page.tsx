@@ -814,7 +814,9 @@ export default function OrderDetailsPage() {
                                         <p className="text-xs text-green-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <a
-                                                href={order.tracking_url || '#'}
+                                                href={order.shipping_carrier === 'DPD' && order.tracking_number
+                                                    ? `https://tracking.dpd.de/parcelstatus?query=${order.tracking_number.split(',')[0].trim()}&locale=sl_SI`
+                                                    : (order.tracking_url || '#')}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"

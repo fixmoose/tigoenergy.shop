@@ -662,8 +662,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 <p className="text-[10px] font-bold text-red-700 uppercase tracking-wider">DPD Tracking</p>
                                 <p className="text-sm font-mono text-red-900">{trackingNumber}</p>
                                 <div className="flex items-center gap-2">
-                                    {trackingUrl && (
-                                        <a href={trackingUrl} target="_blank" rel="noopener noreferrer"
+                                    {trackingNumber && (
+                                        <a href={`https://tracking.dpd.de/parcelstatus?query=${trackingNumber.split(',')[0].trim()}&locale=sl_SI`} target="_blank" rel="noopener noreferrer"
                                             className="inline-block text-xs font-bold text-red-600 hover:underline">
                                             Track on DPD &rarr;
                                         </a>

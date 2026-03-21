@@ -246,7 +246,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div>
                   <span className="text-slate-500">Tracking:</span>
-                  <a href={order.tracking_url || '#'} target="_blank" rel="noopener noreferrer" className="ml-2 font-medium text-blue-600 hover:underline">
+                  <a href={order.shipping_carrier === 'DPD' && order.tracking_number
+                    ? `https://tracking.dpd.de/parcelstatus?query=${order.tracking_number.split(',')[0].trim()}&locale=sl_SI`
+                    : (order.tracking_url || '#')} target="_blank" rel="noopener noreferrer" className="ml-2 font-medium text-blue-600 hover:underline">
                     {order.tracking_number}
                   </a>
                 </div>
