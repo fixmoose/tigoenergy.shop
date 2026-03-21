@@ -26,6 +26,9 @@ export async function generatePdfFromHtml(html: string) {
                     body { margin: 0; padding: 0; }
                     @page { size: A4; margin: 0; }
                     * { -webkit-print-color-adjust: exact; }
+                    .no-break { page-break-inside: avoid; }
+                    table { page-break-inside: auto; }
+                    tr { page-break-inside: avoid; page-break-after: auto; }
                 </style>
             </head>
             <body>

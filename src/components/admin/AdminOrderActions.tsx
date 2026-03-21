@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction, adminDeleteOrderAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
@@ -933,6 +933,37 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             {uploadingDoc === type && <span className="text-[10px] text-blue-500 mt-1">Uploading...</span>}
                         </label>
                     ))}
+                </div>
+            </details>
+
+            {/* Delete Order */}
+            <details className="mt-4 border-t border-red-100 pt-3">
+                <summary className="text-[10px] font-bold text-red-400 uppercase tracking-wider cursor-pointer hover:text-red-600">Danger Zone</summary>
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+                    <p className="text-[10px] text-red-600 mb-2">Permanently delete this order and all related data (items, payments, documents). This cannot be undone.</p>
+                    <button
+                        onClick={async () => {
+                            const typed = prompt('Type DELETE to confirm permanent deletion:')
+                            if (typed !== 'DELETE') return
+                            setLoading(true)
+                            try {
+                                const res = await adminDeleteOrderAction(orderId)
+                                if (res.success) {
+                                    router.push('/admin/orders')
+                                } else {
+                                    alert('Failed: ' + res.error)
+                                }
+                            } catch (err: any) {
+                                alert('Failed: ' + err.message)
+                            } finally {
+                                setLoading(false)
+                            }
+                        }}
+                        disabled={loading}
+                        className="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition disabled:opacity-50"
+                    >
+                        Delete Order
+                    </button>
                 </div>
             </details>
         </div>

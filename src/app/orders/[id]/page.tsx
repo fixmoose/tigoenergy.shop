@@ -9,6 +9,7 @@ import { Order, OrderItem } from '@/types/database'
 import ContactSupportModal from '@/components/orders/ContactSupportModal'
 import { submitSupportRequest } from '@/app/actions/support'
 import { modifyOrder } from '@/app/actions/order-modify'
+import { customerDeleteOrderAction } from '@/app/actions/checkout'
 import { useTranslations } from 'next-intl'
 
 export default function OrderDetailsPage() {
@@ -24,6 +25,7 @@ export default function OrderDetailsPage() {
     const [error, setError] = useState<string | null>(null)
     const [buyAgainLoading, setBuyAgainLoading] = useState(false)
     const [cancelling, setCancelling] = useState(false)
+    const [deleting, setDeleting] = useState(false)
     const [modifying, setModifying] = useState(false)
     const [isHeaderSummaryVisible, setIsHeaderSummaryVisible] = useState(false)
     const [dpdStatus, setDpdStatus] = useState<any[] | null>(null)
@@ -146,6 +148,26 @@ export default function OrderDetailsPage() {
         }
     }
 
+    const handleDeleteOrder = async () => {
+        if (!order) return
+        if (!confirm(t('confirmDelete'))) return
+
+        setDeleting(true)
+        try {
+            const res = await customerDeleteOrderAction(order.id)
+            if (res.success) {
+                router.push('/dashboard')
+            } else {
+                alert(res.error || t('deleteFailed'))
+            }
+        } catch (err) {
+            console.error('Error deleting order:', err)
+            alert(t('deleteFailed'))
+        } finally {
+            setDeleting(false)
+        }
+    }
+
     const handleModifyOrder = async () => {
         if (!order) return
         if (!confirm(t('confirmModify'))) return
@@ -221,6 +243,7 @@ export default function OrderDetailsPage() {
     // Cancellation Logic (Pending orders only, no time window)
     const now = new Date()
     const isCancellable = order.status === 'pending' && !order.confirmed_at
+    const isDeletable = order.status === 'cancelled' || isCancellable
 
     // Modification Logic (pending + not confirmed, or admin-unlocked)
     const canModify = order.status === 'pending' || order.modification_unlocked === true
@@ -472,6 +495,20 @@ export default function OrderDetailsPage() {
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                                 )}
                                                 {t('cancelOrder')}
+                                            </button>
+                                        )}
+                                        {isDeletable && (
+                                            <button
+                                                onClick={handleDeleteOrder}
+                                                disabled={deleting}
+                                                className="flex items-center gap-2 px-4 py-2 bg-red-600 border border-red-600 rounded-xl text-xs font-bold text-white hover:bg-red-700 transition-all duration-200 shadow-sm disabled:opacity-50"
+                                            >
+                                                {deleting ? (
+                                                    <span className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></span>
+                                                ) : (
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                )}
+                                                {t('deleteOrder')}
                                             </button>
                                         )}
                                         {isB2B ? (

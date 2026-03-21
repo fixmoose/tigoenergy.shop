@@ -166,16 +166,16 @@ export function generatePackingItemsTableHtml(items: any[]) {
         const totalWeight = unitWeight * item.quantity;
 
         html += `<tr style="border-bottom:1px solid #f3f4f6;">
-                <td style="padding:14px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
-                <td style="padding:14px 12px;vertical-align:top;">
+                <td style="padding:8px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
+                <td style="padding:8px 12px;vertical-align:top;">
                     <div style="font-size:12px;font-weight:600;color:#1a2b3c;">${item.product_name || item.name || ''}</div>
                     <div style="font-size:9px;color:#9ca3af;margin-top:2px;">CN Code: ${item.cn_code || '85414300'}</div>
                 </td>
-                <td style="padding:14px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
-                <td style="padding:14px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
-                <td style="padding:14px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${unitWeight.toFixed(3)} kg</td>
-                <td style="padding:14px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${totalWeight.toFixed(3)} kg</td>
-                <td style="padding:14px 0;text-align:center;vertical-align:top;">
+                <td style="padding:8px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
+                <td style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
+                <td style="padding:8px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${unitWeight.toFixed(3)} kg</td>
+                <td style="padding:8px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${totalWeight.toFixed(3)} kg</td>
+                <td style="padding:8px 0;text-align:center;vertical-align:top;">
                     <div style="width:16px;height:16px;border:2px solid #d1d5db;border-radius:3px;margin:0 auto;"></div>
                 </td>
             </tr>`;
@@ -210,15 +210,15 @@ export function generateItemsTableHtml(items: any[], currency: string = '€', r
         const total = (parseFloat(item.unit_price || 0) * item.quantity).toFixed(2);
 
         html += `<tr style="border-bottom:1px solid #f3f4f6;">
-                <td style="padding:16px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
-                <td style="padding:16px 12px;vertical-align:top;">
+                <td style="padding:8px 0;color:#d1d5db;font-size:10px;vertical-align:top;">${index + 1}</td>
+                <td style="padding:8px 12px;vertical-align:top;">
                     <div style="font-size:12px;font-weight:600;color:#1a2b3c;">${item.product_name}</div>
                     <div style="font-size:9px;color:#9ca3af;margin-top:2px;">${cnLabel}: ${item.cn_code || '85414300'}</div>
                 </td>
-                <td style="padding:16px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
-                <td style="padding:16px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
-                <td style="padding:16px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${currency} ${price}</td>
-                <td style="padding:16px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${currency} ${total}</td>
+                <td style="padding:8px 12px;vertical-align:top;font-size:11px;color:#6b7280;">${item.sku || '—'}</td>
+                <td style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:#1a2b3c;vertical-align:top;">${item.quantity}</td>
+                <td style="padding:8px 0;text-align:right;font-size:11px;color:#6b7280;vertical-align:top;">${currency} ${price}</td>
+                <td style="padding:8px 0;text-align:right;font-size:12px;font-weight:700;color:#1a2b3c;vertical-align:top;">${currency} ${total}</td>
             </tr>`;
     });
 

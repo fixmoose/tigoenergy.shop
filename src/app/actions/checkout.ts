@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { cookies, headers } from 'next/headers'
 import { clearCartServer } from '@/lib/db/cart'
 import { getMarketFromKey, MARKETS, EU_COUNTRY_CODES } from '@/lib/constants/markets'
@@ -80,7 +80,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         let subtotal = 0
         let totalWeight = 0
-        const orderItemsData = []
+        const orderItemsData: any[] = []
 
         for (const item of cartItems) {
             const product = (products as any[]).find((p: any) => p.id === item.product_id)
@@ -241,6 +241,73 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
 
         if (itemsError) throw new Error(itemsError.message)
+
+        // 6a. Auto-confirm pickup orders with full stock
+        const isPickupOrder = shippingCarrier === 'Personal Pick-up'
+        const isPaymentProofRequired = isPickupOrder && rawData.pickup_payment_proof_required === 'true'
+        let autoConfirmed = false
+
+        if (isPickupOrder && customerId) {
+            try {
+                // Check stock availability for ALL items
+                const productIds = orderItemsData.map(i => i.product_id).filter(Boolean)
+                const { data: products } = await supabase
+                    .from('products')
+                    .select('id, stock_quantity, reserved_quantity')
+                    .in('id', productIds)
+
+                const allInStock = products?.every((product: any) => {
+                    const orderedQty = orderItemsData.find(i => i.product_id === product.id)?.quantity || 0
+                    const available = (product.stock_quantity || 0) - (product.reserved_quantity || 0)
+                    return available >= orderedQty
+                }) ?? false
+
+                if (allInStock) {
+                    // Auto-confirm order
+                    const adminSupabase = await createAdminClient()
+                    await adminSupabase.from('orders').update({
+                        status: 'processing',
+                        confirmed_at: new Date().toISOString(),
+                        packing_slip_url: `/api/orders/${order.id}/packing-slip`,
+                        ...(isPaymentProofRequired ? { pickup_payment_proof_required: true } : {}),
+                    }).eq('id', order.id)
+
+                    autoConfirmed = true
+
+                    // Send packing slip to warehouse
+                    const { data: warehouseWorkers } = await adminSupabase
+                        .from('drivers')
+                        .select('id, name, email')
+                        .eq('is_warehouse', true)
+                        .limit(1)
+
+                    if (warehouseWorkers && warehouseWorkers.length > 0) {
+                        const worker = warehouseWorkers[0]
+                        const { sendWarehouseEmail } = await import('@/lib/warehouse')
+                        const extraNote = isPaymentProofRequired
+                            ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT BEFORE RELEASE'
+                            : undefined
+                        await sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
+                    }
+                } else if (isPaymentProofRequired) {
+                    // Not enough stock but still save the flag
+                    const adminSupabase = await createAdminClient()
+                    await adminSupabase.from('orders').update({
+                        pickup_payment_proof_required: true,
+                    }).eq('id', order.id)
+                }
+            } catch (autoConfirmErr) {
+                console.error('Auto-confirm pickup error (non-fatal):', autoConfirmErr)
+            }
+        } else if (isPaymentProofRequired) {
+            // Non-pickup but flag was set (shouldn't happen, but save it anyway)
+            try {
+                const adminSupabase = await createAdminClient()
+                await adminSupabase.from('orders').update({
+                    pickup_payment_proof_required: true,
+                }).eq('id', order.id)
+            } catch (e) { /* non-fatal */ }
+        }
 
         // 6b. Save shipping address to customer's address book (if logged in)
         if (customerId) {
@@ -450,5 +517,39 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         }).catch(() => {})
 
         return { success: false, error: err.message || 'Failed to place order' }
+    }
+}
+
+export async function customerDeleteOrderAction(orderId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Not authenticated' }
+
+        // Verify ownership and deletable status
+        const { data: order, error: fetchErr } = await supabase
+            .from('orders')
+            .select('id, customer_id, status, confirmed_at')
+            .eq('id', orderId)
+            .single()
+
+        if (fetchErr || !order) return { success: false, error: 'Order not found' }
+        if (order.customer_id !== user.id) return { success: false, error: 'Unauthorized' }
+
+        const isDeletable = order.status === 'cancelled' || (order.status === 'pending' && !order.confirmed_at)
+        if (!isDeletable) return { success: false, error: 'Order cannot be deleted in its current state' }
+
+        // Cascade delete using admin client
+        const admin = await createAdminClient()
+        await admin.from('order_items').delete().eq('order_id', orderId)
+        await admin.from('order_payments').delete().eq('order_id', orderId)
+        await admin.from('order_returns').delete().eq('order_id', orderId)
+        await admin.from('delivery_tokens').delete().eq('order_id', orderId)
+        await admin.from('orders').delete().eq('id', orderId)
+
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in customerDeleteOrderAction:', err)
+        return { success: false, error: err.message || 'Failed to delete order' }
     }
 }

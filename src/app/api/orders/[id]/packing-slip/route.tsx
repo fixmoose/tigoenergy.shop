@@ -88,7 +88,10 @@ export async function GET(
             total_boxes: String(parcels.length),
             total_weight: `${totalWeight.toFixed(2)} kg`,
             tracking_number: order.tracking_number || 'N/A',
-            carrier_name: order.shipping_carrier || 'Standard'
+            carrier_name: order.shipping_carrier || 'Standard',
+            payment_proof_warning: order.pickup_payment_proof_required
+                ? '<div style="margin:0 36px 8px;padding:12px;background:#fef2f2;border:3px solid #ef4444;border-radius:6px;text-align:center;"><span style="font-size:15px;font-weight:900;color:#dc2626;">OBVEZNO PREVERITI DOKAZ O PLAČILU</span><br><span style="font-size:10px;color:#991b1b;">VERIFY PROOF OF PAYMENT BEFORE RELEASING ITEMS</span></div>'
+                : ''
         }
 
         // 5. Replace Placeholders

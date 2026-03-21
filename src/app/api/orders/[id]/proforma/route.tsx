@@ -5,89 +5,89 @@ import { getPinnedTemplate, replacePlaceholders, generateItemsTableHtml, Documen
 import { generatePdfFromHtml } from '../../../../../lib/pdf-generator'
 import { CUSTOMER_BLOCK, WRAP_START, WRAP_END } from '../../../../../lib/document-templates'
 
-// Fully localized proforma template — uses {label_*} placeholders instead of hardcoded English
+// Fully localized proforma template — compact A4 layout with thin header
 const LOCALIZED_PROFORMA_TEMPLATE = `${WRAP_START}
-<div style="background:#1a2b3c;padding:40px 48px;">
+<div style="border-top:6px solid #1a2b3c;padding:16px 36px;background:#ffffff;">
   <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="vertical-align:top;width:58%;padding-right:20px;">
-      <img src="{company_logo}" alt="" style="height:44px;max-width:160px;object-fit:contain;display:block;margin-bottom:14px;">
-      <div style="font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
-        <strong style="font-size:13px;color:#ffffff;display:block;margin-bottom:2px;">{company_name}</strong>
+    <td style="vertical-align:top;width:58%;padding-right:16px;">
+      <img src="{company_logo}" alt="" style="height:32px;max-width:140px;object-fit:contain;display:block;margin-bottom:8px;">
+      <div style="font-size:10px;color:#6b7280;line-height:1.7;">
+        <strong style="font-size:11px;color:#1a2b3c;display:block;margin-bottom:1px;">{company_name}</strong>
         {company_address}<br>VAT: {company_vat}<br>{company_email}
       </div>
     </td>
     <td style="vertical-align:top;text-align:right;width:42%;">
-      <div style="font-size:28px;font-weight:300;letter-spacing:-1px;color:#ffffff;line-height:1.1;">{proforma_title}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;margin:4px 0 18px;">{proforma_subtitle}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.5);">{invoice_number}</div>
+      <div style="font-size:22px;font-weight:300;letter-spacing:-1px;color:#1a2b3c;line-height:1.1;">{proforma_title}</div>
+      <div style="font-size:10px;color:#9ca3af;font-style:italic;margin:3px 0 8px;">{proforma_subtitle}</div>
+      <div style="font-size:11px;color:#9ca3af;">{invoice_number}</div>
     </td>
   </tr></table>
 </div>
-<div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:12px 48px;font-size:11px;color:#92400e;">
+<div style="background:#fffbeb;border-bottom:2px solid #f59e0b;padding:8px 36px;font-size:10px;color:#92400e;">
   <strong>{proforma_note_label}</strong> {proforma_note_text}
 </div>
-<div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:14px 48px;">
+<div style="background:#f9fafb;border-bottom:1px solid #f3f4f6;padding:8px 36px;">
   <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_date}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{invoice_date}</span></td>
-    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_valid_until}</span><span style="font-size:12px;font-weight:600;color:#f59e0b;">{due_date}</span></td>
-    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_order_ref}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{order_number}</span></td>
-    <td style="padding:2px 32px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_payment_method}</span><span style="font-size:12px;font-weight:600;color:#1a2b3c;">{payment_method}</span></td>
+    <td style="padding:2px 24px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_date}</span><span style="font-size:11px;font-weight:600;color:#1a2b3c;">{invoice_date}</span></td>
+    <td style="padding:2px 24px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_valid_until}</span><span style="font-size:11px;font-weight:600;color:#f59e0b;">{due_date}</span></td>
+    <td style="padding:2px 24px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_order_ref}</span><span style="font-size:11px;font-weight:600;color:#1a2b3c;">{order_number}</span></td>
+    <td style="padding:2px 24px 2px 0;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;">{label_payment_method}</span><span style="font-size:11px;font-weight:600;color:#1a2b3c;">{payment_method}</span></td>
   </tr></table>
 </div>
-<div style="padding:32px 48px;border-bottom:1px solid #f3f4f6;">
+<div style="padding:16px 36px;border-bottom:1px solid #f3f4f6;">
   <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="width:50%;vertical-align:top;padding-right:24px;">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">{label_bill_to}</div>
+    <td style="width:50%;vertical-align:top;padding-right:20px;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:6px;">{label_bill_to}</div>
       ${CUSTOMER_BLOCK}
     </td>
-    <td style="width:50%;vertical-align:top;padding-left:24px;border-left:1px solid #f3f4f6;">
-      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:10px;">{label_ship_to}</div>
-      <div style="font-size:11px;color:#6b7280;line-height:1.8;">{shipping_address}</div>
+    <td style="width:50%;vertical-align:top;padding-left:20px;border-left:1px solid #f3f4f6;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:6px;">{label_ship_to}</div>
+      <div style="font-size:10px;color:#6b7280;line-height:1.7;">{shipping_address}</div>
     </td>
   </tr></table>
 </div>
-<div style="padding:32px 48px;">
-  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:20px;">{label_items}</div>
+<div style="padding:16px 36px;">
+  <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:10px;">{label_items}</div>
   {items_table}
 </div>
-<div style="padding:0 48px 32px;">
+<div style="padding:0 36px 16px;">
   <table style="width:100%;border-collapse:collapse;"><tr>
     <td style="width:55%;"></td>
     <td style="width:45%;">
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <tr><td style="padding:5px 0;color:#9ca3af;">{label_subtotal}</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{subtotal_net}</td></tr>
-        <tr><td style="padding:5px 0;color:#9ca3af;">{label_shipping}</td><td style="padding:5px 0;text-align:right;font-weight:600;color:#1a2b3c;">{shipping_cost}</td></tr>
-        <tr style="border-bottom:2px solid #1a2b3c;"><td style="padding:5px 0 10px;color:#9ca3af;">{label_vat}</td><td style="padding:5px 0 10px;text-align:right;font-weight:600;color:#1a2b3c;">{vat_total}</td></tr>
-        <tr><td style="padding:14px 0 6px;font-size:14px;font-weight:700;color:#1a2b3c;">{label_total}</td><td style="padding:14px 0 6px;text-align:right;font-size:22px;font-weight:700;color:#1a2b3c;">{total_amount}</td></tr>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr><td style="padding:4px 0;color:#9ca3af;">{label_subtotal}</td><td style="padding:4px 0;text-align:right;font-weight:600;color:#1a2b3c;">{subtotal_net}</td></tr>
+        <tr><td style="padding:4px 0;color:#9ca3af;">{label_shipping}</td><td style="padding:4px 0;text-align:right;font-weight:600;color:#1a2b3c;">{shipping_cost}</td></tr>
+        <tr style="border-bottom:2px solid #1a2b3c;"><td style="padding:4px 0 8px;color:#9ca3af;">{label_vat}</td><td style="padding:4px 0 8px;text-align:right;font-weight:600;color:#1a2b3c;">{vat_total}</td></tr>
+        <tr><td style="padding:10px 0 4px;font-size:13px;font-weight:700;color:#1a2b3c;">{label_total}</td><td style="padding:10px 0 4px;text-align:right;font-size:18px;font-weight:700;color:#1a2b3c;">{total_amount}</td></tr>
       </table>
     </td>
   </tr></table>
 </div>
-<div style="margin:0 48px 32px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
-  <div style="padding:12px 20px;border-bottom:1px solid #e5e7eb;">
+<div style="margin:0 36px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+  <div style="padding:8px 16px;border-bottom:1px solid #e5e7eb;">
     <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;">{label_bank_details}</span>
-    <span style="font-size:11px;color:#6b7280;margin-left:14px;">{label_reference}: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
+    <span style="font-size:10px;color:#6b7280;margin-left:12px;">{label_reference}: <strong style="font-family:monospace;color:#1a2b3c;">{reference}</strong></span>
   </div>
   <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="width:50%;padding:18px 20px;vertical-align:top;border-right:1px solid #f3f4f6;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">{label_regular}</div>
-      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+    <td style="width:50%;padding:12px 16px;vertical-align:top;border-right:1px solid #f3f4f6;">
+      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{label_regular}</div>
+      <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_si}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
-    <td style="width:50%;padding:18px 20px;vertical-align:top;">
-      <div style="font-size:11px;font-weight:700;color:#1a2b3c;margin-bottom:8px;">{label_faster}</div>
-      <table style="border-collapse:collapse;font-size:11px;line-height:2.1;">
-        <tr><td style="color:#9ca3af;padding-right:12px;min-width:70px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
-        <tr><td style="color:#9ca3af;padding-right:12px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
+    <td style="width:50%;padding:12px 16px;vertical-align:top;">
+      <div style="font-size:10px;font-weight:700;color:#1a2b3c;margin-bottom:4px;">{label_faster}</div>
+      <table style="border-collapse:collapse;font-size:10px;line-height:1.9;">
+        <tr><td style="color:#9ca3af;padding-right:10px;min-width:60px;font-size:9px;text-transform:uppercase;">IBAN</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_iban_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">BIC/SWIFT</td><td style="font-family:monospace;font-weight:600;color:#1a2b3c;">{company_bic_be}</td></tr>
+        <tr><td style="color:#9ca3af;padding-right:10px;font-size:9px;text-transform:uppercase;">Account</td><td style="color:#6b7280;">{company_name}</td></tr>
       </table>
     </td>
   </tr></table>
 </div>
-<div style="padding:16px 48px;border-top:1px solid #f3f4f6;text-align:center;font-size:9px;color:#9ca3af;letter-spacing:0.3px;">
+<div style="padding:10px 36px;border-top:1px solid #f3f4f6;text-align:center;font-size:8px;color:#9ca3af;letter-spacing:0.3px;">
   {company_name} &middot; {company_address} &middot; VAT: {company_vat} &middot; {company_email} &middot; {company_phone}
 </div>
 ${WRAP_END}`

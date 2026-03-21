@@ -91,6 +91,8 @@ export default function CheckoutPage() {
     const [shippingRates, setShippingRates] = useState<any[]>([])
     const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
     const [loadingRates, setLoadingRates] = useState(false)
+    const [customerPaymentTerms, setCustomerPaymentTerms] = useState<string>('prepayment')
+    const [pickupPaymentAcknowledged, setPickupPaymentAcknowledged] = useState(false)
 
     // VAT Validation State
     const [validatingVat, setValidatingVat] = useState(false)
@@ -244,6 +246,7 @@ export default function CheckoutPage() {
                     .single()
 
                 if (customerData) {
+                    if (customerData.payment_terms) setCustomerPaymentTerms(customerData.payment_terms)
                     const addresses: SavedAddress[] = (customerData.addresses || []).map((a: SavedAddress) => ({
                         ...a,
                         country: normalizeCountryCode(a.country),
@@ -673,6 +676,7 @@ export default function CheckoutPage() {
             data.append('exchange_rate', String(rates[currentCurrency.code] || 1))
             if (selectedShippingId) data.append('shipping_id', selectedShippingId)
             if (modifyingOrder) data.append('original_order_id', modifyingOrder.orderId)
+            if (pickupPaymentAcknowledged) data.append('pickup_payment_proof_required', 'true')
 
             const res = await placeOrder({}, data)
             if (res.error) {
@@ -1045,6 +1049,24 @@ export default function CheckoutPage() {
                                 </div>
                             ) : (
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">{t('noShippingMethods')}</div>
+                            )}
+
+                            {/* Pickup payment proof notice — prepayment customers only */}
+                            {selectedShippingRate?.carrier === 'Personal Pick-up' && customerPaymentTerms !== 'net30' && (
+                                <div className="mt-4 bg-amber-50 border-2 border-amber-300 rounded-xl p-4">
+                                    <label className="flex items-start gap-3 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={pickupPaymentAcknowledged}
+                                            onChange={e => setPickupPaymentAcknowledged(e.target.checked)}
+                                            className="mt-1 text-amber-600 rounded"
+                                        />
+                                        <div>
+                                            <p className="font-bold text-amber-800 text-sm">{t('paymentProofTitle')}</p>
+                                            <p className="text-xs text-amber-700 mt-1">{t('paymentProofDescription')}</p>
+                                        </div>
+                                    </label>
+                                </div>
                             )}
                         </div>
 

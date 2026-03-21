@@ -255,6 +255,9 @@ export interface Order {
   payment_due_date?: string | null
   overdue_reminder_sent_at?: string | null
 
+  // Pickup payment proof
+  pickup_payment_proof_required?: boolean
+
   // Order modification
   modification_unlocked?: boolean
   modification_unlocked_at?: string | null
