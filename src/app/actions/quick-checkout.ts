@@ -206,8 +206,7 @@ export async function placeQuickOrder(
                 ? 'domestic'
                 : (EU_COUNTRY_CODES.includes(shippingAddress.country) ? 'eu' : 'export'),
             market: market.key,
-            language: 'en',
-            source: 'quick_order',
+            language: headersList.get('x-preferred-language') || market.defaultLanguage || 'en',
             ...(pickupPaymentProofRequired ? { pickup_payment_proof_required: true } : {}),
         }
 

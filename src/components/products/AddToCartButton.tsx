@@ -101,7 +101,7 @@ export default function AddToCartButton({ product, userId, pricing }: { product:
 
         {message && <div className="text-sm text-gray-600">{message}</div>}
       </div>
-      {canAddToCart && <LowStockBadge available={availableStock} ordered={quantity} />}
+      {canAddToCart && <LowStockBadge available={availableStock} ordered={quantity} label={tc('lowStockBadge', { available: availableStock })} />}
     </div>
   )
 }

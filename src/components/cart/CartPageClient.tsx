@@ -214,7 +214,7 @@ export default function CartPageClient() {
               )}
             </div>
 
-            {hasOverStock && <div className="mb-4"><LowStockWarning /></div>}
+            {hasOverStock && <div className="mb-4"><LowStockWarning title={tc('lowStockTitle')} note={tc('lowStockNote')} /></div>}
 
             <div className="space-y-3">
               <Link href="/checkout" className="block w-full text-center bg-green-600 text-white text-lg font-bold py-3.5 rounded-lg hover:bg-green-700 transition-all shadow-lg shadow-green-200">

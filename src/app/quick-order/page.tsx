@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { Product } from '@/types/database'
 import { LowStockWarning, LowStockBadge } from '@/components/ui/LowStockWarning'
 import { placeQuickOrder } from '@/app/actions/quick-checkout'
+import { useTranslations } from 'next-intl'
 
 // ─── MLPE classification ────────────────────────────────────────────────────
 const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: string }> = {
@@ -33,6 +34,7 @@ type View = 'catalog' | 'boxqty' | 'browse' | 'shipping' | 'confirm' | 'success'
 export default function QuickOrderPage() {
     const { formatPrice, formatPriceNet, isB2B } = useCurrency()
     const router = useRouter()
+    const t = useTranslations('quickOrder')
 
     const [optimizers, setOptimizers] = useState<Product[]>([])
     const [inverters, setInverters] = useState<Product[]>([])
@@ -139,7 +141,6 @@ export default function QuickOrderPage() {
         setBoxQtyProduct(null)
         setCustomQty(false)
         setView('catalog')
-        // Scroll to communicators after a tick (wait for render)
         setTimeout(() => {
             communicatorsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)
@@ -212,30 +213,29 @@ export default function QuickOrderPage() {
             <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto">
                 <div className="flex-1 flex flex-col justify-center px-6 py-8">
                     <img src="/tigo-leaf.png" alt="" className="w-12 h-12 brightness-0 invert opacity-80 mb-6" />
-                    <h1 className="text-2xl font-bold text-white mb-4">Quick Order</h1>
+                    <h1 className="text-2xl font-bold text-white mb-4">{t('termsTitle')}</h1>
                     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
                         <p className="text-slate-300 text-sm leading-relaxed mb-3">
-                            This is a simplified mobile ordering interface. Due to the compact format,
-                            some product details, specifications, and legal text may not be fully visible.
+                            {t('termsIntro')}
                         </p>
                         <p className="text-slate-300 text-sm leading-relaxed mb-3">
-                            By proceeding, you acknowledge and agree that:
+                            {t('termsAgreeIntro')}
                         </p>
                         <ul className="text-slate-400 text-sm space-y-2 ml-4 list-disc">
-                            <li>Product images are for reference only</li>
-                            <li>Full specs available on the desktop version</li>
-                            <li>All orders subject to our <a href="/terms" className="text-teal-400 underline">Terms & Conditions</a></li>
-                            <li>Prices confirmed at checkout</li>
+                            <li>{t('termsImages')}</li>
+                            <li>{t('termsDesktop')}</li>
+                            <li>{t('termsTC')} <a href="/terms" className="text-teal-400 underline">{t('termsTCLink')}</a></li>
+                            <li>{t('termsPrices')}</li>
                         </ul>
                     </div>
                     <button
                         onClick={() => { localStorage.setItem('quick-order-terms', 'accepted'); setTermsAccepted(true) }}
                         className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-green-700 transition-all"
                     >
-                        I Agree — Continue
+                        {t('agreeBtn')}
                     </button>
                     <button onClick={() => router.push('/')} className="w-full text-slate-400 py-3 text-sm mt-2 active:text-white transition">
-                        Go Back
+                        {t('goBack')}
                     </button>
                 </div>
             </div>
@@ -251,33 +251,33 @@ export default function QuickOrderPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Order Placed!</h1>
+                <h1 className="text-2xl font-bold text-white mb-2">{t('orderPlaced')}</h1>
                 <p className="text-slate-400 text-sm text-center mb-2">#{orderResult.orderNumber}</p>
                 {orderResult.shippingCost !== undefined && orderResult.shippingCost > 0 && (
                     <p className="text-slate-400 text-sm text-center mb-1">
-                        Shipping: {fmtPrice(orderResult.shippingCost)} ({orderResult.boxCount} box{(orderResult.boxCount || 1) !== 1 ? 'es' : ''})
+                        {t('shippingLabel')}: {fmtPrice(orderResult.shippingCost)} ({orderResult.boxCount} {(orderResult.boxCount || 1) !== 1 ? t('boxes') : t('box')})
                     </p>
                 )}
                 {orderResult.totalWithShipping !== undefined && (
                     <p className="text-white text-lg font-bold mb-6">
-                        Total: {fmtPrice(orderResult.totalWithShipping)}
+                        {t('totalLabel')}: {fmtPrice(orderResult.totalWithShipping)}
                     </p>
                 )}
                 <p className="text-slate-500 text-xs text-center mb-8 max-w-xs">
-                    You&apos;ll receive a confirmation email shortly. If stock verification is needed, we&apos;ll contact you within 24 hours.
+                    {t('confirmationNote')}
                 </p>
                 <div className="space-y-3 w-full max-w-xs">
                     <button onClick={() => router.push(`/orders/${orderResult.orderId}`)}
                         className="w-full bg-slate-800 border border-slate-700 text-white py-3 rounded-lg font-medium active:bg-slate-700 transition-all">
-                        View Order
+                        {t('viewOrder')}
                     </button>
                     <button onClick={() => { setView('catalog'); setOrderResult(null) }}
                         className="w-full bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700 transition-all">
-                        New Order
+                        {t('newOrder')}
                     </button>
                     <button onClick={() => router.push('/')}
                         className="w-full text-slate-500 py-2 text-sm active:text-white transition">
-                        Back to Home
+                        {t('backToHome')}
                     </button>
                 </div>
             </div>
@@ -291,14 +291,14 @@ export default function QuickOrderPage() {
                 <div className="px-4 pt-4 pb-2">
                     <div className="flex items-center gap-3">
                         <BackButton onClick={() => setView('catalog')} />
-                        <h1 className="text-xl font-medium text-white flex-1">How do you want it?</h1>
+                        <h1 className="text-xl font-medium text-white flex-1">{t('shippingTitle')}</h1>
                     </div>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center px-4 pb-8">
                     {/* Order summary */}
                     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
-                        <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">Your order</p>
+                        <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">{t('yourOrder')}</p>
                         <div className="space-y-1.5">
                             {Array.from(cart.values()).map(({ product, qty }) => (
                                 <div key={product.id} className="flex justify-between text-sm">
@@ -310,12 +310,12 @@ export default function QuickOrderPage() {
                             ))}
                         </div>
                         <div className="border-t border-slate-700 mt-3 pt-2 flex justify-between">
-                            <span className="text-white font-bold">Subtotal</span>
+                            <span className="text-white font-bold">{t('subtotal')}</span>
                             <span className="text-white font-bold">{fmtPrice(cartTotal)}</span>
                         </div>
                     </div>
 
-                    {hasOverStock && <div className="mb-4"><LowStockWarning variant="dark" /></div>}
+                    {hasOverStock && <div className="mb-4"><LowStockWarning variant="dark" title={t('lowStockSomeItems')} note={t('lowStockNote')} /></div>}
 
                     {orderResult?.error && (
                         <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-3 py-2.5 mb-4">
@@ -338,9 +338,9 @@ export default function QuickOrderPage() {
                                 </svg>
                             </div>
                             <div className="text-center">
-                                <div className="text-white font-bold text-sm">Lastni prevzem</div>
-                                <div className="text-slate-400 text-[11px] mt-1">Personal Pick-up</div>
-                                <div className="text-green-400 text-xs font-semibold mt-1">Free</div>
+                                <div className="text-white font-bold text-sm">{t('pickupTitle')}</div>
+                                <div className="text-slate-400 text-[11px] mt-1">{t('pickupSubtitle')}</div>
+                                <div className="text-green-400 text-xs font-semibold mt-1">{t('pickupFree')}</div>
                             </div>
                             {submitting && shippingMode === 'pickup' && (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -360,9 +360,9 @@ export default function QuickOrderPage() {
                                 </svg>
                             </div>
                             <div className="text-center">
-                                <div className="text-white font-bold text-sm">Dostava</div>
-                                <div className="text-slate-400 text-[11px] mt-1">DPD to address on file</div>
-                                <div className="text-blue-400 text-xs font-semibold mt-1">+ shipping</div>
+                                <div className="text-white font-bold text-sm">{t('deliveryTitle')}</div>
+                                <div className="text-slate-400 text-[11px] mt-1">{t('deliverySubtitle')}</div>
+                                <div className="text-blue-400 text-xs font-semibold mt-1">{t('deliveryShipping')}</div>
                             </div>
                             {submitting && shippingMode === 'delivery' && (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -384,7 +384,7 @@ export default function QuickOrderPage() {
                     <div className="px-4 pt-4 pb-2">
                         <div className="flex items-center gap-3">
                             <BackButton onClick={() => { setView('catalog'); setBoxQtyProduct(null) }} />
-                            <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — Quantity</h1>
+                            <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — {t('quantity')}</h1>
                         </div>
                     </div>
                     <div className="flex-1 px-4 pb-4 pt-2">
@@ -400,7 +400,7 @@ export default function QuickOrderPage() {
                                     >
                                         <div className="text-4xl font-bold">{n}</div>
                                         <div>
-                                            <div className="text-white/70 text-sm">{mult} box{mult > 1 ? 'es' : ''}</div>
+                                            <div className="text-white/70 text-sm">{mult} {mult > 1 ? t('boxes') : t('box')}</div>
                                             <div className="text-white/90 text-sm font-semibold mt-1">
                                                 {fmtPrice(getPrice(boxQtyProduct, n) * n)}
                                             </div>
@@ -415,8 +415,8 @@ export default function QuickOrderPage() {
                             >
                                 <div className="text-3xl font-bold">#</div>
                                 <div>
-                                    <div className="text-white/90 text-sm font-medium">Custom</div>
-                                    <div className="text-white/60 text-xs">Enter amount</div>
+                                    <div className="text-white/90 text-sm font-medium">{t('custom')}</div>
+                                    <div className="text-white/60 text-xs">{t('enterAmount')}</div>
                                 </div>
                             </button>
                             <button
@@ -427,7 +427,7 @@ export default function QuickOrderPage() {
                                 <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
-                                <div className="text-white/70 text-sm">Back</div>
+                                <div className="text-white/70 text-sm">{t('back')}</div>
                             </button>
                         </div>
                     </div>
@@ -441,15 +441,15 @@ export default function QuickOrderPage() {
                 <div className="px-4 pt-4 pb-2">
                     <div className="flex items-center gap-3">
                         <BackButton onClick={() => setCustomQty(false)} />
-                        <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — Custom Qty</h1>
+                        <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — {t('customQty')}</h1>
                     </div>
                 </div>
                 <div className="flex-1 px-4 pb-4 pt-4">
                     <div className="bg-slate-800 rounded-lg p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <span className="text-white/70 text-sm">{unitsPerBox} per box</span>
+                            <span className="text-white/70 text-sm">{unitsPerBox} {t('perBox')}</span>
                             <span className="text-white/90 text-sm font-semibold">
-                                {fmtPrice(getPrice(boxQtyProduct, boxQty))}/pc
+                                {fmtPrice(getPrice(boxQtyProduct, boxQty))}/{t('pcs')}
                             </span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -463,12 +463,12 @@ export default function QuickOrderPage() {
                                 className="w-14 h-14 rounded-lg bg-slate-700 text-white text-2xl font-bold active:bg-slate-600 flex items-center justify-center">+</button>
                         </div>
                         <div className="text-center mt-3 text-white/50 text-sm">
-                            {Math.ceil(boxQty / unitsPerBox)} box{Math.ceil(boxQty / unitsPerBox) !== 1 ? 'es' : ''} &middot; {fmtPrice(getPrice(boxQtyProduct, boxQty) * boxQty)} total
+                            {Math.ceil(boxQty / unitsPerBox)} {Math.ceil(boxQty / unitsPerBox) !== 1 ? t('boxes') : t('box')} &middot; {fmtPrice(getPrice(boxQtyProduct, boxQty) * boxQty)} {t('total').toLowerCase()}
                         </div>
                     </div>
                     <button onClick={() => addMLPEToCart(boxQtyProduct, boxQty)}
                         className="w-full mt-4 bg-green-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-green-700 transition-all">
-                        Add {boxQty} pcs to Order
+                        {t('addToOrder', { qty: boxQty })}
                     </button>
                 </div>
             </div>
@@ -492,13 +492,13 @@ export default function QuickOrderPage() {
                 <div className="px-4 pt-4 pb-2">
                     <div className="flex items-center gap-3 mb-3">
                         <BackButton onClick={() => { setView('catalog'); setSearchQuery('') }} />
-                        <h1 className="text-xl font-medium text-white flex-1">All Products</h1>
+                        <h1 className="text-xl font-medium text-white flex-1">{t('allProducts')}</h1>
                     </div>
                     <input
                         type="search"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="Search products..."
+                        placeholder={t('searchPlaceholder')}
                         className="w-full bg-slate-800 text-white rounded-lg px-4 py-3 text-sm border border-slate-700 placeholder-slate-500 outline-none focus:ring-2 focus:ring-teal-400"
                     />
                 </div>
@@ -509,21 +509,21 @@ export default function QuickOrderPage() {
                                 onTap={() => isMLPE(p) ? (() => { setBoxQtyProduct(p); setView('boxqty'); setCustomQty(false) })() : tapProduct(p)}
                                 onDecrement={() => decrementProduct(p.id)}
                                 isAnimating={lastTapped === p.id}
-                                fmtPrice={fmtPrice} stockAvailable={stockAvailable} />
+                                fmtPrice={fmtPrice} stockAvailable={stockAvailable} pcsLabel={t('pcs')} />
                         ))}
                     </div>
                     {filtered.length === 0 && (
-                        <p className="text-center text-slate-500 mt-8">No products found</p>
+                        <p className="text-center text-slate-500 mt-8">{t('noProducts')}</p>
                     )}
                 </div>
                 {/* Floating checkout bar */}
                 {cartItemCount > 0 && (
                     <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
-                        {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
+                        {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" title={t('lowStockSomeItems')} note={t('lowStockNote')} /></div>}
                         <button onClick={() => setView('shipping')} disabled={submitting}
                             className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                            <span>Checkout</span>
-                            <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} items &middot; {fmtPrice(cartTotal)}</span>
+                            <span>{t('checkout')}</span>
+                            <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
                         </button>
                     </div>
                 )}
@@ -538,7 +538,7 @@ export default function QuickOrderPage() {
             <div className="px-4 pt-4 pb-2">
                 <div className="flex items-center gap-3">
                     <BackButton onClick={() => router.push('/')} />
-                    <h1 className="text-xl font-medium text-white flex-1">Quick Order</h1>
+                    <h1 className="text-xl font-medium text-white flex-1">{t('title')}</h1>
                 </div>
             </div>
 
@@ -547,7 +547,7 @@ export default function QuickOrderPage() {
                 {/* Section: MLPE Optimizers */}
                 {optimizers.length > 0 && (
                     <>
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Optimizers</p>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t('optimizers')}</p>
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             {Object.keys(OPTIMIZER_LABELS).map(key => {
                                 const product = optimizers.find(p => classifyOptimizer(p.sku, p.name_en) === key)
@@ -558,7 +558,7 @@ export default function QuickOrderPage() {
                                         onTap={() => { setBoxQtyProduct(product); setView('boxqty'); setCustomQty(false) }}
                                         onDecrement={() => decrementProduct(product.id)}
                                         isAnimating={lastTapped === product.id}
-                                        fmtPrice={fmtPrice} stockAvailable={stockAvailable} />
+                                        fmtPrice={fmtPrice} stockAvailable={stockAvailable} pcsLabel={t('pcs')} />
                                 )
                             })}
                         </div>
@@ -568,14 +568,14 @@ export default function QuickOrderPage() {
                 {/* Section: Inverters */}
                 {inverters.length > 0 && (
                     <>
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Inverters</p>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t('inverters')}</p>
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             {inverters.map(p => (
                                 <ProductTile key={p.id} product={p} qty={cart.get(p.id)?.qty || 0}
                                     onTap={() => tapProduct(p)}
                                     onDecrement={() => decrementProduct(p.id)}
                                     isAnimating={lastTapped === p.id}
-                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} />
+                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} pcsLabel={t('pcs')} />
                             ))}
                         </div>
                     </>
@@ -585,14 +585,14 @@ export default function QuickOrderPage() {
                 <div ref={communicatorsRef} />
                 {communicators.length > 0 && (
                     <>
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Communicators</p>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t('communicators')}</p>
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             {communicators.map(p => (
                                 <ProductTile key={p.id} product={p} qty={cart.get(p.id)?.qty || 0}
                                     onTap={() => tapProduct(p)}
                                     onDecrement={() => decrementProduct(p.id)}
                                     isAnimating={lastTapped === p.id}
-                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} />
+                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} pcsLabel={t('pcs')} />
                             ))}
                         </div>
                     </>
@@ -601,14 +601,14 @@ export default function QuickOrderPage() {
                 {/* Section: Other Products */}
                 {otherProducts.length > 0 && (
                     <>
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">More Products</p>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t('moreProducts')}</p>
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             {otherProducts.map(p => (
                                 <ProductTile key={p.id} product={p} qty={cart.get(p.id)?.qty || 0}
                                     onTap={() => tapProduct(p)}
                                     onDecrement={() => decrementProduct(p.id)}
                                     isAnimating={lastTapped === p.id}
-                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} />
+                                    fmtPrice={fmtPrice} stockAvailable={stockAvailable} pcsLabel={t('pcs')} />
                             ))}
                         </div>
                     </>
@@ -617,18 +617,18 @@ export default function QuickOrderPage() {
                 {/* Shop More button */}
                 <button onClick={() => setView('browse')}
                     className="w-full bg-slate-800 border border-slate-700 text-white py-3 rounded-lg text-sm font-medium active:bg-slate-700 transition-all mb-4">
-                    Browse All Products
+                    {t('browseAll')}
                 </button>
             </div>
 
             {/* Floating checkout bar */}
             {cartItemCount > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
-                    {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
+                    {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" title={t('lowStockSomeItems')} note={t('lowStockNote')} /></div>}
                     <button onClick={() => setView('shipping')} disabled={submitting}
                         className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                        <span>Checkout</span>
-                        <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} items &middot; {fmtPrice(cartTotal)}</span>
+                        <span>{t('checkout')}</span>
+                        <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
                     </button>
                 </div>
             )}
@@ -646,6 +646,7 @@ function ProductTile({
     isAnimating,
     fmtPrice,
     stockAvailable,
+    pcsLabel,
 }: {
     product: Product
     qty: number
@@ -655,7 +656,9 @@ function ProductTile({
     isAnimating: boolean
     fmtPrice: (n: number) => string
     stockAvailable: (p: Product) => number
+    pcsLabel: string
 }) {
+    const t = useTranslations('quickOrder')
     const available = stockAvailable(product)
     const isOut = available <= 0 && product.stock_status !== 'available_to_order'
     const displayName = label || product.name_en?.replace(/^Tigo\s+/i, '').slice(0, 30) || product.sku
@@ -695,10 +698,10 @@ function ProductTile({
                         {fmtPrice(product.b2b_price_eur || product.price_eur)}
                     </span>
                     {available > 0 && available < 999999 && (
-                        <span className="text-slate-500 text-[10px]">{available} pcs</span>
+                        <span className="text-slate-500 text-[10px]">{available} {pcsLabel}</span>
                     )}
                 </div>
-                {qty > 0 && <LowStockBadge available={available} ordered={qty} variant="dark" />}
+                {qty > 0 && <LowStockBadge available={available} ordered={qty} variant="dark" label={t('lowStockBadge', { available })} />}
             </div>
         </button>
     )

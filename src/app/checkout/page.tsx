@@ -772,7 +772,7 @@ export default function CheckoutPage() {
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('secureCheckout')}</h1>
 
-                {hasOverStock && <div className="mb-6"><LowStockWarning /></div>}
+                {hasOverStock && <div className="mb-6"><LowStockWarning title={tc('lowStockTitle')} note={tc('lowStockNote')} /></div>}
 
                 {modifyingOrder && (
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">
