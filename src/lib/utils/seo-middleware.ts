@@ -17,9 +17,7 @@ export function seoMiddleware(request: NextRequest) {
     if (
         pathname.startsWith('/api/') ||
         pathname.startsWith('/_next/') ||
-        pathname.startsWith('/favicon.ico') ||
-        pathname.startsWith('/sitemap.xml') ||
-        pathname.startsWith('/robots.txt')
+        pathname.startsWith('/favicon.ico')
     ) {
         return NextResponse.next()
     }
