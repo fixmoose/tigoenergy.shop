@@ -91,7 +91,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       </div>
 
       <div className="mb-6">
-        <OrderWorkflowTracker order={order} />
+        <OrderWorkflowTracker order={{
+          ...order,
+          warehouse_actions: (order as any).warehouse_actions || [],
+          pickup_payment_proof_required: (order as any).pickup_payment_proof_required || false,
+        }} />
       </div>
 
       {(order as any).warehouse_actions?.length > 0 && (

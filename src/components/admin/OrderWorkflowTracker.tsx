@@ -2,6 +2,14 @@
 
 import React from 'react'
 
+interface WarehouseAction {
+    action: string
+    by_email: string
+    by_name: string
+    at: string
+    file_url?: string
+}
+
 interface WorkflowStep {
     id: string
     label: string
@@ -10,6 +18,7 @@ interface WorkflowStep {
     isActive: boolean
     date?: string | null
     icon: string
+    warehouseStep?: boolean
 }
 
 interface OrderWorkflowTrackerProps {
@@ -24,10 +33,28 @@ interface OrderWorkflowTrackerProps {
         shipping_label_url?: string | null
         invoice_url?: string | null
         tracking_number?: string | null
+        shipping_carrier?: string | null
+        warehouse_actions?: WarehouseAction[] | null
+        pickup_payment_proof_required?: boolean
     }
 }
 
 export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProps) {
+    const actions = order.warehouse_actions || []
+    const isPickup = order.shipping_carrier === 'Personal Pick-up'
+
+    const hasAction = (type: string) => actions.some(a => a.action === type)
+    const actionDate = (type: string) => actions.find(a => a.action === type)?.at || null
+
+    const isPrepared = hasAction('marked_prepared')
+    const hasPaymentVerified = hasAction('payment_verified')
+    const hasDobavnica = hasAction('uploaded_dobavnica')
+    const isPickedUp = hasAction('marked_picked_up')
+    const isDpdPickedUp = hasAction('marked_dpd_picked_up')
+    const isFinalized = isPickedUp || isDpdPickedUp
+
+    const isProcessingOrBeyond = order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' || order.status === 'completed'
+
     const steps: WorkflowStep[] = [
         {
             id: 'ordered',
@@ -36,51 +63,100 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
             isCompleted: true,
             isActive: false,
             date: order.created_at,
-            icon: '🛍️'
+            icon: '🛍️',
         },
         {
             id: 'confirmed',
-            label: 'Confirmation',
+            label: 'Confirmed',
             description: 'Payment verified & confirmed',
             isCompleted: !!order.confirmed_at || order.status !== 'pending',
             isActive: order.status === 'pending',
             date: order.confirmed_at,
-            icon: '✅'
+            icon: '✅',
         },
         {
-            id: 'processing',
-            label: 'Processing',
-            description: 'Warehouse is preparing items',
-            isCompleted: order.status === 'processing' || order.status === 'shipped' || order.status === 'delivered' || order.status === 'completed',
-            isActive: order.status === 'processing',
-            icon: '⚙️'
+            id: 'prepared',
+            label: 'Prepared',
+            description: 'Warehouse prepared items',
+            isCompleted: isPrepared,
+            isActive: isProcessingOrBeyond && !isPrepared,
+            date: actionDate('marked_prepared'),
+            icon: '📦',
+            warehouseStep: true,
         },
-        {
-            id: 'packing_slip',
-            label: 'Packing Slip',
-            description: 'Generated document for picking',
-            isCompleted: !!order.packing_slip_url,
-            isActive: order.status === 'processing' && !order.packing_slip_url,
-            icon: '📋'
-        },
-        {
-            id: 'delivery_note',
-            label: 'Delivery Note',
-            description: 'Shipping label & tracking ready',
-            isCompleted: !!order.shipping_label_url || !!order.tracking_number || order.status === 'delivered' || order.status === 'completed',
-            isActive: !!order.packing_slip_url && !order.shipping_label_url && !order.tracking_number && order.status !== 'delivered' && order.status !== 'completed',
-            date: order.shipped_at,
-            icon: '🚚'
-        },
-        {
-            id: 'invoice',
-            label: 'Invoice',
-            description: 'Financial document issued',
-            isCompleted: !!order.invoice_url,
-            isActive: (!!order.shipping_label_url || !!order.tracking_number || order.status === 'delivered' || order.status === 'completed') && !order.invoice_url,
-            icon: '📄'
-        }
     ]
+
+    // Payment verification step — only for pickup orders requiring payment proof
+    if (order.pickup_payment_proof_required) {
+        steps.push({
+            id: 'payment_verified',
+            label: 'Payment Verified',
+            description: 'Warehouse verified payment proof',
+            isCompleted: hasPaymentVerified,
+            isActive: isPrepared && !hasPaymentVerified,
+            date: actionDate('payment_verified'),
+            icon: '💳',
+            warehouseStep: true,
+        })
+    }
+
+    // Dobavnica upload step
+    steps.push({
+        id: 'dobavnica',
+        label: 'Dobavnica',
+        description: 'Signed delivery note uploaded',
+        isCompleted: hasDobavnica,
+        isActive: isPrepared && !hasDobavnica && !isFinalized,
+        date: actionDate('uploaded_dobavnica'),
+        icon: '📄',
+        warehouseStep: true,
+    })
+
+    if (isPickup) {
+        // Pickup flow
+        steps.push({
+            id: 'picked_up',
+            label: 'Picked Up',
+            description: 'Customer collected the order',
+            isCompleted: isPickedUp || order.status === 'delivered',
+            isActive: isPrepared && !isPickedUp && order.status !== 'delivered',
+            date: actionDate('marked_picked_up') || order.delivered_at,
+            icon: '🤝',
+            warehouseStep: true,
+        })
+    } else {
+        // DPD flow
+        steps.push({
+            id: 'dpd_handed',
+            label: 'DPD Shipped',
+            description: 'Handed to DPD courier',
+            isCompleted: isDpdPickedUp || order.status === 'shipped' || order.status === 'delivered' || order.status === 'completed',
+            isActive: isPrepared && !isDpdPickedUp && order.status === 'processing',
+            date: actionDate('marked_dpd_picked_up') || order.shipped_at,
+            icon: '🚚',
+            warehouseStep: true,
+        })
+
+        steps.push({
+            id: 'delivered',
+            label: 'Delivered',
+            description: 'Customer received the order',
+            isCompleted: order.status === 'delivered' || order.status === 'completed',
+            isActive: order.status === 'shipped',
+            date: order.delivered_at,
+            icon: '📬',
+        })
+    }
+
+    // Invoice — always last
+    steps.push({
+        id: 'invoice',
+        label: 'Invoice',
+        description: 'Financial document issued',
+        isCompleted: !!order.invoice_url,
+        isActive: isFinalized && !order.invoice_url,
+        icon: '📄',
+    })
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -102,33 +178,45 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
                         />
                     </div>
 
-                    {steps.map((step, idx) => {
+                    {steps.map((step) => {
                         const isCompleted = step.isCompleted
                         const isActive = step.isActive
 
                         return (
                             <div key={step.id} className="relative z-10 flex flex-col items-center flex-1">
                                 <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-500 border-4 shadow-sm ${isCompleted
-                                            ? 'bg-green-500 border-green-100 text-white'
+                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-500 border-4 shadow-sm ${
+                                        isCompleted
+                                            ? step.warehouseStep
+                                                ? 'bg-orange-500 border-orange-100 text-white'
+                                                : 'bg-green-500 border-green-100 text-white'
                                             : isActive
-                                                ? 'bg-amber-100 border-amber-400 text-amber-600 animate-pulse'
+                                                ? step.warehouseStep
+                                                    ? 'bg-orange-100 border-orange-400 text-orange-600 animate-pulse'
+                                                    : 'bg-amber-100 border-amber-400 text-amber-600 animate-pulse'
                                                 : 'bg-white border-slate-100 text-slate-300'
-                                        }`}
+                                    }`}
                                 >
                                     {isCompleted ? '✓' : step.icon}
                                 </div>
 
                                 <div className="mt-4 text-center px-1">
-                                    <p className={`text-[10px] font-black uppercase tracking-wider mb-1 ${isCompleted ? 'text-green-600' : isActive ? 'text-amber-600' : 'text-slate-400'
-                                        }`}>
+                                    <p className={`text-[10px] font-black uppercase tracking-wider mb-1 ${
+                                        isCompleted
+                                            ? step.warehouseStep ? 'text-orange-600' : 'text-green-600'
+                                            : isActive
+                                                ? step.warehouseStep ? 'text-orange-600' : 'text-amber-600'
+                                                : 'text-slate-400'
+                                    }`}>
                                         {step.label}
                                     </p>
                                     <p className="text-[9px] text-slate-500 font-medium leading-tight h-6 max-w-[90px] mx-auto hidden md:block">
                                         {step.description}
                                     </p>
                                     {step.date && isCompleted && (
-                                        <div className="mt-2 text-[8px] font-bold py-0.5 px-1.5 rounded-full inline-block bg-slate-100 text-slate-500">
+                                        <div className={`mt-2 text-[8px] font-bold py-0.5 px-1.5 rounded-full inline-block ${
+                                            step.warehouseStep ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'
+                                        }`}>
                                             {new Date(step.date).toLocaleDateString('en-GB')}
                                         </div>
                                     )}

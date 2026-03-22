@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id: orderId } = await params
@@ -10,16 +11,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const { data: driver } = await supabase
         .from('drivers')
-        .select('id, name, email')
+        .select('id, name, email, phone')
         .eq('email', email)
         .eq('is_warehouse', true)
         .single()
     if (!driver) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Get current warehouse_actions
+    // Get current warehouse_actions + order details for customer email
     const { data: order } = await supabase
         .from('orders')
-        .select('warehouse_actions')
+        .select('warehouse_actions, order_number, customer_email, shipping_address, shipping_carrier, language')
         .eq('id', orderId)
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -38,5 +39,62 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .eq('id', orderId)
 
     if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+
+    // Notify customer: order is ready for pickup
+    const isPickup = order.shipping_carrier === 'Personal Pick-up'
+    if (isPickup && order.customer_email) {
+        try {
+            const lang = order.language || 'en'
+            const addr = order.shipping_address
+            const customerName = addr ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim() : ''
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'
+
+            // Only Slovenian customers can pick up locally
+            const l = {
+                subject: `Naročilo #${order.order_number} je pripravljeno za prevzem`,
+                greeting: `Pozdravljeni${customerName ? ` ${customerName}` : ''},`,
+                heading: 'Vaše naročilo je pripravljeno za prevzem!',
+                body: 'Vaše naročilo je pripravljeno in vas čaka na spodnjem naslovu. Prosimo, da se pred prihodom najavite po telefonu ali e-pošti.',
+                address: 'Naslov za prevzem',
+                contact: 'Kontakt skladišča',
+            }
+
+            const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
+<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+  <div style="background:#16a34a;padding:24px 32px;color:#fff;">
+    <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
+    <h1 style="font-size:20px;font-weight:300;margin:0;">${l.heading}</h1>
+  </div>
+  <div style="padding:24px 32px;">
+    <p style="color:#374151;font-size:14px;">${l.greeting}</p>
+    <p style="color:#374151;font-size:14px;">${l.body}</p>
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:16px 0;">
+      <p style="margin:0 0 4px;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700;">${l.address}</p>
+      <p style="margin:0 0 12px;font-size:15px;font-weight:700;color:#111;">Podsmreka 59A, 1356 Dobrova, Slovenija</p>
+      <p style="margin:0 0 4px;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700;">${l.contact}</p>
+      <p style="margin:0;font-size:14px;color:#111;font-weight:600;">${driver.name}</p>
+      ${driver.phone ? `<p style="margin:2px 0;font-size:13px;color:#374151;">${driver.phone}</p>` : ''}
+      <p style="margin:2px 0;font-size:13px;color:#374151;">${driver.email}</p>
+    </div>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin:16px 0;">
+      <p style="margin:0;font-size:13px;color:#1e40af;font-weight:600;">#${order.order_number}</p>
+    </div>
+    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Initra Energija d.o.o.</p>
+  </div>
+</div></body></html>`
+
+            await sendEmail({
+                from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+                to: order.customer_email,
+                subject: l.subject,
+                html,
+                orderId,
+                emailType: 'order_ready_pickup',
+            })
+        } catch (emailErr) {
+            console.error('Failed to send pickup-ready email (non-fatal):', emailErr)
+        }
+    }
+
     return NextResponse.json({ success: true })
 }

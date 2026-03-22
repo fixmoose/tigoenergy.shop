@@ -67,9 +67,8 @@ export async function sendWarehouseEmail(
             }
         }
 
-        if (order.packing_slip_url) {
-            await downloadPdf(order.packing_slip_url, `Dobavnica_${order.order_number}.pdf`)
-        }
+        const packingSlipUrl = order.packing_slip_url || `/api/orders/${orderId}/packing-slip`
+        await downloadPdf(packingSlipUrl, `Dobavnica_${order.order_number}.pdf`)
         if (order.shipping_label_url) {
             await downloadPdf(order.shipping_label_url, `Nalepka_${order.order_number}.pdf`)
         }

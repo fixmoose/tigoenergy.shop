@@ -451,9 +451,11 @@ function OrderCard({
             {/* Actions */}
             <div className="px-4 py-3 space-y-2.5">
                 {/* Download packing slip */}
-                {order.packing_slip_url && (
+                {(() => {
+                    const slipUrl = order.packing_slip_url || `/api/orders/${order.id}/packing-slip`
+                    return (
                     <a
-                        href={`${order.packing_slip_url}${order.packing_slip_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
+                        href={`${slipUrl}${slipUrl.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition"
@@ -463,7 +465,8 @@ function OrderCard({
                         </svg>
                         Prenesi dobavnico
                     </a>
-                )}
+                    )
+                })()}
 
                 {/* Download shipping label (DPD) */}
                 {type === 'dpd' && order.shipping_label_url && (

@@ -336,6 +336,7 @@ export async function placeQuickOrder(
                 cs: { proforma: 'Proforma faktura', confirmation: 'Potvrzení objednávky' },
                 sk: { proforma: 'Proforma faktúra', confirmation: 'Potvrdenie objednávky' },
                 sv: { proforma: 'Proformafaktura', confirmation: 'Orderbekräftelse' },
+                sr: { proforma: 'Predračun', confirmation: 'Potvrda porudžbine' },
             }
             const subj = subjectLabels[orderLanguage] || { proforma: 'Proforma Invoice', confirmation: 'Order Confirmation' }
             let finalSubject = isProformaFlow
