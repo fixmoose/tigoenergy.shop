@@ -32,6 +32,30 @@ const INVOICE_LABELS: Record<string, {
         no: 'No.', description: 'Description', sku: 'Article / SKU', qty: 'Qty', unitPrice: 'Unit Price', amountCol: 'Amount',
         cnCode: 'CN Code', orderRef: 'Order No.', deliveryNote: 'Delivery Note No.', deliveryDate: 'Delivery Date',
     },
+    it: {
+        paymentsReceived: 'Pagamenti ricevuti', date: 'Data', method: 'Metodo', reference: 'Riferimento', amount: 'Importo',
+        totalPaid: 'Totale pagato', balanceDue: 'Saldo dovuto', uponPayment: 'Al ricevimento del pagamento', bankTransfer: 'Bonifico bancario',
+        no: 'N.', description: 'Descrizione', sku: 'Articolo / SKU', qty: 'Qtà', unitPrice: 'Prezzo unitario', amountCol: 'Importo',
+        cnCode: 'Codice NC', orderRef: 'N. ordine', deliveryNote: 'N. bolla di consegna', deliveryDate: 'Data di consegna',
+    },
+    cs: {
+        paymentsReceived: 'Přijaté platby', date: 'Datum', method: 'Způsob', reference: 'Reference', amount: 'Částka',
+        totalPaid: 'Celkem zaplaceno', balanceDue: 'Zbývá k úhradě', uponPayment: 'Po přijetí platby', bankTransfer: 'Bankovní převod',
+        no: 'Č.', description: 'Popis', sku: 'Článek / SKU', qty: 'Mn.', unitPrice: 'Jedn. cena', amountCol: 'Částka',
+        cnCode: 'Kód KN', orderRef: 'Č. objednávky', deliveryNote: 'Č. dodacího listu', deliveryDate: 'Datum dodání',
+    },
+    sk: {
+        paymentsReceived: 'Prijaté platby', date: 'Dátum', method: 'Spôsob', reference: 'Referencia', amount: 'Suma',
+        totalPaid: 'Celkom zaplatené', balanceDue: 'Zostáva k úhrade', uponPayment: 'Po prijatí platby', bankTransfer: 'Bankový prevod',
+        no: 'Č.', description: 'Popis', sku: 'Článok / SKU', qty: 'Mn.', unitPrice: 'Jedn. cena', amountCol: 'Suma',
+        cnCode: 'Kód KN', orderRef: 'Č. objednávky', deliveryNote: 'Č. dodacieho listu', deliveryDate: 'Dátum dodania',
+    },
+    sv: {
+        paymentsReceived: 'Mottagna betalningar', date: 'Datum', method: 'Metod', reference: 'Referens', amount: 'Belopp',
+        totalPaid: 'Totalt betalt', balanceDue: 'Återstående belopp', uponPayment: 'Vid betalning', bankTransfer: 'Banköverföring',
+        no: 'Nr.', description: 'Beskrivning', sku: 'Artikel / SKU', qty: 'Ant.', unitPrice: 'Styckpris', amountCol: 'Belopp',
+        cnCode: 'KN-kod', orderRef: 'Ordernr.', deliveryNote: 'Följesedelsnr.', deliveryDate: 'Leveransdatum',
+    },
 }
 
 function getLabels(lang: string) {
@@ -52,7 +76,9 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
 
     const lang = order.language || 'en'
     const labels = getLabels(lang)
-    const dateLocale = lang === 'sl' ? 'sl-SI' : lang === 'de' ? 'de-DE' : lang === 'hr' ? 'hr-HR' : 'en-GB'
+    const dateLocale = ({ sl: 'sl-SI', de: 'de-DE', hr: 'hr-HR', it: 'it-IT', cs: 'cs-CZ', sk: 'sk-SK', sv: 'sv-SE' } as Record<string, string>)[lang] || 'en-GB'
+    const isNet30 = order.payment_terms === 'net30'
+    const dueDays = isNet30 ? (order.payment_terms_days || 30) : 0 // prepayment has no due date
 
     const template = await getPinnedTemplate('invoice', lang)
     if (!template) throw new Error('Invoice template not found')
@@ -92,9 +118,9 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         }),
         invoice_number: order.invoice_number || `ETRG-INV-${order.order_number}`,
         invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString(dateLocale) : new Date().toLocaleDateString(dateLocale),
-        due_date: order.invoice_created_at
-            ? new Date(new Date(order.invoice_created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale)
-            : new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale),
+        due_date: isNet30
+            ? new Date((order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()).getTime() + dueDays * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale)
+            : (({ sl: 'Predplačilo', de: 'Vorauszahlung', hr: 'Predplaćanje', it: 'Prepagato', cs: 'Předplaceno', sk: 'Predplatené', sv: 'Förskottsbetalning' } as Record<string, string>)[lang] || 'Prepaid'),
         dispatch_date: order.shipped_at
             ? new Date(order.shipped_at).toLocaleDateString(dateLocale)
             : order.delivered_at
@@ -193,6 +219,33 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     </table>
 </div>`
         htmlContent = htmlContent.replace('</body>', paymentTable + '</body>')
+    }
+
+    // Prominent payment due notice (only for Net30 orders)
+    if (isNet30) {
+        const invoiceBase = order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()
+        const dueDate = new Date(invoiceBase.getTime() + dueDays * 24 * 60 * 60 * 1000)
+        const dueDateStr = dueDate.toLocaleDateString(dateLocale)
+        const totalStr = `€${parseFloat(order.total || 0).toFixed(2)}`
+
+        const dueLabelMap: Record<string, string> = {
+            sl: `Znesek za plačilo ${totalStr} najkasneje do ${dueDateStr}.`,
+            hr: `Iznos za plaćanje ${totalStr} najkasnije do ${dueDateStr}.`,
+            de: `Zahlungsbetrag ${totalStr} fällig bis spätestens ${dueDateStr}.`,
+            en: `Amount due ${totalStr} payable by ${dueDateStr}.`,
+            it: `Importo dovuto ${totalStr} pagabile entro il ${dueDateStr}.`,
+            cs: `Částka k úhradě ${totalStr} splatná do ${dueDateStr}.`,
+            sk: `Suma na úhradu ${totalStr} splatná do ${dueDateStr}.`,
+            sv: `Belopp att betala ${totalStr} senast ${dueDateStr}.`,
+        }
+        const dueNotice = dueLabelMap[lang] || dueLabelMap.en
+
+        const dueNoticeHtml = `
+<div style="margin:24px 0 0;padding:16px;border:3px solid #f59e0b;border-radius:8px;background:#fffbeb;text-align:center;">
+  <p style="margin:0;font-size:16px;font-weight:900;color:#92400e;">${dueNotice}</p>
+  <p style="margin:6px 0 0;font-size:11px;color:#b45309;">Net ${dueDays}</p>
+</div>`
+        htmlContent = htmlContent.replace('</body>', dueNoticeHtml + '</body>')
     }
 
     // B2B legal clause

@@ -21,6 +21,7 @@ export default function AccountingReportPage() {
     const [shareModalOpen, setShareModalOpen] = useState(false)
     const [shareUrl, setShareUrl] = useState('')
     const [reportType, setReportType] = useState('orders')
+    const [marginSummary, setMarginSummary] = useState<any>(null)
 
     useEffect(() => {
         setIsMounted(true)
@@ -60,11 +61,16 @@ export default function AccountingReportPage() {
             const res = await fetch(`/api/admin/reporting/accounting?year=${year}&month=${month}&type=${reportType}`)
             const data = await res.json()
             if (data.success) {
-                if (reportType === 'orders' || reportType === 'invoices') {
+                if (reportType === 'margin') {
+                    setOrders(data.data.orders || [])
+                    setMarginSummary(data.data.summary)
+                } else if (reportType === 'orders' || reportType === 'invoices') {
                     setOrders(data.data.orders)
                     setSummary(data.data.summary)
+                    setMarginSummary(null)
                 } else {
                     setOrders(data.data.records || [])
+                    setMarginSummary(null)
                 }
             }
         } catch (error) {
@@ -133,6 +139,7 @@ export default function AccountingReportPage() {
                     >
                         <option value="orders">Orders</option>
                         <option value="invoices">Invoices</option>
+                        <option value="margin">Margin Report</option>
                         <option value="returns">Returns (RMAs)</option>
                         <option value="carts">Abandoned Carts</option>
                         <option value="customers">Customers</option>
@@ -171,23 +178,79 @@ export default function AccountingReportPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-sm font-medium text-slate-500 mb-1">Total Sales ({months[month - 1].l} {year})</div>
-                    <div className="text-3xl font-bold text-slate-800">{formatCurrency(summary.totalRevenue)}</div>
-                    <div className="text-xs text-slate-400 mt-2">Inc. VAT where applicable</div>
+            {reportType === 'margin' && marginSummary ? (
+                <div className="space-y-4">
+                    {/* Margin Summary — 3 segments */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                            { key: 'invoiced', label: 'Invoiced (Actual)', color: 'emerald', desc: 'Based on issued invoices' },
+                            { key: 'confirmed', label: 'Confirmed Orders', color: 'blue', desc: 'Processing + shipped + delivered' },
+                            { key: 'all', label: 'All Orders', color: 'slate', desc: 'Excludes cancelled' },
+                        ].map(seg => {
+                            const d = marginSummary[seg.key]
+                            if (!d) return null
+                            return (
+                                <div key={seg.key} className={`bg-white p-5 rounded-2xl border shadow-sm ${seg.color === 'emerald' ? 'border-emerald-200' : seg.color === 'blue' ? 'border-blue-200' : 'border-slate-200'}`}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className={`text-xs font-bold uppercase tracking-wider ${seg.color === 'emerald' ? 'text-emerald-600' : seg.color === 'blue' ? 'text-blue-600' : 'text-slate-500'}`}>{seg.label}</div>
+                                        <div className="text-[10px] text-slate-400">{d.count} orders</div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <div className="text-[10px] text-slate-400 uppercase">Revenue (Net)</div>
+                                            <div className="text-lg font-bold text-slate-800">{formatCurrency(d.revenue)}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-slate-400 uppercase">Cost</div>
+                                            <div className="text-lg font-bold text-slate-500">{formatCurrency(d.cost)}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-slate-400 uppercase">Margin</div>
+                                            <div className={`text-xl font-black ${d.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatCurrency(d.margin)}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-slate-400 uppercase">Margin %</div>
+                                            <div className={`text-xl font-black ${d.margin_pct >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{d.margin_pct.toFixed(1)}%</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 mt-2">{seg.desc}</div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    {/* Warehouse payout note */}
+                    {marginSummary.invoiced && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+                            <span className="text-amber-500 text-lg">💰</span>
+                            <div>
+                                <div className="text-sm font-bold text-amber-800">Warehouse Margin Share</div>
+                                <div className="text-xs text-amber-700 mt-1">
+                                    Invoiced margin: <strong>{formatCurrency(marginSummary.invoiced.margin)}</strong> —
+                                    Transport costs are NOT included in this calculation (only item sell price minus item purchase cost).
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-sm font-medium text-slate-500 mb-1">Invoices Issued</div>
-                    <div className="text-3xl font-bold text-slate-800">{summary.totalInvoices}</div>
-                    <div className="text-xs text-slate-400 mt-2">{orders.length} total orders</div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Total Sales ({months[month - 1].l} {year})</div>
+                        <div className="text-3xl font-bold text-slate-800">{formatCurrency(summary.totalRevenue)}</div>
+                        <div className="text-xs text-slate-400 mt-2">Inc. VAT where applicable</div>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Invoices Issued</div>
+                        <div className="text-3xl font-bold text-slate-800">{summary.totalInvoices}</div>
+                        <div className="text-xs text-slate-400 mt-2">{orders.length} total orders</div>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Outstanding Receivables</div>
+                        <div className="text-3xl font-bold text-amber-600">{formatCurrency(summary.totalOutstanding)}</div>
+                        <div className="text-xs text-slate-400 mt-2">Excludes cancelled orders</div>
+                    </div>
                 </div>
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="text-sm font-medium text-slate-500 mb-1">Outstanding Receivables</div>
-                    <div className="text-3xl font-bold text-amber-600">{formatCurrency(summary.totalOutstanding)}</div>
-                    <div className="text-xs text-slate-400 mt-2">Excludes cancelled orders</div>
-                </div>
-            </div>
+            )}
 
             {/* Search and Table */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -254,6 +317,17 @@ export default function AccountingReportPage() {
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Country</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Orders</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Spent</th>
+                                    </>
+                                )}
+                                {reportType === 'margin' && (
+                                    <>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Order / Date</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Customer</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Revenue</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Cost</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Margin</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">%</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Invoice</th>
                                     </>
                                 )}
                                 {reportType === 'stock' && (
@@ -411,6 +485,47 @@ export default function AccountingReportPage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded text-[10px] font-bold uppercase">Abandoned</span>
+                                                </td>
+                                            </>
+                                        )}
+
+                                        {reportType === 'margin' && (
+                                            <>
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-slate-800">{record.order_number}</div>
+                                                    <div className="text-[10px] text-slate-400 font-medium uppercase mt-1">
+                                                        {new Date(record.created_at).toLocaleDateString()}
+                                                    </div>
+                                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase mt-1 ${record.status === 'delivered' || record.status === 'completed' ? 'bg-green-50 text-green-700' : record.status === 'shipped' ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-600'}`}>
+                                                        {record.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-semibold text-slate-700">{record.company_name || record.customer_email}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-bold text-slate-800">{formatCurrency(record.revenue)}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-mono text-sm text-slate-500">{formatCurrency(record.cost)}</div>
+                                                    {record.cost === 0 && <div className="text-[9px] text-red-400 font-bold">NO COST DATA</div>}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className={`font-black text-sm ${record.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                                        {formatCurrency(record.margin)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold ${record.margin_pct >= 20 ? 'bg-emerald-50 text-emerald-700' : record.margin_pct >= 10 ? 'bg-amber-50 text-amber-700' : record.margin_pct >= 0 ? 'bg-orange-50 text-orange-700' : 'bg-red-50 text-red-700'}`}>
+                                                        {record.margin_pct.toFixed(1)}%
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    {record.invoice_number ? (
+                                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">{record.invoice_number}</span>
+                                                    ) : (
+                                                        <span className="text-[10px] text-slate-300 italic">—</span>
+                                                    )}
                                                 </td>
                                             </>
                                         )}

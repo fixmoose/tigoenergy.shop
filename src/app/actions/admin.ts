@@ -1225,13 +1225,14 @@ export async function adminCreateOrderWithCustomerAction(payload: {
 }
 
 /**
- * Issues an invoice for an existing order
+ * Issues an invoice for an existing order.
+ * Set skipAdminCheck=true when called from warehouse automation (already validated).
  */
-export async function issueOrderInvoiceAction(orderId: string) {
+export async function issueOrderInvoiceAction(orderId: string, { skipAdminCheck = false } = {}) {
     try {
-        if (!await checkIsAdmin()) throw new Error('Unauthorized');
+        if (!skipAdminCheck && !await checkIsAdmin()) throw new Error('Unauthorized');
 
-        const supabase = await createClient();
+        const supabase = skipAdminCheck ? await createAdminClient() : await createClient();
 
         // 1. Get current order to ensure it exists and doesn't have an invoice yet
         const { data: order, error: fetchError } = await supabase
@@ -1260,7 +1261,6 @@ export async function issueOrderInvoiceAction(orderId: string) {
             .update({
                 invoice_number: invoiceNumber,
                 invoice_created_at: new Date().toISOString(),
-                // Simulate a PDF URL for now - in production this would be a real signed URL
                 invoice_url: `/api/orders/${orderId}/invoice?download=1`,
                 status: 'completed'
             })
@@ -1282,9 +1282,9 @@ export async function issueOrderInvoiceAction(orderId: string) {
 /**
  * Send invoice email to customer with PDF attached
  */
-export async function adminSendInvoiceEmailAction(orderId: string) {
+export async function adminSendInvoiceEmailAction(orderId: string, { skipAdminCheck = false } = {}) {
     try {
-        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        if (!skipAdminCheck && !await checkIsAdmin()) throw new Error('Unauthorized')
 
         const supabase = await createAdminClient()
         const { data: order, error } = await supabase

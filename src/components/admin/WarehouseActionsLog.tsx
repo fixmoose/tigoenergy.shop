@@ -17,6 +17,7 @@ const ACTION_LABELS: Record<string, { label: string; icon: string }> = {
     uploaded_dobavnica: { label: 'Uploaded dobavnica', icon: '📄' },
     marked_picked_up: { label: 'Marked as picked up by customer', icon: '🤝' },
     marked_dpd_picked_up: { label: 'Marked as picked up by DPD', icon: '🚚' },
+    payment_verified: { label: 'Payment proof verified', icon: '💳' },
 }
 
 export default function WarehouseActionsLog({ actions, orderId }: { actions: WarehouseAction[]; orderId: string }) {

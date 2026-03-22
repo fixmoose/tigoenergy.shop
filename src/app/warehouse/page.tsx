@@ -132,6 +132,21 @@ export default function WarehousePortal() {
         }
     }
 
+    const verifyPayment = async (orderId: string) => {
+        if (!confirm('Potrditi, da je dokazilo o plačilu preverjeno?')) return
+        setActionLoading(prev => ({ ...prev, [orderId + '_payment']: true }))
+        try {
+            await fetch(`/api/warehouse/orders/${orderId}/verify-payment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            })
+            await fetchOrders()
+        } finally {
+            setActionLoading(prev => ({ ...prev, [orderId + '_payment']: false }))
+        }
+    }
+
     const markComplete = async (orderId: string, type: 'pickup' | 'dpd') => {
         const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
         if (!confirm(`Označiti naročilo kot ${label}? Naročilo bo odstranjeno s seznama.`)) return
@@ -250,6 +265,7 @@ export default function WarehousePortal() {
                             onPrepare={markPrepared}
                             onUpload={uploadDobavnica}
                             onComplete={markComplete}
+                            onVerifyPayment={verifyPayment}
                         />
                     ))}
                 </div>
@@ -279,6 +295,7 @@ export default function WarehousePortal() {
                             onPrepare={markPrepared}
                             onUpload={uploadDobavnica}
                             onComplete={markComplete}
+                            onVerifyPayment={verifyPayment}
                         />
                     ))}
                 </div>
@@ -336,7 +353,7 @@ export default function WarehousePortal() {
 // ── Order Card ──
 function OrderCard({
     order, type, email, actionLoading, hasAction, getUploadedDobavnica,
-    onPrepare, onUpload, onComplete,
+    onPrepare, onUpload, onComplete, onVerifyPayment,
 }: {
     order: WarehouseOrder
     type: 'pickup' | 'dpd'
@@ -347,8 +364,10 @@ function OrderCard({
     onPrepare: (id: string) => void
     onUpload: (id: string, file: File) => void
     onComplete: (id: string, type: 'pickup' | 'dpd') => void
+    onVerifyPayment: (id: string) => void
 }) {
     const isPrepared = hasAction(order, 'marked_prepared')
+    const isPaymentVerified = hasAction(order, 'payment_verified')
     const dobavnica = getUploadedDobavnica(order)
     const addr = order.shipping_address
     const customerName = addr
@@ -472,7 +491,7 @@ function OrderCard({
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
                             <span className="text-slate-300 text-sm">
-                                {actionLoading[order.id + '_upload'] ? 'Nalagam...' : 'Naloži dobavnico'}
+                                {actionLoading[order.id + '_upload'] ? 'Nalagam...' : 'Naloži podpisano dobavnico'}
                             </span>
                             <input
                                 type="file"
@@ -488,6 +507,26 @@ function OrderCard({
                     )}
                 </div>
 
+                {/* Payment verification checkbox (only for payment-proof-required orders) */}
+                {order.pickup_payment_proof_required && (
+                    <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
+                        isPaymentVerified
+                            ? 'bg-green-900/30 border border-green-700/40'
+                            : 'bg-red-900/20 border border-red-700/30 hover:bg-red-900/30'
+                    }`}>
+                        <input
+                            type="checkbox"
+                            checked={isPaymentVerified}
+                            disabled={isPaymentVerified || actionLoading[order.id + '_payment']}
+                            onChange={() => !isPaymentVerified && onVerifyPayment(order.id)}
+                            className="w-6 h-6 rounded border-2 border-red-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
+                        />
+                        <span className={`font-bold text-sm ${isPaymentVerified ? 'text-green-400' : 'text-red-300'}`}>
+                            {actionLoading[order.id + '_payment'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno ✓' : 'Preveri dokazilo o plačilu'}
+                        </span>
+                    </label>
+                )}
+
                 {/* Complete checkbox */}
                 <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
                     'bg-slate-700/40 border border-slate-600/30 hover:bg-orange-900/20 hover:border-orange-600/30'
@@ -495,11 +534,11 @@ function OrderCard({
                     <input
                         type="checkbox"
                         checked={false}
-                        disabled={actionLoading[order.id + '_complete']}
+                        disabled={actionLoading[order.id + '_complete'] || (order.pickup_payment_proof_required && !isPaymentVerified)}
                         onChange={() => onComplete(order.id, type)}
-                        className="w-6 h-6 rounded border-2 border-slate-500 text-orange-500 focus:ring-orange-500 bg-slate-700 cursor-pointer"
+                        className="w-6 h-6 rounded border-2 border-slate-500 text-orange-500 focus:ring-orange-500 bg-slate-700 cursor-pointer disabled:opacity-30"
                     />
-                    <span className="text-slate-300 font-bold text-sm">
+                    <span className={`font-bold text-sm ${order.pickup_payment_proof_required && !isPaymentVerified ? 'text-slate-600' : 'text-slate-300'}`}>
                         {actionLoading[order.id + '_complete'] ? 'Shranjujem...' : type === 'pickup' ? 'Prevzeto s strani stranke' : 'Prevzeto s strani DPD'}
                     </span>
                 </label>

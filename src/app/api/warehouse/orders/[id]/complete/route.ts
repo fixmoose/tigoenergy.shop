@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Append to warehouse_actions
     const { data: order } = await supabase
         .from('orders')
-        .select('warehouse_actions')
+        .select('warehouse_actions, pickup_payment_proof_required, invoice_number')
         .eq('id', orderId)
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     })
 
     // Pickup = customer already has it → delivered. DPD = shipped (in transit).
-    const statusUpdate = type === 'pickup'
+    const statusUpdate: Record<string, any> = type === 'pickup'
         ? { status: 'delivered', delivered_at: new Date().toISOString(), warehouse_actions: actions }
         : { status: 'shipped', shipped_at: new Date().toISOString(), warehouse_actions: actions }
 
@@ -44,5 +44,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .eq('id', orderId)
 
     if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
-    return NextResponse.json({ success: true })
+
+    // Auto-issue invoice for pickup orders when payment has been verified
+    // (DPD orders wait for delivery confirmation — no auto-invoice)
+    let invoiceIssued = false
+    if (type === 'pickup' && !order.invoice_number) {
+        const hasPaymentVerified = actions.some((a: any) => a.action === 'payment_verified')
+        // Auto-invoice if: payment was verified OR order doesn't require payment proof (net30)
+        if (hasPaymentVerified || !order.pickup_payment_proof_required) {
+            try {
+                const { issueOrderInvoiceAction, adminSendInvoiceEmailAction } = await import('@/app/actions/admin')
+                await issueOrderInvoiceAction(orderId, { skipAdminCheck: true })
+                await adminSendInvoiceEmailAction(orderId, { skipAdminCheck: true })
+                invoiceIssued = true
+            } catch (invoiceErr) {
+                console.error('Auto-invoice failed (non-fatal):', invoiceErr)
+            }
+        }
+    }
+
+    return NextResponse.json({ success: true, invoiceIssued })
 }

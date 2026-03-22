@@ -66,17 +66,55 @@ export async function GET(
             templateHtml = DOCUMENT_TEMPLATES.packing_slip
         }
 
-        // Localize hardcoded template labels for Slovenian orders
-        if (lang === 'sl' && !dbTemplate?.content_html) {
+        // Localize hardcoded template labels
+        const packingLabels: Record<string, Record<string, string>> = {
+            sl: {
+                title: 'Dobavnica', orderDate: 'Datum naročila', shipFrom: 'Pošiljatelj', shipTo: 'Prejemnik',
+                itemsToPack: 'Artikli za pakiranje', totalParcels: 'Število paketov / škatel:',
+                totalWeight: 'Skupna teža:', verifyNote: 'Pred zapiranjem preverite vse artikle. Neskladja sporočite na',
+            },
+            hr: {
+                title: 'Otpremnica', orderDate: 'Datum narudžbe', shipFrom: 'Pošiljatelj', shipTo: 'Primatelj',
+                itemsToPack: 'Artikli za pakiranje', totalParcels: 'Ukupno paketa / kutija:',
+                totalWeight: 'Ukupna težina:', verifyNote: 'Provjerite sve artikle prije zatvaranja. Neslaganja prijavite na',
+            },
+            de: {
+                title: 'Lieferschein', orderDate: 'Bestelldatum', shipFrom: 'Absender', shipTo: 'Empfänger',
+                itemsToPack: 'Artikel zum Verpacken', totalParcels: 'Pakete / Kartons gesamt:',
+                totalWeight: 'Gesamtgewicht:', verifyNote: 'Alle Artikel vor dem Verschließen prüfen. Abweichungen melden an',
+            },
+            it: {
+                title: 'Bolla di consegna', orderDate: 'Data ordine', shipFrom: 'Mittente', shipTo: 'Destinatario',
+                itemsToPack: 'Articoli da imballare', totalParcels: 'Totale colli / scatole:',
+                totalWeight: 'Peso totale:', verifyNote: 'Verificare tutti gli articoli prima della chiusura. Segnalare discrepanze a',
+            },
+            cs: {
+                title: 'Dodací list', orderDate: 'Datum objednávky', shipFrom: 'Odesílatel', shipTo: 'Příjemce',
+                itemsToPack: 'Položky k zabalení', totalParcels: 'Celkem balíků / krabic:',
+                totalWeight: 'Celková hmotnost:', verifyNote: 'Před uzavřením zkontrolujte všechny položky. Nesrovnalosti nahlaste na',
+            },
+            sk: {
+                title: 'Dodací list', orderDate: 'Dátum objednávky', shipFrom: 'Odosielateľ', shipTo: 'Príjemca',
+                itemsToPack: 'Položky na zabalenie', totalParcels: 'Celkom balíkov / krabíc:',
+                totalWeight: 'Celková hmotnosť:', verifyNote: 'Pred uzavretím skontrolujte všetky položky. Nezrovnalosti nahláste na',
+            },
+            sv: {
+                title: 'Följesedel', orderDate: 'Orderdatum', shipFrom: 'Avsändare', shipTo: 'Mottagare',
+                itemsToPack: 'Artiklar att packa', totalParcels: 'Totalt kolli / kartonger:',
+                totalWeight: 'Totalvikt:', verifyNote: 'Kontrollera alla artiklar innan försegling. Rapportera avvikelser till',
+            },
+        }
+        if (lang !== 'en' && !dbTemplate?.content_html && packingLabels[lang]) {
+            const pl = packingLabels[lang]
             templateHtml = templateHtml
-                .replace('>Packing Slip<', '>Dobavnica<')
-                .replace('>Order Date<', '>Datum naročila<')
-                .replace('>Ship From<', '>Pošiljatelj<')
-                .replace('>Ship To<', '>Prejemnik<')
-                .replace('>Items to Pack<', '>Artikli za pakiranje<')
-                .replace('>Total Parcels / Boxes:<', '>Število paketov / škatel:<')
-                .replace('>Total Weight:<', '>Skupna teža:<')
-                .replace('Verify all items before sealing. Report discrepancies to', 'Pred zapiranjem preverite vse artikle. Neskladja sporočite na')
+                .replace('>Packing Slip<', `>${pl.title}<`)
+                .replace('>Order Date<', `>${pl.orderDate}<`)
+                .replace('>Ship From<', `>${pl.shipFrom}<`)
+                .replace('>Ship To<', `>${pl.shipTo}<`)
+                .replace('>Items to Pack<', `>${pl.itemsToPack}<`)
+                .replace('>Total Parcels / Boxes:<', `>${pl.totalParcels}<`)
+                .replace('>Total Weight:<', `>${pl.totalWeight}<`)
+                .replace('Verify all items before sealing. Report discrepancies to', pl.verifyNote)
         }
 
         // 4. Prepare Data for Placeholders
@@ -125,13 +163,21 @@ export async function GET(
 
         // 6. Inject pickup signature block (for personal pick-up orders)
         if (isPickup) {
-            const sigTitle = lang === 'sl' ? 'Podpis ob prevzemu' : 'Pickup Signature'
-            const sigName = lang === 'sl' ? 'Ime in priimek' : 'Full Name'
-            const sigDate = lang === 'sl' ? 'Datum' : 'Date'
-            const sigSign = lang === 'sl' ? 'Podpis' : 'Signature'
-            const sigNote = lang === 'sl'
-                ? 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.'
-                : 'By signing, I confirm that I have received the above goods in good condition.'
+            const sigLabels: Record<string, { title: string; name: string; date: string; sign: string; note: string }> = {
+                sl: { title: 'Podpis ob prevzemu', name: 'Ime in priimek', date: 'Datum', sign: 'Podpis', note: 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.' },
+                hr: { title: 'Potpis pri preuzimanju', name: 'Ime i prezime', date: 'Datum', sign: 'Potpis', note: 'Potpisom potvrđujem da sam preuzeo/la gore navedenu robu u ispravnom stanju.' },
+                de: { title: 'Unterschrift bei Abholung', name: 'Vollständiger Name', date: 'Datum', sign: 'Unterschrift', note: 'Mit meiner Unterschrift bestätige ich, dass ich die oben genannten Waren in einwandfreiem Zustand erhalten habe.' },
+                it: { title: 'Firma al ritiro', name: 'Nome completo', date: 'Data', sign: 'Firma', note: 'Con la firma confermo di aver ricevuto la merce sopra indicata in buone condizioni.' },
+                cs: { title: 'Podpis při převzetí', name: 'Celé jméno', date: 'Datum', sign: 'Podpis', note: 'Podpisem potvrzuji, že jsem převzal/a výše uvedené zboží v bezvadném stavu.' },
+                sk: { title: 'Podpis pri prevzatí', name: 'Celé meno', date: 'Dátum', sign: 'Podpis', note: 'Podpisom potvrdzujem, že som prevzal/a vyššie uvedený tovar v bezchybnom stave.' },
+                sv: { title: 'Signatur vid upphämtning', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
+            }
+            const sig = sigLabels[lang] || { title: 'Pickup Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
+            const sigTitle = sig.title
+            const sigName = sig.name
+            const sigDate = sig.date
+            const sigSign = sig.sign
+            const sigNote = sig.note
             const signatureBlock = `
 <div style="margin:24px 36px 0;padding:16px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sigTitle}</div>
@@ -178,7 +224,7 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=${lang === 'sl' ? 'Dobavnica' : 'PackingSlip'}_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=${({ sl: 'Dobavnica', hr: 'Otpremnica', de: 'Lieferschein', it: 'BollaConsegna', cs: 'DodaciList', sk: 'DodaciList', sv: 'Foljesedel' } as Record<string, string>)[lang] || 'PackingSlip'}_${order.order_number}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })

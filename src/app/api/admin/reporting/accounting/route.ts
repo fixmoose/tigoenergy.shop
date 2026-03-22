@@ -81,6 +81,94 @@ export async function GET(req: NextRequest) {
 
             if (error) throw error
             resultData = { records }
+        } else if (type === 'margin') {
+            // Margin report: fetch orders with items + product cost data
+            // We compute margin = sold price - purchase cost (no shipping)
+            // Segmented: invoiced (actual), confirmed (processing+shipped+delivered), all non-cancelled
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('id, order_number, customer_email, company_name, created_at, status, payment_status, invoice_number, invoice_created_at, total, subtotal, vat_amount, shipping_cost, order_items(product_id, sku, product_name, quantity, unit_price, unit_cost, total_price)')
+                .neq('status', 'cancelled')
+                .gte('created_at', start)
+                .lt('created_at', endDate)
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+
+            // Fetch product cost data for items that don't have unit_cost on the order item
+            const allProductIds = new Set<string>()
+            for (const order of (orders || [])) {
+                for (const item of (order.order_items || [])) {
+                    if (item.product_id && !item.unit_cost) allProductIds.add(item.product_id)
+                }
+            }
+
+            let productCosts: Record<string, number> = {}
+            if (allProductIds.size > 0) {
+                const { data: products } = await supabase
+                    .from('products')
+                    .select('id, cost_eur')
+                    .in('id', Array.from(allProductIds))
+                if (products) {
+                    productCosts = Object.fromEntries(products.map((p: any) => [p.id, p.cost_eur || 0]))
+                }
+            }
+
+            // Calculate margin per order
+            const orderMargins = (orders || []).map((order: any) => {
+                let totalRevenue = 0
+                let totalCost = 0
+                for (const item of (order.order_items || [])) {
+                    const revenue = (item.unit_price || 0) * (item.quantity || 0)
+                    const costPerUnit = item.unit_cost || (item.product_id ? (productCosts[item.product_id] || 0) : 0)
+                    const cost = costPerUnit * (item.quantity || 0)
+                    totalRevenue += revenue
+                    totalCost += cost
+                }
+                const margin = totalRevenue - totalCost
+                return {
+                    id: order.id,
+                    order_number: order.order_number,
+                    customer_email: order.customer_email,
+                    company_name: order.company_name,
+                    created_at: order.created_at,
+                    status: order.status,
+                    payment_status: order.payment_status,
+                    invoice_number: order.invoice_number,
+                    invoice_created_at: order.invoice_created_at,
+                    total: order.total,
+                    subtotal: order.subtotal,
+                    revenue: totalRevenue,
+                    cost: totalCost,
+                    margin,
+                    margin_pct: totalRevenue > 0 ? (margin / totalRevenue) * 100 : 0,
+                }
+            })
+
+            // Segment summaries
+            const invoiced = orderMargins.filter((o: any) => o.invoice_number)
+            const confirmed = orderMargins.filter((o: any) => ['processing', 'shipped', 'delivered', 'completed'].includes(o.status))
+            const all = orderMargins
+
+            const summarize = (arr: any[]) => ({
+                count: arr.length,
+                revenue: arr.reduce((s, o) => s + o.revenue, 0),
+                cost: arr.reduce((s, o) => s + o.cost, 0),
+                margin: arr.reduce((s, o) => s + o.margin, 0),
+                margin_pct: arr.reduce((s, o) => s + o.revenue, 0) > 0
+                    ? (arr.reduce((s, o) => s + o.margin, 0) / arr.reduce((s, o) => s + o.revenue, 0)) * 100
+                    : 0,
+            })
+
+            resultData = {
+                orders: orderMargins,
+                summary: {
+                    invoiced: summarize(invoiced),
+                    confirmed: summarize(confirmed),
+                    all: summarize(all),
+                }
+            }
         } else if (type === 'stock') {
             const { data: records, error } = await supabase
                 .from('products')
