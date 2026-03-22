@@ -15,7 +15,7 @@ export async function GET() {
         .from('products')
         .select('id, sku, name_en, name_sl, name_de, category, subcategory, price_eur, b2b_price_eur, weight_kg, stock_quantity, reserved_quantity, stock_status, images, units_per_box, quantity_discounts')
         .eq('active', true)
-        .or('category.eq.ts4-flex-mlpe,category.eq.ts4-x-mlpe,sku.ilike.%CCA%,sku.ilike.%RSS%,name_en.ilike.%CCA%,name_en.ilike.%RSS%')
+        .or('category.ilike.%TS4%MLPE%,sku.ilike.%CCA%,sku.ilike.%RSS%,name_en.ilike.%CCA%,name_en.ilike.%RSS%')
         .order('sku', { ascending: true })
 
     if (error) {
