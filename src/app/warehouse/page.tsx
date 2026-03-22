@@ -40,6 +40,7 @@ export default function WarehousePortal() {
     const [password, setPassword] = useState('')
     const [email, setEmail] = useState('')
     const [driverName, setDriverName] = useState('')
+    const [emailConfirmed, setEmailConfirmed] = useState(false)
     const [pickupOrders, setPickupOrders] = useState<WarehouseOrder[]>([])
     const [deliveryOrders, setDeliveryOrders] = useState<WarehouseOrder[]>([])
     const [completedOrders, setCompletedOrders] = useState<WarehouseOrder[]>([])
@@ -50,7 +51,10 @@ export default function WarehousePortal() {
         if (password === '123456') {
             setAuthenticated(true)
             const saved = localStorage.getItem('warehouse_email')
-            if (saved) setEmail(saved)
+            if (saved) {
+                setEmail(saved)
+                setEmailConfirmed(true)
+            }
         } else {
             alert('Napačno geslo')
         }
@@ -83,17 +87,17 @@ export default function WarehousePortal() {
     const loadOrders = () => {
         if (email) {
             localStorage.setItem('warehouse_email', email)
-            fetchOrders()
+            setEmailConfirmed(true)
         }
     }
 
-    // Auto-refresh every 30s
+    // Auto-refresh every 30s — only after email is confirmed
     useEffect(() => {
-        if (!email || !authenticated) return
+        if (!emailConfirmed || !email || !authenticated) return
         fetchOrders()
         const interval = setInterval(fetchOrders, 30000)
         return () => clearInterval(interval)
-    }, [email, authenticated, fetchOrders])
+    }, [emailConfirmed, authenticated, fetchOrders, email])
 
     const markPrepared = async (orderId: string) => {
         setActionLoading(prev => ({ ...prev, [orderId + '_prep']: true }))
@@ -181,7 +185,7 @@ export default function WarehousePortal() {
     }
 
     // ── Email entry ──
-    if (!email || pickupOrders.length === 0 && deliveryOrders.length === 0 && !loading && !driverName) {
+    if (!emailConfirmed) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
                 <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
@@ -230,7 +234,7 @@ export default function WarehousePortal() {
                         className="text-xs px-3 py-1.5 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition disabled:opacity-50">
                         {loading ? 'Nalagam...' : 'Osveži'}
                     </button>
-                    <button onClick={() => { setAuthenticated(false); setEmail(''); setPassword('') }}
+                    <button onClick={() => { setAuthenticated(false); setEmail(''); setPassword(''); setEmailConfirmed(false) }}
                         className="text-xs px-3 py-1.5 bg-slate-700 text-slate-400 rounded-lg hover:bg-slate-600 transition">
                         Odjava
                     </button>
