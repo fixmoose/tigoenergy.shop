@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { getMarketFromKey } from '@/lib/constants/markets'
 import { getLocalizedDescription, getLocalizedName } from '@/lib/utils/localization'
-import { buildHreflangAlternates, buildCanonicalUrl } from '@/lib/utils/seo'
+import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 import { getTranslations } from 'next-intl/server'
 import { getEffectivePrice } from '@/lib/db/pricing'
 
@@ -79,8 +79,49 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const subcategoryName = product.subcategory
   const subcategorySlug = subcategoryName ? subcategoryName.toLowerCase().replace(/ /g, '-') : null
 
+  const productDescription = getLocalizedDescription(product, market.defaultLanguage)
+  const domain = MARKET_DOMAINS[marketKey] || 'tigoenergy.shop'
+  const baseUrl = `https://${domain}`
+
+  // JSON-LD: Product schema
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: productName,
+    description: productDescription?.slice(0, 300) || `${productName} — professional solar solution by Tigo Energy.`,
+    image: product.images?.[0] || `${baseUrl}/tigo-logo.png`,
+    sku: product.sku,
+    brand: { '@type': 'Brand', name: 'Tigo Energy' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: market.currency,
+      price: effectivePrice.discountedPrice,
+      availability: (product.stock_quantity ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
+      url: `${baseUrl}/products/${slug}`,
+      seller: { '@type': 'Organization', name: 'Tigo Energy', url: baseUrl },
+    },
+  }
+
+  // JSON-LD: Breadcrumb schema
+  const breadcrumbItems: { '@type': string; position: number; name: string; item: string }[] = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+    { '@type': 'ListItem', position: 2, name: 'Products', item: `${baseUrl}/products` },
+  ]
+  if (categoryName) {
+    breadcrumbItems.push({ '@type': 'ListItem', position: 3, name: categoryName, item: `${baseUrl}/products?category=${categorySlug}` })
+  }
+  breadcrumbItems.push({ '@type': 'ListItem', position: breadcrumbItems.length + 1, name: productName, item: `${baseUrl}/products/${slug}` })
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbItems,
+  }
+
   return (
     <main className="container mx-auto py-12 px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Breadcrumbs */}
       <nav className="flex items-center flex-wrap gap-2 text-sm text-gray-500 mb-8 animate-in fade-in duration-500">
         <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>

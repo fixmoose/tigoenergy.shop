@@ -1,4 +1,10 @@
 import { useTranslations } from 'next-intl'
+import { generateStaticPageMetadata } from '@/lib/utils/static-page-metadata'
+import type { Metadata } from 'next'
+
+export async function generateMetadata(): Promise<Metadata> {
+    return generateStaticPageMetadata('faq')
+}
 
 export default function FAQPage() {
     const t = useTranslations('staticPages.faq')

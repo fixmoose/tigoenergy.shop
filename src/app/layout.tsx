@@ -77,9 +77,49 @@ export default async function RootLayout({
     ? preferredLang
     : market.defaultLanguage
 
+  const domain = MARKET_DOMAINS[marketKey] || 'tigoenergy.shop'
+  const baseUrl = `https://${domain}`
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Tigo Energy',
+    url: baseUrl,
+    logo: `${baseUrl}/tigo-logo.png`,
+    description: 'Professional solar energy solutions provider across Europe.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'support@tigoenergy.shop',
+      contactType: 'customer service',
+      areaServed: market.country,
+      availableLanguage: market.availableLanguages,
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Podsmreka 59A',
+      addressLocality: 'Dobrova',
+      postalCode: '1356',
+      addressCountry: 'SI',
+    },
+  }
+
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: `Tigo Energy ${market.countryName}`,
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/products?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
     <html lang={htmlLang} suppressHydrationWarning>
       <body className={inter.className}>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
         <QueryProvider>
           <NextIntlClientProvider messages={messages}>
             <MarketProvider initialMarket={market} initialLanguage={htmlLang}>
