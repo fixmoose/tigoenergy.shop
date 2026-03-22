@@ -10,6 +10,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import MobileNav from '@/components/MobileNav'
 import CookieConsent from '@/components/CookieConsent'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 import { QueryProvider } from '@/components/providers/QueryProvider'
@@ -84,11 +85,16 @@ export default async function RootLayout({
             <MarketProvider initialMarket={market} initialLanguage={htmlLang}>
               <CurrencyProvider>
                 <CartProvider>
-                  <Header />
-                  <main>
+                  <div className="hidden lg:contents">
+                    <Header />
+                  </div>
+                  <MobileNav />
+                  <main className="lg:pt-0 pt-12">
                     {children}
                   </main>
-                  <Footer />
+                  <div className="hidden lg:contents">
+                    <Footer />
+                  </div>
                   <CookieConsent />
                   <SpeedInsights />
                 </CartProvider>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -48,6 +49,8 @@ function Tile({
 export default function MobileLanding() {
     const [user, setUser] = useState<User | null>(null)
     const [checking, setChecking] = useState(true)
+    const [signingOut, setSigningOut] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         const supabase = createClient()
@@ -55,6 +58,15 @@ export default function MobileLanding() {
             setUser(user)
             setChecking(false)
         })
+    }, [])
+
+    // Prevent body scroll behind the fixed overlay on mobile
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 1023px)')
+        if (mq.matches) {
+            document.body.style.overflow = 'hidden'
+            return () => { document.body.style.overflow = '' }
+        }
     }, [])
 
     if (checking) {
@@ -244,8 +256,23 @@ export default function MobileLanding() {
                 )}
             </div>
 
-            {/* Bottom brand line */}
-            <div className="px-5 pb-6 text-center">
+            {/* Bottom — sign out + brand */}
+            <div className="px-5 pb-6 text-center space-y-3">
+                {user && (
+                    <button
+                        onClick={async () => {
+                            setSigningOut(true)
+                            const supabase = createClient()
+                            await supabase.auth.signOut()
+                            router.refresh()
+                            window.location.reload()
+                        }}
+                        disabled={signingOut}
+                        className="text-slate-500 text-xs hover:text-slate-300 transition active:text-white"
+                    >
+                        {signingOut ? 'Signing out...' : 'Sign Out'}
+                    </button>
+                )}
                 <p className="text-slate-600 text-xs">Tigo Energy Europe &middot; tigoenergy.shop</p>
             </div>
         </div>

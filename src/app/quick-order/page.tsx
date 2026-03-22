@@ -85,6 +85,7 @@ export default function QuickOrderPage() {
     const [accessories, setAccessories] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
+    const [termsAccepted, setTermsAccepted] = useState(false)
 
     // Flow state
     const [step, setStep] = useState<Step>('model')
@@ -94,6 +95,10 @@ export default function QuickOrderPage() {
     const [customQty, setCustomQty] = useState(false)
 
     useEffect(() => {
+        // Check if terms were previously accepted
+        if (typeof window !== 'undefined' && localStorage.getItem('quick-order-terms') === 'accepted') {
+            setTermsAccepted(true)
+        }
         fetch('/api/quick-order')
             .then(r => r.json())
             .then(data => {
@@ -191,6 +196,51 @@ export default function QuickOrderPage() {
         )
     }
 
+    // Mobile terms acceptance screen
+    if (!termsAccepted) {
+        return (
+            <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto">
+                <div className="flex-1 flex flex-col justify-center px-6 py-8">
+                    <img src="/tigo-leaf.png" alt="" className="w-12 h-12 brightness-0 invert opacity-80 mb-6" />
+                    <h1 className="text-2xl font-bold text-white mb-4">Quick Order</h1>
+                    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
+                        <p className="text-slate-300 text-sm leading-relaxed mb-3">
+                            This is a simplified mobile ordering interface. Due to the compact format,
+                            some product details, specifications, and legal text may not be fully visible
+                            or may be abbreviated.
+                        </p>
+                        <p className="text-slate-300 text-sm leading-relaxed mb-3">
+                            By proceeding, you acknowledge and agree that:
+                        </p>
+                        <ul className="text-slate-400 text-sm space-y-2 ml-4 list-disc">
+                            <li>Product images are for reference only</li>
+                            <li>Full product specifications are available on the desktop version</li>
+                            <li>All orders are subject to our standard <a href="/terms" className="text-teal-400 underline">Terms & Conditions</a></li>
+                            <li>Prices shown are indicative and confirmed at checkout</li>
+                            <li>Some formatting may be simplified for mobile display</li>
+                        </ul>
+                    </div>
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('quick-order-terms', 'accepted')
+                            setTermsAccepted(true)
+                        }}
+                        className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg
+                            active:scale-[0.98] active:bg-green-700 transition-all"
+                    >
+                        I Agree — Continue
+                    </button>
+                    <button
+                        onClick={() => router.push('/')}
+                        className="w-full text-slate-400 py-3 text-sm mt-2 active:text-white transition"
+                    >
+                        Go Back
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
     const optimizerPrice = selectedProduct ? getPrice(selectedProduct, quantity) : 0
     const optimizerTotal = optimizerPrice * quantity
     let accessoriesTotal = 0
@@ -200,11 +250,19 @@ export default function QuickOrderPage() {
     const grandTotal = optimizerTotal + accessoriesTotal
 
     return (
-        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto">
-            {/* Metro header — flat, no border */}
-            <div className="px-5 pt-6 pb-2">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-light text-white tracking-wide">
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto overflow-x-hidden">
+            {/* Header bar */}
+            <div className="px-4 pt-4 pb-2">
+                <div className="flex items-center gap-3 mb-2">
+                    <button
+                        onClick={() => router.push('/')}
+                        className="text-slate-400 active:text-white transition p-1"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <h1 className="text-xl font-medium text-white flex-1">
                         {step === 'model' && 'Quick Order'}
                         {step === 'qty' && (OPTIMIZER_LABELS[classifyProduct(selectedProduct?.sku || '', selectedProduct?.name_en) || '']?.short || 'Quantity')}
                         {step === 'accessories' && 'Accessories'}
@@ -213,28 +271,26 @@ export default function QuickOrderPage() {
                     <StepDots current={step} />
                 </div>
                 {step === 'model' && (
-                    <p className="text-slate-400 text-sm mt-1">Select your optimizer</p>
+                    <p className="text-slate-400 text-sm ml-9">Select your optimizer</p>
                 )}
             </div>
 
             {/* Content area — tiles */}
-            <div className="flex-1 px-4 pb-4 pt-2 overflow-y-auto">
+            <div className="flex-1 px-4 pb-4 pt-2">
 
                 {/* ═══════ STEP 1: MODEL ═══════ */}
                 {step === 'model' && (
-                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                    <div className="grid grid-cols-2 gap-3">
                         {Object.entries(OPTIMIZER_LABELS).map(([key, info]) => {
                             const products = optimizers.filter(p => classifyProduct(p.sku, p.name_en) === key)
                             const product = products[0]
                             if (!product) return null
                             const available = stockAvailable(product)
                             const isOut = available <= 0 && product.stock_status !== 'available_to_order'
-                            const tile = MODEL_TILES[key]
 
                             return (
-                                <Tile
+                                <button
                                     key={key}
-                                    color={tile.color}
                                     disabled={isOut}
                                     onClick={() => {
                                         setSelectedProduct(product)
@@ -242,20 +298,33 @@ export default function QuickOrderPage() {
                                         setCustomQty(false)
                                         setStep('qty')
                                     }}
-                                    className="aspect-square"
+                                    className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden
+                                        active:scale-[0.97] active:border-teal-400 transition-all
+                                        disabled:opacity-30 disabled:cursor-not-allowed
+                                        flex flex-col"
                                 >
-                                    <div className="text-3xl">{tile.icon}</div>
-                                    <div>
-                                        <div className="text-2xl font-bold leading-tight">{info.short}</div>
-                                        <div className="text-white/70 text-xs mt-0.5">{info.desc}</div>
-                                        <div className="text-white/90 text-sm font-semibold mt-1.5">
-                                            {fmtPrice(product.b2b_price_eur || product.price_eur)}
-                                        </div>
-                                        {available > 0 && available < 999999 && (
-                                            <div className="text-white/60 text-xs">{available} pcs</div>
+                                    {/* Product image */}
+                                    <div className="aspect-square bg-white p-3 flex items-center justify-center">
+                                        {product.images?.[0] ? (
+                                            <img src={product.images[0]} alt={info.full} className="w-full h-full object-contain" />
+                                        ) : (
+                                            <div className="text-4xl text-slate-400">⚡</div>
                                         )}
                                     </div>
-                                </Tile>
+                                    {/* Info bar */}
+                                    <div className="p-3 text-left">
+                                        <div className="text-white text-lg font-bold leading-tight">{info.short}</div>
+                                        <div className="text-slate-400 text-xs mt-0.5">{info.desc}</div>
+                                        <div className="flex items-baseline justify-between mt-1.5">
+                                            <span className="text-teal-400 text-sm font-semibold">
+                                                {fmtPrice(product.b2b_price_eur || product.price_eur)}
+                                            </span>
+                                            {available > 0 && available < 999999 && (
+                                                <span className="text-slate-500 text-xs">{available} pcs</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </button>
                             )
                         })}
                     </div>
@@ -263,7 +332,7 @@ export default function QuickOrderPage() {
 
                 {/* ═══════ STEP 2: QUANTITY ═══════ */}
                 {step === 'qty' && selectedProduct && !customQty && (
-                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                    <div className="grid grid-cols-2 gap-2">
                         {[1, 2, 5, 10].map(mult => {
                             const n = mult * unitsPerBox
                             return (
@@ -316,7 +385,7 @@ export default function QuickOrderPage() {
 
                 {/* Custom quantity input */}
                 {step === 'qty' && selectedProduct && customQty && (
-                    <div className="max-w-lg mx-auto space-y-4">
+                    <div className="space-y-4">
                         <div className="bg-slate-800 rounded-sm p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <span className="text-white/70 text-sm">{unitsPerBox} per box</span>
@@ -377,7 +446,7 @@ export default function QuickOrderPage() {
 
                 {/* ═══════ STEP 3: ACCESSORIES ═══════ */}
                 {step === 'accessories' && (
-                    <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
+                    <div className="grid grid-cols-2 gap-3">
                         {accessories.map(acc => {
                             const type = classifyProduct(acc.sku, acc.name_en)
                             const isSelected = selectedAccessories.has(acc.id)
@@ -386,33 +455,38 @@ export default function QuickOrderPage() {
                             const label = type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : acc.name_en
 
                             return (
-                                <Tile
+                                <button
                                     key={acc.id}
-                                    color={isSelected ? TILE_COLORS.green : TILE_COLORS.slate}
                                     disabled={isOut}
                                     onClick={() => toggleAccessory(acc)}
-                                    className="aspect-square relative"
+                                    className={`bg-slate-800 rounded-lg overflow-hidden relative
+                                        active:scale-[0.97] transition-all
+                                        disabled:opacity-30 disabled:cursor-not-allowed
+                                        flex flex-col border-2
+                                        ${isSelected ? 'border-green-500' : 'border-slate-700'}`}
                                 >
                                     {isSelected && (
-                                        <div className="absolute top-2 right-2">
-                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                        <div className="absolute top-2 right-2 z-10 bg-green-500 rounded-full p-0.5">
+                                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
                                     )}
-                                    {acc.images?.[0] ? (
-                                        <img src={acc.images[0]} alt="" className="w-12 h-12 object-contain brightness-0 invert opacity-80" />
-                                    ) : (
-                                        <div className="text-3xl">{type === 'CCA' ? '🔌' : '📡'}</div>
-                                    )}
-                                    <div>
-                                        <div className="text-lg font-bold leading-tight">{label}</div>
-                                        <div className="text-white/60 text-xs">{acc.sku}</div>
-                                        <div className="text-white/90 text-sm font-semibold mt-1">
+                                    <div className="aspect-square bg-white p-3 flex items-center justify-center">
+                                        {acc.images?.[0] ? (
+                                            <img src={acc.images[0]} alt={label} className="w-full h-full object-contain" />
+                                        ) : (
+                                            <div className="text-4xl text-slate-400">{type === 'CCA' ? '🔌' : '📡'}</div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 text-left">
+                                        <div className="text-white text-base font-bold leading-tight">{label}</div>
+                                        <div className="text-slate-400 text-xs">{acc.sku}</div>
+                                        <div className="text-teal-400 text-sm font-semibold mt-1">
                                             {fmtPrice(acc.b2b_price_eur || acc.price_eur)}
                                         </div>
                                     </div>
-                                </Tile>
+                                </button>
                             )
                         })}
 
@@ -484,87 +558,89 @@ export default function QuickOrderPage() {
 
                 {/* ═══════ STEP 4: SUMMARY ═══════ */}
                 {step === 'summary' && selectedProduct && (
-                    <div className="max-w-lg mx-auto space-y-2">
-                        {/* Optimizer summary tile */}
-                        <div className={`${MODEL_TILES[classifyProduct(selectedProduct.sku, selectedProduct.name_en) || '']?.color || TILE_COLORS.green} rounded-sm p-4 flex items-center gap-4`}>
-                            {selectedProduct.images?.[0] && (
-                                <img src={selectedProduct.images[0]} alt="" className="w-14 h-14 object-contain brightness-0 invert opacity-80" />
-                            )}
-                            <div className="flex-1">
-                                <div className="text-white text-xl font-bold">
+                    <div className="space-y-3">
+                        {/* Optimizer summary */}
+                        <div className="bg-slate-800 rounded-lg p-4 flex items-center gap-4 border border-slate-700">
+                            <div className="w-14 h-14 bg-white rounded-md p-1 flex-shrink-0">
+                                {selectedProduct.images?.[0] && (
+                                    <img src={selectedProduct.images[0]} alt="" className="w-full h-full object-contain" />
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-white text-lg font-bold">
                                     {OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku, selectedProduct.name_en) || '']?.short}
                                 </div>
-                                <div className="text-white/70 text-sm">{quantity} pcs &times; {fmtPrice(optimizerPrice)}</div>
+                                <div className="text-slate-400 text-sm">{quantity} pcs &times; {fmtPrice(optimizerPrice)}</div>
                             </div>
-                            <div className="text-white text-xl font-bold">{fmtPrice(optimizerTotal)}</div>
+                            <div className="text-teal-400 text-lg font-bold">{fmtPrice(optimizerTotal)}</div>
                         </div>
 
-                        {/* Accessory summary tiles */}
+                        {/* Accessory summary */}
                         {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
                             const unitP = getPrice(product, qty)
                             const type = classifyProduct(product.sku, product.name_en)
                             return (
-                                <div key={id} className={`${TILE_COLORS.slate} rounded-sm p-4 flex items-center gap-4`}>
-                                    {product.images?.[0] && (
-                                        <img src={product.images[0]} alt="" className="w-10 h-10 object-contain brightness-0 invert opacity-80" />
-                                    )}
-                                    <div className="flex-1">
-                                        <div className="text-white text-lg font-bold">
+                                <div key={id} className="bg-slate-800 rounded-lg p-4 flex items-center gap-4 border border-slate-700">
+                                    <div className="w-12 h-12 bg-white rounded-md p-1 flex-shrink-0">
+                                        {product.images?.[0] && (
+                                            <img src={product.images[0]} alt="" className="w-full h-full object-contain" />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-white text-base font-bold">
                                             {type === 'CCA' ? 'CCA Kit' : type === 'RSS' ? 'RSS' : product.sku}
                                         </div>
-                                        <div className="text-white/70 text-sm">{qty} pcs &times; {fmtPrice(unitP)}</div>
+                                        <div className="text-slate-400 text-sm">{qty} pcs &times; {fmtPrice(unitP)}</div>
                                     </div>
-                                    <div className="text-white text-lg font-bold">{fmtPrice(unitP * qty)}</div>
+                                    <div className="text-teal-400 text-base font-bold">{fmtPrice(unitP * qty)}</div>
                                 </div>
                             )
                         })}
 
                         {/* Total bar */}
-                        <div className="bg-slate-800 rounded-sm p-4 flex justify-between items-center border border-slate-700">
-                            <span className="text-white/70 text-lg">Total</span>
+                        <div className="bg-slate-800 rounded-lg p-4 flex justify-between items-center border border-teal-600">
+                            <span className="text-slate-300 text-lg">Total</span>
                             <span className="text-white text-2xl font-bold">{fmtPrice(grandTotal)}</span>
                         </div>
 
-                        {/* Action tiles */}
-                        <div className="grid grid-cols-2 gap-2 pt-2">
-                            <Tile
-                                color={TILE_COLORS.green}
+                        {/* Action buttons */}
+                        <div className="space-y-2 pt-2">
+                            <button
                                 onClick={handleAddToCart}
                                 disabled={submitting}
-                                className="col-span-2 py-5"
+                                className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg
+                                    active:scale-[0.98] active:bg-green-700 transition-all
+                                    disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <div className="text-xl font-bold text-center w-full">
-                                    {submitting ? 'Adding...' : 'Checkout'}
-                                </div>
-                                <div className="text-white/60 text-xs text-center w-full">Add to cart & proceed</div>
-                            </Tile>
-
-                            <Tile
-                                color={TILE_COLORS.back}
-                                onClick={() => setStep('accessories')}
-                                className="py-4"
-                            >
-                                <svg className="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                                <div className="text-white/70 text-sm">Back</div>
-                            </Tile>
-
-                            <Tile
-                                color={TILE_COLORS.slate}
-                                onClick={() => {
-                                    setStep('model')
-                                    setSelectedProduct(null)
-                                    setQuantity(20)
-                                    setSelectedAccessories(new Map())
-                                }}
-                                className="py-4"
-                            >
-                                <svg className="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                                <div className="text-white/70 text-sm">Start Over</div>
-                            </Tile>
+                                {submitting ? 'Adding...' : 'Checkout'}
+                            </button>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={() => setStep('accessories')}
+                                    className="bg-slate-700 text-white py-3 rounded-lg text-sm font-medium
+                                        active:bg-slate-600 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                    Back
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setStep('model')
+                                        setSelectedProduct(null)
+                                        setQuantity(20)
+                                        setSelectedAccessories(new Map())
+                                    }}
+                                    className="bg-slate-700 text-white py-3 rounded-lg text-sm font-medium
+                                        active:bg-slate-600 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Start Over
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
