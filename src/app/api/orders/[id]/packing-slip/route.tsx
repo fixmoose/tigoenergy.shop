@@ -14,9 +14,19 @@ export async function GET(
     const { id } = await params
 
     const cookieStore = await cookies()
-    const isAdminCookie = cookieStore.get('tigo-admin')?.value === '1'
+    let isAdmin = cookieStore.get('tigo-admin')?.value === '1'
 
-    const supabase = isAdminCookie ? await createAdminClient() : await createClient()
+    // Allow warehouse members by email param (packing slips don't contain prices)
+    if (!isAdmin) {
+        const warehouseEmail = req.nextUrl.searchParams.get('warehouse_email')
+        if (warehouseEmail) {
+            const adminSb = await createAdminClient()
+            const { data: driver } = await adminSb.from('drivers').select('id').eq('email', warehouseEmail).eq('is_warehouse', true).single()
+            if (driver) isAdmin = true
+        }
+    }
+
+    const supabase = isAdmin ? await createAdminClient() : await createClient()
 
     // 1. Fetch Order with Items
     const { data: order, error: orderError } = await supabase
@@ -29,15 +39,15 @@ export async function GET(
         return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // 2. Security Check (Only owner or admin)
-    if (!isAdminCookie) {
+    // 2. Security Check (Only owner, admin, or warehouse)
+    if (!isAdmin) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
         if (order.customer_email !== user.email) {
-            const isAdmin = user.email?.endsWith('@tigoenergy.com') || user.user_metadata?.role === 'admin'
-            if (!isAdmin) {
+            const isAdminUser = user.email?.endsWith('@tigoenergy.com') || user.user_metadata?.role === 'admin'
+            if (!isAdminUser) {
                 return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
             }
         }
