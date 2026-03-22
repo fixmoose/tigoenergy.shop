@@ -79,6 +79,10 @@
     "disclaimers": "Disclaimer",
     "companyDesc": "Il vostro partner per soluzioni professionali di ottimizzazione solare in tutta Europa.",
     "operatedBy": "Gestito da: Initra Energija d.o.o. - Distributore autorizzato Tigo Energy",
+    "trustAuthorized": "Distributore Tigo autorizzato",
+    "trustSecurePayments": "Pagamenti sicuri",
+    "trustReturns": "Reso entro 14 giorni",
+    "trustEuShipping": "Spedizione in tutta l'UE",
     "designBy": "Design di:",
     "allRightsReserved": "Tutti i diritti riservati.",
     "disclaimer1": "La spedizione dipende da fornitori terzi e non abbiamo controllo sui tempi di consegna.",
@@ -86,6 +90,7 @@
     "disclaimer3": "I resi si applicano ai clienti B2C per uso personale entro 14 giorni. L'acquirente è responsabile delle spese di reso."
   },
   "products": {
+    "authorizedDistributor": "Distributore Tigo autorizzato",
     "shopAll": "Tutti i prodotti",
     "description": "Descrizione",
     "downloads": "Download",

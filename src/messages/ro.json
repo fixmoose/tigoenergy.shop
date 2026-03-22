@@ -79,6 +79,10 @@
     "disclaimers": "Disclaimer-uri legale",
     "companyDesc": "Partenerul dvs. pentru soluții profesionale de optimizare solară în toată Europa.",
     "operatedBy": "Operat de: Initra Energija d.o.o. - Distribuitor autorizat Tigo Energy",
+    "trustAuthorized": "Distribuitor Tigo autorizat",
+    "trustSecurePayments": "Plăți securizate",
+    "trustReturns": "Returnare în 14 zile",
+    "trustEuShipping": "Livrare în toată UE",
     "designBy": "Design de:",
     "allRightsReserved": "Toate drepturile rezervate.",
     "disclaimer1": "Livrarea depinde de furnizori terți și nu avem control asupra timpilor de livrare sau întârzierilor.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Returnarea fără griji se aplică clienților B2C pentru uz personal în termen de 14 zile. Cumpărătorul este responsabil pentru costurile de returnare."
   },
   "products": {
+    "authorizedDistributor": "Distribuitor Tigo autorizat",
     "shopAll": "Toate produsele",
     "description": "Descriere",
     "downloads": "Descărcări",

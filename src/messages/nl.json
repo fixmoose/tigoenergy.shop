@@ -79,6 +79,10 @@
     "disclaimers": "Disclaimers",
     "companyDesc": "Uw partner voor professionele zonne-optimalisatie oplossingen in heel Europa.",
     "operatedBy": "Geëxploiteerd door: Initra Energija d.o.o. - Geautoriseerde Tigo Energy distributeur",
+    "trustAuthorized": "Geautoriseerde Tigo distributeur",
+    "trustSecurePayments": "Veilig betalen",
+    "trustReturns": "14 dagen retour",
+    "trustEuShipping": "Verzending in heel de EU",
     "designBy": "Ontwerp door:",
     "allRightsReserved": "Alle rechten voorbehouden.",
     "disclaimer1": "Verzending is afhankelijk van externe leveranciers en we hebben geen controle over levertijden of vertragingen.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Zorgeloos retourneren is van toepassing op B2C klanten voor persoonlijk gebruik binnen 14 dagen. De koper is verantwoordelijk voor de retourverzendkosten."
   },
   "products": {
+    "authorizedDistributor": "Geautoriseerde Tigo distributeur",
     "shopAll": "Winkel alles",
     "description": "Beschrijving",
     "downloads": "Downloads",

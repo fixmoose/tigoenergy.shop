@@ -79,6 +79,10 @@
     "disclaimers": "Právní upozornění",
     "companyDesc": "Váš partner pro profesionální solární optimalizační řešení v celé Evropě.",
     "operatedBy": "Provozuje: Initra Energija d.o.o. - Autorizovaný distributor Tigo Energy",
+    "trustAuthorized": "Autorizovaný distributor Tigo",
+    "trustSecurePayments": "Bezpečné platby",
+    "trustReturns": "Vrácení do 14 dnů",
+    "trustEuShipping": "Doručení po celé EU",
     "designBy": "Design:",
     "allRightsReserved": "Všechna práva vyhrazena.",
     "disclaimer1": "Doprava závisí na poskytovatelích třetích stran a nemáme kontrolu nad dobou dodání nebo zpožděními.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Bezstarostné vrácení se vztahuje na B2C zákazníky pro osobní použití do 14 dnů. Kupující je odpovědný za náklady na zpáteční dopravu."
   },
   "products": {
+    "authorizedDistributor": "Autorizovaný distributor Tigo",
     "shopAll": "Všechny produkty",
     "description": "Popis",
     "downloads": "Ke stažení",

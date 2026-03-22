@@ -79,6 +79,10 @@
     "disclaimers": "Avertissements",
     "companyDesc": "Votre partenaire pour des solutions professionnelles d'optimisation solaire à travers l'Europe.",
     "operatedBy": "Exploité par : Initra Energija d.o.o. - Distributeur autorisé Tigo Energy",
+    "trustAuthorized": "Distributeur Tigo agréé",
+    "trustSecurePayments": "Paiement sécurisé",
+    "trustReturns": "Retours sous 14 jours",
+    "trustEuShipping": "Livraison dans toute l'UE",
     "designBy": "Design par :",
     "allRightsReserved": "Tous droits réservés.",
     "disclaimer1": "La livraison dépend de prestataires tiers et nous n'avons aucun contrôle sur les délais de livraison.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Les retours sans souci s'appliquent aux clients B2C pour usage personnel dans les 14 jours. L'acheteur est responsable des frais de retour."
   },
   "products": {
+    "authorizedDistributor": "Distributeur Tigo agréé",
     "shopAll": "Tous les produits",
     "description": "Description",
     "downloads": "Telechargements",

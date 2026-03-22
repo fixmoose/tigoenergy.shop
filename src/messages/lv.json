@@ -79,6 +79,10 @@
     "disclaimers": "Atrunas",
     "companyDesc": "Jūsu partneris profesionāliem saules optimizācijas risinājumiem visā Eiropā.",
     "operatedBy": "Uztur: Initra Energija d.o.o. - Pilnvarots Tigo Energy izplatītājs",
+    "trustAuthorized": "Pilnvarots Tigo izplatītājs",
+    "trustSecurePayments": "Droši maksājumi",
+    "trustReturns": "Atgriešana 14 dienās",
+    "trustEuShipping": "Piegāde visā ES",
     "designBy": "Dizains:",
     "allRightsReserved": "Visas tiesības aizsargātas.",
     "disclaimer1": "Piegāde ir atkarīga od trešo pušu pakalpojumu sniedzējiem, un mums nav kontroles pār piegādes laikiem vai kavējumiem.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Bezrūpīga atgriešana attiecas uz B2C klientiem personiskai lietošanai 14 dienu laikā. Pircējs ir atbildīgs par atgriešanas piegādes izmaksām."
   },
   "products": {
+    "authorizedDistributor": "Pilnvarots Tigo izplatītājs",
     "shopAll": "Visi produkti",
     "description": "Apraksts",
     "downloads": "Lejupielādes",

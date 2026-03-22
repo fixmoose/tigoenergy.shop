@@ -79,6 +79,10 @@
     "disclaimers": "Jogi nyilatkozatok",
     "companyDesc": "Az Ön partnere professzionális napenergia optimalizálási megoldásokhoz Európa-szerte.",
     "operatedBy": "Üzemelteti: Initra Energija d.o.o. - Hivatalos Tigo Energy forgalmazó",
+    "trustAuthorized": "Hivatalos Tigo forgalmazó",
+    "trustSecurePayments": "Biztonságos fizetés",
+    "trustReturns": "14 napos visszaküldés",
+    "trustEuShipping": "EU-szerte szállítás",
     "designBy": "Tervezte:",
     "allRightsReserved": "Minden jog fenntartva.",
     "disclaimer1": "A szállítás harmadik fél szolgáltatóktól függ, és nem tudunk befolyásolni a szállítási időket vagy késéseket.",
@@ -86,6 +90,7 @@
     "disclaimer3": "A gondtalan visszaküldés a B2C ügyfelekre vonatkozik személyes használatra 14 napon belül. A vevő felelős a visszaküldés szállítási költségeiért."
   },
   "products": {
+    "authorizedDistributor": "Hivatalos Tigo forgalmazó",
     "shopAll": "Összes termék",
     "description": "Leírás",
     "downloads": "Letöltések",

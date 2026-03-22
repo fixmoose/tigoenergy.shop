@@ -79,6 +79,10 @@
     "disclaimers": "Vastutuse piirangud",
     "companyDesc": "Teie partner professionaalsete päikeseenergia optimeerimislahenduste jaoks üle Euroopa.",
     "operatedBy": "Opereerib: Initra Energija d.o.o. - Volitatud Tigo Energy levitaja",
+    "trustAuthorized": "Volitatud Tigo levitaja",
+    "trustSecurePayments": "Turvalised maksed",
+    "trustReturns": "Tagastus 14 päeva jooksul",
+    "trustEuShipping": "Tarne üle kogu EL-i",
     "designBy": "Disain:",
     "allRightsReserved": "Kõik õigused kaitstud.",
     "disclaimer1": "Tarne sõltub kolmanda osapoole pakkujatest ja meil pole kontrolli tarneaegade või viivituste üle.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Murevaba tagastamine kehtib B2C klientidele isiklikuks kasutamiseks 14 päeva jooksul. Ostja vastutab tagastamise transpordikulu eest."
   },
   "products": {
+    "authorizedDistributor": "Volitatud Tigo levitaja",
     "shopAll": "Kõik tooted",
     "description": "Kirjeldus",
     "downloads": "Allalaadimised",

@@ -105,6 +105,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       url: `${baseUrl}/products/${slug}`,
       seller: { '@type': 'Organization', name: 'Tigo Energy Shop', url: baseUrl },
     },
+    ...(reviews.length > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1),
+        reviewCount: reviews.length,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    } : {}),
   }
 
   // JSON-LD: Breadcrumb schema

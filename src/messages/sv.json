@@ -79,6 +79,10 @@
     "disclaimers": "Ansvarsfriskrivningar",
     "companyDesc": "Din partner för professionella solenergioptimeringslösningar i hela Europa.",
     "operatedBy": "Drivs av: Initra Energija d.o.o. - Auktoriserad Tigo Energy-distributör",
+    "trustAuthorized": "Auktoriserad Tigo-distributör",
+    "trustSecurePayments": "Säkra betalningar",
+    "trustReturns": "14 dagars retur",
+    "trustEuShipping": "Frakt i hela EU",
     "designBy": "Design av:",
     "allRightsReserved": "Alla rättigheter förbehållna.",
     "disclaimer1": "Frakt är beroende av tredjepartsleverantörer och vi har ingen kontroll över leveranstider eller förseningar.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Bekymmersfria returer gäller för B2C-kunder för personligt bruk inom 14 dagar. Köparen ansvarar för returfrakt."
   },
   "products": {
+    "authorizedDistributor": "Auktoriserad Tigo-distributör",
     "shopAll": "Handla allt",
     "description": "Beskrivning",
     "downloads": "Nedladdningar",

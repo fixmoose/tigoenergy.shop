@@ -79,6 +79,10 @@
     "disclaimers": "Atsakomybės apribojimai",
     "companyDesc": "Jūsų partneris profesionaliems saulės energijos optimizavimo sprendimams visoje Europoje.",
     "operatedBy": "Valdo: Initra Energija d.o.o. - Įgaliotas Tigo Energy platintojas",
+    "trustAuthorized": "Įgaliotas Tigo platintojas",
+    "trustSecurePayments": "Saugūs mokėjimai",
+    "trustReturns": "Grąžinimas per 14 dienų",
+    "trustEuShipping": "Pristatymas visoje ES",
     "designBy": "Dizainas:",
     "allRightsReserved": "Visos teisės saugomos.",
     "disclaimer1": "Pristatymas priklauso nuo trečiųjų šalių paslaugų teikėjų ir mes neturime kontrolės dėl pristatymo laikų ar vėlavimų.",
@@ -86,6 +90,7 @@
     "disclaimer3": "Nerūpestingi grąžinimai taikomi B2C klientams asmeniniam naudojimui per 14 dienų. Pirkėjas atsako už grąžinimo pristatymo išlaidas."
   },
   "products": {
+    "authorizedDistributor": "Įgaliotas Tigo platintojas",
     "shopAll": "Visi produktai",
     "description": "Aprašymas",
     "downloads": "Atsisiuntimai",
