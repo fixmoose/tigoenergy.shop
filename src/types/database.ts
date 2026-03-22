@@ -233,6 +233,7 @@ export interface Order {
   shipping_label_created_at?: string | null
   packing_slip_url?: string | null
 
+  stock_adjusted?: boolean
   intrastat_reported?: boolean
   intrastat_report_date?: string | null
 

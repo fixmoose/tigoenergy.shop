@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction, adminDeleteOrderAction } from '@/app/actions/admin'
+import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction, adminDeleteOrderAction, reserveStockForOrderAction, adjustStockForOrderAction } from '@/app/actions/admin'
 import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
@@ -173,6 +173,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 .update({ status: 'processing', confirmed_at: new Date().toISOString() })
                 .eq('id', orderId)
             if (error) throw error
+            // Reserve stock for this order
+            await reserveStockForOrderAction(orderId)
             router.refresh()
         } catch (err) {
             console.error('Error confirming order:', err)
@@ -194,6 +196,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to process shipping')
+            // Deduct stock — goods leaving warehouse
+            await adjustStockForOrderAction(orderId)
             alert(`${carrier} shipment processed. Email sent to customer.`)
             router.refresh()
         } catch (err: any) {
@@ -528,6 +532,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             shipped_at: new Date().toISOString(),
                                         }).eq('id', orderId)
                                         if (error) throw error
+                                        // Deduct stock — goods leaving warehouse
+                                        await adjustStockForOrderAction(orderId)
                                         router.refresh()
                                     } catch { alert('Failed') } finally { setLoading(false) }
                                 }} disabled={loading}
@@ -570,6 +576,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             shipped_at: new Date().toISOString(),
                                         }).eq('id', orderId)
                                         if (error) throw error
+                                        // Deduct stock — goods leaving warehouse
+                                        await adjustStockForOrderAction(orderId)
                                         alert(`Marked as shipped via ${carrier}`)
                                         router.refresh()
                                     } catch { alert('Failed') } finally { setLoading(false) }

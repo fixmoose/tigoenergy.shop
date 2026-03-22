@@ -52,6 +52,107 @@ async function checkIsMasterAdmin() {
 }
 
 /**
+ * Deduct stock_quantity for all items in an order.
+ * Sets stock_adjusted=true on the order to prevent double-deduction.
+ * Also decrements reserved_quantity if it was previously incremented on confirm.
+ */
+export async function adjustStockForOrderAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        // Fetch order with items — check guard flag
+        const { data: order, error: orderErr } = await supabase
+            .from('orders')
+            .select('id, stock_adjusted, order_items(product_id, quantity)')
+            .eq('id', orderId)
+            .single()
+
+        if (orderErr || !order) throw new Error('Order not found')
+        if (order.stock_adjusted) {
+            console.log(`Stock already adjusted for order ${orderId}, skipping`)
+            return { success: true, skipped: true }
+        }
+
+        // Deduct stock for each item with a product_id
+        for (const item of (order.order_items || [])) {
+            if (!item.product_id || item.quantity <= 0) continue
+
+            // Use RPC or manual decrement
+            const { data: product } = await supabase
+                .from('products')
+                .select('stock_quantity, reserved_quantity')
+                .eq('id', item.product_id)
+                .single()
+
+            if (!product) continue
+
+            const newStock = Math.max(0, (product.stock_quantity || 0) - item.quantity)
+            const newReserved = Math.max(0, (product.reserved_quantity || 0) - item.quantity)
+
+            await supabase
+                .from('products')
+                .update({ stock_quantity: newStock, reserved_quantity: newReserved })
+                .eq('id', item.product_id)
+        }
+
+        // Mark order as stock-adjusted
+        await supabase
+            .from('orders')
+            .update({ stock_adjusted: true })
+            .eq('id', orderId)
+
+        console.log(`Stock adjusted for order ${orderId}: ${(order.order_items || []).length} items`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in adjustStockForOrderAction:', err)
+        return { success: false, error: err.message }
+    }
+}
+
+/**
+ * Increment reserved_quantity for all items in an order (called on order confirmation).
+ */
+export async function reserveStockForOrderAction(orderId: string) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+
+        const supabase = await createAdminClient()
+
+        const { data: order, error } = await supabase
+            .from('orders')
+            .select('id, order_items(product_id, quantity)')
+            .eq('id', orderId)
+            .single()
+
+        if (error || !order) throw new Error('Order not found')
+
+        for (const item of (order.order_items || [])) {
+            if (!item.product_id || item.quantity <= 0) continue
+
+            const { data: product } = await supabase
+                .from('products')
+                .select('reserved_quantity')
+                .eq('id', item.product_id)
+                .single()
+
+            if (!product) continue
+
+            await supabase
+                .from('products')
+                .update({ reserved_quantity: (product.reserved_quantity || 0) + item.quantity })
+                .eq('id', item.product_id)
+        }
+
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in reserveStockForOrderAction:', err)
+        return { success: false, error: err.message }
+    }
+}
+
+/**
  * Invite a new admin
  */
 export async function inviteAdminAction(email: string) {
@@ -1694,6 +1795,9 @@ export async function adminSendDeliveryToDriverAction(orderId: string, driverEma
             orderId,
             emailType: 'driver_delivery_assignment',
         })
+
+        // Deduct stock when dobavnica is issued (goods leaving warehouse)
+        await adjustStockForOrderAction(orderId)
 
         revalidatePath(`/admin/orders/${orderId}`)
         return { success: true, token }

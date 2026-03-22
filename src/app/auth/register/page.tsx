@@ -67,10 +67,19 @@ function RegisterContent() {
 
 export default function RegisterPage() {
     return (
-        <div className="min-h-screen bg-gray-50 pt-14 pb-12">
-            <Suspense fallback={<div>Loading...</div>}>
-                <RegisterContent />
-            </Suspense>
-        </div>
+        <>
+            {/* Mobile — dark theme */}
+            <div className="lg:hidden min-h-screen bg-slate-900 pt-2 pb-12 px-4 -mt-12">
+                <Suspense fallback={<div className="text-white text-center pt-20">Loading...</div>}>
+                    <RegisterContent />
+                </Suspense>
+            </div>
+            {/* Desktop */}
+            <div className="hidden lg:block min-h-screen bg-gray-50 pt-14 pb-12">
+                <Suspense fallback={<div>Loading...</div>}>
+                    <RegisterContent />
+                </Suspense>
+            </div>
+        </>
     )
 }
