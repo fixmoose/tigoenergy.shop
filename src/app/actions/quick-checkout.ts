@@ -245,11 +245,11 @@ export async function placeQuickOrder(
                         packing_slip_url: `/api/orders/${order.id}/packing-slip`,
                     }).eq('id', order.id)
 
-                    // Notify all warehouse-flagged drivers
+                    // Notify all auto-pickup flagged drivers
                     const { data: warehouseWorkers } = await adminSupabase
                         .from('drivers')
                         .select('id, name, email')
-                        .eq('is_warehouse', true)
+                        .eq('is_auto_pickup', true)
 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
                         const extraNote = pickupPaymentProofRequired

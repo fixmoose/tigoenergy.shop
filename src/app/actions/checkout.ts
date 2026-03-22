@@ -274,11 +274,11 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
                     autoConfirmed = true
 
-                    // Send packing slip to all warehouse-flagged drivers
+                    // Send packing slip to all auto-pickup flagged drivers
                     const { data: warehouseWorkers } = await adminSupabase
                         .from('drivers')
                         .select('id, name, email')
-                        .eq('is_warehouse', true)
+                        .eq('is_auto_pickup', true)
 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
                         const { sendWarehouseEmail } = await import('@/lib/warehouse')

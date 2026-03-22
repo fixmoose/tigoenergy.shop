@@ -22,6 +22,7 @@ type Driver = {
     email: string
     phone: string
     is_warehouse?: boolean
+    is_auto_pickup?: boolean
 }
 
 export default function SettingsPage() {
@@ -392,7 +393,7 @@ export default function SettingsPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                     <h3 className="text-lg font-bold text-gray-800">Drivers & Warehouse</h3>
-                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers and warehouse workers. Toggle &quot;Warehouse&quot; to receive auto-checkout emails and show quick-send buttons on orders.</p>
+                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers and warehouse workers. &quot;Warehouse&quot; = quick-send button on orders. &quot;Auto-pickup&quot; = auto-receive email when customer pickup order is placed.</p>
                 </div>
                 <div className="p-6 space-y-4">
                     <form onSubmit={handleSaveDriver} className="flex flex-wrap gap-2 items-end">
@@ -436,12 +437,15 @@ export default function SettingsPage() {
                                             {d.is_warehouse && (
                                                 <span className="text-[9px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded font-bold uppercase">Warehouse</span>
                                             )}
+                                            {d.is_auto_pickup && (
+                                                <span className="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-bold uppercase">Auto-pickup</span>
+                                            )}
                                         </div>
                                         <div className="text-xs text-gray-500">{d.email}{d.phone ? ` · ${d.phone}` : ''}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                    <label className="flex items-center gap-1.5 cursor-pointer" title="Show as quick-send button on orders">
                                         <input
                                             type="checkbox"
                                             checked={!!d.is_warehouse}
@@ -452,6 +456,18 @@ export default function SettingsPage() {
                                             className="w-3.5 h-3.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                                         />
                                         <span className="text-[10px] font-bold text-gray-400 uppercase">Warehouse</span>
+                                    </label>
+                                    <label className="flex items-center gap-1.5 cursor-pointer" title="Auto-receive email when customer pickup order is placed">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!d.is_auto_pickup}
+                                            onChange={async (e) => {
+                                                const { error } = await supabase.from('drivers').update({ is_auto_pickup: e.target.checked }).eq('id', d.id)
+                                                if (!error) fetchDrivers()
+                                            }}
+                                            className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                        />
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase">Auto-pickup</span>
                                     </label>
                                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button onClick={() => { setEditingDriver(d); setDriverForm({ name: d.name, email: d.email, phone: d.phone }) }}

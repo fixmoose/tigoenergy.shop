@@ -1836,7 +1836,7 @@ export async function adminSendToWarehouseAction(orderId: string, warehouseEmail
 export async function adminDeleteOrderAction(orderId: string): Promise<{ success: boolean; error?: string }> {
     try {
         const cookieStore = await cookies()
-        if (cookieStore.get('tigo-admin')?.value !== 'true') {
+        if (cookieStore.get('tigo-admin')?.value !== '1') {
             return { success: false, error: 'Unauthorized' }
         }
         const supabase = await createAdminClient()
