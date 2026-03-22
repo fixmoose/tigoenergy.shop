@@ -721,7 +721,7 @@
       "pContact": "Za sva pitanja u vezi s ovim Uvjetima, kontaktirajte nas na: Initra Energija d.o.o., Podsmreka 59A, 1356 Dobrova, Slovenija. E-pošta: support@tigoenergy.shop. PDV ID: SI62518313. Matični broj: 9624007000."
     },
     "impressum": {
-      "title": "Impressum",
+      "title": "Impressum / Pravna obavijest",
       "hCompany": "Podaci o tvrtki",
       "companyName": "Initra Energija d.o.o.",
       "vat": "PDV broj: SI62518313",
@@ -730,9 +730,21 @@
       "emailLabel": "E-pošta:",
       "clickToReveal": "Kliknite za prikaz",
       "hAuthorized": "Ovlašteni Tigo Energy distributer",
-      "pAuthorized1": "Initra Energija d.o.o. je ovlašteni distributer proizvoda Tigo Energy u Europi. Specijalizirani smo isključivo za rješenja Tigo Energy, što osigurava stručno znanje i autentične proizvode.",
+      "pAuthorized1": "Initra Energija d.o.o. je neovisna tvrtka i ovlašteni distributer Tigo Energy proizvoda u Europi. Ovu web stranicu upravlja Initra Energija d.o.o. i nije u vlasništvu, upravljanju ili pod kontrolom tvrtke Tigo Energy, Inc.",
       "hResponsible": "Odgovoran za sadržaj",
-      "pResponsible": "Initra Energija d.o.o. je odgovorna za sav sadržaj objavljen na ovoj web stranici."
+      "pResponsible": "Dejan Obradović, Initra Energija d.o.o., Podsmreka 59A, 1356 Dobrova, Slovenija.",
+      "address": "Podsmreka 59A, 1356 Dobrova, Slovenija",
+      "court": "Registrirano pri: Okružni sud u Ljubljani",
+      "ceo": "Direktor: Dejan Obradović",
+      "pAuthorized2": "Tigo Energy® i svi povezani nazivi proizvoda i logotipi zaštitni su znakovi tvrtke Tigo Energy, Inc. Sve slike proizvoda, specifikacije i opisi osigurani su od strane proizvođača i koriste se uz dopuštenje.",
+      "hDispute": "Rješavanje sporova",
+      "pDispute1": "Nismo obvezni niti voljni sudjelovati u postupcima rješavanja sporova pred potrošačkim arbitražnim tijelom. Međutim, obvezujemo se izravno rješavati sve sporove s našim kupcima.",
+      "pDispute2": "Europska komisija pruža platformu za online rješavanje sporova (ODR):",
+      "pDispute3": "Našu e-mail adresu možete pronaći u gornjim kontaktnim podacima.",
+      "hLiability": "Odgovornost za vanjske linkove",
+      "pLiability": "Naša web stranica sadrži linkove na vanjske web stranice trećih strana na čiji sadržaj nemamo utjecaja. Za sadržaj povezanih stranica uvijek je odgovoran njihov pružatelj ili operator. Trajni nadzor sadržaja povezanih stranica nije razuman bez konkretnih dokaza o kršenju. Ukoliko saznamo za kršenja zakona, odmah ćemo ukloniti takve linkove.",
+      "hCopyright": "Autorska prava",
+      "pCopyright": "Sadržaj i djela objavljena na ovoj web stranici podliježu autorskom pravu. Svako umnožavanje, obrada, distribucija ili bilo koji oblik komercijalizacije izvan okvira autorskog prava zahtijeva prethodnu pisanu suglasnost Initra Energija d.o.o."
     },
     "cookies": {
       "title": "Politika kolačića",

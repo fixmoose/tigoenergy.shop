@@ -556,9 +556,21 @@
       "emailLabel": "Email:",
       "clickToReveal": "Kliknite da otkrijete",
       "hAuthorized": "Ovlašćeni Tigo Energy distributer",
-      "pAuthorized1": "Initra Energija d.o.o. je ovlašćeni distributer Tigo Energy proizvoda u Evropi. Specijalizovani smo isključivo za Tigo Energy rešenja, pružajući stručno znanje i originalne proizvode.",
+      "pAuthorized1": "Initra Energija d.o.o. is an independent company and authorized distributor of Tigo Energy products in Europe. This website is operated by Initra Energija d.o.o. and is not owned, operated, or controlled by Tigo Energy, Inc.",
       "hResponsible": "Odgovoran za sadržaj",
-      "pResponsible": "Initra Energija d.o.o. je odgovorna za sav sadržaj objavljen na ovom veb sajtu."
+      "pResponsible": "Initra Energija d.o.o. je odgovorna za sav sadržaj objavljen na ovom veb sajtu.",
+      "address": "Podsmreka 59A, 1356 Dobrova, Slovenia",
+      "court": "Registered at: Okrožno sodišče v Ljubljani (District Court of Ljubljana)",
+      "ceo": "Managing Director: Dejan Obradović",
+      "pAuthorized2": "Tigo Energy® and all related product names and logos are trademarks of Tigo Energy, Inc. All product images, specifications, and descriptions are provided by the manufacturer and are used with permission.",
+      "hDispute": "Dispute Resolution",
+      "pDispute1": "We are not obliged and not willing to participate in dispute resolution proceedings before a consumer arbitration board. However, we are committed to resolving any disputes directly with our customers.",
+      "pDispute2": "The European Commission provides an Online Dispute Resolution (ODR) platform:",
+      "pDispute3": "Our email address can be found in the contact information above.",
+      "hLiability": "Liability for External Links",
+      "pLiability": "Our website contains links to external third-party websites over whose content we have no influence. We cannot accept any liability for this third-party content. The respective provider or operator of the linked pages is always responsible for the content of the linked pages. If we become aware of any legal violations, we will remove such links immediately.",
+      "hCopyright": "Copyright Notice",
+      "pCopyright": "The content and works published on this website are subject to copyright law. Any duplication, processing, distribution, or any form of commercialization beyond the scope of copyright law requires the prior written consent of Initra Energija d.o.o."
     },
     "cookies": {
       "title": "Cookie Policy",

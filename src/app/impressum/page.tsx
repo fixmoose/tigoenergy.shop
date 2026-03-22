@@ -24,8 +24,11 @@ export default function ImpressumPage() {
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hCompany')}</h2>
                         <div className="space-y-2 text-gray-700">
                             <p className="font-medium text-lg">{t('companyName')}</p>
+                            <p>{t('address')}</p>
                             <p>{t('vat')}</p>
                             <p>{t('registration')}</p>
+                            <p>{t('court')}</p>
+                            <p>{t('ceo')}</p>
                         </div>
                     </section>
 
@@ -60,18 +63,42 @@ export default function ImpressumPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hAuthorized')}</h2>
                         <div className="space-y-4 text-gray-700">
-                            <p>
-                                {t('pAuthorized1')}
-                            </p>
+                            <p>{t('pAuthorized1')}</p>
+                            <p>{t('pAuthorized2')}</p>
                         </div>
                     </section>
 
                     {/* Responsible for Content */}
                     <section className="mb-8">
                         <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hResponsible')}</h2>
-                        <p className="text-gray-700">
-                            {t('pResponsible')}
-                        </p>
+                        <p className="text-gray-700">{t('pResponsible')}</p>
+                    </section>
+
+                    {/* Dispute Resolution */}
+                    <section className="mb-8">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hDispute')}</h2>
+                        <div className="space-y-3 text-gray-700">
+                            <p>{t('pDispute1')}</p>
+                            <p>
+                                {t('pDispute2')}{' '}
+                                <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 break-all">
+                                    https://ec.europa.eu/consumers/odr/
+                                </a>
+                            </p>
+                            <p>{t('pDispute3')}</p>
+                        </div>
+                    </section>
+
+                    {/* Liability for Links */}
+                    <section className="mb-8">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hLiability')}</h2>
+                        <p className="text-gray-700">{t('pLiability')}</p>
+                    </section>
+
+                    {/* Copyright */}
+                    <section className="mb-8">
+                        <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('hCopyright')}</h2>
+                        <p className="text-gray-700">{t('pCopyright')}</p>
                     </section>
                 </div>
             </div>
