@@ -67,6 +67,9 @@ export default function WarehousePortal() {
             const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}`)
             if (!res.ok) {
                 if (res.status === 401) {
+                    setEmailConfirmed(false)
+                    setEmail('')
+                    localStorage.removeItem('warehouse_email')
                     alert('E-pošta ni pooblaščena za dostop do skladišča. Preverite Admin → Nastavitve → Vozniki.')
                     return
                 }
