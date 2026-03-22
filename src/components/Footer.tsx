@@ -126,7 +126,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
             <div className="text-center text-gray-400 text-sm mb-4">
-              <p>&copy; {new Date().getFullYear()} {t('operatedBy')}</p>
+              <p>&copy; {new Date().getFullYear()} Tigo Energy Shop</p>
             </div>
             <div className="flex flex-wrap justify-center gap-4 text-gray-400 items-center">
               <Link href="/impressum" className="hover:text-white transition">{t('impressum')}</Link>
