@@ -217,7 +217,11 @@ export async function GET(
                 ? (lang === 'sl' ? 'Prevzem' : lang === 'hr' ? 'Preuzimanje' : 'Pickup / Free')
                 : `${currency} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
             total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
-            payment_method: order.payment_method || (lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'),
+            payment_method: (() => {
+                const v = (order.payment_method || '').toLowerCase()
+                if (!v || v === 'wise' || v === 'iban') return lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'
+                return order.payment_method
+            })(),
             items_table: generateItemsTableHtml(order.order_items, currency, false, {
                 no: L.labelNo, description: L.labelDescription, sku: L.labelSku,
                 qty: L.labelQty, unitPrice: L.labelUnitPrice, amount: L.labelAmount,

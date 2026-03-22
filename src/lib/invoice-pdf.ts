@@ -62,6 +62,17 @@ function getLabels(lang: string) {
     return INVOICE_LABELS[lang] || INVOICE_LABELS.en
 }
 
+/** Map raw payment_method DB values to localized display labels */
+function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>): string {
+    const v = (raw || '').toLowerCase()
+    if (v === 'wise' || v === 'iban') return labels.bankTransfer
+    if (v === 'invoice' || v === 'net30') {
+        const map: Record<string, string> = { sl: 'Plačilo po računu', hr: 'Plaćanje po računu', de: 'Zahlung auf Rechnung', it: 'Pagamento su fattura', cs: 'Platba na fakturu', sk: 'Platba na faktúru', sv: 'Betalning mot faktura' }
+        return map[lang] || 'Payment on Invoice'
+    }
+    return raw || labels.bankTransfer
+}
+
 /**
  * Generate invoice PDF buffer from an order object.
  * Order must include order_items relation.
@@ -110,7 +121,7 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
         shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
         total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
-        payment_method: order.payment_method || labels.bankTransfer,
+        payment_method: formatPaymentMethod(order.payment_method, lang, labels),
         items_table: generateItemsTableHtml(order.order_items, order.currency || '€', false, {
             no: labels.no, description: labels.description, sku: labels.sku,
             qty: labels.qty, unitPrice: labels.unitPrice, amount: labels.amountCol,
@@ -169,7 +180,7 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     if (effectivePayments.length === 0 && order.payment_status === 'paid' && order.paid_at) {
         effectivePayments = [{
             payment_date: order.paid_at,
-            payment_method: order.payment_method || labels.bankTransfer,
+            payment_method: formatPaymentMethod(order.payment_method, lang, labels),
             reference: '-',
             amount: order.amount_paid || order.total,
         }]
