@@ -280,8 +280,8 @@ export default function Header() {
                 style={{ filter: 'brightness(0) invert(1)' }}
               />
               <div className="flex flex-col leading-tight">
-                <span className="text-green-100 text-xs font-medium tracking-wider">TIGO AUTHORIZED</span>
-                <span className="text-green-100 text-xs font-medium tracking-wider">DIRECT ONLINE SHOP</span>
+                <span className="text-green-100 text-xs font-medium tracking-wider">AUTHORIZED DISTRIBUTOR</span>
+                <span className="text-green-100 text-xs font-medium tracking-wider">Initra EU</span>
               </div>
             </Link>
 
