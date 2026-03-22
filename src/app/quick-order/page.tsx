@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useCart } from '@/contexts/CartContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useRouter } from 'next/navigation'
 import type { Product } from '@/types/database'
 import { LowStockWarning, LowStockBadge } from '@/components/ui/LowStockWarning'
+import { placeQuickOrder } from '@/app/actions/quick-checkout'
 
 // ─── MLPE classification ────────────────────────────────────────────────────
 const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: string }> = {
@@ -28,10 +28,9 @@ function isMLPE(p: Product): boolean {
     return classifyOptimizer(p.sku, p.name_en) !== null
 }
 
-type View = 'catalog' | 'boxqty' | 'browse'
+type View = 'catalog' | 'boxqty' | 'browse' | 'shipping' | 'confirm' | 'success'
 
 export default function QuickOrderPage() {
-    const { addItem, openDrawer } = useCart()
     const { formatPrice, formatPriceNet, isB2B } = useCurrency()
     const router = useRouter()
 
@@ -53,8 +52,20 @@ export default function QuickOrderPage() {
     const [boxQty, setBoxQty] = useState(20)
     const [searchQuery, setSearchQuery] = useState('')
 
+    // Shipping choice
+    const [shippingMode, setShippingMode] = useState<'pickup' | 'delivery' | null>(null)
+
+    // Order result
+    const [orderResult, setOrderResult] = useState<{
+        orderId?: string; orderNumber?: string; shippingCost?: number; boxCount?: number; totalWithShipping?: number; error?: string
+    } | null>(null)
+
     // Animation state for tap feedback
     const [lastTapped, setLastTapped] = useState<string | null>(null)
+
+    // Ref for scrolling to communicators after MLPE selection
+    const communicatorsRef = useRef<HTMLDivElement>(null)
+    const catalogScrollRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (typeof window !== 'undefined' && localStorage.getItem('quick-order-terms') === 'accepted') {
@@ -102,12 +113,11 @@ export default function QuickOrderPage() {
             next.set(product.id, { product, qty: 1 })
         }
         setCart(next)
-        // Trigger tap animation
         setLastTapped(product.id)
         setTimeout(() => setLastTapped(null), 300)
     }
 
-    // Remove one from cart (long-press or decrement)
+    // Remove one from cart
     function decrementProduct(productId: string) {
         const next = new Map(cart)
         const existing = next.get(productId)
@@ -121,7 +131,7 @@ export default function QuickOrderPage() {
         }
     }
 
-    // Add MLPE with box qty
+    // Add MLPE with box qty → then scroll to communicators
     function addMLPEToCart(product: Product, qty: number) {
         const next = new Map(cart)
         next.set(product.id, { product, qty })
@@ -129,30 +139,38 @@ export default function QuickOrderPage() {
         setBoxQtyProduct(null)
         setCustomQty(false)
         setView('catalog')
+        // Scroll to communicators after a tick (wait for render)
+        setTimeout(() => {
+            communicatorsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
     }
 
-    // Checkout: add all cart items to the global cart context
-    async function handleCheckout() {
+    // Place order via server action
+    async function handlePlaceOrder(mode: 'pickup' | 'delivery') {
         setSubmitting(true)
+        setOrderResult(null)
         try {
-            for (const [, { product, qty }] of cart) {
-                if (qty > 0) {
-                    await addItem({
-                        product_id: product.id,
-                        sku: product.sku,
-                        name: product.name_en,
-                        quantity: qty,
-                        unit_price: getPrice(product, qty),
-                        image_url: product.images?.[0],
-                        weight_kg: product.weight_kg,
-                        metadata: { category: product.category, subcategory: product.subcategory }
-                    })
-                }
+            const items = Array.from(cart.values()).map(({ product, qty }) => ({
+                product_id: product.id,
+                sku: product.sku,
+                name: product.name_en || product.sku,
+                quantity: qty,
+                weight_kg: product.weight_kg || 0,
+                category: product.category,
+                subcategory: product.subcategory,
+            }))
+
+            const result = await placeQuickOrder(items, mode)
+
+            if (result.success) {
+                setOrderResult(result)
+                setView('success')
+                setCart(new Map())
+            } else {
+                setOrderResult({ error: result.error })
             }
-            openDrawer()
-            router.push('/checkout')
-        } catch (err) {
-            console.error('Quick order error:', err)
+        } catch (err: any) {
+            setOrderResult({ error: err.message || 'Order failed' })
         } finally {
             setSubmitting(false)
         }
@@ -169,6 +187,15 @@ export default function QuickOrderPage() {
     })
 
     const unitsPerBox = boxQtyProduct?.units_per_box || (classifyOptimizer(boxQtyProduct?.sku || '', boxQtyProduct?.name_en)?.startsWith('TS4-X') ? 18 : 20)
+
+    // ─── Back button helper ────────────────────────────────────────────────────
+    const BackButton = ({ onClick }: { onClick: () => void }) => (
+        <button onClick={onClick} className="text-slate-400 active:text-white transition p-1">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+        </button>
+    )
 
     // ─── Loading ────────────────────────────────────────────────────────────────
     if (loading) {
@@ -215,6 +242,138 @@ export default function QuickOrderPage() {
         )
     }
 
+    // ─── Success ────────────────────────────────────────────────────────────────
+    if (view === 'success' && orderResult?.orderId) {
+        return (
+            <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
+                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h1 className="text-2xl font-bold text-white mb-2">Order Placed!</h1>
+                <p className="text-slate-400 text-sm text-center mb-2">#{orderResult.orderNumber}</p>
+                {orderResult.shippingCost !== undefined && orderResult.shippingCost > 0 && (
+                    <p className="text-slate-400 text-sm text-center mb-1">
+                        Shipping: {fmtPrice(orderResult.shippingCost)} ({orderResult.boxCount} box{(orderResult.boxCount || 1) !== 1 ? 'es' : ''})
+                    </p>
+                )}
+                {orderResult.totalWithShipping !== undefined && (
+                    <p className="text-white text-lg font-bold mb-6">
+                        Total: {fmtPrice(orderResult.totalWithShipping)}
+                    </p>
+                )}
+                <p className="text-slate-500 text-xs text-center mb-8 max-w-xs">
+                    You&apos;ll receive a confirmation email shortly. If stock verification is needed, we&apos;ll contact you within 24 hours.
+                </p>
+                <div className="space-y-3 w-full max-w-xs">
+                    <button onClick={() => router.push(`/orders/${orderResult.orderId}`)}
+                        className="w-full bg-slate-800 border border-slate-700 text-white py-3 rounded-lg font-medium active:bg-slate-700 transition-all">
+                        View Order
+                    </button>
+                    <button onClick={() => { setView('catalog'); setOrderResult(null) }}
+                        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700 transition-all">
+                        New Order
+                    </button>
+                    <button onClick={() => router.push('/')}
+                        className="w-full text-slate-500 py-2 text-sm active:text-white transition">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // ─── Shipping Choice (2 tiles) ──────────────────────────────────────────────
+    if (view === 'shipping') {
+        return (
+            <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-x-hidden">
+                <div className="px-4 pt-4 pb-2">
+                    <div className="flex items-center gap-3">
+                        <BackButton onClick={() => setView('catalog')} />
+                        <h1 className="text-xl font-medium text-white flex-1">How do you want it?</h1>
+                    </div>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center px-4 pb-8">
+                    {/* Order summary */}
+                    <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
+                        <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">Your order</p>
+                        <div className="space-y-1.5">
+                            {Array.from(cart.values()).map(({ product, qty }) => (
+                                <div key={product.id} className="flex justify-between text-sm">
+                                    <span className="text-white truncate flex-1 mr-2">
+                                        {product.name_en?.replace(/^Tigo\s+/i, '').slice(0, 35) || product.sku} x{qty}
+                                    </span>
+                                    <span className="text-teal-400 font-semibold shrink-0">{fmtPrice(getPrice(product, qty) * qty)}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="border-t border-slate-700 mt-3 pt-2 flex justify-between">
+                            <span className="text-white font-bold">Subtotal</span>
+                            <span className="text-white font-bold">{fmtPrice(cartTotal)}</span>
+                        </div>
+                    </div>
+
+                    {hasOverStock && <div className="mb-4"><LowStockWarning variant="dark" /></div>}
+
+                    {orderResult?.error && (
+                        <div className="bg-red-900/40 border border-red-500/50 rounded-lg px-3 py-2.5 mb-4">
+                            <p className="text-red-300 text-sm">{orderResult.error}</p>
+                        </div>
+                    )}
+
+                    {/* Two tiles */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            onClick={() => { setShippingMode('pickup'); handlePlaceOrder('pickup') }}
+                            disabled={submitting}
+                            className="bg-slate-800 border border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center gap-3
+                                active:scale-[0.95] active:border-green-500 transition-all disabled:opacity-50"
+                        >
+                            <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-white font-bold text-sm">Lastni prevzem</div>
+                                <div className="text-slate-400 text-[11px] mt-1">Personal Pick-up</div>
+                                <div className="text-green-400 text-xs font-semibold mt-1">Free</div>
+                            </div>
+                            {submitting && shippingMode === 'pickup' && (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            )}
+                        </button>
+
+                        <button
+                            onClick={() => { setShippingMode('delivery'); handlePlaceOrder('delivery') }}
+                            disabled={submitting}
+                            className="bg-slate-800 border border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center gap-3
+                                active:scale-[0.95] active:border-blue-500 transition-all disabled:opacity-50"
+                        >
+                            <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                <svg className="w-7 h-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12l-4 9H8l-4-9h4m0 0V4m0 3L4 7" />
+                                    <circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" />
+                                </svg>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-white font-bold text-sm">Dostava</div>
+                                <div className="text-slate-400 text-[11px] mt-1">DPD to address on file</div>
+                                <div className="text-blue-400 text-xs font-semibold mt-1">+ shipping</div>
+                            </div>
+                            {submitting && shippingMode === 'delivery' && (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     // ─── Box Qty selector (MLPE only) ───────────────────────────────────────────
     if (view === 'boxqty' && boxQtyProduct) {
         const label = OPTIMIZER_LABELS[classifyOptimizer(boxQtyProduct.sku, boxQtyProduct.name_en) || '']
@@ -224,11 +383,7 @@ export default function QuickOrderPage() {
                 <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto overflow-x-hidden">
                     <div className="px-4 pt-4 pb-2">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => { setView('catalog'); setBoxQtyProduct(null) }} className="text-slate-400 active:text-white transition p-1">
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                            </button>
+                            <BackButton onClick={() => { setView('catalog'); setBoxQtyProduct(null) }} />
                             <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — Quantity</h1>
                         </div>
                     </div>
@@ -285,11 +440,7 @@ export default function QuickOrderPage() {
             <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto overflow-x-hidden">
                 <div className="px-4 pt-4 pb-2">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => setCustomQty(false)} className="text-slate-400 active:text-white transition p-1">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                        </button>
+                        <BackButton onClick={() => setCustomQty(false)} />
                         <h1 className="text-xl font-medium text-white flex-1">{label?.short || boxQtyProduct.sku} — Custom Qty</h1>
                     </div>
                 </div>
@@ -340,11 +491,7 @@ export default function QuickOrderPage() {
             <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-x-hidden">
                 <div className="px-4 pt-4 pb-2">
                     <div className="flex items-center gap-3 mb-3">
-                        <button onClick={() => { setView('catalog'); setSearchQuery('') }} className="text-slate-400 active:text-white transition p-1">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                        </button>
+                        <BackButton onClick={() => { setView('catalog'); setSearchQuery('') }} />
                         <h1 className="text-xl font-medium text-white flex-1">All Products</h1>
                     </div>
                     <input
@@ -373,9 +520,9 @@ export default function QuickOrderPage() {
                 {cartItemCount > 0 && (
                     <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
                         {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
-                        <button onClick={handleCheckout} disabled={submitting}
+                        <button onClick={() => setView('shipping')} disabled={submitting}
                             className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                            <span>{submitting ? 'Adding...' : 'Checkout'}</span>
+                            <span>Checkout</span>
                             <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} items &middot; {fmtPrice(cartTotal)}</span>
                         </button>
                     </div>
@@ -390,17 +537,13 @@ export default function QuickOrderPage() {
             {/* Header */}
             <div className="px-4 pt-4 pb-2">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => router.push('/')} className="text-slate-400 active:text-white transition p-1">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </button>
+                    <BackButton onClick={() => router.push('/')} />
                     <h1 className="text-xl font-medium text-white flex-1">Quick Order</h1>
                 </div>
             </div>
 
             {/* Scrollable catalog */}
-            <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
+            <div ref={catalogScrollRef} className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
                 {/* Section: MLPE Optimizers */}
                 {optimizers.length > 0 && (
                     <>
@@ -438,7 +581,8 @@ export default function QuickOrderPage() {
                     </>
                 )}
 
-                {/* Section: Communicators */}
+                {/* Section: Communicators — scrolled to after MLPE selection */}
+                <div ref={communicatorsRef} />
                 {communicators.length > 0 && (
                     <>
                         <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Communicators</p>
@@ -481,9 +625,9 @@ export default function QuickOrderPage() {
             {cartItemCount > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
                     {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
-                    <button onClick={handleCheckout} disabled={submitting}
+                    <button onClick={() => setView('shipping')} disabled={submitting}
                         className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                        <span>{submitting ? 'Adding...' : 'Checkout'}</span>
+                        <span>Checkout</span>
                         <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} items &middot; {fmtPrice(cartTotal)}</span>
                     </button>
                 </div>
