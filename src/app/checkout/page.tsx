@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
-import { calculateTigoParcels } from '@/lib/shipping/dpd'
+import { calculateTigoParcels, calculateDPDShippingCost } from '@/lib/shipping/dpd'
 import { LowStockWarning } from '@/components/ui/LowStockWarning'
 
 import { MARKETS, EU_COUNTRY_CODES, getMarketKeyFromHostname } from '@/lib/constants/markets'
@@ -91,6 +91,7 @@ export default function CheckoutPage() {
 
     // Shipping Rates State
     const [shippingRates, setShippingRates] = useState<any[]>([])
+    const [allDpdRates, setAllDpdRates] = useState<{ min_weight_kg: number; max_weight_kg: number; rate_eur: number }[]>([])
     const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
     const [loadingRates, setLoadingRates] = useState(false)
     const [customerPaymentTerms, setCustomerPaymentTerms] = useState<string>('prepayment')
@@ -383,8 +384,6 @@ export default function CheckoutPage() {
                     .from('shipping_rates')
                     .select('*')
                     .eq('country_code', formData.shipping_country)
-                    .lte('min_weight_kg', totalWeight)
-                    .gte('max_weight_kg', totalWeight)
                     .eq('active', true)
 
                 if (error) throw error
@@ -407,6 +406,9 @@ export default function CheckoutPage() {
                         (r.carrier === 'Personal Pick-up' && formData.shipping_country === 'SI')
                     )
                 }
+
+                // Store all DPD weight bands for per-parcel pricing
+                setAllDpdRates(filtered.filter(r => r.carrier === 'DPD'))
 
                 // Deduplication: Keep only one rate per carrier + service type (the cheapest one)
                 const uniqueRates = new Map<string, any>();
@@ -442,12 +444,13 @@ export default function CheckoutPage() {
                         setSelectedShippingId(pickupRate ? pickupRate.id : filtered[0].id)
                     }
                 } else {
-                    console.warn(`No shipping rates found for ${formData.shipping_country} at weight ${totalWeight}kg`);
+                    console.warn(`No shipping rates found for ${formData.shipping_country}`);
                     setSelectedShippingId(null)
                 }
             } catch (err) {
                 console.error('Error fetching shipping rates:', err)
                 setShippingRates([])
+                setAllDpdRates([])
             } finally {
                 setLoadingRates(false)
             }
@@ -739,7 +742,7 @@ export default function CheckoutPage() {
     const boxCount = parcels.length
     const currentShippingCost = selectedShippingRate
         ? (selectedShippingRate.carrier === 'DPD' && boxCount > 1
-            ? selectedShippingRate.rate_eur * boxCount
+            ? calculateDPDShippingCost(parcels, allDpdRates)
             : selectedShippingRate.rate_eur)
         : 0
 
@@ -1049,7 +1052,7 @@ export default function CheckoutPage() {
                                     {shippingRates.map((rate) => {
                                         const isPickup = rate.carrier === 'Personal Pick-up'
                                         const effectiveRate = rate.carrier === 'DPD' && boxCount > 1
-                                            ? rate.rate_eur * boxCount
+                                            ? calculateDPDShippingCost(parcels, allDpdRates)
                                             : rate.rate_eur
                                         return (
                                             <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>

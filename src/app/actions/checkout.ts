@@ -9,6 +9,7 @@ import { buildOrderConfirmationEmail } from '@/lib/emails/order-confirmation'
 import { getEffectivePrice } from '@/lib/db/pricing'
 import { verifyRecaptcha } from '@/lib/recaptcha'
 import { normalizeCountryCode } from '@/lib/normalize-country'
+import { calculateTigoParcels, calculateDPDShippingCost } from '@/lib/shipping/dpd'
 
 export type CheckoutState = {
     success?: boolean
@@ -133,9 +134,24 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 return { success: false, error: 'Invalid shipping method selected' }
             }
 
-            shippingCost = rateData.rate_eur
             shippingCarrier = rateData.carrier
             shippingMethod = rateData.service_type
+
+            if (rateData.carrier === 'DPD') {
+                // Calculate per-parcel shipping cost
+                const parcels = calculateTigoParcels(orderItemsData.map(i => ({
+                    sku: i.sku, name: i.product_name, quantity: i.quantity, weight_kg: i.weight_kg || 0,
+                })))
+                const { data: allRates } = await supabase
+                    .from('shipping_rates')
+                    .select('min_weight_kg, max_weight_kg, rate_eur')
+                    .eq('country_code', rateData.country_code)
+                    .eq('carrier', 'DPD')
+                    .eq('active', true)
+                shippingCost = calculateDPDShippingCost(parcels, allRates || [])
+            } else {
+                shippingCost = rateData.rate_eur
+            }
         } else {
             shippingCost = totalWeight > 20 ? 0 : 15.00
         }

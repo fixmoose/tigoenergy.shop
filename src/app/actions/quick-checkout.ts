@@ -7,7 +7,7 @@ import { sendEmail, notifyAdmins, renderDatabaseTemplate } from '@/lib/email'
 import { buildOrderConfirmationEmail } from '@/lib/emails/order-confirmation'
 import { generateItemsTableHtml } from '@/lib/document-service'
 import { getEffectivePrice } from '@/lib/db/pricing'
-import { calculateTigoParcels } from '@/lib/shipping/dpd'
+import { calculateTigoParcels, calculateDPDShippingCost } from '@/lib/shipping/dpd'
 import { sendWarehouseEmail } from '@/lib/warehouse'
 import { clearCartServer } from '@/lib/db/cart'
 import { cookies } from 'next/headers'
@@ -124,24 +124,16 @@ export async function placeQuickOrder(
             })))
             boxCount = parcels.length || 1
 
-            // Fetch DPD rate for the address country
+            // Fetch all DPD weight bands for the address country, price per parcel
             const country = defaultAddr?.country || 'SI'
             const { data: rates } = await supabase
                 .from('shipping_rates')
-                .select('*')
+                .select('min_weight_kg, max_weight_kg, rate_eur')
                 .eq('country_code', country)
                 .eq('carrier', 'DPD')
                 .eq('active', true)
-                .lte('min_weight_kg', totalWeight)
-                .gte('max_weight_kg', totalWeight)
-                .limit(1)
 
-            if (rates && rates.length > 0) {
-                shippingCost = (rates[0].rate_eur || 0) * boxCount
-            } else {
-                // Fallback: default rate * box count
-                shippingCost = 7.5 * boxCount
-            }
+            shippingCost = calculateDPDShippingCost(parcels, rates || [])
 
             shippingCarrier = 'DPD'
             shippingMethod = 'DPD Classic'
