@@ -147,7 +147,7 @@ ${FOOTER_SECTION}
 ${WRAP_END}`,
 
 packing_slip: `${WRAP_START}
-${COMPACT_HDR('Packing Slip', '{order_number}', '{company_address}')}
+${COMPACT_HDR('Packing Slip', '{order_number}')}
 ${META_ROW([{ label: 'Order Date', value: '{order_date}' }])}
 ${BILL_SHIP(
     'Ship From',
