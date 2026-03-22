@@ -54,13 +54,29 @@ export async function GET(
     }
 
     try {
+        const lang = order.language || 'en'
+        const isPickup = order.shipping_carrier === 'Personal Pick-up'
+
         // 3. Get Pinned Template — fall back to hardcoded if DB template is broken/missing items placeholder
         let templateHtml: string
-        const dbTemplate = await getPinnedTemplate('packing_slip', order.language || 'en')
+        const dbTemplate = await getPinnedTemplate('packing_slip', lang)
         if (dbTemplate?.content_html?.includes('{packing_items_table}')) {
             templateHtml = dbTemplate.content_html
         } else {
             templateHtml = DOCUMENT_TEMPLATES.packing_slip
+        }
+
+        // Localize hardcoded template labels for Slovenian orders
+        if (lang === 'sl' && !dbTemplate?.content_html) {
+            templateHtml = templateHtml
+                .replace('>Packing Slip<', '>Dobavnica<')
+                .replace('>Order Date<', '>Datum naročila<')
+                .replace('>Ship From<', '>Pošiljatelj<')
+                .replace('>Ship To<', '>Prejemnik<')
+                .replace('>Items to Pack<', '>Artikli za pakiranje<')
+                .replace('>Total Parcels / Boxes:<', '>Število paketov / škatel:<')
+                .replace('>Total Weight:<', '>Skupna teža:<')
+                .replace('Verify all items before sealing. Report discrepancies to', 'Pred zapiranjem preverite vse artikle. Neskladja sporočite na')
         }
 
         // 4. Prepare Data for Placeholders
@@ -107,9 +123,41 @@ export async function GET(
         // 5. Replace Placeholders
         let htmlContent = replacePlaceholders(templateHtml, documentData)
 
-        // 6. Inject legal clauses
+        // 6. Inject pickup signature block (for personal pick-up orders)
+        if (isPickup) {
+            const sigTitle = lang === 'sl' ? 'Podpis ob prevzemu' : 'Pickup Signature'
+            const sigName = lang === 'sl' ? 'Ime in priimek' : 'Full Name'
+            const sigDate = lang === 'sl' ? 'Datum' : 'Date'
+            const sigSign = lang === 'sl' ? 'Podpis' : 'Signature'
+            const sigNote = lang === 'sl'
+                ? 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.'
+                : 'By signing, I confirm that I have received the above goods in good condition.'
+            const signatureBlock = `
+<div style="margin:24px 36px 0;padding:16px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sigTitle}</div>
+  <div style="font-size:9px;color:#6b7280;margin-bottom:16px;">${sigNote}</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="width:50%;padding-right:16px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigName}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
+      </td>
+      <td style="width:25%;padding-right:16px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigDate}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
+      </td>
+      <td style="width:25%;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigSign}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
+      </td>
+    </tr>
+  </table>
+</div>`
+            htmlContent = htmlContent.replace('</body>', signatureBlock + '</body>')
+        }
+
+        // 7. Inject legal clauses
         const isB2BOrder = !!(order.company_name || order.vat_id)
-        const lang = order.language || 'en'
         const clauses = getLegalClauses(lang)
         const enClauses = getLegalClauses('en')
         const isEnglish = lang === 'en'
@@ -130,7 +178,7 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=PackingSlip_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=${lang === 'sl' ? 'Dobavnica' : 'PackingSlip'}_${order.order_number}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })

@@ -47,17 +47,24 @@ export default function WarehousePortal() {
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
 
+    // On mount, pre-fill email from localStorage
+    useEffect(() => {
+        const saved = localStorage.getItem('warehouse_email')
+        if (saved) setEmail(saved)
+    }, [])
+
     const handleLogin = () => {
-        if (password === '123456') {
-            setAuthenticated(true)
-            const saved = localStorage.getItem('warehouse_email')
-            if (saved) {
-                setEmail(saved)
-                setEmailConfirmed(true)
-            }
-        } else {
+        if (password !== '123456') {
             alert('Napačno geslo')
+            return
         }
+        if (!email.trim()) {
+            alert('Vnesite e-poštni naslov')
+            return
+        }
+        localStorage.setItem('warehouse_email', email.trim())
+        setAuthenticated(true)
+        setEmailConfirmed(true)
     }
 
     const fetchOrders = useCallback(async () => {
@@ -86,13 +93,6 @@ export default function WarehousePortal() {
             setLoading(false)
         }
     }, [email])
-
-    const loadOrders = () => {
-        if (email) {
-            localStorage.setItem('warehouse_email', email)
-            setEmailConfirmed(true)
-        }
-    }
 
     // Auto-refresh every 30s — only after email is confirmed
     useEffect(() => {
@@ -157,8 +157,8 @@ export default function WarehousePortal() {
         return (order.warehouse_actions || []).find(a => a.action === 'uploaded_dobavnica')
     }
 
-    // ── Login screen ──
-    if (!authenticated) {
+    // ── Login screen (email + password together) ──
+    if (!authenticated || !emailConfirmed) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
                 <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
@@ -172,6 +172,14 @@ export default function WarehousePortal() {
                         <p className="text-slate-400 text-sm mt-1">Tigo Energy</p>
                     </div>
                     <input
+                        type="email"
+                        placeholder="E-poštni naslov"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    <input
                         type="password"
                         placeholder="Geslo"
                         value={password}
@@ -181,35 +189,6 @@ export default function WarehousePortal() {
                     />
                     <button onClick={handleLogin} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
                         Vstopi
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
-    // ── Email entry ──
-    if (!emailConfirmed) {
-        return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-                <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-                    <div className="text-center mb-6">
-                        <div className="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
-                            </svg>
-                        </div>
-                        <h1 className="text-xl font-bold text-white">Skladišče</h1>
-                    </div>
-                    <input
-                        type="email"
-                        placeholder="Vaš e-poštni naslov"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && loadOrders()}
-                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
-                    <button onClick={loadOrders} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
-                        Naloži naročila
                     </button>
                 </div>
             </div>
