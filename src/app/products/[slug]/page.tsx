@@ -29,18 +29,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const path = `/products/${slug}`
 
   return {
-    title: `${productName} | Tigo Energy ${market.countryName}`,
-    description: productDescription?.slice(0, 160) || `${productName} — professional solar solution by Tigo Energy.`,
+    title: `${productName} | Tigo Energy Shop ${market.countryName}`,
+    description: productDescription?.slice(0, 160) || `${productName} — available at Tigo Energy Shop, authorized distributor.`,
     alternates: {
       canonical: buildCanonicalUrl(marketKey, path),
       languages: buildHreflangAlternates(path),
     },
     openGraph: {
       title: productName,
-      description: productDescription?.slice(0, 160) || `${productName} — professional solar solution by Tigo Energy.`,
+      description: productDescription?.slice(0, 160) || `${productName} — available at Tigo Energy Shop, authorized distributor.`,
       images: product.images?.[0] ? [{ url: product.images[0] }] : undefined,
       type: 'website',
       locale: market.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: productName,
+      description: productDescription?.slice(0, 160) || `${productName} — available at Tigo Energy Shop, authorized distributor.`,
     },
   }
 }
@@ -88,7 +93,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: productName,
-    description: productDescription?.slice(0, 300) || `${productName} — professional solar solution by Tigo Energy.`,
+    description: productDescription?.slice(0, 300) || `${productName} — available at Tigo Energy Shop, authorized distributor.`,
     image: product.images?.[0] || `${baseUrl}/tigo-logo.png`,
     sku: product.sku,
     brand: { '@type': 'Brand', name: 'Tigo Energy' },
@@ -98,7 +103,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       price: effectivePrice.discountedPrice,
       availability: (product.stock_quantity ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
       url: `${baseUrl}/products/${slug}`,
-      seller: { '@type': 'Organization', name: 'Tigo Energy', url: baseUrl },
+      seller: { '@type': 'Organization', name: 'Tigo Energy Shop', url: baseUrl },
     },
   }
 

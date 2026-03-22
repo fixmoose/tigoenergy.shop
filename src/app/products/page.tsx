@@ -21,8 +21,8 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
   const hasQueryParams = params && Object.keys(params).length > 0
 
   return {
-    title: `Products | Tigo Energy ${market.countryName}`,
-    description: 'Browse our complete range of Tigo solar optimizers, inverters, batteries, and monitoring solutions.',
+    title: `Products | Tigo Energy Shop ${market.countryName}`,
+    description: 'Browse Tigo solar optimizers, inverters, batteries, and monitoring solutions. Authorized distributor with delivery across Europe.',
     alternates: {
       canonical: buildCanonicalUrl(marketKey, '/products'),
       languages: buildHreflangAlternates('/products'),
