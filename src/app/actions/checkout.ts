@@ -284,7 +284,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
                         const { sendWarehouseEmail } = await import('@/lib/warehouse')
                         const extraNote = isPaymentProofRequired
-                            ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT BEFORE RELEASE'
+                            ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU PRED IZDAJO BLAGA!'
                             : undefined
                         await Promise.all(warehouseWorkers.map(worker =>
                             sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)

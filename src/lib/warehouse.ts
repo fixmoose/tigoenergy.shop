@@ -68,10 +68,10 @@ export async function sendWarehouseEmail(
         }
 
         if (order.packing_slip_url) {
-            await downloadPdf(order.packing_slip_url, `packing_slip_${order.order_number}.pdf`)
+            await downloadPdf(order.packing_slip_url, `Dobavnica_${order.order_number}.pdf`)
         }
         if (order.shipping_label_url) {
-            await downloadPdf(order.shipping_label_url, `shipping_label_${order.order_number}.pdf`)
+            await downloadPdf(order.shipping_label_url, `Nalepka_${order.order_number}.pdf`)
         }
 
         const attachedDocs = attachments.map(a => a.name).join(', ')
@@ -82,32 +82,37 @@ export async function sendWarehouseEmail(
                </div>`
             : ''
 
+        const warehouseUrl = `${siteUrl}/warehouse`
+
         const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
   <div style="background:#1a2b3c;padding:24px 32px;color:#fff;">
     <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
-    <h1 style="font-size:20px;font-weight:300;margin:0;">Warehouse — Order to Process</h1>
+    <h1 style="font-size:20px;font-weight:300;margin:0;">Skladišče — Naročilo za obdelavo</h1>
   </div>
   <div style="padding:24px 32px;">
-    <p style="color:#374151;font-size:14px;">Please process the following order:</p>
+    <p style="color:#374151;font-size:14px;">Prosimo, obdelajte naslednje naročilo:</p>
     ${noteHtml}
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0;">
-      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">Order</p>
+      <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">Naročilo</p>
       <p style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111;">#${order.order_number}</p>
-      <p style="margin:0 0 4px;font-size:12px;color:#6b7280;">Ship to</p>
+      <p style="margin:0 0 4px;font-size:12px;color:#6b7280;">Dostavi na</p>
       <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111;">${customerName}${order.company_name ? ` (${order.company_name})` : ''}</p>
       <p style="margin:0;font-size:13px;color:#6b7280;">${shippingAddr}</p>
     </div>
-    <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Documents attached:</p>
-    <p style="color:#374151;font-size:13px;">${attachedDocs || 'No documents available.'}</p>
-    <p style="color:#6b7280;font-size:12px;margin-top:8px;">Print the attached PDFs and process this order.</p>
-    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Sent from Tigo Energy SHOP</p>
+    <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Priloženi dokumenti:</p>
+    <p style="color:#374151;font-size:13px;">${attachedDocs || 'Ni priloženih dokumentov.'}</p>
+    <p style="color:#6b7280;font-size:12px;margin-top:8px;">Natisnite priložene PDF dokumente in obdelajte to naročilo.</p>
+    <div style="text-align:center;margin:20px 0 8px;">
+      <a href="${warehouseUrl}" style="display:inline-block;background:#f97316;color:#fff;font-weight:700;font-size:14px;padding:12px 28px;border-radius:8px;text-decoration:none;">Odpri skladiščni portal</a>
+    </div>
+    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Poslano iz Tigo Energy SHOP</p>
   </div>
 </div></body></html>`
 
         await sendEmail({
             to: warehouseEmail,
-            subject: `Warehouse: Process Order #${order.order_number}`,
+            subject: `Skladišče: Obdelaj naročilo #${order.order_number}`,
             html,
             orderId,
             emailType: 'warehouse_order',

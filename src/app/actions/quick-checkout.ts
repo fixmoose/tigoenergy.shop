@@ -3,7 +3,9 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { getMarketFromKey, EU_COUNTRY_CODES } from '@/lib/constants/markets'
-import { notifyAdmins } from '@/lib/email'
+import { sendEmail, notifyAdmins, renderDatabaseTemplate } from '@/lib/email'
+import { buildOrderConfirmationEmail } from '@/lib/emails/order-confirmation'
+import { generateItemsTableHtml } from '@/lib/document-service'
 import { getEffectivePrice } from '@/lib/db/pricing'
 import { calculateTigoParcels } from '@/lib/shipping/dpd'
 import { sendWarehouseEmail } from '@/lib/warehouse'
@@ -224,6 +226,7 @@ export async function placeQuickOrder(
         if (itemsError) throw new Error(itemsError.message)
 
         // Auto-confirm pickup orders with full stock
+        let autoConfirmed = false
         if (mode === 'pickup') {
             try {
                 const { data: stockProducts } = await supabase
@@ -238,6 +241,7 @@ export async function placeQuickOrder(
                 }) ?? false
 
                 if (allInStock) {
+                    autoConfirmed = true
                     const adminSupabase = await createAdminClient()
                     await adminSupabase.from('orders').update({
                         status: 'processing',
@@ -253,7 +257,7 @@ export async function placeQuickOrder(
 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
                         const extraNote = pickupPaymentProofRequired
-                            ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT BEFORE RELEASE'
+                            ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU PRED IZDAJO BLAGA!'
                             : undefined
                         await Promise.all(warehouseWorkers.map(worker =>
                             sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
@@ -286,6 +290,155 @@ export async function placeQuickOrder(
                 <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://tigoenergy.shop'}/admin/orders/${order.id}">View Order in Admin</a></p>
             `,
         }).catch(err => console.error('Failed to send admin quick order notification:', err))
+
+        // Send order confirmation email to customer
+        try {
+            const orderLanguage = (orderPayload.language as string) || 'sl'
+            const formatAddress = (addr: any) => {
+                if (!addr) return 'N/A'
+                return [
+                    [addr.first_name, addr.last_name].filter(Boolean).join(' '),
+                    addr.street || '', addr.street2 || '',
+                    `${addr.postal_code || ''} ${addr.city || ''}`.trim(),
+                    addr.country || '',
+                ].filter(Boolean).join('<br>')
+            }
+
+            const isProformaFlow = orderPayload.payment_method === 'wise'
+            const documentType = isProformaFlow ? 'proforma_invoice' : 'order_confirmation'
+
+            const emailData: Record<string, string> = {
+                order_number: String(order.order_number),
+                order_date: new Date(order.created_at).toLocaleDateString(),
+                customer_name: customerName,
+                customer_email: String(orderPayload.customer_email),
+                customer_company: String(orderPayload.company_name || ''),
+                customer_vat: String(orderPayload.vat_id || ''),
+                shipping_address: formatAddress(orderPayload.shipping_address),
+                billing_address: formatAddress(orderPayload.billing_address),
+                subtotal_net: `EUR ${subtotal.toFixed(2)}`,
+                vat_total: `EUR ${vatAmount.toFixed(2)}`,
+                shipping_cost: `EUR ${shippingCost.toFixed(2)}`,
+                total_amount: `EUR ${grandTotal.toFixed(2)}`,
+                payment_method: String(orderPayload.payment_method),
+                items_table: generateItemsTableHtml(orderItemsData, 'EUR'),
+                reference: `SI00 ${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}`,
+                wise_payment_link: isProformaFlow
+                    ? `<div style="text-align:center;margin-top:16px"><a href="https://wise.com/pay/business/initraenergijadoo?amount=${grandTotal.toFixed(2)}&currency=EUR&description=${String(order.order_number).replace('ETRG-ORD-', '').slice(-6)}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Pay Now with Wise</a></div>`
+                    : '',
+            }
+
+            const subjectLabels: Record<string, { proforma: string; confirmation: string }> = {
+                sl: { proforma: 'Predračun', confirmation: 'Potrditev naročila' },
+                hr: { proforma: 'Predračun', confirmation: 'Potvrda narudžbe' },
+                de: { proforma: 'Proforma-Rechnung', confirmation: 'Bestellbestätigung' },
+                it: { proforma: 'Fattura proforma', confirmation: 'Conferma ordine' },
+                cs: { proforma: 'Proforma faktura', confirmation: 'Potvrzení objednávky' },
+                sk: { proforma: 'Proforma faktúra', confirmation: 'Potvrdenie objednávky' },
+                sv: { proforma: 'Proformafaktura', confirmation: 'Orderbekräftelse' },
+            }
+            const subj = subjectLabels[orderLanguage] || { proforma: 'Proforma Invoice', confirmation: 'Order Confirmation' }
+            let finalSubject = isProformaFlow
+                ? `${subj.proforma} — #${order.order_number}`
+                : `${subj.confirmation} — #${order.order_number}`
+
+            // Try DB template first, fall back to code-generated email
+            const dbHtml = await renderDatabaseTemplate(documentType, emailData, orderLanguage)
+            let finalHtml = ''
+            const isPickupOrder = mode === 'pickup'
+            const isExportOrder = orderPayload.transaction_type === 'export'
+
+            if (dbHtml) {
+                finalHtml = dbHtml
+                const insertBeforeBody = (html: string, block: string) =>
+                    html.includes('</body>') ? html.replace('</body>', `${block}</body>`) : html + block
+
+                // Low stock notice (pickup order not auto-confirmed)
+                if (isPickupOrder && !autoConfirmed) {
+                    const lsLabels: Record<string, { title: string; body: string }> = {
+                        en: { title: 'Stock Verification Required', body: 'Some items in your order have limited availability. Our team will verify stock and send you a confirmation email within 24 hours.' },
+                        sl: { title: 'Potrebna preverba zalog', body: 'Nekateri artikli vašega naročila imajo omejeno razpoložljivost. Naša ekipa bo preverila zaloge in vam v 24 urah poslala potrditveno e-pošto.' },
+                        de: { title: 'Lagerbestandsprüfung erforderlich', body: 'Einige Artikel Ihrer Bestellung haben eine begrenzte Verfügbarkeit. Unser Team wird den Bestand prüfen und Ihnen innerhalb von 24 Stunden eine Bestätigung senden.' },
+                        hr: { title: 'Potrebna provjera zaliha', body: 'Neki artikli iz vaše narudžbe imaju ograničenu dostupnost. Naš tim će provjeriti zalihe i poslati vam potvrdu e-poštom u roku od 24 sata.' },
+                        it: { title: 'Verifica disponibilità richiesta', body: 'Alcuni articoli del tuo ordine hanno disponibilità limitata. Il nostro team verificherà la disponibilità e ti invierà un\'e-mail di conferma entro 24 ore.' },
+                        cs: { title: 'Vyžadováno ověření skladu', body: 'Některé položky vaší objednávky mají omezenou dostupnost. Náš tým ověří dostupnost a do 24 hodin vám zašle potvrzovací e-mail.' },
+                        sk: { title: 'Vyžadované overenie skladu', body: 'Niektoré položky vašej objednávky majú obmedzenú dostupnosť. Náš tím overí dostupnosť a do 24 hodín vám zašle potvrdzovací e-mail.' },
+                        sv: { title: 'Lagerverifiering krävs', body: 'Vissa artiklar i din beställning har begränsad tillgänglighet. Vårt team kommer att verifiera lagerstatus och skicka dig en bekräftelse via e-post inom 24 timmar.' },
+                    }
+                    const ls = lsLabels[orderLanguage] || lsLabels.en
+                    finalHtml = insertBeforeBody(finalHtml, `<div style="background:#fff7ed;border:1px solid #f97316;border-radius:8px;padding:16px;margin:24px 32px"><p style="font-size:14px;font-weight:700;color:#9a3412;margin:0 0 8px">⏳ ${ls.title}</p><p style="font-size:13px;color:#9a3412;margin:0;line-height:1.5">${ls.body}</p></div>`)
+                }
+
+                // Payment proof required (pickup, non-net30)
+                if (pickupPaymentProofRequired) {
+                    const ppLabels: Record<string, { title: string; body: string }> = {
+                        en: { title: 'Payment Required Before Pickup', body: 'You must present proof of payment (bank transfer confirmation) to our warehouse staff before items will be released. Items will NOT be handed over without verified proof of payment.' },
+                        sl: { title: 'Plačilo obvezno pred prevzemom', body: 'Pred prevzemom blaga morate skladiščnemu osebju predložiti dokazilo o plačilu (potrdilo o bančnem nakazilu). Brez preverjenega dokazila o plačilu blago NE bo izdano.' },
+                        de: { title: 'Zahlung vor Abholung erforderlich', body: 'Sie müssen dem Lagerpersonal einen Zahlungsnachweis (Banküberweisung) vorlegen, bevor die Ware ausgehändigt wird. Ohne verifizierten Zahlungsnachweis werden keine Artikel herausgegeben.' },
+                        hr: { title: 'Plaćanje obvezno prije preuzimanja', body: 'Morate predočiti dokaz o plaćanju (potvrdu bankovnog prijenosa) skladišnom osoblju prije preuzimanja robe. Roba NEĆE biti izdana bez verificiranog dokaza o plaćanju.' },
+                        it: { title: 'Pagamento richiesto prima del ritiro', body: 'È necessario presentare una prova di pagamento (conferma di bonifico bancario) al personale del magazzino prima del rilascio della merce. Nessun articolo verrà consegnato senza prova di pagamento verificata.' },
+                        cs: { title: 'Platba vyžadována před vyzvednutím', body: 'Před vydáním zboží musíte skladovému personálu předložit doklad o platbě (potvrzení bankovního převodu). Bez ověřeného dokladu o platbě zboží NEBUDE vydáno.' },
+                        sk: { title: 'Platba vyžadovaná pred vyzdvihnutím', body: 'Pred vydaním tovaru musíte skladovému personálu predložiť doklad o platbe (potvrdenie bankového prevodu). Bez overeného dokladu o platbe tovar NEBUDE vydaný.' },
+                        sv: { title: 'Betalning krävs före upphämtning', body: 'Du måste visa betalningsbevis (bekräftelse på banköverföring) till vår lagerpersonal innan varor lämnas ut. Varor kommer INTE att lämnas ut utan verifierat betalningsbevis.' },
+                    }
+                    const pp = ppLabels[orderLanguage] || ppLabels.en
+                    finalHtml = insertBeforeBody(finalHtml, `<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:8px;padding:16px;margin:24px 32px"><p style="font-size:14px;font-weight:700;color:#dc2626;margin:0 0 8px">🚨 ${pp.title}</p><p style="font-size:13px;color:#991b1b;margin:0;line-height:1.5">${pp.body}</p></div>`)
+                }
+
+                // Customs disclaimer for export orders
+                if (isExportOrder) {
+                    const customsLabels: Record<string, { title: string; body: string }> = {
+                        en: { title: 'Important: Customs & Import Duties', body: 'This order is shipping outside the European Union. Customs duties, import taxes, and other fees are NOT included in the order total and are the sole responsibility of the buyer.' },
+                        sl: { title: 'Pomembno: Carinske dajatve in uvozne takse', body: 'To naročilo se pošilja izven Evropske unije. Carinske dajatve, uvozni davki in druge pristojbine NISO vključene v skupni znesek naročila in so izključno odgovornost kupca.' },
+                        de: { title: 'Wichtig: Zölle & Einfuhrabgaben', body: 'Diese Bestellung wird außerhalb der Europäischen Union versendet. Zölle, Einfuhrsteuern und sonstige Gebühren sind NICHT im Bestellbetrag enthalten und liegen in der alleinigen Verantwortung des Käufers.' },
+                        hr: { title: 'Važno: Carine i uvozne pristojbe', body: 'Ova narudžba se šalje izvan Europske unije. Carine, uvozni porezi i druge pristojbe NISU uključeni u ukupni iznos narudžbe i isključiva su odgovornost kupca.' },
+                        it: { title: 'Importante: Dazi doganali e tasse di importazione', body: 'Questo ordine viene spedito al di fuori dell\'Unione Europea. Dazi doganali, tasse di importazione e altri oneri NON sono inclusi nel totale dell\'ordine e sono a carico esclusivo dell\'acquirente.' },
+                        cs: { title: 'Důležité: Cla a dovozní poplatky', body: 'Tato objednávka je zasílána mimo Evropskou unii. Cla, dovozní daně a další poplatky NEJSOU zahrnuty v celkové částce objednávky a jsou výhradní odpovědností kupujícího.' },
+                        sk: { title: 'Dôležité: Clá a dovozné poplatky', body: 'Táto objednávka je zasielaná mimo Európsku úniu. Clá, dovozné dane a ďalšie poplatky NIE SÚ zahrnuté v celkovej sume objednávky a sú výhradnou zodpovednosťou kupujúceho.' },
+                        sv: { title: 'Viktigt: Tullavgifter och importskatter', body: 'Denna beställning skickas utanför Europeiska unionen. Tullavgifter, importskatter och andra avgifter INGÅR INTE i ordertotalen och är köparens enskilda ansvar.' },
+                    }
+                    const cl = customsLabels[orderLanguage] || customsLabels.en
+                    finalHtml = insertBeforeBody(finalHtml, `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:24px 32px"><p style="font-size:14px;font-weight:700;color:#92400e;margin:0 0 8px">⚠️ ${cl.title}</p><p style="font-size:13px;color:#92400e;margin:0;line-height:1.5">${cl.body}</p></div>`)
+                }
+            } else {
+                const fallback = buildOrderConfirmationEmail({
+                    orderNumber: order.order_number,
+                    customerName,
+                    email: orderPayload.customer_email,
+                    items: orderItemsData.map(i => ({
+                        name: i.product_name,
+                        sku: i.sku,
+                        quantity: i.quantity,
+                        unitPrice: i.unit_price,
+                        totalPrice: i.total_price,
+                    })),
+                    subtotal,
+                    shippingCost,
+                    vatAmount,
+                    total: grandTotal,
+                    currency: 'EUR',
+                    shippingAddress: orderPayload.shipping_address as any,
+                    paymentMethod: orderPayload.payment_method,
+                    language: orderLanguage,
+                    isExport: orderPayload.transaction_type === 'export',
+                    isLowStock: isPickupOrder && !autoConfirmed,
+                    pickupPaymentProofRequired,
+                })
+                finalHtml = fallback.html
+                finalSubject = fallback.subject
+            }
+
+            await sendEmail({
+                from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+                to: orderPayload.customer_email,
+                subject: finalSubject,
+                html: finalHtml,
+                orderId: order.id,
+                emailType: 'order_confirmation',
+            })
+        } catch (emailErr) {
+            console.error('Failed to send quick order confirmation email:', emailErr)
+        }
 
         // Clear cart
         const cartId = (await cookies()).get('cartId')?.value

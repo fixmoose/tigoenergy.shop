@@ -198,19 +198,19 @@ export default function AccountingReportPage() {
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <div className="text-[10px] text-slate-400 uppercase">Revenue (Net)</div>
-                                            <div className="text-lg font-bold text-slate-800">{formatCurrency(d.revenue)}</div>
+                                            <div className="text-lg font-bold text-slate-800">{formatCurrency(d.revenue || 0)}</div>
                                         </div>
                                         <div>
                                             <div className="text-[10px] text-slate-400 uppercase">Cost</div>
-                                            <div className="text-lg font-bold text-slate-500">{formatCurrency(d.cost)}</div>
+                                            <div className="text-lg font-bold text-slate-500">{formatCurrency(d.cost || 0)}</div>
                                         </div>
                                         <div>
                                             <div className="text-[10px] text-slate-400 uppercase">Margin</div>
-                                            <div className={`text-xl font-black ${d.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatCurrency(d.margin)}</div>
+                                            <div className={`text-xl font-black ${(d.margin || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatCurrency(d.margin || 0)}</div>
                                         </div>
                                         <div>
                                             <div className="text-[10px] text-slate-400 uppercase">Margin %</div>
-                                            <div className={`text-xl font-black ${d.margin_pct >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{d.margin_pct.toFixed(1)}%</div>
+                                            <div className={`text-xl font-black ${(d.margin_pct || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{(d.margin_pct || 0).toFixed(1)}%</div>
                                         </div>
                                     </div>
                                     <div className="text-[10px] text-slate-400 mt-2">{seg.desc}</div>
@@ -511,13 +511,13 @@ export default function AccountingReportPage() {
                                                     {record.cost === 0 && <div className="text-[9px] text-red-400 font-bold">NO COST DATA</div>}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <div className={`font-black text-sm ${record.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                        {formatCurrency(record.margin)}
+                                                    <div className={`font-black text-sm ${(record.margin || 0) >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                                        {formatCurrency(record.margin || 0)}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold ${record.margin_pct >= 20 ? 'bg-emerald-50 text-emerald-700' : record.margin_pct >= 10 ? 'bg-amber-50 text-amber-700' : record.margin_pct >= 0 ? 'bg-orange-50 text-orange-700' : 'bg-red-50 text-red-700'}`}>
-                                                        {record.margin_pct.toFixed(1)}%
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold ${(record.margin_pct || 0) >= 20 ? 'bg-emerald-50 text-emerald-700' : (record.margin_pct || 0) >= 10 ? 'bg-amber-50 text-amber-700' : (record.margin_pct || 0) >= 0 ? 'bg-orange-50 text-orange-700' : 'bg-red-50 text-red-700'}`}>
+                                                        {(record.margin_pct || 0).toFixed(1)}%
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">

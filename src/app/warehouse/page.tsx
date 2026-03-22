@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 interface OrderItem {
     id: string
@@ -101,6 +101,38 @@ export default function WarehousePortal() {
         const interval = setInterval(fetchOrders, 30000)
         return () => clearInterval(interval)
     }, [emailConfirmed, authenticated, fetchOrders, email])
+
+    const toggleAction = async (orderId: string, actionType: string, currentlyChecked: boolean) => {
+        const key = orderId + '_' + actionType
+        setActionLoading(prev => ({ ...prev, [key]: true }))
+        try {
+            if (currentlyChecked) {
+                // Undo
+                await fetch(`/api/warehouse/orders/${orderId}/undo`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, actionType }),
+                })
+            } else {
+                // Do
+                const routeMap: Record<string, string> = {
+                    marked_prepared: 'prepare',
+                    payment_verified: 'verify-payment',
+                }
+                const route = routeMap[actionType]
+                if (route) {
+                    await fetch(`/api/warehouse/orders/${orderId}/${route}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email }),
+                    })
+                }
+            }
+            await fetchOrders()
+        } finally {
+            setActionLoading(prev => ({ ...prev, [key]: false }))
+        }
+    }
 
     const markPrepared = async (orderId: string) => {
         setActionLoading(prev => ({ ...prev, [orderId + '_prep']: true }))
@@ -262,10 +294,9 @@ export default function WarehousePortal() {
                             actionLoading={actionLoading}
                             hasAction={hasAction}
                             getUploadedDobavnica={getUploadedDobavnica}
-                            onPrepare={markPrepared}
+                            onToggleAction={toggleAction}
                             onUpload={uploadDobavnica}
                             onComplete={markComplete}
-                            onVerifyPayment={verifyPayment}
                         />
                     ))}
                 </div>
@@ -292,10 +323,9 @@ export default function WarehousePortal() {
                             actionLoading={actionLoading}
                             hasAction={hasAction}
                             getUploadedDobavnica={getUploadedDobavnica}
-                            onPrepare={markPrepared}
+                            onToggleAction={toggleAction}
                             onUpload={uploadDobavnica}
                             onComplete={markComplete}
-                            onVerifyPayment={verifyPayment}
                         />
                     ))}
                 </div>
@@ -353,7 +383,7 @@ export default function WarehousePortal() {
 // ── Order Card ──
 function OrderCard({
     order, type, email, actionLoading, hasAction, getUploadedDobavnica,
-    onPrepare, onUpload, onComplete, onVerifyPayment,
+    onToggleAction, onUpload, onComplete,
 }: {
     order: WarehouseOrder
     type: 'pickup' | 'dpd'
@@ -361,10 +391,9 @@ function OrderCard({
     actionLoading: Record<string, boolean>
     hasAction: (order: WarehouseOrder, action: string) => boolean
     getUploadedDobavnica: (order: WarehouseOrder) => WarehouseAction | undefined
-    onPrepare: (id: string) => void
+    onToggleAction: (id: string, actionType: string, currentlyChecked: boolean) => void
     onUpload: (id: string, file: File) => void
     onComplete: (id: string, type: 'pickup' | 'dpd') => void
-    onVerifyPayment: (id: string) => void
 }) {
     const isPrepared = hasAction(order, 'marked_prepared')
     const isPaymentVerified = hasAction(order, 'payment_verified')
@@ -374,12 +403,15 @@ function OrderCard({
         ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim()
         : order.customer_email
 
+    // Can finalize? Prepared must be checked. Payment must be verified if required.
+    const canFinalize = isPrepared && (!order.pickup_payment_proof_required || isPaymentVerified)
+
     return (
         <div className={`bg-slate-800 rounded-xl border mb-3 overflow-hidden transition-all ${
             isPrepared ? 'border-green-600/50' : 'border-slate-700'
         }`}>
             {/* Payment proof warning */}
-            {order.pickup_payment_proof_required && (
+            {order.pickup_payment_proof_required && !isPaymentVerified && (
                 <div className="bg-red-900/60 border-b border-red-700/50 px-4 py-2 text-center">
                     <p className="text-red-200 text-xs font-bold">
                         OBVEZNO PREVERI DOKAZ O PLAČILU PRED IZDAJO BLAGA
@@ -448,27 +480,25 @@ function OrderCard({
                     </a>
                 )}
 
-                {/* Prepared checkbox */}
+                {/* Prepared checkbox — toggleable */}
                 <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
                     isPrepared ? 'bg-green-900/30 border border-green-700/40' : 'bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60'
                 }`}>
                     <input
                         type="checkbox"
                         checked={isPrepared}
-                        disabled={isPrepared || actionLoading[order.id + '_prep']}
-                        onChange={() => !isPrepared && onPrepare(order.id)}
+                        disabled={actionLoading[order.id + '_marked_prepared']}
+                        onChange={() => onToggleAction(order.id, 'marked_prepared', isPrepared)}
                         className="w-6 h-6 rounded border-2 border-slate-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
                     />
                     <span className={`font-bold text-sm ${isPrepared ? 'text-green-400' : 'text-slate-300'}`}>
-                        {actionLoading[order.id + '_prep'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
+                        {actionLoading[order.id + '_marked_prepared'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
                     </span>
                 </label>
 
-                {/* Upload dobavnica */}
-                <div className={`p-2.5 rounded-lg border ${
-                    dobavnica ? 'bg-green-900/20 border-green-700/30' : 'bg-slate-700/30 border-slate-600/30'
-                }`}>
-                    {dobavnica ? (
+                {/* Upload dobavnica — drag & drop, browse, or phone camera via QR */}
+                {dobavnica ? (
+                    <div className="p-2.5 rounded-lg border bg-green-900/20 border-green-700/30">
                         <div className="flex items-center gap-2">
                             <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -485,29 +515,18 @@ function OrderCard({
                                 </a>
                             )}
                         </div>
-                    ) : (
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            <span className="text-slate-300 text-sm">
-                                {actionLoading[order.id + '_upload'] ? 'Nalagam...' : 'Naloži podpisano dobavnico'}
-                            </span>
-                            <input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                className="hidden"
-                                disabled={actionLoading[order.id + '_upload']}
-                                onChange={e => {
-                                    const file = e.target.files?.[0]
-                                    if (file) onUpload(order.id, file)
-                                }}
-                            />
-                        </label>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <DropZone
+                        orderId={order.id}
+                        orderNumber={order.order_number}
+                        email={email}
+                        loading={actionLoading[order.id + '_upload']}
+                        onFile={(file) => onUpload(order.id, file)}
+                    />
+                )}
 
-                {/* Payment verification checkbox (only for payment-proof-required orders) */}
+                {/* Payment verification checkbox — toggleable (only for payment-proof-required orders) */}
                 {order.pickup_payment_proof_required && (
                     <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
                         isPaymentVerified
@@ -517,32 +536,126 @@ function OrderCard({
                         <input
                             type="checkbox"
                             checked={isPaymentVerified}
-                            disabled={isPaymentVerified || actionLoading[order.id + '_payment']}
-                            onChange={() => !isPaymentVerified && onVerifyPayment(order.id)}
+                            disabled={actionLoading[order.id + '_payment_verified']}
+                            onChange={() => onToggleAction(order.id, 'payment_verified', isPaymentVerified)}
                             className="w-6 h-6 rounded border-2 border-red-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
                         />
                         <span className={`font-bold text-sm ${isPaymentVerified ? 'text-green-400' : 'text-red-300'}`}>
-                            {actionLoading[order.id + '_payment'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno ✓' : 'Preveri dokazilo o plačilu'}
+                            {actionLoading[order.id + '_payment_verified'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno' : 'Preveri dokazilo o plačilu'}
                         </span>
                     </label>
                 )}
 
-                {/* Complete checkbox */}
-                <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
-                    'bg-slate-700/40 border border-slate-600/30 hover:bg-orange-900/20 hover:border-orange-600/30'
-                }`}>
-                    <input
-                        type="checkbox"
-                        checked={false}
-                        disabled={actionLoading[order.id + '_complete'] || (order.pickup_payment_proof_required && !isPaymentVerified)}
-                        onChange={() => onComplete(order.id, type)}
-                        className="w-6 h-6 rounded border-2 border-slate-500 text-orange-500 focus:ring-orange-500 bg-slate-700 cursor-pointer disabled:opacity-30"
-                    />
-                    <span className={`font-bold text-sm ${order.pickup_payment_proof_required && !isPaymentVerified ? 'text-slate-600' : 'text-slate-300'}`}>
-                        {actionLoading[order.id + '_complete'] ? 'Shranjujem...' : type === 'pickup' ? 'Prevzeto s strani stranke' : 'Prevzeto s strani DPD'}
-                    </span>
-                </label>
+                {/* Zaključi naročilo button */}
+                <button
+                    disabled={!canFinalize || actionLoading[order.id + '_complete']}
+                    onClick={() => {
+                        const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
+                        if (confirm(`Zaključi naročilo #${order.order_number} kot ${label}?\n\nTo dejanje ni mogoče razveljaviti.`)) {
+                            onComplete(order.id, type)
+                        }
+                    }}
+                    className={`w-full py-3 rounded-lg font-bold text-sm transition ${
+                        canFinalize
+                            ? 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer'
+                            : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                    }`}
+                >
+                    {actionLoading[order.id + '_complete']
+                        ? 'Zaključujem...'
+                        : type === 'pickup'
+                            ? 'Zaključi naročilo'
+                            : 'Zaključi naročilo'
+                    }
+                </button>
+                {!canFinalize && (
+                    <p className="text-slate-500 text-[10px] text-center">
+                        {!isPrepared ? 'Najprej označi kot pripravljeno' : 'Najprej preveri dokazilo o plačilu'}
+                    </p>
+                )}
             </div>
+        </div>
+    )
+}
+
+// ── Drag & Drop Upload Zone with QR phone option ──
+function DropZone({ orderId, orderNumber, email, loading, onFile }: {
+    orderId: string; orderNumber: string; email: string; loading: boolean; onFile: (file: File) => void
+}) {
+    const [dragging, setDragging] = useState(false)
+    const [showQR, setShowQR] = useState(false)
+    const inputRef = useRef<HTMLInputElement>(null)
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        setDragging(false)
+        const file = e.dataTransfer.files?.[0]
+        if (file && !loading) onFile(file)
+    }
+
+    const uploadUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/warehouse/upload?order=${orderId}&email=${encodeURIComponent(email)}&num=${encodeURIComponent(orderNumber)}`
+        : ''
+    const qrSrc = uploadUrl
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uploadUrl)}`
+        : ''
+
+    return (
+        <div className="space-y-2">
+            <div
+                onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => !loading && inputRef.current?.click()}
+                className={`p-4 rounded-lg border-2 border-dashed text-center cursor-pointer transition ${
+                    loading
+                        ? 'border-slate-600 bg-slate-700/30 cursor-wait'
+                        : dragging
+                            ? 'border-orange-400 bg-orange-900/20'
+                            : 'border-slate-600 bg-slate-700/20 hover:border-slate-500 hover:bg-slate-700/40'
+                }`}
+            >
+                <input
+                    ref={inputRef}
+                    type="file"
+                    className="hidden"
+                    disabled={loading}
+                    onChange={e => {
+                        const file = e.target.files?.[0]
+                        if (file) onFile(file)
+                        e.target.value = ''
+                    }}
+                />
+                {loading ? (
+                    <p className="text-slate-400 text-sm font-medium">Nalagam...</p>
+                ) : (
+                    <>
+                        <svg className="w-6 h-6 text-slate-400 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <p className="text-slate-300 text-sm font-medium">Povleci datoteko sem</p>
+                        <p className="text-slate-500 text-xs mt-0.5">ali klikni za izbiro</p>
+                    </>
+                )}
+            </div>
+            {/* Phone camera via QR */}
+            <button
+                type="button"
+                onClick={() => setShowQR(!showQR)}
+                className="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-xs transition w-full justify-center"
+            >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" />
+                </svg>
+                {showQR ? 'Skrij QR kodo' : 'Naloži s telefona'}
+            </button>
+            {showQR && qrSrc && (
+                <div className="bg-white rounded-xl p-4 text-center">
+                    <img src={qrSrc} alt="QR" className="mx-auto w-[140px] h-[140px]" />
+                    <p className="text-slate-700 text-xs font-bold mt-2">Skeniraj s telefonom</p>
+                    <p className="text-slate-500 text-[10px]">Odpre kamero za fotografiranje dobavnice</p>
+                </div>
+            )}
         </div>
     )
 }
