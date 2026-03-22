@@ -392,7 +392,7 @@ export default function SettingsPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                     <h3 className="text-lg font-bold text-gray-800">Drivers & Warehouse</h3>
-                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers and warehouse workers. Toggle warehouse to show quick-send buttons on orders.</p>
+                    <p className="text-xs text-gray-500 mt-1">Manage delivery drivers and warehouse workers. Toggle &quot;Warehouse&quot; to receive auto-checkout emails and show quick-send buttons on orders.</p>
                 </div>
                 <div className="p-6 space-y-4">
                     <form onSubmit={handleSaveDriver} className="flex flex-wrap gap-2 items-end">

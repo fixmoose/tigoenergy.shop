@@ -245,19 +245,19 @@ export async function placeQuickOrder(
                         packing_slip_url: `/api/orders/${order.id}/packing-slip`,
                     }).eq('id', order.id)
 
-                    // Notify warehouse (Milan)
+                    // Notify all warehouse-flagged drivers
                     const { data: warehouseWorkers } = await adminSupabase
                         .from('drivers')
                         .select('id, name, email')
                         .eq('is_warehouse', true)
-                        .limit(1)
 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
-                        const worker = warehouseWorkers[0]
                         const extraNote = pickupPaymentProofRequired
                             ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT BEFORE RELEASE'
                             : undefined
-                        await sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
+                        await Promise.all(warehouseWorkers.map(worker =>
+                            sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
+                        ))
                     }
                 }
             } catch (autoConfirmErr) {

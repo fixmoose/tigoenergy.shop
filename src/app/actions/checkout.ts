@@ -274,20 +274,20 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
                     autoConfirmed = true
 
-                    // Send packing slip to warehouse
+                    // Send packing slip to all warehouse-flagged drivers
                     const { data: warehouseWorkers } = await adminSupabase
                         .from('drivers')
                         .select('id, name, email')
                         .eq('is_warehouse', true)
-                        .limit(1)
 
                     if (warehouseWorkers && warehouseWorkers.length > 0) {
-                        const worker = warehouseWorkers[0]
                         const { sendWarehouseEmail } = await import('@/lib/warehouse')
                         const extraNote = isPaymentProofRequired
                             ? 'OBVEZNO PREVERITI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT BEFORE RELEASE'
                             : undefined
-                        await sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
+                        await Promise.all(warehouseWorkers.map(worker =>
+                            sendWarehouseEmail(order.id, worker.email, worker.name, extraNote)
+                        ))
                     }
                 } else if (isPaymentProofRequired) {
                     // Not enough stock but still save the flag
