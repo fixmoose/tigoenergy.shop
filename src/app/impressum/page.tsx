@@ -10,8 +10,7 @@ export default function ImpressumPage() {
     const { market } = useMarket()
     const [emailRevealed, setEmailRevealed] = useState(false)
     const email = "support@tigoenergy.shop"
-    const localSites = ['si', 'hr']
-    const companyWebsite = localSites.includes(market.country) ? 'initraenergija.si' : 'initraenergija.com'
+    const companyWebsite = 'initraenergija.si'
 
     return (
         <div className="min-h-screen bg-gray-50 py-12">
