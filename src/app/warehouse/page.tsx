@@ -636,8 +636,8 @@ function DropZone({ orderId, orderNumber, email, loading, onFile }: {
                         <svg className="w-6 h-6 text-slate-400 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
-                        <p className="text-slate-300 text-sm font-medium">Povleci datoteko sem</p>
-                        <p className="text-slate-500 text-xs mt-0.5">ali klikni za izbiro</p>
+                        <p className="text-slate-300 text-sm font-medium">Podpisano dobavnico naloži tukaj</p>
+                        <p className="text-slate-500 text-xs mt-0.5">povleci datoteko ali klikni za izbiro</p>
                     </>
                 )}
             </div>
@@ -650,7 +650,7 @@ function DropZone({ orderId, orderNumber, email, loading, onFile }: {
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3" />
                 </svg>
-                {showQR ? 'Skrij QR kodo' : 'Naloži s telefona'}
+                {showQR ? 'Skrij QR kodo' : 'ali fotografiraj s telefona'}
             </button>
             {showQR && qrSrc && (
                 <div className="bg-white rounded-xl p-4 text-center">

@@ -78,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     ${paymentProofHtml}
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:16px 0;">
       <p style="margin:0 0 4px;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700;">${l.address}</p>
-      <p style="margin:0 0 12px;font-size:15px;font-weight:700;color:#111;">Podsmreka 59A, 1356 Dobrova, Slovenija</p>
+      <p style="margin:0 0 12px;font-size:15px;font-weight:700;color:#111;">Initra d.o.o., Podsmreka 59A, 1356 Dobrova, Slovenija</p>
       <p style="margin:0 0 4px;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700;">${l.contact}</p>
       <p style="margin:0;font-size:14px;color:#111;font-weight:600;">${driver.name}</p>
       ${driver.phone ? `<p style="margin:2px 0;font-size:13px;color:#374151;">${driver.phone}</p>` : ''}
