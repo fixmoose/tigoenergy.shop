@@ -122,7 +122,12 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         let shippingCarrier = 'Standard'
         let shippingMethod = 'Standard'
 
-        if (shippingId) {
+        if (shippingId === 'intereuropa-pallet') {
+            // Synthetic InterEuropa pallet rate — estimated, confirmed manually
+            shippingCost = totalWeight <= 200 ? 150 : 250
+            shippingCarrier = 'InterEuropa'
+            shippingMethod = 'Pallet'
+        } else if (shippingId) {
             const { data: rateData, error: rateError } = await supabase
                 .from('shipping_rates')
                 .select('*')

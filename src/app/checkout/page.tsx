@@ -372,7 +372,10 @@ export default function CheckoutPage() {
     const evChargerQty = items
         .filter(i => (i.metadata as any)?.subcategory === 'GO EV Charger' || i.name.includes('GO EV Charger'))
         .reduce((s, i) => s + i.quantity, 0)
-    const isPalletMode = junctionQty >= 50 || evChargerQty >= 25 || totalWeight > 100
+    const isPalletMode = junctionQty >= 50 || evChargerQty >= 25
+    const parcels = calculateTigoParcels(items as any)
+    const boxCount = parcels.length
+    const showInterEuropa = totalWeight > 100 || boxCount > 5
 
     useEffect(() => {
         const fetchRates = async () => {
@@ -393,14 +396,13 @@ export default function CheckoutPage() {
                 const isSI = formData.shipping_country === 'SI'
 
                 if (isPalletMode) {
-                    // Large orders: Only InterEuropa or Personal Pick-up
+                    // Bulky items (junctions/chargers): Only InterEuropa or Personal Pick-up
                     filtered = filtered.filter(r =>
                         r.carrier === 'InterEuropa' ||
                         (r.carrier === 'Personal Pick-up' && formData.shipping_country === 'SI')
                     )
                 } else {
-                    // Normal orders: Show DPD. Hide InterEuropa and GLS.
-                    // Personal Pick-up only for SI.
+                    // Normal orders: Show DPD + optionally InterEuropa for large orders
                     filtered = filtered.filter(r =>
                         r.carrier === 'DPD' ||
                         (r.carrier === 'Personal Pick-up' && formData.shipping_country === 'SI')
@@ -420,6 +422,19 @@ export default function CheckoutPage() {
                     }
                 });
                 filtered = Array.from(uniqueRates.values());
+
+                // Inject InterEuropa pallet option for large orders (>100kg or >5 boxes)
+                if (showInterEuropa && !isPalletMode) {
+                    const ieRate = totalWeight <= 200 ? 150 : 250
+                    filtered.push({
+                        id: 'intereuropa-pallet',
+                        carrier: 'InterEuropa',
+                        service_type: 'Pallet',
+                        rate_eur: ieRate,
+                        country_code: formData.shipping_country,
+                        is_estimate: true,
+                    })
+                }
 
                 // Sorting: GLS > DPD > Others
                 filtered.sort((a, b) => {
@@ -738,8 +753,6 @@ export default function CheckoutPage() {
     }
 
     const selectedShippingRate = shippingRates.find(r => r.id === selectedShippingId)
-    const parcels = calculateTigoParcels(items as any)
-    const boxCount = parcels.length
     const currentShippingCost = selectedShippingRate
         ? (selectedShippingRate.carrier === 'DPD' && boxCount > 1
             ? calculateDPDShippingCost(parcels, allDpdRates)
@@ -1051,27 +1064,32 @@ export default function CheckoutPage() {
                                 <div className="space-y-3">
                                     {shippingRates.map((rate) => {
                                         const isPickup = rate.carrier === 'Personal Pick-up'
+                                        const isIE = rate.carrier === 'InterEuropa'
                                         const effectiveRate = rate.carrier === 'DPD' && boxCount > 1
                                             ? calculateDPDShippingCost(parcels, allDpdRates)
                                             : rate.rate_eur
                                         return (
-                                            <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
+                                            <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? (isIE ? 'border-blue-500 bg-blue-50' : 'border-green-500 bg-green-50') : 'border-gray-200 hover:border-green-300'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-green-600" />
                                                     <div>
                                                         <div className="font-bold text-gray-900">
-                                                            {isPickup ? t('personalPickup') : `${rate.carrier} ${t('standard')}`}
+                                                            {isPickup ? t('personalPickup') : isIE ? 'InterEuropa Pallet' : `${rate.carrier} ${t('standard')}`}
                                                             {rate.carrier === 'DPD' && boxCount > 1 && (
                                                                 <span className="ml-2 text-xs font-normal text-green-600 bg-green-100 px-1.5 py-0.5 rounded">
                                                                     ({boxCount} {t('boxes')})
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="text-xs text-gray-500">{isPickup ? t('pickupReady') : t('deliveryDays')}</div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {isPickup ? t('pickupReady') : isIE ? t('interEuropaEstimate') : t('deliveryDays')}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="font-bold text-gray-900">
-                                                    {isPickup ? t('personalPickup') : (effectiveRate === 0 ? t('free') : formatPriceNet(effectiveRate))}
+                                                <div className={`font-bold ${isIE ? 'text-blue-700' : 'text-gray-900'}`}>
+                                                    {isPickup ? t('personalPickup') : isIE
+                                                        ? `~${formatPriceNet(effectiveRate)}`
+                                                        : (effectiveRate === 0 ? t('free') : formatPriceNet(effectiveRate))}
                                                 </div>
                                             </label>
                                         )

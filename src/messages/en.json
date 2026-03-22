@@ -188,6 +188,7 @@
     "paymentProofTitle": "Proof of Payment Required",
     "paymentProofDescription": "You must provide proof of payment upon pick-up to warehouse personnel, otherwise items will not be issued. / Obvezno predložiti dokazilo o plačilu ob prevzemu, sicer blago ne bo izdano.",
     "deliveryDays": "3-5 business days",
+    "interEuropaEstimate": "Pallet delivery, 3-7 days. Estimated price — confirmed within 24h.",
     "logisticsAccess": "Logistics & Access",
     "truckAccess": "My delivery location has standard commercial truck access",
     "truckAccessDesc": "Check this if a 12-ton truck can easily access and unload at your site.",
