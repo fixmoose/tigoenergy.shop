@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
 interface WarehouseAction {
     action: string
     by_email: string
@@ -16,8 +19,39 @@ const ACTION_LABELS: Record<string, { label: string; icon: string }> = {
     marked_dpd_picked_up: { label: 'Marked as picked up by DPD', icon: '🚚' },
 }
 
-export default function WarehouseActionsLog({ actions }: { actions: WarehouseAction[] }) {
+export default function WarehouseActionsLog({ actions, orderId }: { actions: WarehouseAction[]; orderId: string }) {
+    const [undoing, setUndoing] = useState<number | null>(null)
+    const router = useRouter()
+
     if (!actions || actions.length === 0) return null
+
+    const handleUndo = async (index: number) => {
+        const action = actions[index]
+        const meta = ACTION_LABELS[action.action] || { label: action.action }
+        const isCompletion = action.action === 'marked_picked_up' || action.action === 'marked_dpd_picked_up'
+        const warning = isCompletion
+            ? `This will also revert the order status back to "Processing". Continue?`
+            : `Undo "${meta.label}" by ${action.by_name || action.by_email}?`
+
+        if (!confirm(warning)) return
+
+        setUndoing(index)
+        try {
+            const res = await fetch('/api/admin/warehouse-undo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, actionIndex: index }),
+            })
+            if (res.ok) {
+                router.refresh()
+            } else {
+                const data = await res.json()
+                alert(`Failed: ${data.error || 'Unknown error'}`)
+            }
+        } finally {
+            setUndoing(null)
+        }
+    }
 
     return (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
@@ -32,7 +66,7 @@ export default function WarehouseActionsLog({ actions }: { actions: WarehouseAct
                     const meta = ACTION_LABELS[action.action] || { label: action.action, icon: '🔧' }
                     const time = new Date(action.at)
                     return (
-                        <div key={i} className="flex items-start gap-2 text-sm">
+                        <div key={i} className="flex items-start gap-2 text-sm group">
                             <span className="text-base leading-none mt-0.5">{meta.icon}</span>
                             <div className="flex-1 min-w-0">
                                 <span className="text-orange-800 font-semibold">{meta.label}</span>
@@ -46,6 +80,14 @@ export default function WarehouseActionsLog({ actions }: { actions: WarehouseAct
                                     {action.by_name || action.by_email} · {time.toLocaleDateString('sl-SI')} {time.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             </div>
+                            <button
+                                onClick={() => handleUndo(i)}
+                                disabled={undoing === i}
+                                className="text-[10px] px-2 py-1 rounded bg-orange-100 text-orange-600 hover:bg-red-100 hover:text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
+                                title="Undo this action"
+                            >
+                                {undoing === i ? '...' : 'Undo'}
+                            </button>
                         </div>
                     )
                 })}

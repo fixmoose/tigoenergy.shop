@@ -42,6 +42,7 @@ export default function WarehousePortal() {
     const [driverName, setDriverName] = useState('')
     const [pickupOrders, setPickupOrders] = useState<WarehouseOrder[]>([])
     const [deliveryOrders, setDeliveryOrders] = useState<WarehouseOrder[]>([])
+    const [completedOrders, setCompletedOrders] = useState<WarehouseOrder[]>([])
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
 
@@ -51,7 +52,7 @@ export default function WarehousePortal() {
             const saved = localStorage.getItem('warehouse_email')
             if (saved) setEmail(saved)
         } else {
-            alert('Wrong password')
+            alert('Napačno geslo')
         }
     }
 
@@ -62,7 +63,7 @@ export default function WarehousePortal() {
             const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}`)
             if (!res.ok) {
                 if (res.status === 401) {
-                    alert('Email not authorized for warehouse access. Check Admin → Settings → Drivers.')
+                    alert('E-pošta ni pooblaščena za dostop do skladišča. Preverite Admin → Nastavitve → Vozniki.')
                     return
                 }
                 throw new Error('Failed to fetch')
@@ -70,6 +71,7 @@ export default function WarehousePortal() {
             const data = await res.json()
             setPickupOrders(data.pickup || [])
             setDeliveryOrders(data.delivery || [])
+            setCompletedOrders(data.completed || [])
             setDriverName(data.driverName || '')
         } catch (err) {
             console.error('Failed to fetch orders:', err)
@@ -124,8 +126,8 @@ export default function WarehousePortal() {
     }
 
     const markComplete = async (orderId: string, type: 'pickup' | 'dpd') => {
-        const label = type === 'pickup' ? 'picked up' : 'picked up by DPD'
-        if (!confirm(`Mark order as ${label}? This will remove it from the list.`)) return
+        const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
+        if (!confirm(`Označiti naročilo kot ${label}? Naročilo bo odstranjeno s seznama.`)) return
         setActionLoading(prev => ({ ...prev, [orderId + '_complete']: true }))
         try {
             await fetch(`/api/warehouse/orders/${orderId}/complete`, {
@@ -159,19 +161,19 @@ export default function WarehousePortal() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
                             </svg>
                         </div>
-                        <h1 className="text-xl font-bold text-white">Warehouse Portal</h1>
+                        <h1 className="text-xl font-bold text-white">Skladišče</h1>
                         <p className="text-slate-400 text-sm mt-1">Tigo Energy</p>
                     </div>
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Geslo"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleLogin()}
                         className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                     <button onClick={handleLogin} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
-                        Enter
+                        Vstopi
                     </button>
                 </div>
             </div>
@@ -189,18 +191,18 @@ export default function WarehousePortal() {
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
                             </svg>
                         </div>
-                        <h1 className="text-xl font-bold text-white">Warehouse Portal</h1>
+                        <h1 className="text-xl font-bold text-white">Skladišče</h1>
                     </div>
                     <input
                         type="email"
-                        placeholder="Your warehouse email"
+                        placeholder="Vaš e-poštni naslov"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && loadOrders()}
                         className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                     <button onClick={loadOrders} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
-                        Load Orders
+                        Naloži naročila
                     </button>
                 </div>
             </div>
@@ -219,18 +221,18 @@ export default function WarehousePortal() {
                         </svg>
                     </div>
                     <div>
-                        <h1 className="text-white font-bold text-sm">Warehouse</h1>
+                        <h1 className="text-white font-bold text-sm">Skladišče</h1>
                         <p className="text-slate-400 text-xs">{driverName || email}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={fetchOrders} disabled={loading}
                         className="text-xs px-3 py-1.5 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition disabled:opacity-50">
-                        {loading ? 'Loading...' : 'Refresh'}
+                        {loading ? 'Nalagam...' : 'Osveži'}
                     </button>
                     <button onClick={() => { setAuthenticated(false); setEmail(''); setPassword('') }}
                         className="text-xs px-3 py-1.5 bg-slate-700 text-slate-400 rounded-lg hover:bg-slate-600 transition">
-                        Logout
+                        Odjava
                     </button>
                 </div>
             </div>
@@ -242,13 +244,13 @@ export default function WarehousePortal() {
                     <div className="flex items-center gap-2 mb-3">
                         <div className="w-3 h-3 bg-blue-500 rounded-full" />
                         <h2 className="text-white font-bold text-sm uppercase tracking-wide">
-                            Lastni prevzem / Pickup
+                            Lastni prevzem
                         </h2>
                         <span className="text-slate-500 text-xs">({pickupOrders.length})</span>
                     </div>
                     {pickupOrders.length === 0 ? (
                         <div className="text-slate-500 text-sm text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                            No pickup orders
+                            Ni naročil za prevzem
                         </div>
                     ) : pickupOrders.map(order => (
                         <OrderCard
@@ -271,13 +273,13 @@ export default function WarehousePortal() {
                     <div className="flex items-center gap-2 mb-3">
                         <div className="w-3 h-3 bg-red-500 rounded-full" />
                         <h2 className="text-white font-bold text-sm uppercase tracking-wide">
-                            DPD Delivery
+                            DPD Dostava
                         </h2>
                         <span className="text-slate-500 text-xs">({deliveryOrders.length})</span>
                     </div>
                     {deliveryOrders.length === 0 ? (
                         <div className="text-slate-500 text-sm text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                            No delivery orders
+                            Ni naročil za dostavo
                         </div>
                     ) : deliveryOrders.map(order => (
                         <OrderCard
@@ -295,6 +297,52 @@ export default function WarehousePortal() {
                     ))}
                 </div>
             </div>
+
+            {/* Completed orders — reference list */}
+            {completedOrders.length > 0 && (
+                <div className="px-4 pb-6 max-w-7xl mx-auto">
+                    <div className="border-t border-slate-700 pt-4 mt-2">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-3 h-3 bg-slate-500 rounded-full" />
+                            <h2 className="text-slate-400 font-bold text-sm uppercase tracking-wide">
+                                Zaključena naročila (zadnjih 7 dni)
+                            </h2>
+                            <span className="text-slate-600 text-xs">({completedOrders.length})</span>
+                        </div>
+                        <div className="space-y-1">
+                            {completedOrders.map(order => {
+                                const addr = order.shipping_address
+                                const customerName = addr
+                                    ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim()
+                                    : order.customer_email
+                                const isPickup = order.shipping_carrier === 'Personal Pick-up'
+                                const actions = order.warehouse_actions || []
+                                const preparedAt = actions.find(a => a.action === 'marked_prepared')?.at
+                                const completedAt = actions.find(a => a.action === 'marked_picked_up' || a.action === 'marked_dpd_picked_up')?.at
+
+                                return (
+                                    <div key={order.id} className="flex items-center gap-3 px-3 py-2 bg-slate-800/40 rounded-lg border border-slate-700/30 text-xs">
+                                        <span className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
+                                            isPickup ? 'bg-blue-900/40 text-blue-400' : 'bg-red-900/40 text-red-400'
+                                        }`}>
+                                            {isPickup ? 'PREVZEM' : 'DPD'}
+                                        </span>
+                                        <span className="text-orange-400 font-mono font-bold">{order.order_number}</span>
+                                        <span className="text-slate-300 truncate flex-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</span>
+                                        <span className="text-slate-500">EUR {order.total?.toFixed(2)}</span>
+                                        {completedAt && (
+                                            <span className="text-green-500/70">
+                                                {new Date(completedAt).toLocaleDateString('sl-SI')} {new Date(completedAt).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        )}
+                                        <span className="text-green-500">✓</span>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -329,7 +377,7 @@ function OrderCard({
             {order.pickup_payment_proof_required && (
                 <div className="bg-red-900/60 border-b border-red-700/50 px-4 py-2 text-center">
                     <p className="text-red-200 text-xs font-bold">
-                        PREVERI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT
+                        OBVEZNO PREVERI DOKAZ O PLAČILU PRED IZDAJO BLAGA
                     </p>
                 </div>
             )}
@@ -376,7 +424,7 @@ function OrderCard({
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Download Packing Slip
+                        Prenesi dobavnico
                     </a>
                 )}
 
@@ -391,7 +439,7 @@ function OrderCard({
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                        Download Shipping Label
+                        Prenesi nalepko za pošiljko
                     </a>
                 )}
 
@@ -407,7 +455,7 @@ function OrderCard({
                         className="w-6 h-6 rounded border-2 border-slate-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
                     />
                     <span className={`font-bold text-sm ${isPrepared ? 'text-green-400' : 'text-slate-300'}`}>
-                        {actionLoading[order.id + '_prep'] ? 'Saving...' : isPrepared ? 'Prepared' : 'Mark as Prepared'}
+                        {actionLoading[order.id + '_prep'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
                     </span>
                 </label>
 
@@ -420,7 +468,7 @@ function OrderCard({
                             <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span className="text-green-400 text-sm font-medium">Dobavnica uploaded</span>
+                            <span className="text-green-400 text-sm font-medium">Dobavnica naložena</span>
                             {dobavnica.file_url && (
                                 <a
                                     href={`${dobavnica.file_url}${dobavnica.file_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
@@ -428,7 +476,7 @@ function OrderCard({
                                     rel="noopener noreferrer"
                                     className="text-blue-400 text-xs hover:underline ml-auto"
                                 >
-                                    View
+                                    Poglej
                                 </a>
                             )}
                         </div>
@@ -438,7 +486,7 @@ function OrderCard({
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
                             <span className="text-slate-300 text-sm">
-                                {actionLoading[order.id + '_upload'] ? 'Uploading...' : 'Upload dobavnica'}
+                                {actionLoading[order.id + '_upload'] ? 'Nalagam...' : 'Naloži dobavnico'}
                             </span>
                             <input
                                 type="file"
@@ -466,7 +514,7 @@ function OrderCard({
                         className="w-6 h-6 rounded border-2 border-slate-500 text-orange-500 focus:ring-orange-500 bg-slate-700 cursor-pointer"
                     />
                     <span className="text-slate-300 font-bold text-sm">
-                        {actionLoading[order.id + '_complete'] ? 'Saving...' : type === 'pickup' ? 'Picked up by customer' : 'Picked up by DPD'}
+                        {actionLoading[order.id + '_complete'] ? 'Shranjujem...' : type === 'pickup' ? 'Prevzeto s strani stranke' : 'Prevzeto s strani DPD'}
                     </span>
                 </label>
             </div>

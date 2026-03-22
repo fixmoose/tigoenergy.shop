@@ -95,7 +95,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {(order as any).warehouse_actions?.length > 0 && (
-        <WarehouseActionsLog actions={(order as any).warehouse_actions} />
+        <WarehouseActionsLog actions={(order as any).warehouse_actions} orderId={order.id} />
       )}
 
       <div className="mb-6">
