@@ -61,12 +61,14 @@ export async function GET(request: NextRequest) {
     const lang = market.defaultLanguage
     const currency = market.currency
 
-    // Fetch all active products
+    // Fetch active, in-stock products only
     const supabase = await createAdminClient()
     const { data: products, error } = await supabase
         .from('products')
         .select('*')
         .eq('active', true)
+        .eq('stock_status', 'in_stock')
+        .gt('stock_quantity', 0)
         .order('sku', { ascending: true })
 
     if (error) {
