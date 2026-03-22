@@ -123,9 +123,9 @@ function CollapsibleSubCategory({ subcategory, items }: { subcategory: string, i
                                 <div className="font-medium text-sm text-gray-800 truncate group-hover:text-blue-700">{p.name_en}</div>
                                 <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-0.5">
                                     <span className="font-mono bg-gray-100 px-1 rounded">{p.sku}</span>
-                                    {p.stock_quantity !== null && p.stock_quantity !== undefined && p.stock_quantity < (p.low_stock_threshold || 5) && (
-                                        <span className="text-red-500 font-bold">Low Stock ({p.stock_quantity})</span>
-                                    )}
+                                    <span className={`font-medium ${p.stock_quantity !== null && p.stock_quantity !== undefined && p.stock_quantity < (p.low_stock_threshold || 5) ? 'text-red-500' : 'text-gray-500'}`}>
+                                        {p.stock_quantity ?? 0}{p.reserved_quantity ? <span className="text-orange-500"> ({p.reserved_quantity} res)</span> : null}
+                                    </span>
                                 </div>
                             </div>
 
