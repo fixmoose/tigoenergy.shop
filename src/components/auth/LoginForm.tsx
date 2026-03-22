@@ -53,7 +53,8 @@ export default function LoginForm() {
                         const vatCountry = customer.vat_id.replace(/\s/g, '').slice(0, 2).toUpperCase()
                         if (vatCountry !== currentMarket) {
                             const targetDomain = getDomainForMarket(vatCountry)
-                            window.location.href = `https://${targetDomain}/dashboard`
+                            const mobilePath = window.innerWidth < 1024 ? '/' : '/dashboard'
+                            window.location.href = `https://${targetDomain}${mobilePath}`
                             return
                         }
                     }
@@ -62,7 +63,9 @@ export default function LoginForm() {
                 }
             }
 
-            router.push('/dashboard')
+            // Mobile → home (MobileLanding with Quick Order), Desktop → dashboard
+            const isMobile = window.innerWidth < 1024
+            router.push(isMobile ? '/' : '/dashboard')
             router.refresh()
         } catch (error: any) {
             setError(error.message)
