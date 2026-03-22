@@ -4,17 +4,18 @@ import { createClient } from '@/lib/supabase/server'
 /**
  * GET /api/quick-order
  * Returns the quick-order product catalog: optimizers (A-O, A-F, X-O, A-2F) + accessories (CCA, RSS).
- * Includes stock status and pricing for the authenticated user.
+ * Matches both SKU patterns (TS4-AO, TS4-A-O) and name patterns.
  */
 export async function GET() {
     const supabase = await createClient()
 
-    // Fetch optimizer and accessory products by SKU pattern
+    // Fetch from TS4 FLEX MLPE + TS4-X MLPE + COMMUNICATIONS categories
+    // This is broader than SKU matching and catches all relevant products
     const { data: products, error } = await supabase
         .from('products')
         .select('id, sku, name_en, name_sl, name_de, category, subcategory, price_eur, b2b_price_eur, weight_kg, stock_quantity, reserved_quantity, stock_status, images, units_per_box, quantity_discounts')
         .eq('active', true)
-        .or('sku.ilike.%TS4-A-O%,sku.ilike.%TS4-A-F%,sku.ilike.%TS4-X-O%,sku.ilike.%TS4-A-2F%,sku.ilike.%CCA%,sku.ilike.%RSS%')
+        .or('category.eq.ts4-flex-mlpe,category.eq.ts4-x-mlpe,sku.ilike.%CCA%,sku.ilike.%RSS%,name_en.ilike.%CCA%,name_en.ilike.%RSS%')
         .order('sku', { ascending: true })
 
     if (error) {
@@ -22,16 +23,31 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
     }
 
-    // Classify products
-    const optimizers = (products || []).filter((p: any) => {
-        const sku = (p.sku as string).toUpperCase()
-        return sku.includes('TS4-A-O') || sku.includes('TS4-A-F') || sku.includes('TS4-X-O') || sku.includes('TS4-A-2F')
-    })
+    // Classify by checking both SKU and name
+    function isOptimizer(p: any): boolean {
+        const sku = (p.sku || '').toUpperCase()
+        const name = (p.name_en || '').toUpperCase()
+        const combined = sku + ' ' + name
+        // Match TS4-A-O, TS4-AO, TS4-A-F, TS4-AF, TS4-X-O, TS4-XO, TS4-A-2F, TS4-A2F
+        return /TS4.?A.?O/i.test(combined) ||
+               /TS4.?A.?F/i.test(combined) ||
+               /TS4.?X.?O/i.test(combined) ||
+               /TS4.?A.?2F/i.test(combined)
+    }
 
-    const accessories = (products || []).filter((p: any) => {
-        const sku = (p.sku as string).toUpperCase()
-        return sku.includes('CCA') || sku.includes('RSS')
-    })
+    function isAccessory(p: any): boolean {
+        const sku = (p.sku || '').toUpperCase()
+        const name = (p.name_en || '').toUpperCase()
+        return sku.includes('CCA') || sku.includes('RSS') ||
+               name.includes('CCA') || name.includes('RSS')
+    }
 
-    return NextResponse.json({ optimizers, accessories })
+    const optimizers = (products || []).filter((p: any) => isOptimizer(p))
+    const accessories = (products || []).filter((p: any) => isAccessory(p))
+
+    return NextResponse.json({
+        optimizers,
+        accessories,
+        debug: { total: (products || []).length, optimizerCount: optimizers.length, accessoryCount: accessories.length }
+    })
 }

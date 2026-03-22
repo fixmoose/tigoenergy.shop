@@ -59,7 +59,7 @@ export default function MobileLanding() {
 
     if (checking) {
         return (
-            <div className="min-h-[100dvh] bg-slate-900 flex items-center justify-center">
+            <div className="fixed inset-0 z-[60] bg-slate-900 flex items-center justify-center lg:hidden">
                 <div className="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
             </div>
         )
@@ -68,7 +68,7 @@ export default function MobileLanding() {
     const isAdmin = user?.user_metadata?.role === 'admin'
 
     return (
-        <div className="min-h-[100dvh] bg-slate-900 flex flex-col lg:hidden">
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col lg:hidden overflow-y-auto">
             {/* Header */}
             <div className="px-5 pt-8 pb-4">
                 <img src="/tigo-leaf.png" alt="Tigo Energy" className="w-10 h-10 brightness-0 invert opacity-90 mb-4" />

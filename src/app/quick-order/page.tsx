@@ -32,12 +32,14 @@ const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: stri
     'TS4-A-2F': { short: 'A-2F', full: 'TS4-A-2F', desc: 'Dual Fire Safety' },
 }
 
-function classifyProduct(sku: string): string | null {
-    const s = sku.toUpperCase()
-    if (s.includes('TS4-A-2F')) return 'TS4-A-2F'
-    if (s.includes('TS4-A-O')) return 'TS4-A-O'
-    if (s.includes('TS4-A-F')) return 'TS4-A-F'
-    if (s.includes('TS4-X-O')) return 'TS4-X-O'
+function classifyProduct(sku: string, name?: string): string | null {
+    const s = (sku + ' ' + (name || '')).toUpperCase()
+    // Check A-2F first (most specific — contains "A" and "F" so must come before A-F)
+    if (/TS4.?A.?2F/.test(s)) return 'TS4-A-2F'
+    if (/TS4.?A.?O/.test(s)) return 'TS4-A-O'
+    // A-F must come after A-O and A-2F to avoid false matches
+    if (/TS4.?A.?F/.test(s) && !/TS4.?A.?2F/.test(s)) return 'TS4-A-F'
+    if (/TS4.?X.?O/.test(s)) return 'TS4-X-O'
     if (s.includes('CCA')) return 'CCA'
     if (s.includes('RSS')) return 'RSS'
     return null
@@ -120,7 +122,7 @@ export default function QuickOrderPage() {
         return isB2B && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur
     }, [isB2B])
 
-    const unitsPerBox = selectedProduct?.units_per_box || (classifyProduct(selectedProduct?.sku || '')?.startsWith('TS4-X') ? 18 : 20)
+    const unitsPerBox = selectedProduct?.units_per_box || (classifyProduct(selectedProduct?.sku || '', selectedProduct?.name_en)?.startsWith('TS4-X') ? 18 : 20)
 
     const fmtPrice = (n: number) => isB2B ? formatPriceNet(n) : formatPrice(n)
 
@@ -183,7 +185,7 @@ export default function QuickOrderPage() {
 
     if (loading) {
         return (
-            <div className="min-h-[100dvh] flex items-center justify-center bg-slate-900">
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900">
                 <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin" />
             </div>
         )
@@ -198,13 +200,13 @@ export default function QuickOrderPage() {
     const grandTotal = optimizerTotal + accessoriesTotal
 
     return (
-        <div className="min-h-[100dvh] bg-slate-900 flex flex-col">
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto">
             {/* Metro header — flat, no border */}
             <div className="px-5 pt-6 pb-2">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-light text-white tracking-wide">
                         {step === 'model' && 'Quick Order'}
-                        {step === 'qty' && (OPTIMIZER_LABELS[classifyProduct(selectedProduct?.sku || '') || '']?.short || 'Quantity')}
+                        {step === 'qty' && (OPTIMIZER_LABELS[classifyProduct(selectedProduct?.sku || '', selectedProduct?.name_en) || '']?.short || 'Quantity')}
                         {step === 'accessories' && 'Accessories'}
                         {step === 'summary' && 'Review'}
                     </h1>
@@ -222,7 +224,7 @@ export default function QuickOrderPage() {
                 {step === 'model' && (
                     <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
                         {Object.entries(OPTIMIZER_LABELS).map(([key, info]) => {
-                            const products = optimizers.filter(p => classifyProduct(p.sku) === key)
+                            const products = optimizers.filter(p => classifyProduct(p.sku, p.name_en) === key)
                             const product = products[0]
                             if (!product) return null
                             const available = stockAvailable(product)
@@ -377,7 +379,7 @@ export default function QuickOrderPage() {
                 {step === 'accessories' && (
                     <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
                         {accessories.map(acc => {
-                            const type = classifyProduct(acc.sku)
+                            const type = classifyProduct(acc.sku, acc.name_en)
                             const isSelected = selectedAccessories.has(acc.id)
                             const available = stockAvailable(acc)
                             const isOut = available <= 0 && acc.stock_status !== 'available_to_order'
@@ -416,7 +418,7 @@ export default function QuickOrderPage() {
 
                         {/* Accessory qty adjusters if selected */}
                         {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
-                            const type = classifyProduct(product.sku)
+                            const type = classifyProduct(product.sku, product.name_en)
                             return (
                                 <div key={`qty-${id}`} className="col-span-2 bg-slate-800 rounded-sm p-3 flex items-center gap-3">
                                     <span className="text-white text-sm font-medium flex-1">
@@ -484,13 +486,13 @@ export default function QuickOrderPage() {
                 {step === 'summary' && selectedProduct && (
                     <div className="max-w-lg mx-auto space-y-2">
                         {/* Optimizer summary tile */}
-                        <div className={`${MODEL_TILES[classifyProduct(selectedProduct.sku) || '']?.color || TILE_COLORS.green} rounded-sm p-4 flex items-center gap-4`}>
+                        <div className={`${MODEL_TILES[classifyProduct(selectedProduct.sku, selectedProduct.name_en) || '']?.color || TILE_COLORS.green} rounded-sm p-4 flex items-center gap-4`}>
                             {selectedProduct.images?.[0] && (
                                 <img src={selectedProduct.images[0]} alt="" className="w-14 h-14 object-contain brightness-0 invert opacity-80" />
                             )}
                             <div className="flex-1">
                                 <div className="text-white text-xl font-bold">
-                                    {OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku) || '']?.short}
+                                    {OPTIMIZER_LABELS[classifyProduct(selectedProduct.sku, selectedProduct.name_en) || '']?.short}
                                 </div>
                                 <div className="text-white/70 text-sm">{quantity} pcs &times; {fmtPrice(optimizerPrice)}</div>
                             </div>
@@ -500,7 +502,7 @@ export default function QuickOrderPage() {
                         {/* Accessory summary tiles */}
                         {Array.from(selectedAccessories.entries()).map(([id, { product, qty }]) => {
                             const unitP = getPrice(product, qty)
-                            const type = classifyProduct(product.sku)
+                            const type = classifyProduct(product.sku, product.name_en)
                             return (
                                 <div key={id} className={`${TILE_COLORS.slate} rounded-sm p-4 flex items-center gap-4`}>
                                     {product.images?.[0] && (
