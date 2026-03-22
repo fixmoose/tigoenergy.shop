@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Get current warehouse_actions + order details for customer email
     const { data: order } = await supabase
         .from('orders')
-        .select('warehouse_actions, order_number, customer_email, shipping_address, shipping_carrier, language')
+        .select('warehouse_actions, order_number, customer_email, shipping_address, shipping_carrier, language, pickup_payment_proof_required')
         .eq('id', orderId)
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -59,6 +59,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
                 contact: 'Kontakt skladišča',
             }
 
+            const paymentProofHtml = order.pickup_payment_proof_required
+                ? `<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:8px;padding:14px;margin:16px 0;">
+                    <p style="font-size:14px;font-weight:700;color:#dc2626;margin:0 0 8px;">Plačilo obvezno pred prevzemom</p>
+                    <p style="font-size:13px;color:#991b1b;margin:0;line-height:1.5;">Pred prevzemom blaga morate skladiščnemu osebju predložiti dokazilo o plačilu (potrdilo o bančnem nakazilu). Brez preverjenega dokazila o plačilu blago NE bo izdano.</p>
+                   </div>`
+                : ''
+
             const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
   <div style="background:#16a34a;padding:24px 32px;color:#fff;">
@@ -68,6 +75,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   <div style="padding:24px 32px;">
     <p style="color:#374151;font-size:14px;">${l.greeting}</p>
     <p style="color:#374151;font-size:14px;">${l.body}</p>
+    ${paymentProofHtml}
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px;margin:16px 0;">
       <p style="margin:0 0 4px;font-size:11px;color:#6b7280;text-transform:uppercase;font-weight:700;">${l.address}</p>
       <p style="margin:0 0 12px;font-size:15px;font-weight:700;color:#111;">Podsmreka 59A, 1356 Dobrova, Slovenija</p>
