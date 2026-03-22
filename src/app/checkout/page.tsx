@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl'
 import { useRecaptcha } from '@/hooks/useRecaptcha'
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete'
 import { calculateTigoParcels } from '@/lib/shipping/dpd'
+import { LowStockWarning } from '@/components/ui/LowStockWarning'
 
 import { MARKETS, EU_COUNTRY_CODES, getMarketKeyFromHostname } from '@/lib/constants/markets'
 
@@ -86,6 +87,7 @@ export default function CheckoutPage() {
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
     const [preferredPayment, setPreferredPayment] = useState<string>('wise')
     const [invalidFields, setInvalidFields] = useState<string[]>([])
+    const [hasOverStock, setHasOverStock] = useState(false)
 
     // Shipping Rates State
     const [shippingRates, setShippingRates] = useState<any[]>([])
@@ -329,6 +331,29 @@ export default function CheckoutPage() {
             if (raw) setModifyingOrder(JSON.parse(raw))
         } catch {}
     }, [])
+
+    // Check stock availability for cart items
+    useEffect(() => {
+        if (items.length === 0) { setHasOverStock(false); return }
+        const productIds = items.map(i => i.product_id).filter(Boolean)
+        if (productIds.length === 0) return
+
+        fetch('/api/stock-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds }),
+        })
+            .then(r => r.json())
+            .then(data => {
+                const overStock = items.some(item => {
+                    const stock = data.products?.find((p: any) => p.id === item.product_id)
+                    if (!stock) return false
+                    return stock.available < 999999 && (item.quantity || 0) > stock.available
+                })
+                setHasOverStock(overStock)
+            })
+            .catch(() => {})
+    }, [items])
 
     // Auto-validate VAT on load for B2B users with a pre-filled VAT ID
     useEffect(() => {
@@ -746,6 +771,8 @@ export default function CheckoutPage() {
         <div className="bg-gray-50 min-h-screen pb-12">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">{t('secureCheckout')}</h1>
+
+                {hasOverStock && <div className="mb-6"><LowStockWarning /></div>}
 
                 {modifyingOrder && (
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">

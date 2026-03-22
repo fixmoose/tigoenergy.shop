@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { saveCurrentCart } from '@/app/actions/cart_actions'
 import { useTranslations } from 'next-intl'
+import { LowStockWarning } from '@/components/ui/LowStockWarning'
 
 export default function CartPageClient() {
   const { items, subtotal, count, refresh, clearCart } = useCart()
@@ -20,6 +21,7 @@ export default function CartPageClient() {
   const [saveName, setSaveName] = useState('')
   const [saving, setSaving] = useState(false)
   const [modifyingOrder, setModifyingOrder] = useState<{ orderNumber: string; orderId: string } | null>(null)
+  const [hasOverStock, setHasOverStock] = useState(false)
 
   useEffect(() => {
     refresh()
@@ -32,6 +34,29 @@ export default function CartPageClient() {
       if (raw) setModifyingOrder(JSON.parse(raw))
     } catch {}
   }, [])
+
+  // Check stock availability when items change
+  useEffect(() => {
+    if (items.length === 0) { setHasOverStock(false); return }
+    const productIds = items.map(i => i.product_id).filter(Boolean)
+    if (productIds.length === 0) return
+
+    fetch('/api/stock-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productIds }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        const overStock = items.some(item => {
+          const stock = data.products?.find((p: any) => p.id === item.product_id)
+          if (!stock) return false
+          return stock.available < 999999 && (item.quantity || 0) > stock.available
+        })
+        setHasOverStock(overStock)
+      })
+      .catch(() => {})
+  }, [items])
 
   const handleSaveCart = async () => {
     if (!user) {
@@ -188,6 +213,8 @@ export default function CartPageClient() {
                 </>
               )}
             </div>
+
+            {hasOverStock && <div className="mb-4"><LowStockWarning /></div>}
 
             <div className="space-y-3">
               <Link href="/checkout" className="block w-full text-center bg-green-600 text-white text-lg font-bold py-3.5 rounded-lg hover:bg-green-700 transition-all shadow-lg shadow-green-200">

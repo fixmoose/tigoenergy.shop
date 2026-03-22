@@ -5,6 +5,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import { useRouter } from 'next/navigation'
 import type { Product } from '@/types/database'
+import { LowStockWarning, LowStockBadge } from '@/components/ui/LowStockWarning'
 
 // ─── MLPE classification ────────────────────────────────────────────────────
 const OPTIMIZER_LABELS: Record<string, { short: string; full: string; desc: string }> = {
@@ -160,6 +161,12 @@ export default function QuickOrderPage() {
     // Cart totals
     const cartItemCount = Array.from(cart.values()).reduce((sum, { qty }) => sum + qty, 0)
     const cartTotal = Array.from(cart.values()).reduce((sum, { product, qty }) => sum + getPrice(product, qty) * qty, 0)
+
+    // Check if any cart item exceeds available stock
+    const hasOverStock = Array.from(cart.values()).some(({ product, qty }) => {
+        const avail = stockAvailable(product)
+        return avail < 999999 && qty > avail
+    })
 
     const unitsPerBox = boxQtyProduct?.units_per_box || (classifyOptimizer(boxQtyProduct?.sku || '', boxQtyProduct?.name_en)?.startsWith('TS4-X') ? 18 : 20)
 
@@ -365,6 +372,7 @@ export default function QuickOrderPage() {
                 {/* Floating checkout bar */}
                 {cartItemCount > 0 && (
                     <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
+                        {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
                         <button onClick={handleCheckout} disabled={submitting}
                             className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
                             <span>{submitting ? 'Adding...' : 'Checkout'}</span>
@@ -472,6 +480,7 @@ export default function QuickOrderPage() {
             {/* Floating checkout bar */}
             {cartItemCount > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
+                    {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" /></div>}
                     <button onClick={handleCheckout} disabled={submitting}
                         className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
                         <span>{submitting ? 'Adding...' : 'Checkout'}</span>
@@ -545,6 +554,7 @@ function ProductTile({
                         <span className="text-slate-500 text-[10px]">{available} pcs</span>
                     )}
                 </div>
+                {qty > 0 && <LowStockBadge available={available} ordered={qty} variant="dark" />}
             </div>
         </button>
     )
