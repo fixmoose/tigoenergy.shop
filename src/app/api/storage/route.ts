@@ -16,9 +16,19 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Missing bucket or path' }, { status: 400 })
     }
 
-    // Auth: allow admin cookie or authenticated user
+    // Auth: allow admin cookie, warehouse email, or authenticated user
     const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('tigo-admin')?.value === '1'
+    let isAdmin = cookieStore.get('tigo-admin')?.value === '1'
+
+    // Allow warehouse members by email param
+    if (!isAdmin) {
+        const warehouseEmail = req.nextUrl.searchParams.get('warehouse_email')
+        if (warehouseEmail) {
+            const admin = await createAdminClient()
+            const { data: driver } = await admin.from('drivers').select('id').eq('email', warehouseEmail).eq('is_warehouse', true).single()
+            if (driver) isAdmin = true
+        }
+    }
 
     if (!isAdmin) {
         const supabase = await createClient()

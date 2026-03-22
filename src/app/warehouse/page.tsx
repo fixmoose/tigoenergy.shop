@@ -1,0 +1,475 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+
+interface OrderItem {
+    id: string
+    product_name: string
+    quantity: number
+    sku: string
+}
+
+interface WarehouseAction {
+    action: string
+    by_email: string
+    by_name: string
+    at: string
+    file_url?: string
+}
+
+interface WarehouseOrder {
+    id: string
+    order_number: string
+    customer_email: string
+    company_name: string | null
+    shipping_address: any
+    shipping_carrier: string
+    shipping_method: string
+    packing_slip_url: string | null
+    shipping_label_url: string | null
+    total: number
+    currency: string
+    warehouse_actions: WarehouseAction[] | null
+    pickup_payment_proof_required: boolean
+    created_at: string
+    order_items: OrderItem[]
+}
+
+export default function WarehousePortal() {
+    const [authenticated, setAuthenticated] = useState(false)
+    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('')
+    const [driverName, setDriverName] = useState('')
+    const [pickupOrders, setPickupOrders] = useState<WarehouseOrder[]>([])
+    const [deliveryOrders, setDeliveryOrders] = useState<WarehouseOrder[]>([])
+    const [loading, setLoading] = useState(false)
+    const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
+
+    const handleLogin = () => {
+        if (password === '123456') {
+            setAuthenticated(true)
+            const saved = localStorage.getItem('warehouse_email')
+            if (saved) setEmail(saved)
+        } else {
+            alert('Wrong password')
+        }
+    }
+
+    const fetchOrders = useCallback(async () => {
+        if (!email) return
+        setLoading(true)
+        try {
+            const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}`)
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert('Email not authorized for warehouse access. Check Admin → Settings → Drivers.')
+                    return
+                }
+                throw new Error('Failed to fetch')
+            }
+            const data = await res.json()
+            setPickupOrders(data.pickup || [])
+            setDeliveryOrders(data.delivery || [])
+            setDriverName(data.driverName || '')
+        } catch (err) {
+            console.error('Failed to fetch orders:', err)
+        } finally {
+            setLoading(false)
+        }
+    }, [email])
+
+    const loadOrders = () => {
+        if (email) {
+            localStorage.setItem('warehouse_email', email)
+            fetchOrders()
+        }
+    }
+
+    // Auto-refresh every 30s
+    useEffect(() => {
+        if (!email || !authenticated) return
+        fetchOrders()
+        const interval = setInterval(fetchOrders, 30000)
+        return () => clearInterval(interval)
+    }, [email, authenticated, fetchOrders])
+
+    const markPrepared = async (orderId: string) => {
+        setActionLoading(prev => ({ ...prev, [orderId + '_prep']: true }))
+        try {
+            await fetch(`/api/warehouse/orders/${orderId}/prepare`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            })
+            await fetchOrders()
+        } finally {
+            setActionLoading(prev => ({ ...prev, [orderId + '_prep']: false }))
+        }
+    }
+
+    const uploadDobavnica = async (orderId: string, file: File) => {
+        setActionLoading(prev => ({ ...prev, [orderId + '_upload']: true }))
+        try {
+            const formData = new FormData()
+            formData.append('email', email)
+            formData.append('file', file)
+            await fetch(`/api/warehouse/orders/${orderId}/upload`, {
+                method: 'POST',
+                body: formData,
+            })
+            await fetchOrders()
+        } finally {
+            setActionLoading(prev => ({ ...prev, [orderId + '_upload']: false }))
+        }
+    }
+
+    const markComplete = async (orderId: string, type: 'pickup' | 'dpd') => {
+        const label = type === 'pickup' ? 'picked up' : 'picked up by DPD'
+        if (!confirm(`Mark order as ${label}? This will remove it from the list.`)) return
+        setActionLoading(prev => ({ ...prev, [orderId + '_complete']: true }))
+        try {
+            await fetch(`/api/warehouse/orders/${orderId}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, type }),
+            })
+            await fetchOrders()
+        } finally {
+            setActionLoading(prev => ({ ...prev, [orderId + '_complete']: false }))
+        }
+    }
+
+    // Helper: check if action exists
+    const hasAction = (order: WarehouseOrder, actionType: string) => {
+        return (order.warehouse_actions || []).some(a => a.action === actionType)
+    }
+
+    const getUploadedDobavnica = (order: WarehouseOrder) => {
+        return (order.warehouse_actions || []).find(a => a.action === 'uploaded_dobavnica')
+    }
+
+    // ── Login screen ──
+    if (!authenticated) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+                <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
+                    <div className="text-center mb-6">
+                        <div className="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+                            </svg>
+                        </div>
+                        <h1 className="text-xl font-bold text-white">Warehouse Portal</h1>
+                        <p className="text-slate-400 text-sm mt-1">Tigo Energy</p>
+                    </div>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    <button onClick={handleLogin} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
+                        Enter
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // ── Email entry ──
+    if (!email || pickupOrders.length === 0 && deliveryOrders.length === 0 && !loading && !driverName) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+                <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
+                    <div className="text-center mb-6">
+                        <div className="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+                            </svg>
+                        </div>
+                        <h1 className="text-xl font-bold text-white">Warehouse Portal</h1>
+                    </div>
+                    <input
+                        type="email"
+                        placeholder="Your warehouse email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && loadOrders()}
+                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 mb-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    <button onClick={loadOrders} className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition">
+                        Load Orders
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // ── Dashboard ──
+    return (
+        <div className="min-h-screen bg-slate-900">
+            {/* Header */}
+            <div className="bg-slate-800 border-b border-slate-700 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 className="text-white font-bold text-sm">Warehouse</h1>
+                        <p className="text-slate-400 text-xs">{driverName || email}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button onClick={fetchOrders} disabled={loading}
+                        className="text-xs px-3 py-1.5 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition disabled:opacity-50">
+                        {loading ? 'Loading...' : 'Refresh'}
+                    </button>
+                    <button onClick={() => { setAuthenticated(false); setEmail(''); setPassword('') }}
+                        className="text-xs px-3 py-1.5 bg-slate-700 text-slate-400 rounded-lg hover:bg-slate-600 transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+
+            {/* Two columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 max-w-7xl mx-auto">
+                {/* Pickup column */}
+                <div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full" />
+                        <h2 className="text-white font-bold text-sm uppercase tracking-wide">
+                            Lastni prevzem / Pickup
+                        </h2>
+                        <span className="text-slate-500 text-xs">({pickupOrders.length})</span>
+                    </div>
+                    {pickupOrders.length === 0 ? (
+                        <div className="text-slate-500 text-sm text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                            No pickup orders
+                        </div>
+                    ) : pickupOrders.map(order => (
+                        <OrderCard
+                            key={order.id}
+                            order={order}
+                            type="pickup"
+                            email={email}
+                            actionLoading={actionLoading}
+                            hasAction={hasAction}
+                            getUploadedDobavnica={getUploadedDobavnica}
+                            onPrepare={markPrepared}
+                            onUpload={uploadDobavnica}
+                            onComplete={markComplete}
+                        />
+                    ))}
+                </div>
+
+                {/* DPD column */}
+                <div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-3 h-3 bg-red-500 rounded-full" />
+                        <h2 className="text-white font-bold text-sm uppercase tracking-wide">
+                            DPD Delivery
+                        </h2>
+                        <span className="text-slate-500 text-xs">({deliveryOrders.length})</span>
+                    </div>
+                    {deliveryOrders.length === 0 ? (
+                        <div className="text-slate-500 text-sm text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                            No delivery orders
+                        </div>
+                    ) : deliveryOrders.map(order => (
+                        <OrderCard
+                            key={order.id}
+                            order={order}
+                            type="dpd"
+                            email={email}
+                            actionLoading={actionLoading}
+                            hasAction={hasAction}
+                            getUploadedDobavnica={getUploadedDobavnica}
+                            onPrepare={markPrepared}
+                            onUpload={uploadDobavnica}
+                            onComplete={markComplete}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ── Order Card ──
+function OrderCard({
+    order, type, email, actionLoading, hasAction, getUploadedDobavnica,
+    onPrepare, onUpload, onComplete,
+}: {
+    order: WarehouseOrder
+    type: 'pickup' | 'dpd'
+    email: string
+    actionLoading: Record<string, boolean>
+    hasAction: (order: WarehouseOrder, action: string) => boolean
+    getUploadedDobavnica: (order: WarehouseOrder) => WarehouseAction | undefined
+    onPrepare: (id: string) => void
+    onUpload: (id: string, file: File) => void
+    onComplete: (id: string, type: 'pickup' | 'dpd') => void
+}) {
+    const isPrepared = hasAction(order, 'marked_prepared')
+    const dobavnica = getUploadedDobavnica(order)
+    const addr = order.shipping_address
+    const customerName = addr
+        ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim()
+        : order.customer_email
+
+    return (
+        <div className={`bg-slate-800 rounded-xl border mb-3 overflow-hidden transition-all ${
+            isPrepared ? 'border-green-600/50' : 'border-slate-700'
+        }`}>
+            {/* Payment proof warning */}
+            {order.pickup_payment_proof_required && (
+                <div className="bg-red-900/60 border-b border-red-700/50 px-4 py-2 text-center">
+                    <p className="text-red-200 text-xs font-bold">
+                        PREVERI DOKAZ O PLAČILU / VERIFY PROOF OF PAYMENT
+                    </p>
+                </div>
+            )}
+
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-slate-700/50">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <span className="text-orange-400 font-mono font-bold text-sm">{order.order_number}</span>
+                        <span className="text-slate-500 text-xs ml-2">
+                            {new Date(order.created_at).toLocaleDateString('sl-SI')}
+                        </span>
+                    </div>
+                    <span className="text-white font-bold text-sm">EUR {order.total?.toFixed(2)}</span>
+                </div>
+                <p className="text-white text-sm mt-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</p>
+                {type === 'dpd' && addr && (
+                    <p className="text-slate-400 text-xs mt-0.5">
+                        {addr.street}, {addr.postal_code} {addr.city}, {addr.country}
+                    </p>
+                )}
+            </div>
+
+            {/* Items */}
+            <div className="px-4 py-2 border-b border-slate-700/30">
+                {order.order_items?.map(item => (
+                    <div key={item.id} className="flex justify-between text-xs py-0.5">
+                        <span className="text-slate-300">{item.product_name}</span>
+                        <span className="text-slate-400 font-mono">x{item.quantity}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Actions */}
+            <div className="px-4 py-3 space-y-2.5">
+                {/* Download packing slip */}
+                {order.packing_slip_url && (
+                    <a
+                        href={`${order.packing_slip_url}${order.packing_slip_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Packing Slip
+                    </a>
+                )}
+
+                {/* Download shipping label (DPD) */}
+                {type === 'dpd' && order.shipping_label_url && (
+                    <a
+                        href={`${order.shipping_label_url}${order.shipping_label_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        Download Shipping Label
+                    </a>
+                )}
+
+                {/* Prepared checkbox */}
+                <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
+                    isPrepared ? 'bg-green-900/30 border border-green-700/40' : 'bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60'
+                }`}>
+                    <input
+                        type="checkbox"
+                        checked={isPrepared}
+                        disabled={isPrepared || actionLoading[order.id + '_prep']}
+                        onChange={() => !isPrepared && onPrepare(order.id)}
+                        className="w-6 h-6 rounded border-2 border-slate-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
+                    />
+                    <span className={`font-bold text-sm ${isPrepared ? 'text-green-400' : 'text-slate-300'}`}>
+                        {actionLoading[order.id + '_prep'] ? 'Saving...' : isPrepared ? 'Prepared' : 'Mark as Prepared'}
+                    </span>
+                </label>
+
+                {/* Upload dobavnica */}
+                <div className={`p-2.5 rounded-lg border ${
+                    dobavnica ? 'bg-green-900/20 border-green-700/30' : 'bg-slate-700/30 border-slate-600/30'
+                }`}>
+                    {dobavnica ? (
+                        <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-green-400 text-sm font-medium">Dobavnica uploaded</span>
+                            {dobavnica.file_url && (
+                                <a
+                                    href={`${dobavnica.file_url}${dobavnica.file_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 text-xs hover:underline ml-auto"
+                                >
+                                    View
+                                </a>
+                            )}
+                        </div>
+                    ) : (
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            <span className="text-slate-300 text-sm">
+                                {actionLoading[order.id + '_upload'] ? 'Uploading...' : 'Upload dobavnica'}
+                            </span>
+                            <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                className="hidden"
+                                disabled={actionLoading[order.id + '_upload']}
+                                onChange={e => {
+                                    const file = e.target.files?.[0]
+                                    if (file) onUpload(order.id, file)
+                                }}
+                            />
+                        </label>
+                    )}
+                </div>
+
+                {/* Complete checkbox */}
+                <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
+                    'bg-slate-700/40 border border-slate-600/30 hover:bg-orange-900/20 hover:border-orange-600/30'
+                }`}>
+                    <input
+                        type="checkbox"
+                        checked={false}
+                        disabled={actionLoading[order.id + '_complete']}
+                        onChange={() => onComplete(order.id, type)}
+                        className="w-6 h-6 rounded border-2 border-slate-500 text-orange-500 focus:ring-orange-500 bg-slate-700 cursor-pointer"
+                    />
+                    <span className="text-slate-300 font-bold text-sm">
+                        {actionLoading[order.id + '_complete'] ? 'Saving...' : type === 'pickup' ? 'Picked up by customer' : 'Picked up by DPD'}
+                    </span>
+                </label>
+            </div>
+        </div>
+    )
+}

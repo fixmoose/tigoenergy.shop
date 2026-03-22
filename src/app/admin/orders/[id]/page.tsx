@@ -4,6 +4,7 @@ import { createAdminClient as createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
 import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'
+import WarehouseActionsLog from '@/components/admin/WarehouseActionsLog'
 import OrderEmailHistory from '@/components/admin/OrderEmailHistory'
 import EditableShippingAddress from '@/components/admin/EditableShippingAddress'
 import EditableOrderItems from '@/components/admin/EditableOrderItems'
@@ -92,6 +93,10 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       <div className="mb-6">
         <OrderWorkflowTracker order={order} />
       </div>
+
+      {(order as any).warehouse_actions?.length > 0 && (
+        <WarehouseActionsLog actions={(order as any).warehouse_actions} />
+      )}
 
       <div className="mb-6">
         <AdminOrderActions

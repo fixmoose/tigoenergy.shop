@@ -259,6 +259,16 @@ export interface Order {
   // Pickup payment proof
   pickup_payment_proof_required?: boolean
 
+  // Warehouse actions log
+  warehouse_actions?: {
+    action: string
+    by_email: string
+    by_name: string
+    at: string
+    note?: string
+    file_url?: string
+  }[] | null
+
   // Order modification
   modification_unlocked?: boolean
   modification_unlocked_at?: string | null
