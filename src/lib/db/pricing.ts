@@ -218,11 +218,42 @@ export function calculateEffectivePrice(product: Product, pricingData: CustomerP
 /**
  * Calculates the effective price for a product for a specific user.
  * Convenience wrapper for single products.
+ *
+ * Priority: custom override > schema discount > b2b_price_eur (for B2B customers) > price_eur
  */
 export async function getEffectivePrice(product: Product, userId?: string | null, quantity: number = 1): Promise<EffectivePrice> {
+    const originalPrice = product.price_eur || 0
     if (!userId) {
-        return { originalPrice: product.price_eur || 0, discountedPrice: product.price_eur || 0, isDiscounted: false }
+        return { originalPrice, discountedPrice: originalPrice, isDiscounted: false }
     }
+
     const pricingData = await getCustomerPricingData(userId)
-    return calculateEffectivePrice(product, pricingData, quantity)
+    const schemaResult = calculateEffectivePrice(product, pricingData, quantity)
+
+    // If a schema/override discount was applied, use that
+    if (schemaResult.isDiscounted) {
+        return schemaResult
+    }
+
+    // No schema discount — check if customer is B2B and product has a B2B base price
+    if (product.b2b_price_eur && product.b2b_price_eur < originalPrice) {
+        const supabase = await createClient()
+        const { data: customer } = await supabase
+            .from('customers')
+            .select('is_b2b, customer_type')
+            .eq('id', userId)
+            .single()
+
+        const isB2B = customer?.is_b2b || customer?.customer_type === 'b2b'
+        if (isB2B) {
+            return {
+                originalPrice,
+                discountedPrice: product.b2b_price_eur,
+                isDiscounted: true,
+                appliedSchemaName: 'B2B Price'
+            }
+        }
+    }
+
+    return schemaResult
 }

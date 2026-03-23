@@ -221,18 +221,18 @@ export async function GET(
             `</div>${shippingBanner}<div style="background:#f9fafb`
         )
 
-        // 6. Inject pickup signature block (for personal pick-up orders)
-        if (isPickup) {
+        // 6. Inject signature block — "Podpis prevzemnika" for all dobavnicas
+        {
             const sigLabels: Record<string, { title: string; name: string; date: string; sign: string; note: string }> = {
-                sl: { title: 'Podpis ob prevzemu', name: 'Ime in priimek', date: 'Datum', sign: 'Podpis', note: 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.' },
-                hr: { title: 'Potpis pri preuzimanju', name: 'Ime i prezime', date: 'Datum', sign: 'Potpis', note: 'Potpisom potvrđujem da sam preuzeo/la gore navedenu robu u ispravnom stanju.' },
-                de: { title: 'Unterschrift bei Abholung', name: 'Vollständiger Name', date: 'Datum', sign: 'Unterschrift', note: 'Mit meiner Unterschrift bestätige ich, dass ich die oben genannten Waren in einwandfreiem Zustand erhalten habe.' },
-                it: { title: 'Firma al ritiro', name: 'Nome completo', date: 'Data', sign: 'Firma', note: 'Con la firma confermo di aver ricevuto la merce sopra indicata in buone condizioni.' },
-                cs: { title: 'Podpis při převzetí', name: 'Celé jméno', date: 'Datum', sign: 'Podpis', note: 'Podpisem potvrzuji, že jsem převzal/a výše uvedené zboží v bezvadném stavu.' },
-                sk: { title: 'Podpis pri prevzatí', name: 'Celé meno', date: 'Dátum', sign: 'Podpis', note: 'Podpisom potvrdzujem, že som prevzal/a vyššie uvedený tovar v bezchybnom stave.' },
-                sv: { title: 'Signatur vid upphämtning', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
+                sl: { title: 'Podpis prevzemnika', name: 'Ime in priimek', date: 'Datum', sign: 'Podpis', note: 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.' },
+                hr: { title: 'Potpis primatelja', name: 'Ime i prezime', date: 'Datum', sign: 'Potpis', note: 'Potpisom potvrđujem da sam preuzeo/la gore navedenu robu u ispravnom stanju.' },
+                de: { title: 'Unterschrift des Empfängers', name: 'Vollständiger Name', date: 'Datum', sign: 'Unterschrift', note: 'Mit meiner Unterschrift bestätige ich, dass ich die oben genannten Waren in einwandfreiem Zustand erhalten habe.' },
+                it: { title: 'Firma del destinatario', name: 'Nome completo', date: 'Data', sign: 'Firma', note: 'Con la firma confermo di aver ricevuto la merce sopra indicata in buone condizioni.' },
+                cs: { title: 'Podpis příjemce', name: 'Celé jméno', date: 'Datum', sign: 'Podpis', note: 'Podpisem potvrzuji, že jsem převzal/a výše uvedené zboží v bezvadném stavu.' },
+                sk: { title: 'Podpis príjemcu', name: 'Celé meno', date: 'Dátum', sign: 'Podpis', note: 'Podpisom potvrdzujem, že som prevzal/a vyššie uvedený tovar v bezchybnom stave.' },
+                sv: { title: 'Mottagarens signatur', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
             }
-            const sig = sigLabels[lang] || { title: 'Pickup Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
+            const sig = sigLabels[lang] || { title: 'Recipient Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
             const signatureBlock = `
 <div style="margin:24px 36px 0;padding:16px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sig.title}</div>
@@ -254,7 +254,14 @@ export async function GET(
     </tr>
   </table>
 </div>`
-            htmlContent = htmlContent.replace('</body>', signatureBlock + '</body>')
+            // Insert before the footer div (which has border-top and text-align:center)
+            const footerPattern = /<div style="padding:10px 36px;border-top/
+            if (footerPattern.test(htmlContent)) {
+                htmlContent = htmlContent.replace(footerPattern, signatureBlock + '\n<div style="padding:10px 36px;border-top')
+            } else {
+                // Fallback: append before the last closing </div>
+                htmlContent = htmlContent.replace(/(<\/div>\s*)$/, signatureBlock + '$1')
+            }
         }
 
         // 7. Inject legal clauses
@@ -264,13 +271,19 @@ export async function GET(
         const isEnglish = lang === 'en'
         const emailLink = '<a href="mailto:support@tigoenergy.shop" style="color:#16a34a;">support@tigoenergy.shop</a>'
         const legalClause = `
-<div style="margin-top:32px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
+<div style="margin:0 36px 16px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
   <strong style="display:block;margin-bottom:4px;font-size:10.5px;">${clauses.packingTitle}${!isEnglish ? ` / ${enClauses.packingTitle}` : ''}</strong>
   ${clauses.packingBody.replace('support@tigoenergy.shop', emailLink)}
   ${!isEnglish ? `<br><br><em style="color:#6b7280;">${enClauses.packingBody.replace('support@tigoenergy.shop', emailLink)}</em>` : ''}
   ${isB2BOrder ? `<br><br><strong>${clauses.packingB2BAddition}</strong>${!isEnglish ? `<br><em style="color:#6b7280;">${enClauses.packingB2BAddition}</em>` : ''}` : ''}
 </div>`
-        htmlContent = htmlContent.replace('</body>', legalClause + '</body>')
+        // Insert before footer
+        const footerPattern2 = /<div style="padding:10px 36px;border-top/
+        if (footerPattern2.test(htmlContent)) {
+            htmlContent = htmlContent.replace(footerPattern2, legalClause + '\n<div style="padding:10px 36px;border-top')
+        } else {
+            htmlContent = htmlContent.replace(/(<\/div>\s*)$/, legalClause + '$1')
+        }
 
         // 8. Generate PDF
         const pdfBuffer = await generatePdfFromHtml(htmlContent)

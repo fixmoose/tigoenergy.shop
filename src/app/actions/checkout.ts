@@ -74,7 +74,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         const productIds = cartItems.map((i: any) => i.product_id)
         const { data: products } = await supabase
             .from('products')
-            .select('id, price_eur, cost_eur, weight_kg, is_electrical_equipment, trod_category_code, default_packaging_type, packaging_weight_per_unit_kg, cn_code')
+            .select('id, price_eur, b2b_price_eur, cost_eur, weight_kg, is_electrical_equipment, trod_category_code, default_packaging_type, packaging_weight_per_unit_kg, cn_code')
             .in('id', productIds)
 
         if (!products) return { success: false, error: 'Failed to fetch product data' }
