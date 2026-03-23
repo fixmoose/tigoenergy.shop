@@ -102,7 +102,8 @@ export async function GET(req: NextRequest) {
             let totalOutstanding = 0
 
             for (const o of (orders || [])) {
-                const rate = o.vat_rate || 0
+                const rawRate = Number(o.vat_rate) || 0
+                const rate = rawRate < 1 ? Math.round(rawRate * 100) : rawRate
                 if (!byRate[rate]) byRate[rate] = { count: 0, subtotal: 0, vat: 0, total: 0 }
                 byRate[rate].count++
                 byRate[rate].subtotal += Number(o.subtotal) || 0
