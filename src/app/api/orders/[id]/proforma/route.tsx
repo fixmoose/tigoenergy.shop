@@ -128,6 +128,7 @@ export async function GET(
         const currency = order.currency || '€'
         const billing = order.billing_address as any
         const shipping = order.shipping_address as any
+        const isPickup = order.shipping_carrier === 'Personal Pick-up'
 
         const formatAddress = (addr: any) => {
             if (!addr) return ''
@@ -199,7 +200,15 @@ export async function GET(
                 labelRegular: 'Regular speed — Delavska hranilnica', labelRegularNote: 'Processing may take 1+ business day. Do not use for immediate pickup.',
             },
         }
-        const L = docLabels[lang] || docLabels.en
+        const L = { ...(docLabels[lang] || docLabels.en) }
+        // Override "Ship To" label for pickup orders
+        if (isPickup) {
+            const pickupShipToLabels: Record<string, string> = {
+                sl: 'Lastni prevzem', de: 'Selbstabholung', hr: 'Osobno preuzimanje', en: 'Self-Pickup',
+                it: 'Ritiro in sede', cs: 'Osobní odběr', sk: 'Osobný odber', sv: 'Upphämtning',
+            }
+            L.labelShipTo = pickupShipToLabels[lang] || 'Self-Pickup'
+        }
 
         const documentData: DocumentData = {
             order_number: order.order_number,
@@ -210,7 +219,9 @@ export async function GET(
             customer_vat: order.vat_id || '',
             customer_phone: billing?.phone || shipping?.phone || '',
             billing_address: formatAddress(billing),
-            shipping_address: formatAddress(shipping),
+            shipping_address: isPickup
+                ? 'Initra Energija d.o.o., Podsmreka 59A, 1356 Dobrova, SI'
+                : formatAddress(shipping),
             subtotal_net: `${currency} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
             vat_total: `${currency} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
             shipping_cost: order.shipping_cost == 0

@@ -114,9 +114,11 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         customer_vat: order.vat_id,
         customer_phone: order.billing_address?.phone || order.shipping_address?.phone,
         billing_address: formatAddress(billing),
-        shipping_address: order.shipping_carrier
-            ? `<strong>${order.shipping_carrier}</strong><br>${formatAddress(shipping)}`
-            : formatAddress(shipping),
+        shipping_address: order.shipping_carrier === 'Personal Pick-up'
+            ? `<strong>${lang === 'sl' ? 'Lastni prevzem' : lang === 'de' ? 'Selbstabholung' : lang === 'hr' ? 'Osobno preuzimanje' : 'Self-Pickup'}</strong><br>Initra Energija d.o.o., Podsmreka 59A, 1356 Dobrova, SI`
+            : order.shipping_carrier
+                ? `<strong>${order.shipping_carrier}</strong><br>${formatAddress(shipping)}`
+                : formatAddress(shipping),
         subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
         vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
         shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
