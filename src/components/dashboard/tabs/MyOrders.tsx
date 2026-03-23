@@ -156,6 +156,38 @@ export default function MyOrders({ user, customer }: Props) {
             </div>
         )}
 
+        {/* Pay All Open Net Orders */}
+        {!loading && (() => {
+            const unpaidNetOrders = orders.filter(o =>
+                (o as any).payment_terms === 'net30' &&
+                o.payment_status !== 'paid' &&
+                o.status !== 'cancelled'
+            )
+            if (unpaidNetOrders.length < 2) return null
+            const totalDue = unpaidNetOrders.reduce((sum, o) => {
+                const paid = (o as any).amount_paid || 0
+                return sum + (o.total - paid)
+            }, 0)
+            const refs = unpaidNetOrders.map(o => o.order_number.replace('ETRG-ORD-', '').slice(-6)).join(',')
+            const wiseUrl = `https://wise.com/pay/business/initraenergijadoo?amount=${totalDue.toFixed(2)}&currency=${unpaidNetOrders[0].currency || 'EUR'}&description=${refs}`
+            return (
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 className="font-bold text-lg text-blue-900">{unpaidNetOrders.length} {t('openOrders') || 'open orders'}</h3>
+                        <p className="text-sm text-blue-700 font-medium mt-1">{t('totalOutstanding') || 'Total outstanding'}: <strong>{unpaidNetOrders[0].currency || 'EUR'} {totalDue.toFixed(2)}</strong></p>
+                    </div>
+                    <a
+                        href={wiseUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-md shadow-blue-200"
+                    >
+                        💳 {t('payAllOpenOrders') || 'Pay All Open Orders'}
+                    </a>
+                </div>
+            )
+        })()}
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="flex items-center gap-3">
@@ -210,7 +242,19 @@ export default function MyOrders({ user, customer }: Props) {
                                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                                 'bg-blue-100 text-blue-700'
                                             }`}>{order.status || 'Pending'}</span>
-                                        {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' && (
+                                        {(order as any).payment_terms === 'net30' && (order as any).payment_due_date && order.payment_status !== 'paid' && order.status !== 'cancelled' && (() => {
+                                            const dueDate = new Date((order as any).payment_due_date)
+                                            const diffDays = Math.ceil((dueDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+                                            const isOverdue = diffDays < 0
+                                            return (
+                                                <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
+                                                    isOverdue ? 'bg-red-100 text-red-700' : diffDays <= 7 ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                                                }`}>
+                                                    {isOverdue ? `${Math.abs(diffDays)}d overdue` : `${diffDays}d left`}
+                                                </span>
+                                            )
+                                        })()}
+                                        {(order.payment_status === 'unpaid' || order.payment_status === 'pending' || !order.payment_status) && order.status !== 'cancelled' && (order as any).payment_terms !== 'net30' && (
                                             <span className="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-amber-100 text-amber-700 animate-pulse">
                                                 {t('awaitingPayment')}
                                             </span>
@@ -227,6 +271,16 @@ export default function MyOrders({ user, customer }: Props) {
                                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">{t('totalAmount')}</p>
                                     <p className="text-lg font-bold text-gray-900">{order.currency} {order.total.toFixed(2)}</p>
                                 </div>
+                                {(order as any).payment_terms === 'net30' && order.payment_status !== 'paid' && order.status !== 'cancelled' && (
+                                    <a
+                                        href={`https://wise.com/pay/business/initraenergijadoo?amount=${(order.total - ((order as any).amount_paid || 0)).toFixed(2)}&currency=${order.currency || 'EUR'}&description=${order.order_number.replace('ETRG-ORD-', '').slice(-6)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                                    >
+                                        {t('payNow') || 'Pay Now'}
+                                    </a>
+                                )}
                                 <Link
                                     href={`/orders/${order.id}`}
                                     className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"

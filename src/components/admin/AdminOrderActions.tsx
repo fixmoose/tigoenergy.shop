@@ -299,6 +299,68 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <span className="text-blue-500">&#9889;</span> Order Flow
             </h3>
 
+            {/* Net Payment Counter — always visible for net orders */}
+            {paymentTerms === 'net30' && paymentDueDate && (() => {
+                const dueDate = new Date(paymentDueDate)
+                const now = new Date()
+                const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+                const isOverdue = diffDays < 0
+                const isPaidFull = paymentStatus === 'paid'
+                return (
+                    <div className={`rounded-xl px-4 py-3 mb-4 text-sm flex items-center justify-between ${
+                        isPaidFull ? 'bg-green-50 border-2 border-green-300 text-green-800'
+                        : isOverdue ? 'bg-red-50 border-2 border-red-300 text-red-800'
+                        : diffDays <= 7 ? 'bg-amber-50 border-2 border-amber-300 text-amber-800'
+                        : 'bg-blue-50 border-2 border-blue-300 text-blue-800'
+                    }`}>
+                        <div className="flex items-center gap-3">
+                            <span className="text-lg">{isPaidFull ? '✅' : isOverdue ? '🚨' : '⏳'}</span>
+                            <div>
+                                <span className="font-bold">
+                                    {isPaidFull ? (
+                                        <>Net payment — Paid (was due {dueDate.toLocaleDateString('en-GB')})</>
+                                    ) : isOverdue ? (
+                                        <>{Math.abs(diffDays)} day{Math.abs(diffDays) !== 1 ? 's' : ''} OVERDUE — was due {dueDate.toLocaleDateString('en-GB')}</>
+                                    ) : (
+                                        <>{diffDays} day{diffDays !== 1 ? 's' : ''} left — due {dueDate.toLocaleDateString('en-GB')}</>
+                                    )}
+                                </span>
+                                <span className="ml-3 text-xs opacity-70">€{(amountPaid || 0).toFixed(2)} / €{(orderTotal || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {!isPaidFull && (
+                                <button
+                                    onClick={async () => {
+                                        if (!confirm(`Send payment reminder to ${customerEmail}?`)) return
+                                        setLoading(true)
+                                        try {
+                                            const res = await sendPaymentReminderAction(orderId) as any
+                                            if (res.success) { alert('Reminder sent!'); router.refresh() }
+                                            else { alert('Failed: ' + (res.error || 'Unknown error')) }
+                                        } catch (err: any) { alert('Failed: ' + err.message) }
+                                        finally { setLoading(false) }
+                                    }}
+                                    disabled={loading}
+                                    className={`py-1.5 px-4 rounded-lg text-xs font-bold transition disabled:opacity-50 ${
+                                        isOverdue
+                                            ? 'bg-red-600 text-white hover:bg-red-700'
+                                            : 'bg-amber-600 text-white hover:bg-amber-700'
+                                    }`}
+                                >
+                                    {loading ? 'Sending...' : 'Send Payment Reminder'}
+                                </button>
+                            )}
+                            {overdueReminderSentAt && (
+                                <span className="text-[10px] opacity-70">
+                                    Auto-reminder: {new Date(overdueReminderSentAt).toLocaleDateString('en-GB')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )
+            })()}
+
             <div className="grid grid-cols-8 gap-2 items-start">
                 {/* Step 1: Order Received */}
                 <StepCard step="received" currentStep={currentStep} title="Order Received" subtitle={createdAt ? new Date(createdAt).toLocaleDateString('en-GB') : ''} icon="1" color="slate">
@@ -490,62 +552,6 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             </button>
                         )}
 
-                        {paymentTerms === 'net30' && paymentDueDate && (() => {
-                            const dueDate = new Date(paymentDueDate)
-                            const now = new Date()
-                            const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
-                            const isOverdue = diffDays < 0
-                            const isPaidFull = paymentStatus === 'paid'
-                            return (
-                                <div className={`rounded-lg px-3 py-2 text-xs space-y-2 ${
-                                    isPaidFull ? 'bg-green-50 border border-green-200 text-green-800'
-                                    : isOverdue ? 'bg-red-50 border border-red-200 text-red-800'
-                                    : diffDays <= 7 ? 'bg-amber-50 border border-amber-200 text-amber-800'
-                                    : 'bg-blue-50 border border-blue-200 text-blue-800'
-                                }`}>
-                                    <div className="flex items-center justify-between">
-                                        <span>
-                                            {isPaidFull ? (
-                                                <>Paid — was due {dueDate.toLocaleDateString('en-GB')}</>
-                                            ) : isOverdue ? (
-                                                <><strong>{Math.abs(diffDays)} day{Math.abs(diffDays) !== 1 ? 's' : ''} overdue</strong> — was due {dueDate.toLocaleDateString('en-GB')}</>
-                                            ) : (
-                                                <><strong>{diffDays} day{diffDays !== 1 ? 's' : ''} left</strong> — due {dueDate.toLocaleDateString('en-GB')}</>
-                                            )}
-                                        </span>
-                                    </div>
-                                    {!isPaidFull && (
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={async () => {
-                                                    if (!confirm(`Send payment reminder to ${customerEmail}?`)) return
-                                                    setLoading(true)
-                                                    try {
-                                                        const res = await sendPaymentReminderAction(orderId) as any
-                                                        if (res.success) { alert('Reminder sent!'); router.refresh() }
-                                                        else { alert('Failed: ' + (res.error || 'Unknown error')) }
-                                                    } catch (err: any) { alert('Failed: ' + err.message) }
-                                                    finally { setLoading(false) }
-                                                }}
-                                                disabled={loading}
-                                                className={`py-1 px-3 rounded text-[10px] font-bold transition disabled:opacity-50 ${
-                                                    isOverdue
-                                                        ? 'bg-red-600 text-white hover:bg-red-700'
-                                                        : 'bg-amber-600 text-white hover:bg-amber-700'
-                                                }`}
-                                            >
-                                                {loading ? 'Sending...' : 'Send Payment Reminder'}
-                                            </button>
-                                            {overdueReminderSentAt && (
-                                                <span className="text-[10px] opacity-70">
-                                                    Auto-reminder sent {new Date(overdueReminderSentAt).toLocaleDateString('en-GB')}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        })()}
 
                     </div>
                 </StepCard>

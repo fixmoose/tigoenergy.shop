@@ -213,10 +213,21 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         }]
     }
 
-    if (effectivePayments.length > 0) {
-        const amountPaid = effectivePayments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0)
-        const remaining = parseFloat(order.total || 0) - amountPaid
+    const totalAmount = parseFloat(order.total || 0)
+    const totalPaidAmount = effectivePayments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || 0), 0)
+    const remainingAmount = Math.max(0, totalAmount - totalPaidAmount)
 
+    // Localized labels for paid/due summary
+    const paidLabel: Record<string, string> = {
+        sl: 'Plačano', hr: 'Plaćeno', de: 'Bezahlt', en: 'Paid',
+        it: 'Pagato', cs: 'Zaplaceno', sk: 'Zaplatené', sv: 'Betalt',
+    }
+    const dueLabel: Record<string, string> = {
+        sl: 'Znesek za plačilo', hr: 'Iznos za plaćanje', de: 'Zahlungsbetrag', en: 'Amount due',
+        it: 'Importo dovuto', cs: 'Částka k úhradě', sk: 'Suma na úhradu', sv: 'Belopp att betala',
+    }
+
+    if (effectivePayments.length > 0) {
         const paymentRows = effectivePayments.map((p: any) =>
             `<tr>
                 <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${new Date(p.payment_date).toLocaleDateString(dateLocale)}</td>
@@ -244,11 +255,11 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         <tfoot>
             <tr style="background:#f0fdf4;">
                 <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">${labels.totalPaid}</td>
-                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€${amountPaid.toFixed(2)}</td>
+                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€${totalPaidAmount.toFixed(2)}</td>
             </tr>
-            ${remaining > 0.01 ? `<tr style="background:#fef3c7;">
+            ${remainingAmount > 0.01 ? `<tr style="background:#fef3c7;">
                 <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;">${labels.balanceDue}</td>
-                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;text-align:right;">€${remaining.toFixed(2)}</td>
+                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;text-align:right;">€${remainingAmount.toFixed(2)}</td>
             </tr>` : `<tr style="background:#f0fdf4;">
                 <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">${labels.balanceDue}</td>
                 <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€0.00</td>
@@ -259,22 +270,38 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         htmlContent = htmlContent.replace('</body>', paymentTable + '</body>')
     }
 
-    // Prominent payment due notice (only for Net30 orders)
-    if (isNet30) {
+    // Paid/Due summary block — always shown, prominent
+    const paidSummaryHtml = `
+<div style="margin-top:20px;border:2px solid ${remainingAmount <= 0.01 ? '#22c55e' : '#e5e7eb'};border-radius:8px;overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;">
+        <tr style="background:#f9fafb;">
+            <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#374151;">${paidLabel[lang] || paidLabel.en}</td>
+            <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#15803d;text-align:right;">€${totalPaidAmount.toFixed(2)}</td>
+        </tr>
+        <tr style="background:${remainingAmount <= 0.01 ? '#f0fdf4' : '#fffbeb'};">
+            <td style="padding:10px 14px;font-size:14px;font-weight:900;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};">${dueLabel[lang] || dueLabel.en}</td>
+            <td style="padding:10px 14px;font-size:14px;font-weight:900;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};text-align:right;">€${remainingAmount.toFixed(2)}</td>
+        </tr>
+    </table>
+</div>`
+    htmlContent = htmlContent.replace('</body>', paidSummaryHtml + '</body>')
+
+    // Prominent payment due notice (only for Net30 orders with outstanding balance)
+    if (isNet30 && remainingAmount > 0.01) {
         const invoiceBase = order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()
         const dueDate = new Date(invoiceBase.getTime() + dueDays * 24 * 60 * 60 * 1000)
         const dueDateStr = dueDate.toLocaleDateString(dateLocale)
-        const totalStr = `€${parseFloat(order.total || 0).toFixed(2)}`
+        const dueStr = `€${remainingAmount.toFixed(2)}`
 
         const dueLabelMap: Record<string, string> = {
-            sl: `Znesek za plačilo ${totalStr} najkasneje do ${dueDateStr}.`,
-            hr: `Iznos za plaćanje ${totalStr} najkasnije do ${dueDateStr}.`,
-            de: `Zahlungsbetrag ${totalStr} fällig bis spätestens ${dueDateStr}.`,
-            en: `Amount due ${totalStr} payable by ${dueDateStr}.`,
-            it: `Importo dovuto ${totalStr} pagabile entro il ${dueDateStr}.`,
-            cs: `Částka k úhradě ${totalStr} splatná do ${dueDateStr}.`,
-            sk: `Suma na úhradu ${totalStr} splatná do ${dueDateStr}.`,
-            sv: `Belopp att betala ${totalStr} senast ${dueDateStr}.`,
+            sl: `Znesek za plačilo ${dueStr} najkasneje do ${dueDateStr}.`,
+            hr: `Iznos za plaćanje ${dueStr} najkasnije do ${dueDateStr}.`,
+            de: `Zahlungsbetrag ${dueStr} fällig bis spätestens ${dueDateStr}.`,
+            en: `Amount due ${dueStr} payable by ${dueDateStr}.`,
+            it: `Importo dovuto ${dueStr} pagabile entro il ${dueDateStr}.`,
+            cs: `Částka k úhradě ${dueStr} splatná do ${dueDateStr}.`,
+            sk: `Suma na úhradu ${dueStr} splatná do ${dueDateStr}.`,
+            sv: `Belopp att betala ${dueStr} senast ${dueDateStr}.`,
         }
         const dueNotice = dueLabelMap[lang] || dueLabelMap.en
 
