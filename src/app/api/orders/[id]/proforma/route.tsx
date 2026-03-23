@@ -149,8 +149,8 @@ export async function GET(
             lang === 'sl' ? 'sl-SI' : lang === 'hr' ? 'hr-HR' : lang === 'de' ? 'de-DE' : 'en-GB'
         )
 
-        // Valid-until = order date + 30 days
-        const validUntil = new Date(new Date(order.created_at).getTime() + 30 * 24 * 60 * 60 * 1000)
+        // Valid-until = order date + 7 days
+        const validUntil = new Date(new Date(order.created_at).getTime() + 7 * 24 * 60 * 60 * 1000)
             .toLocaleDateString(lang === 'sl' ? 'sl-SI' : lang === 'hr' ? 'hr-HR' : lang === 'de' ? 'de-DE' : 'en-GB')
 
         // Fully localized document labels
@@ -201,6 +201,19 @@ export async function GET(
             },
         }
         const L = { ...(docLabels[lang] || docLabels.en) }
+
+        // For net30 customers, remove the "goods dispatched upon full payment" sentence
+        if (order.payment_terms === 'net30') {
+            const stripSentences: Record<string, string> = {
+                sl: ' Blago se odpremi po prejemu celotnega plačila.',
+                de: ' Die Ware wird nach Erhalt der vollständigen Zahlung versandt.',
+                hr: ' Roba se otprema po primitku cjelokupne uplate.',
+                en: ' Goods are dispatched upon receipt of full payment.',
+            }
+            const strip = stripSentences[lang] || stripSentences.en
+            L.noteText = L.noteText.replace(strip, '')
+        }
+
         // Append VAT percentage to label (required by law)
         const vatPct = Math.round((order.vat_rate || 0) * 100)
         if (vatPct > 0) {
