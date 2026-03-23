@@ -136,6 +136,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           modificationUnlocked={order.modification_unlocked || false}
           paymentTerms={(order as any).payment_terms || null}
           paymentDueDate={(order as any).payment_due_date || null}
+          overdueReminderSentAt={(order as any).overdue_reminder_sent_at || null}
+          warehouseActions={(order as any).warehouse_actions || []}
           warehouseSendLog={(order as any).warehouse_send_log || []}
         />
       </div>

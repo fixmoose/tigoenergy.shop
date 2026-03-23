@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { issueOrderInvoiceAction, adminMarkDeliveredAction, adminRecordPaymentAction, getOrderPaymentsAction, adminDeletePaymentAction, adminSendDeliveryToDriverAction, adminSendToWarehouseAction, adminSendInvoiceEmailAction, adminDeleteOrderAction, reserveStockForOrderAction, adjustStockForOrderAction } from '@/app/actions/admin'
-import { adminSendOrderForPaymentAction, adminSendOrderToClientAction } from '@/app/actions/order-notifications'
+import { adminSendOrderForPaymentAction, adminSendOrderToClientAction, sendPaymentReminderAction } from '@/app/actions/order-notifications'
 import { adminUnlockOrder } from '@/app/actions/order-modify'
 import type { OrderPayment } from '@/types/database'
 
@@ -27,6 +27,8 @@ interface AdminOrderActionsProps {
     modificationUnlocked?: boolean
     paymentTerms?: string | null
     paymentDueDate?: string | null
+    overdueReminderSentAt?: string | null
+    warehouseActions?: { action: string; by_email?: string; by_name?: string; at: string; file_url?: string }[]
     warehouseSendLog?: { email: string; name: string; sentAt: string }[]
 }
 
@@ -94,7 +96,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, warehouseSendLog = [] }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, overdueReminderSentAt, warehouseActions = [], warehouseSendLog = [] }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -151,11 +153,18 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
     const isDelivered = status === 'delivered' || status === 'completed'
     const isPickup = shippingCarrier === 'Personal Pick-up'
 
+    // Check warehouse actions for auto-advancement
+    const warehousePrepared = warehouseActions.some(a => a.action === 'marked_prepared')
+    const warehousePickedUp = warehouseActions.some(a => a.action === 'marked_picked_up')
+    const warehouseDpdPickedUp = warehouseActions.some(a => a.action === 'marked_dpd_picked_up')
+
     const getCurrentStep = (): FlowStep => {
         if (isPending && !confirmedAt) return 'confirm'
         if (!isPaid) return 'payment'
-        if (!packingSlipUrl) return 'packing'
-        if (isPickup && !isDelivered) return 'delivered' // Pickup skips shipping
+        // Packing: skip if warehouse already prepared OR packing slip exists
+        if (!packingSlipUrl && !warehousePrepared) return 'packing'
+        // Shipping/delivery: check actual DB status (warehouse updates these)
+        if (isPickup && !isDelivered) return 'delivered'
         if (!isShipped && !isDelivered) return 'shipping'
         if (isShipped && !isDelivered) return 'delivered'
         if (!invoiceUrl) return 'invoice'
@@ -481,11 +490,62 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             </button>
                         )}
 
-                        {paymentTerms === 'net30' && paymentDueDate && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs text-blue-800">
-                                Net 30 — Payment due by <strong>{new Date(paymentDueDate).toLocaleDateString('en-GB')}</strong>
-                            </div>
-                        )}
+                        {paymentTerms === 'net30' && paymentDueDate && (() => {
+                            const dueDate = new Date(paymentDueDate)
+                            const now = new Date()
+                            const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+                            const isOverdue = diffDays < 0
+                            const isPaidFull = paymentStatus === 'paid'
+                            return (
+                                <div className={`rounded-lg px-3 py-2 text-xs space-y-2 ${
+                                    isPaidFull ? 'bg-green-50 border border-green-200 text-green-800'
+                                    : isOverdue ? 'bg-red-50 border border-red-200 text-red-800'
+                                    : diffDays <= 7 ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                                    : 'bg-blue-50 border border-blue-200 text-blue-800'
+                                }`}>
+                                    <div className="flex items-center justify-between">
+                                        <span>
+                                            {isPaidFull ? (
+                                                <>Paid — was due {dueDate.toLocaleDateString('en-GB')}</>
+                                            ) : isOverdue ? (
+                                                <><strong>{Math.abs(diffDays)} day{Math.abs(diffDays) !== 1 ? 's' : ''} overdue</strong> — was due {dueDate.toLocaleDateString('en-GB')}</>
+                                            ) : (
+                                                <><strong>{diffDays} day{diffDays !== 1 ? 's' : ''} left</strong> — due {dueDate.toLocaleDateString('en-GB')}</>
+                                            )}
+                                        </span>
+                                    </div>
+                                    {!isPaidFull && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={async () => {
+                                                    if (!confirm(`Send payment reminder to ${customerEmail}?`)) return
+                                                    setLoading(true)
+                                                    try {
+                                                        const res = await sendPaymentReminderAction(orderId) as any
+                                                        if (res.success) { alert('Reminder sent!'); router.refresh() }
+                                                        else { alert('Failed: ' + (res.error || 'Unknown error')) }
+                                                    } catch (err: any) { alert('Failed: ' + err.message) }
+                                                    finally { setLoading(false) }
+                                                }}
+                                                disabled={loading}
+                                                className={`py-1 px-3 rounded text-[10px] font-bold transition disabled:opacity-50 ${
+                                                    isOverdue
+                                                        ? 'bg-red-600 text-white hover:bg-red-700'
+                                                        : 'bg-amber-600 text-white hover:bg-amber-700'
+                                                }`}
+                                            >
+                                                {loading ? 'Sending...' : 'Send Payment Reminder'}
+                                            </button>
+                                            {overdueReminderSentAt && (
+                                                <span className="text-[10px] opacity-70">
+                                                    Auto-reminder sent {new Date(overdueReminderSentAt).toLocaleDateString('en-GB')}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })()}
 
                     </div>
                 </StepCard>
