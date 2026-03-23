@@ -69,6 +69,17 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             if (authData.user) customerId = authData.user.id
         }
 
+        // Fetch customer payment terms
+        let customerPaymentTerms: string | null = null
+        if (customerId) {
+            const { data: custData } = await supabase
+                .from('customers')
+                .select('payment_terms')
+                .eq('id', customerId)
+                .single()
+            customerPaymentTerms = custData?.payment_terms || null
+        }
+
         // 3. Verify Prices & Calculate Total
         // Fetch latest product prices to prevent tampering
         const productIds = cartItems.map((i: any) => i.product_id)
@@ -252,6 +263,9 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
                 original_order_id: rawData.original_order_id as string,
                 is_modification: true,
             } : {}),
+
+            // Payment terms from customer profile
+            ...(customerPaymentTerms === 'net30' ? { payment_terms: 'net30', payment_terms_days: 30 } : {}),
         }
 
         const { data: order, error: orderError } = await supabase

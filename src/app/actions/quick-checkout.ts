@@ -205,6 +205,7 @@ export async function placeQuickOrder(
             market: market.key,
             language: headersList.get('x-preferred-language') || market.defaultLanguage || 'en',
             ...(pickupPaymentProofRequired ? { pickup_payment_proof_required: true } : {}),
+            ...(isNet30 ? { payment_terms: 'net30', payment_terms_days: 30 } : {}),
         }
 
         const { data: order, error: orderError } = await supabase
