@@ -71,13 +71,15 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         // Fetch customer payment terms
         let customerPaymentTerms: string | null = null
+        let customerPaymentTermsDays = 30
         if (customerId) {
             const { data: custData } = await supabase
                 .from('customers')
-                .select('payment_terms')
+                .select('payment_terms, payment_terms_days')
                 .eq('id', customerId)
                 .single()
             customerPaymentTerms = custData?.payment_terms || null
+            customerPaymentTermsDays = custData?.payment_terms_days || 30
         }
 
         // 3. Verify Prices & Calculate Total
@@ -265,7 +267,10 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             } : {}),
 
             // Payment terms from customer profile
-            ...(customerPaymentTerms === 'net30' ? { payment_terms: 'net30' } : {}),
+            ...(customerPaymentTerms === 'net30' ? {
+                payment_terms: 'net30',
+                payment_due_date: new Date(Date.now() + customerPaymentTermsDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            } : {}),
         }
 
         const { data: order, error: orderError } = await supabase

@@ -49,7 +49,7 @@ export async function placeQuickOrder(
         // Get customer details
         const { data: customer } = await supabase
             .from('customers')
-            .select('id, first_name, last_name, email, phone, company_name, vat_id, is_b2b, payment_terms, addresses')
+            .select('id, first_name, last_name, email, phone, company_name, vat_id, is_b2b, payment_terms, payment_terms_days, addresses')
             .eq('id', user.id)
             .single()
 
@@ -205,7 +205,10 @@ export async function placeQuickOrder(
             market: market.key,
             language: headersList.get('x-preferred-language') || market.defaultLanguage || 'en',
             ...(pickupPaymentProofRequired ? { pickup_payment_proof_required: true } : {}),
-            ...(isNet30 ? { payment_terms: 'net30' } : {}),
+            ...(isNet30 ? {
+                payment_terms: 'net30',
+                payment_due_date: new Date(Date.now() + (customer.payment_terms_days || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            } : {}),
         }
 
         const { data: order, error: orderError } = await supabase

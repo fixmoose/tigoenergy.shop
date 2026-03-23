@@ -64,9 +64,13 @@ function getLabels(lang: string) {
 
 /** Map raw payment_method DB values to localized display labels */
 function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>, order?: any): string {
-    // Net30 customers — show "Net 30" prominently
+    // Net customers — show "Net XX" prominently
     if (order?.payment_terms === 'net30') {
-        const days = order.payment_terms_days || 30
+        let days = 30
+        if (order.payment_due_date && order.created_at) {
+            days = Math.round((new Date(order.payment_due_date).getTime() - new Date(order.created_at).getTime()) / (24 * 60 * 60 * 1000))
+            if (days < 1) days = 30
+        }
         return `Net ${days}`
     }
     const v = (raw || '').toLowerCase()
@@ -90,7 +94,15 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     const labels = getLabels(lang)
     const dateLocale = ({ sl: 'sl-SI', de: 'de-DE', hr: 'hr-HR', it: 'it-IT', cs: 'cs-CZ', sk: 'sk-SK', sv: 'sv-SE' } as Record<string, string>)[lang] || 'en-GB'
     const isNet30 = order.payment_terms === 'net30'
-    const dueDays = isNet30 ? (order.payment_terms_days || 30) : 0 // prepayment has no due date
+    let dueDays = 0
+    if (isNet30) {
+        if (order.payment_due_date && order.created_at) {
+            dueDays = Math.round((new Date(order.payment_due_date).getTime() - new Date(order.created_at).getTime()) / (24 * 60 * 60 * 1000))
+            if (dueDays < 1) dueDays = 30
+        } else {
+            dueDays = 30
+        }
+    }
 
     const template = await getPinnedTemplate('invoice', lang)
     if (!template) throw new Error('Invoice template not found')

@@ -249,7 +249,11 @@ export async function GET(
             payment_method: (() => {
                 const v = (order.payment_method || '').toLowerCase()
                 if (order.payment_terms === 'net30') {
-                    const days = order.payment_terms_days || 30
+                    let days = 30
+                    if (order.payment_due_date && order.created_at) {
+                        days = Math.round((new Date(order.payment_due_date).getTime() - new Date(order.created_at).getTime()) / (24 * 60 * 60 * 1000))
+                        if (days < 1) days = 30
+                    }
                     return `Net ${days}`
                 }
                 if (!v || v === 'wise' || v === 'iban') return lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'
