@@ -408,9 +408,35 @@ export async function adminMarkDeliveredAction(orderId: string) {
 
         const supabase = await createAdminClient()
 
+        const deliveredAt = new Date().toISOString()
+        const updateData: any = { status: 'delivered', delivered_at: deliveredAt }
+
+        // For net orders: set payment_due_date starting from delivery
+        // First fetch order to check payment_terms
+        const { data: existingOrder } = await supabase
+            .from('orders')
+            .select('payment_terms, payment_due_date, customer_id')
+            .eq('id', orderId)
+            .single()
+
+        if (existingOrder?.payment_terms === 'net30' && !existingOrder.payment_due_date) {
+            let days = 30
+            if (existingOrder.customer_id) {
+                const { data: customer } = await supabase
+                    .from('customers')
+                    .select('payment_terms_days')
+                    .eq('id', existingOrder.customer_id)
+                    .single()
+                if (customer?.payment_terms_days) days = customer.payment_terms_days
+            }
+            const dueDate = new Date(deliveredAt)
+            dueDate.setDate(dueDate.getDate() + days)
+            updateData.payment_due_date = dueDate.toISOString().split('T')[0]
+        }
+
         const { data: order, error } = await supabase
             .from('orders')
-            .update({ status: 'delivered', delivered_at: new Date().toISOString() })
+            .update(updateData)
             .eq('id', orderId)
             .select('*, order_items(*)')
             .single()

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     // Find all shipped DPD orders that haven't been delivered yet
     const { data: shippedOrders, error } = await supabase
         .from('orders')
-        .select('id, order_number, tracking_number, customer_email, shipping_address, language, invoice_number')
+        .select('id, order_number, tracking_number, customer_email, shipping_address, language, invoice_number, payment_terms, payment_due_date, customer_id')
         .eq('status', 'shipped')
         .eq('shipping_carrier', 'DPD')
         .not('tracking_number', 'is', null)
@@ -56,12 +56,31 @@ export async function GET(req: NextRequest) {
 
             // Mark order as delivered
             const deliveredAt = statuses[0]?.delivered_at || new Date().toISOString()
+            const deliveryUpdate: any = {
+                status: 'delivered',
+                delivered_at: deliveredAt,
+            }
+
+            // For net orders: set payment_due_date starting from delivery
+            if (order.payment_terms === 'net30' && !order.payment_due_date) {
+                let days = 30
+                if (order.customer_id) {
+                    const { data: customer } = await supabase
+                        .from('customers')
+                        .select('payment_terms_days')
+                        .eq('id', order.customer_id)
+                        .single()
+                    if (customer?.payment_terms_days) days = customer.payment_terms_days
+                }
+                const dueDate = new Date(deliveredAt)
+                dueDate.setDate(dueDate.getDate() + days)
+                deliveryUpdate.payment_due_date = dueDate.toISOString().split('T')[0]
+                console.log(`Net payment due date set for ${order.order_number}: ${deliveryUpdate.payment_due_date} (${days} days from delivery)`)
+            }
+
             await supabase
                 .from('orders')
-                .update({
-                    status: 'delivered',
-                    delivered_at: deliveredAt,
-                })
+                .update(deliveryUpdate)
                 .eq('id', order.id)
 
             delivered++

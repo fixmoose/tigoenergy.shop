@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Append to warehouse_actions
     const { data: order } = await supabase
         .from('orders')
-        .select('warehouse_actions, pickup_payment_proof_required, invoice_number, order_number, customer_email, shipping_address, language')
+        .select('warehouse_actions, pickup_payment_proof_required, invoice_number, order_number, customer_email, shipping_address, language, payment_terms, payment_due_date, customer_id')
         .eq('id', orderId)
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -35,9 +35,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     })
 
     // Pickup = customer already has it → delivered. DPD = shipped (in transit).
+    const now = new Date().toISOString()
     const statusUpdate: Record<string, any> = type === 'pickup'
-        ? { status: 'delivered', delivered_at: new Date().toISOString(), warehouse_actions: actions }
-        : { status: 'shipped', shipped_at: new Date().toISOString(), warehouse_actions: actions }
+        ? { status: 'delivered', delivered_at: now, warehouse_actions: actions }
+        : { status: 'shipped', shipped_at: now, warehouse_actions: actions }
+
+    // For net pickup orders: set payment_due_date starting from delivery
+    if (type === 'pickup' && order.payment_terms === 'net30' && !order.payment_due_date) {
+        let days = 30
+        if (order.customer_id) {
+            const { data: customer } = await supabase
+                .from('customers')
+                .select('payment_terms_days')
+                .eq('id', order.customer_id)
+                .single()
+            if (customer?.payment_terms_days) days = customer.payment_terms_days
+        }
+        const dueDate = new Date(now)
+        dueDate.setDate(dueDate.getDate() + days)
+        statusUpdate.payment_due_date = dueDate.toISOString().split('T')[0]
+    }
 
     const { error } = await supabase
         .from('orders')

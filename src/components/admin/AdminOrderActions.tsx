@@ -301,29 +301,33 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             </h3>
 
             {/* Net Payment Counter — always visible for net orders */}
-            {paymentTerms === 'net30' && paymentDueDate && (() => {
-                const dueDate = new Date(paymentDueDate)
+            {paymentTerms === 'net30' && (() => {
+                const dueDate = paymentDueDate ? new Date(paymentDueDate) : null
                 const now = new Date()
-                const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
-                const isOverdue = diffDays < 0
+                const diffDays = dueDate ? Math.ceil((dueDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)) : null
+                const isOverdue = diffDays !== null && diffDays < 0
                 const isPaidFull = paymentStatus === 'paid'
+                const isPreDelivery = !dueDate && !isPaidFull
                 return (
                     <div className={`rounded-xl px-4 py-3 mb-4 text-sm flex items-center justify-between ${
                         isPaidFull ? 'bg-green-50 border-2 border-green-300 text-green-800'
+                        : isPreDelivery ? 'bg-blue-50 border-2 border-blue-300 text-blue-800'
                         : isOverdue ? 'bg-red-50 border-2 border-red-300 text-red-800'
-                        : diffDays <= 7 ? 'bg-amber-50 border-2 border-amber-300 text-amber-800'
+                        : diffDays !== null && diffDays <= 7 ? 'bg-amber-50 border-2 border-amber-300 text-amber-800'
                         : 'bg-blue-50 border-2 border-blue-300 text-blue-800'
                     }`}>
                         <div className="flex items-center gap-3">
-                            <span className="text-lg">{isPaidFull ? '✅' : isOverdue ? '🚨' : '⏳'}</span>
+                            <span className="text-lg">{isPaidFull ? '✅' : isPreDelivery ? '📦' : isOverdue ? '🚨' : '⏳'}</span>
                             <div>
                                 <span className="font-bold">
                                     {isPaidFull ? (
-                                        <>Net payment — Paid (was due {dueDate.toLocaleDateString('en-GB')})</>
+                                        <>Net payment — Paid{dueDate && <> (was due {dueDate.toLocaleDateString('en-GB')})</>}</>
+                                    ) : isPreDelivery ? (
+                                        <>Net payment — countdown starts on delivery</>
                                     ) : isOverdue ? (
-                                        <>{Math.abs(diffDays)} day{Math.abs(diffDays) !== 1 ? 's' : ''} OVERDUE — was due {dueDate.toLocaleDateString('en-GB')}</>
+                                        <>{Math.abs(diffDays!)} day{Math.abs(diffDays!) !== 1 ? 's' : ''} OVERDUE — was due {dueDate!.toLocaleDateString('en-GB')}</>
                                     ) : (
-                                        <>{diffDays} day{diffDays !== 1 ? 's' : ''} left — due {dueDate.toLocaleDateString('en-GB')}</>
+                                        <>{diffDays} day{diffDays !== 1 ? 's' : ''} left — due {dueDate!.toLocaleDateString('en-GB')}</>
                                     )}
                                 </span>
                                 <span className="ml-3 text-xs opacity-70">€{(amountPaid || 0).toFixed(2)} (paid so far) / €{(orderTotal || 0).toFixed(2)} (owe)</span>
@@ -577,8 +581,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             .update({
                                                 payment_method: 'IBAN',
                                                 payment_terms: 'net30',
-                                                payment_due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                                                 payment_status: 'net30',
+                                                // payment_due_date set on delivery (not now)
                                             })
                                             .eq('id', orderId)
                                         if (error) throw error
