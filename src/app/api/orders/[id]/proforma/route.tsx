@@ -201,6 +201,11 @@ export async function GET(
             },
         }
         const L = { ...(docLabels[lang] || docLabels.en) }
+        // Append VAT percentage to label (required by law)
+        const vatPct = Math.round((order.vat_rate || 0) * 100)
+        if (vatPct > 0) {
+            L.labelVat = `${L.labelVat} (${vatPct}%)`
+        }
         // Override "Ship To" label for pickup orders
         if (isPickup) {
             const pickupShipToLabels: Record<string, string> = {

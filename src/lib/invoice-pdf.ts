@@ -178,6 +178,17 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
 
     htmlContent = replacePlaceholders(htmlContent, documentData)
 
+    // Append VAT percentage to label (required by law)
+    const vatPct = Math.round((order.vat_rate || 0) * 100)
+    if (vatPct > 0) {
+        // Match common VAT labels in any language and append percentage
+        const vatLabels = ['DDV', 'MwSt\\.', 'MwSt', 'PDV', 'VAT', 'IVA', 'DPH', 'Moms']
+        for (const vl of vatLabels) {
+            const re = new RegExp(`(>\\s*)(${vl})(\\s*<)`, 'g')
+            htmlContent = htmlContent.replace(re, `$1$2 (${vatPct}%)$3`)
+        }
+    }
+
     // Payment records
     let effectivePayments = (payments && payments.length > 0) ? payments : []
     if (effectivePayments.length === 0 && order.payment_status === 'paid' && order.paid_at) {
