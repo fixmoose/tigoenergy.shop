@@ -66,55 +66,79 @@ export async function GET(
             templateHtml = DOCUMENT_TEMPLATES.packing_slip
         }
 
-        // Localize hardcoded template labels
+        // Localize template labels (always apply — DB template may still have English labels)
         const packingLabels: Record<string, Record<string, string>> = {
             sl: {
                 title: 'Dobavnica', orderDate: 'Datum naročila', shipFrom: 'Pošiljatelj', shipTo: 'Prejemnik',
+                shipToPickup: 'Prevzemnik',
                 itemsToPack: 'Artikli za pakiranje', totalParcels: 'Število paketov / škatel:',
                 totalWeight: 'Skupna teža:', verifyNote: 'Pred zapiranjem preverite vse artikle. Neskladja sporočite na',
+                pickupBanner: 'LASTNI PREVZEM', deliveryBanner: 'DOSTAVA / DPD',
+                customerLabel: 'Stranka',
             },
             hr: {
                 title: 'Otpremnica', orderDate: 'Datum narudžbe', shipFrom: 'Pošiljatelj', shipTo: 'Primatelj',
+                shipToPickup: 'Preuzima',
                 itemsToPack: 'Artikli za pakiranje', totalParcels: 'Ukupno paketa / kutija:',
                 totalWeight: 'Ukupna težina:', verifyNote: 'Provjerite sve artikle prije zatvaranja. Neslaganja prijavite na',
+                pickupBanner: 'OSOBNO PREUZIMANJE', deliveryBanner: 'DOSTAVA / DPD',
+                customerLabel: 'Kupac',
             },
             de: {
                 title: 'Lieferschein', orderDate: 'Bestelldatum', shipFrom: 'Absender', shipTo: 'Empfänger',
+                shipToPickup: 'Abholer',
                 itemsToPack: 'Artikel zum Verpacken', totalParcels: 'Pakete / Kartons gesamt:',
                 totalWeight: 'Gesamtgewicht:', verifyNote: 'Alle Artikel vor dem Verschließen prüfen. Abweichungen melden an',
+                pickupBanner: 'SELBSTABHOLUNG', deliveryBanner: 'LIEFERUNG / DPD',
+                customerLabel: 'Kunde',
             },
             it: {
                 title: 'Bolla di consegna', orderDate: 'Data ordine', shipFrom: 'Mittente', shipTo: 'Destinatario',
+                shipToPickup: 'Ritiro da',
                 itemsToPack: 'Articoli da imballare', totalParcels: 'Totale colli / scatole:',
                 totalWeight: 'Peso totale:', verifyNote: 'Verificare tutti gli articoli prima della chiusura. Segnalare discrepanze a',
+                pickupBanner: 'RITIRO IN SEDE', deliveryBanner: 'CONSEGNA / DPD',
+                customerLabel: 'Cliente',
             },
             cs: {
                 title: 'Dodací list', orderDate: 'Datum objednávky', shipFrom: 'Odesílatel', shipTo: 'Příjemce',
+                shipToPickup: 'Přebírající',
                 itemsToPack: 'Položky k zabalení', totalParcels: 'Celkem balíků / krabic:',
                 totalWeight: 'Celková hmotnost:', verifyNote: 'Před uzavřením zkontrolujte všechny položky. Nesrovnalosti nahlaste na',
+                pickupBanner: 'OSOBNÍ ODBĚR', deliveryBanner: 'DORUČENÍ / DPD',
+                customerLabel: 'Zákazník',
             },
             sk: {
                 title: 'Dodací list', orderDate: 'Dátum objednávky', shipFrom: 'Odosielateľ', shipTo: 'Príjemca',
+                shipToPickup: 'Preberajúci',
                 itemsToPack: 'Položky na zabalenie', totalParcels: 'Celkom balíkov / krabíc:',
                 totalWeight: 'Celková hmotnosť:', verifyNote: 'Pred uzavretím skontrolujte všetky položky. Nezrovnalosti nahláste na',
+                pickupBanner: 'OSOBNÝ ODBER', deliveryBanner: 'DORUČENIE / DPD',
+                customerLabel: 'Zákazník',
             },
             sv: {
                 title: 'Följesedel', orderDate: 'Orderdatum', shipFrom: 'Avsändare', shipTo: 'Mottagare',
+                shipToPickup: 'Hämtas av',
                 itemsToPack: 'Artiklar att packa', totalParcels: 'Totalt kolli / kartonger:',
                 totalWeight: 'Totalvikt:', verifyNote: 'Kontrollera alla artiklar innan försegling. Rapportera avvikelser till',
+                pickupBanner: 'UPPHÄMTNING', deliveryBanner: 'LEVERANS / DPD',
+                customerLabel: 'Kund',
             },
         }
-        if (lang !== 'en' && !dbTemplate?.content_html && packingLabels[lang]) {
+        const shipToLabel = isPickup ? 'shipToPickup' : 'shipTo'
+        if (lang !== 'en' && packingLabels[lang]) {
             const pl = packingLabels[lang]
             templateHtml = templateHtml
                 .replace('>Packing Slip<', `>${pl.title}<`)
                 .replace('>Order Date<', `>${pl.orderDate}<`)
                 .replace('>Ship From<', `>${pl.shipFrom}<`)
-                .replace('>Ship To<', `>${pl.shipTo}<`)
+                .replace('>Ship To<', `>${pl[shipToLabel]}<`)
                 .replace('>Items to Pack<', `>${pl.itemsToPack}<`)
                 .replace('>Total Parcels / Boxes:<', `>${pl.totalParcels}<`)
                 .replace('>Total Weight:<', `>${pl.totalWeight}<`)
                 .replace('Verify all items before sealing. Report discrepancies to', pl.verifyNote)
+        } else if (lang === 'en' && isPickup) {
+            templateHtml = templateHtml.replace('>Ship To<', '>Pickup By<')
         }
 
         // 4. Prepare Data for Placeholders
@@ -122,6 +146,9 @@ export async function GET(
             if (!addr) return 'N/A'
             return `${addr.street || addr.line1 || ''}, ${addr.postal_code || ''} ${addr.city || ''}, ${addr.country || ''}`
         }
+
+        // Build customer name from billing or shipping address
+        const customerName = `${order.billing_address?.first_name || order.shipping_address?.first_name || ''} ${order.billing_address?.last_name || order.shipping_address?.last_name || ''}`.trim() || order.customer_email
 
         // Calculate parcels/boxes using DPD packing logic
         const orderItems = order.order_items || []
@@ -135,13 +162,15 @@ export async function GET(
 
         const documentData: DocumentData = {
             order_number: order.order_number,
-            order_date: new Date(order.created_at).toLocaleDateString(),
-            customer_name: `${order.billing_address?.first_name || ''} ${order.billing_address?.last_name || ''}`.trim() || order.customer_email,
+            order_date: new Date(order.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+            customer_name: customerName,
             customer_email: order.customer_email,
             customer_company: order.company_name,
             customer_phone: order.shipping_address?.phone || order.customer_phone || '',
             billing_address: formatAddress(order.billing_address),
-            shipping_address: formatAddress(order.shipping_address),
+            shipping_address: isPickup
+                ? formatAddress(order.billing_address)
+                : formatAddress(order.shipping_address),
             subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
             vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
             shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
@@ -161,6 +190,37 @@ export async function GET(
         // 5. Replace Placeholders
         let htmlContent = replacePlaceholders(templateHtml, documentData)
 
+        // 5b. Inject shipping method banner + customer info after the header
+        const pl = packingLabels[lang]
+        const pickupLabel = pl?.pickupBanner || 'SELF-PICKUP'
+        const deliveryLabel = pl?.deliveryBanner || 'DELIVERY / DPD'
+        const customerLabel = pl?.customerLabel || 'Customer'
+        const bannerColor = isPickup ? '#16a34a' : '#2563eb'
+        const bannerBg = isPickup ? '#f0fdf4' : '#eff6ff'
+        const bannerBorder = isPickup ? '#22c55e' : '#3b82f6'
+        const bannerText = isPickup ? pickupLabel : deliveryLabel
+        const enFallback = isPickup ? 'SELF-PICKUP' : 'DELIVERY'
+
+        const shippingBanner = `<div style="background:${bannerBg};border-bottom:3px solid ${bannerBorder};padding:10px 36px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:middle;">
+      <span style="font-size:18px;font-weight:900;letter-spacing:2px;color:${bannerColor};">${bannerText}</span>
+      ${lang !== 'en' ? `<span style="font-size:11px;color:#6b7280;margin-left:8px;">(${enFallback})</span>` : ''}
+    </td>
+    <td style="text-align:right;vertical-align:middle;">
+      <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;">${customerLabel}</span><br>
+      <span style="font-size:14px;font-weight:700;color:#1a2b3c;">${customerName}</span>
+      ${order.company_name ? `<br><span style="font-size:11px;color:#6b7280;">${order.company_name}</span>` : ''}
+    </td>
+  </tr></table>
+</div>`
+
+        // Insert banner after the first border-top header div
+        htmlContent = htmlContent.replace(
+            /(<\/div>\s*<div style="background:#f9fafb)/,
+            `</div>${shippingBanner}<div style="background:#f9fafb`
+        )
+
         // 6. Inject pickup signature block (for personal pick-up orders)
         if (isPickup) {
             const sigLabels: Record<string, { title: string; name: string; date: string; sign: string; note: string }> = {
@@ -173,27 +233,22 @@ export async function GET(
                 sv: { title: 'Signatur vid upphämtning', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
             }
             const sig = sigLabels[lang] || { title: 'Pickup Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
-            const sigTitle = sig.title
-            const sigName = sig.name
-            const sigDate = sig.date
-            const sigSign = sig.sign
-            const sigNote = sig.note
             const signatureBlock = `
 <div style="margin:24px 36px 0;padding:16px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sigTitle}</div>
-  <div style="font-size:9px;color:#6b7280;margin-bottom:16px;">${sigNote}</div>
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sig.title}</div>
+  <div style="font-size:9px;color:#6b7280;margin-bottom:16px;">${sig.note}</div>
   <table style="width:100%;border-collapse:collapse;">
     <tr>
       <td style="width:50%;padding-right:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigName}</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.name}</div>
         <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
       </td>
       <td style="width:25%;padding-right:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigDate}</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.date}</div>
         <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
       </td>
       <td style="width:25%;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sigSign}</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.sign}</div>
         <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
       </td>
     </tr>
@@ -217,10 +272,10 @@ export async function GET(
 </div>`
         htmlContent = htmlContent.replace('</body>', legalClause + '</body>')
 
-        // 7. Generate PDF
+        // 8. Generate PDF
         const pdfBuffer = await generatePdfFromHtml(htmlContent)
 
-        // 7. Return PDF response
+        // 9. Return PDF response
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',

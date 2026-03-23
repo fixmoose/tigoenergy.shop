@@ -80,6 +80,15 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             <span className={`px-2 py-1 rounded text-xs font-medium ${transactionType.color}`}>
               {transactionType.label}
             </span>
+            {order.shipping_carrier === 'Personal Pick-up' ? (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 border border-green-300">
+                🏪 Lastni prevzem
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                🚚 {order.shipping_carrier || 'DPD'} dostava
+              </span>
+            )}
           </div>
           <p className="text-slate-500 mt-1">
             {order.customer_email} {order.created_at && `• ${new Date(order.created_at).toLocaleDateString('en-GB')}`}
@@ -245,22 +254,27 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             />
           </div>
 
-          {order.tracking_number && (
-            <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="font-semibold text-slate-800 mb-3">Shipping</h3>
               <div className="text-sm space-y-2">
                 <div>
-                  <span className="text-slate-500">Carrier:</span>
-                  <span className="ml-2 font-medium">{order.shipping_carrier}</span>
+                  <span className="text-slate-500">Method:</span>
+                  {order.shipping_carrier === 'Personal Pick-up' ? (
+                    <span className="ml-2 font-bold text-green-700">🏪 Lastni prevzem (Self-Pickup)</span>
+                  ) : (
+                    <span className="ml-2 font-bold text-blue-700">🚚 {order.shipping_carrier || 'DPD'} dostava</span>
+                  )}
                 </div>
-                <div>
-                  <span className="text-slate-500">Tracking:</span>
-                  <a href={order.shipping_carrier === 'DPD' && order.tracking_number
-                    ? `https://tracking.dpd.de/parcelstatus?query=${order.tracking_number.split(',')[0].trim()}&locale=sl_SI`
-                    : (order.tracking_url || '#')} target="_blank" rel="noopener noreferrer" className="ml-2 font-medium text-blue-600 hover:underline">
-                    {order.tracking_number}
-                  </a>
-                </div>
+                {order.tracking_number && (
+                  <div>
+                    <span className="text-slate-500">Tracking:</span>
+                    <a href={order.shipping_carrier === 'DPD' && order.tracking_number
+                      ? `https://tracking.dpd.de/parcelstatus?query=${order.tracking_number.split(',')[0].trim()}&locale=sl_SI`
+                      : (order.tracking_url || '#')} target="_blank" rel="noopener noreferrer" className="ml-2 font-medium text-blue-600 hover:underline">
+                      {order.tracking_number}
+                    </a>
+                  </div>
+                )}
                 {order.shipped_at && (
                   <div>
                     <span className="text-slate-500">Shipped:</span>
@@ -269,7 +283,6 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 )}
               </div>
             </div>
-          )}
 
           <OrderEmailHistory orderId={order.id} />
         </div>

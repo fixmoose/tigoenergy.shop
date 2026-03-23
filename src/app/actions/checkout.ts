@@ -168,7 +168,11 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         const vatRate = market.vatRate
         const isActuallyB2B = !!(rawData.vat_id && (isB2B || rawData.company_name))
-        const vatAmount = isActuallyB2B ? 0 : (subtotal + shippingCost) * vatRate
+        // Slovenian B2B must still pay VAT (domestic sale) — only exempt for EU cross-border
+        const shippingCountry = (rawData.shipping_country as string) || ''
+        const isSlovenianB2B = isActuallyB2B && shippingCountry === 'SI'
+        const vatExemptB2B = isActuallyB2B && !isSlovenianB2B
+        const vatAmount = vatExemptB2B ? 0 : (subtotal + shippingCost) * vatRate
         const grandTotal = subtotal + shippingCost + vatAmount
 
         // 5. Create Order
