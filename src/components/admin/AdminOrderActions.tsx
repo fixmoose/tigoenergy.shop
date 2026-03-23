@@ -28,6 +28,7 @@ interface AdminOrderActionsProps {
     paymentTerms?: string | null
     paymentDueDate?: string | null
     overdueReminderSentAt?: string | null
+    autoReminderEnabled?: boolean
     warehouseActions?: { action: string; by_email?: string; by_name?: string; at: string; file_url?: string }[]
     warehouseSendLog?: { email: string; name: string; sentAt: string }[]
 }
@@ -96,7 +97,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, overdueReminderSentAt, warehouseActions = [], warehouseSendLog = [] }: AdminOrderActionsProps) {
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, overdueReminderSentAt, autoReminderEnabled = true, warehouseActions = [], warehouseSendLog = [] }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -325,10 +326,26 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                         <>{diffDays} day{diffDays !== 1 ? 's' : ''} left — due {dueDate.toLocaleDateString('en-GB')}</>
                                     )}
                                 </span>
-                                <span className="ml-3 text-xs opacity-70">€{(amountPaid || 0).toFixed(2)} / €{(orderTotal || 0).toFixed(2)}</span>
+                                <span className="ml-3 text-xs opacity-70">€{(amountPaid || 0).toFixed(2)} (paid so far) / €{(orderTotal || 0).toFixed(2)} (owe)</span>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
+                            {!isPaidFull && (
+                                <button
+                                    onClick={() => {
+                                        setPayAmount(((orderTotal || 0) - (amountPaid || 0)).toFixed(2))
+                                        setPayDate(new Date().toISOString().split('T')[0])
+                                        setShowPaymentForm(true)
+                                        if (!paymentsLoaded) {
+                                            getOrderPaymentsAction(orderId).then(res => {
+                                                if (res.success) setPayments(res.data as OrderPayment[])
+                                                setPaymentsLoaded(true)
+                                            })
+                                        }
+                                    }}
+                                    className="py-1.5 px-4 rounded-lg text-xs font-bold transition bg-green-600 text-white hover:bg-green-700"
+                                >Record Payment</button>
+                            )}
                             {!isPaidFull && (
                                 <button
                                     onClick={async () => {
@@ -348,12 +365,39 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             : 'bg-amber-600 text-white hover:bg-amber-700'
                                     }`}
                                 >
-                                    {loading ? 'Sending...' : 'Send Payment Reminder'}
+                                    {loading ? 'Sending...' : 'Send Reminder'}
+                                </button>
+                            )}
+                            {!isPaidFull && (
+                                <button
+                                    onClick={async () => {
+                                        setLoading(true)
+                                        try {
+                                            const supabaseClient = createClient()
+                                            const newVal = !autoReminderEnabled
+                                            const { error } = await supabaseClient
+                                                .from('orders')
+                                                .update({ auto_reminder_enabled: newVal })
+                                                .eq('id', orderId)
+                                            if (error) throw error
+                                            router.refresh()
+                                        } catch (err: any) { alert('Failed: ' + err.message) }
+                                        finally { setLoading(false) }
+                                    }}
+                                    disabled={loading}
+                                    className={`py-1.5 px-3 rounded-lg text-[10px] font-bold transition border ${
+                                        autoReminderEnabled
+                                            ? 'bg-green-100 border-green-300 text-green-700 hover:bg-green-200'
+                                            : 'bg-slate-100 border-slate-300 text-slate-500 hover:bg-slate-200'
+                                    }`}
+                                    title={autoReminderEnabled ? 'Auto-reminder ON — will email 1 day before due' : 'Auto-reminder OFF'}
+                                >
+                                    {autoReminderEnabled ? '🔔 Auto' : '🔕 Auto'}
                                 </button>
                             )}
                             {overdueReminderSentAt && (
                                 <span className="text-[10px] opacity-70">
-                                    Auto-reminder: {new Date(overdueReminderSentAt).toLocaleDateString('en-GB')}
+                                    Reminded: {new Date(overdueReminderSentAt).toLocaleDateString('en-GB')}
                                 </span>
                             )}
                         </div>
