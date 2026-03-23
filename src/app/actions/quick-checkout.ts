@@ -69,7 +69,7 @@ export async function placeQuickOrder(
         const productIds = items.map(i => i.product_id)
         const { data: products } = await supabase
             .from('products')
-            .select('id, price_eur, weight_kg, is_electrical_equipment, trod_category_code, default_packaging_type, packaging_weight_per_unit_kg, cn_code')
+            .select('id, price_eur, b2b_price_eur, weight_kg, is_electrical_equipment, trod_category_code, default_packaging_type, packaging_weight_per_unit_kg, cn_code')
             .in('id', productIds)
 
         if (!products) return { success: false, error: 'Failed to verify products.' }
@@ -145,7 +145,10 @@ export async function placeQuickOrder(
         const market = getMarketFromKey(marketKey)
         const vatRate = market.vatRate
         const isB2B = !!(customer.vat_id && customer.is_b2b)
-        const vatAmount = isB2B ? 0 : (subtotal + shippingCost) * vatRate
+        const shippingCountry = defaultAddr?.country || 'SI'
+        const isSlovenianB2B = isB2B && shippingCountry === 'SI'
+        const vatExemptB2B = isB2B && !isSlovenianB2B
+        const vatAmount = vatExemptB2B ? 0 : (subtotal + shippingCost) * vatRate
         const grandTotal = subtotal + shippingCost + vatAmount
 
         // Shipping address

@@ -230,7 +230,12 @@ export async function GET(
             total_amount: `${currency} ${parseFloat(order.total || 0).toFixed(2)}`,
             payment_method: (() => {
                 const v = (order.payment_method || '').toLowerCase()
+                if (order.payment_terms === 'net30') {
+                    const days = order.payment_terms_days || 30
+                    return `Net ${days}`
+                }
                 if (!v || v === 'wise' || v === 'iban') return lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'
+                if (v === 'invoice') return lang === 'sl' ? 'Bančno nakazilo' : lang === 'de' ? 'Banküberweisung' : lang === 'hr' ? 'Bankovni prijenos' : 'Bank Transfer'
                 return order.payment_method
             })(),
             items_table: generateItemsTableHtml(order.order_items, currency, false, {

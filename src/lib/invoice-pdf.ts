@@ -63,13 +63,14 @@ function getLabels(lang: string) {
 }
 
 /** Map raw payment_method DB values to localized display labels */
-function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>): string {
-    const v = (raw || '').toLowerCase()
-    if (v === 'wise' || v === 'iban') return labels.bankTransfer
-    if (v === 'invoice' || v === 'net30') {
-        const map: Record<string, string> = { sl: 'Plačilo po računu', hr: 'Plaćanje po računu', de: 'Zahlung auf Rechnung', it: 'Pagamento su fattura', cs: 'Platba na fakturu', sk: 'Platba na faktúru', sv: 'Betalning mot faktura' }
-        return map[lang] || 'Payment on Invoice'
+function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>, order?: any): string {
+    // Net30 customers — show "Net 30" prominently
+    if (order?.payment_terms === 'net30') {
+        const days = order.payment_terms_days || 30
+        return `Net ${days}`
     }
+    const v = (raw || '').toLowerCase()
+    if (v === 'wise' || v === 'iban' || v === 'invoice') return labels.bankTransfer
     return raw || labels.bankTransfer
 }
 
@@ -123,7 +124,7 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
         shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
         total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
-        payment_method: formatPaymentMethod(order.payment_method, lang, labels),
+        payment_method: formatPaymentMethod(order.payment_method, lang, labels, order),
         items_table: generateItemsTableHtml(order.order_items, order.currency || '€', false, {
             no: labels.no, description: labels.description, sku: labels.sku,
             qty: labels.qty, unitPrice: labels.unitPrice, amount: labels.amountCol,
@@ -182,7 +183,7 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     if (effectivePayments.length === 0 && order.payment_status === 'paid' && order.paid_at) {
         effectivePayments = [{
             payment_date: order.paid_at,
-            payment_method: formatPaymentMethod(order.payment_method, lang, labels),
+            payment_method: formatPaymentMethod(order.payment_method, lang, labels, order),
             reference: '-',
             amount: order.amount_paid || order.total,
         }]
