@@ -22,6 +22,7 @@ export default function AccountingReportPage() {
     const [shareUrl, setShareUrl] = useState('')
     const [reportType, setReportType] = useState('orders')
     const [marginSummary, setMarginSummary] = useState<any>(null)
+    const [ddvSummary, setDdvSummary] = useState<any>(null)
 
     useEffect(() => {
         setIsMounted(true)
@@ -64,13 +65,20 @@ export default function AccountingReportPage() {
                 if (reportType === 'margin') {
                     setOrders(data.data.orders || [])
                     setMarginSummary(data.data.summary)
+                    setDdvSummary(null)
+                } else if (reportType === 'ddv') {
+                    setOrders(data.data.orders || [])
+                    setDdvSummary(data.data.summary)
+                    setMarginSummary(null)
                 } else if (reportType === 'orders' || reportType === 'invoices') {
                     setOrders(data.data.orders)
                     setSummary(data.data.summary)
                     setMarginSummary(null)
+                    setDdvSummary(null)
                 } else {
                     setOrders(data.data.records || [])
                     setMarginSummary(null)
+                    setDdvSummary(null)
                 }
             }
         } catch (error) {
@@ -139,6 +147,7 @@ export default function AccountingReportPage() {
                     >
                         <option value="orders">Orders</option>
                         <option value="invoices">Invoices</option>
+                        <option value="ddv">DDV (VAT)</option>
                         <option value="margin">Margin Report</option>
                         <option value="returns">Returns (RMAs)</option>
                         <option value="carts">Abandoned Carts</option>
@@ -178,7 +187,63 @@ export default function AccountingReportPage() {
             </div>
 
             {/* Summary Cards */}
-            {reportType === 'margin' && marginSummary ? (
+            {reportType === 'ddv' && ddvSummary ? (
+                <div className="space-y-4">
+                    {/* DDV Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">VAT Owed to Gov</div>
+                            <div className="text-3xl font-black text-red-600">{formatCurrency(ddvSummary.totalVat)}</div>
+                            <div className="text-[10px] text-slate-400 mt-1">Reserve this on bank account</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Net Revenue (excl. VAT)</div>
+                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(ddvSummary.totalSubtotal)}</div>
+                            <div className="text-[10px] text-slate-400 mt-1">{ddvSummary.invoiceCount} invoices</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Gross (incl. VAT)</div>
+                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(ddvSummary.totalGross)}</div>
+                            <div className="text-[10px] text-emerald-600 font-semibold mt-1">{formatCurrency(ddvSummary.totalPaid)} paid</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-amber-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-amber-600 mb-1">Outstanding</div>
+                            <div className="text-2xl font-bold text-amber-600">{formatCurrency(ddvSummary.totalOutstanding)}</div>
+                            <div className="text-[10px] text-slate-400 mt-1">Unpaid invoiced orders</div>
+                        </div>
+                    </div>
+                    {/* Breakdown by VAT Rate */}
+                    {ddvSummary.byRate && ddvSummary.byRate.length > 0 && (
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Breakdown by VAT Rate</div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                {ddvSummary.byRate.map((r: any) => (
+                                    <div key={r.rate} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-lg font-black text-slate-700">{r.rate}%</span>
+                                            <span className="text-[10px] text-slate-400">{r.count} invoices</span>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 text-center">
+                                            <div>
+                                                <div className="text-[10px] text-slate-400">Net</div>
+                                                <div className="text-sm font-bold text-slate-700">{formatCurrency(r.subtotal)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-red-400">VAT</div>
+                                                <div className="text-sm font-bold text-red-600">{formatCurrency(r.vat)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-slate-400">Gross</div>
+                                                <div className="text-sm font-bold text-slate-700">{formatCurrency(r.total)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ) : reportType === 'margin' && marginSummary ? (
                 <div className="space-y-4">
                     {/* Margin Summary — 3 segments */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -317,6 +382,17 @@ export default function AccountingReportPage() {
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Country</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Orders</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Spent</th>
+                                    </>
+                                )}
+                                {reportType === 'ddv' && (
+                                    <>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Invoice / Date</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Customer</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Net</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">VAT %</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">VAT</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Gross</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Payment</th>
                                     </>
                                 )}
                                 {reportType === 'margin' && (
@@ -485,6 +561,50 @@ export default function AccountingReportPage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded text-[10px] font-bold uppercase">Abandoned</span>
+                                                </td>
+                                            </>
+                                        )}
+
+                                        {reportType === 'ddv' && (
+                                            <>
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-slate-800">{record.invoice_number}</div>
+                                                    <div className="text-[10px] text-slate-400 font-medium uppercase mt-1">
+                                                        {record.invoice_created_at ? new Date(record.invoice_created_at).toLocaleDateString() : new Date(record.created_at).toLocaleDateString()}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-400 font-mono">#{record.order_number}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-semibold text-slate-700">{record.company_name || record.customer_email}</div>
+                                                    {record.company_name && <div className="text-xs text-slate-400">{record.customer_email}</div>}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-bold text-slate-800">{formatCurrency(Number(record.subtotal) || 0)}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
+                                                        {record.vat_rate || 0}%
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-bold text-red-600">{formatCurrency(Number(record.vat_amount) || 0)}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-bold text-slate-800">{formatCurrency(Number(record.total) || 0)}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${record.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                                                            record.payment_status === 'partially_paid' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                            record.payment_status === 'net30' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                                            'bg-slate-50 text-slate-600 border-slate-100'
+                                                            }`}>
+                                                            {record.payment_status}
+                                                        </span>
+                                                        {record.payment_terms === 'net30' && record.payment_due_date && (
+                                                            <span className="text-[9px] text-slate-400">Due: {record.payment_due_date}</span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </>
                                         )}

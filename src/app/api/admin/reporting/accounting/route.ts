@@ -81,6 +81,56 @@ export async function GET(req: NextRequest) {
 
             if (error) throw error
             resultData = { records }
+        } else if (type === 'ddv') {
+            // DDV (VAT) report: VAT collected on invoiced orders — what you owe the government
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('id, order_number, customer_email, company_name, created_at, status, payment_status, invoice_number, invoice_created_at, total, subtotal, vat_amount, vat_rate, shipping_cost, shipping_address, amount_paid, payment_terms, payment_due_date')
+                .not('invoice_number', 'is', null)
+                .gte('created_at', start)
+                .lt('created_at', endDate)
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+
+            // Group by VAT rate
+            const byRate: Record<number, { count: number; subtotal: number; vat: number; total: number }> = {}
+            let totalVat = 0
+            let totalSubtotal = 0
+            let totalGross = 0
+            let totalPaid = 0
+            let totalOutstanding = 0
+
+            for (const o of (orders || [])) {
+                const rate = o.vat_rate || 0
+                if (!byRate[rate]) byRate[rate] = { count: 0, subtotal: 0, vat: 0, total: 0 }
+                byRate[rate].count++
+                byRate[rate].subtotal += Number(o.subtotal) || 0
+                byRate[rate].vat += Number(o.vat_amount) || 0
+                byRate[rate].total += Number(o.total) || 0
+                totalVat += Number(o.vat_amount) || 0
+                totalSubtotal += Number(o.subtotal) || 0
+                totalGross += Number(o.total) || 0
+                totalPaid += Number(o.amount_paid) || 0
+                if (o.payment_status !== 'paid' && o.status !== 'cancelled') {
+                    totalOutstanding += Number(o.total) || 0
+                }
+            }
+
+            resultData = {
+                orders: orders || [],
+                summary: {
+                    totalVat,
+                    totalSubtotal,
+                    totalGross,
+                    totalPaid,
+                    totalOutstanding,
+                    invoiceCount: (orders || []).length,
+                    byRate: Object.entries(byRate)
+                        .sort(([a], [b]) => Number(b) - Number(a))
+                        .map(([rate, data]) => ({ rate: Number(rate), ...data })),
+                }
+            }
         } else if (type === 'margin') {
             // Margin report: fetch orders with items + product cost data
             // We compute margin = sold price - purchase cost (no shipping)
