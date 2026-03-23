@@ -265,7 +265,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             } : {}),
 
             // Payment terms from customer profile
-            ...(customerPaymentTerms === 'net30' ? { payment_terms: 'net30', payment_terms_days: 30 } : {}),
+            ...(customerPaymentTerms === 'net30' ? { payment_terms: 'net30' } : {}),
         }
 
         const { data: order, error: orderError } = await supabase
