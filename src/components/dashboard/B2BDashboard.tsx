@@ -143,7 +143,15 @@ export default function B2BDashboard({ user, customer }: Props) {
                 <section id="overview" className="scroll-mt-[180px]">
                     <div className="mb-4 flex items-center justify-between">
                         <h2 className="text-lg font-bold text-gray-400 uppercase tracking-wider text-xs">{t('businessOverview')}</h2>
-                        <span className="bg-blue-50 text-blue-700 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter">{t('b2bTermsApply')}</span>
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter ${
+                            customer.payment_terms === 'net30'
+                                ? 'bg-amber-50 text-amber-700'
+                                : 'bg-blue-50 text-blue-700'
+                        }`}>
+                            {customer.payment_terms === 'net30'
+                                ? `NET ${customer.payment_terms_days || 30} ${t('days')}`
+                                : t('prepayment')}
+                        </span>
                     </div>
                     <DashboardOverview user={user} customer={customer} />
                 </section>
