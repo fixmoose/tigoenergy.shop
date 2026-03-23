@@ -179,7 +179,7 @@ export default function AdminQuoteCreator({ onClose, onCreated }: { onClose: () 
                     market,
                     language,
                     shipping_cost: shippingCost,
-                    vat_rate: vatRate,
+                    vat_rate: vatRate / 100,
                     items,
                     shipping_address: includeAddress ? shippingAddress : undefined,
                     internal_notes: internalNotes || undefined,

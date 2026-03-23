@@ -207,7 +207,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                 order: {
                     market,
                     shipping_cost: pickupInPerson ? 0 : shippingCost,
-                    vat_rate: vatRate,
+                    vat_rate: vatRate / 100,
                     payment_method: paymentMethod,
                     items,
                     shipping_address: pickupInPerson

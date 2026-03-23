@@ -215,7 +215,8 @@ export async function GET(
         }
 
         // Append VAT percentage to label (required by law)
-        const vatPct = Math.round((order.vat_rate || 0) * 100)
+        const rawVatRate = parseFloat(order.vat_rate || 0)
+        const vatPct = Math.round(rawVatRate >= 1 ? rawVatRate : rawVatRate * 100)
         if (vatPct > 0) {
             L.labelVat = `${L.labelVat} (${vatPct}%)`
         }
