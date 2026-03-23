@@ -546,11 +546,38 @@ export default function B2CRegistrationForm() {
                     </div>
                     <label htmlFor="reg-country" className="sr-only">{t('labels.country')}</label>
                     <select id="reg-country" name="country" autoComplete="country" className="w-full border p-2.5 rounded-lg bg-white" value={formData.country} onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}>
-                        <option value="SI">Slovenia</option>
-                        <option value="DE">Germany</option>
-                        <option value="HR">Croatia</option>
+                        <option value="">{t('labels.selectCountry') || 'Select country'}</option>
                         <option value="AT">Austria</option>
+                        <option value="BE">Belgium</option>
+                        <option value="BG">Bulgaria</option>
+                        <option value="HR">Croatia</option>
+                        <option value="CZ">Czech Republic</option>
+                        <option value="DK">Denmark</option>
+                        <option value="EE">Estonia</option>
+                        <option value="FI">Finland</option>
+                        <option value="FR">France</option>
+                        <option value="DE">Germany</option>
+                        <option value="GR">Greece</option>
+                        <option value="HU">Hungary</option>
+                        <option value="IE">Ireland</option>
                         <option value="IT">Italy</option>
+                        <option value="LV">Latvia</option>
+                        <option value="LT">Lithuania</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="ME">Montenegro</option>
+                        <option value="NL">Netherlands</option>
+                        <option value="MK">North Macedonia</option>
+                        <option value="NO">Norway</option>
+                        <option value="PL">Poland</option>
+                        <option value="PT">Portugal</option>
+                        <option value="RO">Romania</option>
+                        <option value="RS">Serbia</option>
+                        <option value="SK">Slovakia</option>
+                        <option value="SI">Slovenia</option>
+                        <option value="ES">Spain</option>
+                        <option value="SE">Sweden</option>
+                        <option value="CH">Switzerland</option>
+                        <option value="GB">United Kingdom</option>
                     </select>
                     <div className="flex gap-3 mt-2">
                         <button type="button" onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors border">{t('buttons.back')}</button>
