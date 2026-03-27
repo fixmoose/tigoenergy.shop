@@ -17,7 +17,7 @@ export async function sendWarehouseEmail(
 
         const { data: order, error: orderError } = await supabase
             .from('orders')
-            .select('order_number, customer_email, company_name, shipping_address, packing_slip_url, shipping_label_url')
+            .select('order_number, customer_email, company_name, shipping_address, shipping_carrier, packing_slip_url, shipping_label_url')
             .eq('id', orderId)
             .single()
 
@@ -82,22 +82,26 @@ export async function sendWarehouseEmail(
             : ''
 
         const warehouseUrl = `${siteUrl}/warehouse`
+        const isPickup = order.shipping_carrier === 'Personal Pick-up'
+        const shippingLabel = isPickup ? 'LASTNI PREVZEM' : `Dostavi na (${order.shipping_carrier || 'DPD'})`
+        const headerBg = isPickup ? '#16a34a' : '#1a2b3c'
+        const headerTitle = isPickup ? 'Skladišče — Prevzem stranke' : 'Skladišče — Naročilo za dostavo'
 
         const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-  <div style="background:#1a2b3c;padding:24px 32px;color:#fff;">
+  <div style="background:${headerBg};padding:24px 32px;color:#fff;">
     <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
-    <h1 style="font-size:20px;font-weight:300;margin:0;">Skladišče — Naročilo za obdelavo</h1>
+    <h1 style="font-size:20px;font-weight:300;margin:0;">${headerTitle}</h1>
   </div>
   <div style="padding:24px 32px;">
     <p style="color:#374151;font-size:14px;">Prosimo, obdelajte naslednje naročilo:</p>
     ${noteHtml}
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0;">
+    <div style="background:${isPickup ? '#f0fdf4' : '#eff6ff'};border:1px solid ${isPickup ? '#bbf7d0' : '#bfdbfe'};border-radius:8px;padding:16px;margin:16px 0;">
       <p style="margin:0 0 8px;font-size:12px;color:#6b7280;">Naročilo</p>
       <p style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111;">#${order.order_number}</p>
-      <p style="margin:0 0 4px;font-size:12px;color:#6b7280;">Dostavi na</p>
+      <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:${isPickup ? '#16a34a' : '#6b7280'};">${shippingLabel}</p>
       <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#111;">${customerName}${order.company_name ? ` (${order.company_name})` : ''}</p>
-      <p style="margin:0;font-size:13px;color:#6b7280;">${shippingAddr}</p>
+      ${isPickup ? '' : `<p style="margin:0;font-size:13px;color:#6b7280;">${shippingAddr}</p>`}
     </div>
     <p style="color:#374151;font-size:13px;font-weight:600;margin-bottom:12px;">Priloženi dokumenti:</p>
     <p style="color:#374151;font-size:13px;">${attachedDocs || 'Ni priloženih dokumentov.'}</p>
@@ -111,7 +115,9 @@ export async function sendWarehouseEmail(
 
         await sendEmail({
             to: warehouseEmail,
-            subject: `Skladišče: Obdelaj naročilo #${order.order_number}`,
+            subject: isPickup
+                ? `Skladišče: PREVZEM #${order.order_number}`
+                : `Skladišče: DOSTAVA #${order.order_number}`,
             html,
             orderId,
             emailType: 'warehouse_order',
