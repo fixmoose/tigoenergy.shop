@@ -74,7 +74,7 @@ export function splitStreetAndNumber(address: string) {
 export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
     const mlpe20_leftovers: { weight: number, qty: number }[] = [];
     const mlpe18_leftovers: { weight: number, qty: number }[] = [];
-    const scootable_items: { weight: number, qty: number }[] = [];
+    const scootable_items: { weight: number, qty: number, vol: number }[] = [];
     const parcels: Parcel[] = [];
     let otherWeight = 0;
 
@@ -86,7 +86,8 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
         // Classify items
         const isAseries = name.includes('TS4-A-O') || name.includes('TS4-A-F') || name.includes('TS4-A-2F');
         const isXseries = name.startsWith('TS4-X');
-        const isScootable = name.includes('CCA') || name.includes('RSS') || name.includes('TAP');
+        const isCCAKit = name.includes('CCA') && name.includes('KIT');
+        const isScootable = !isCCAKit && (name.includes('CCA') || name.includes('RSS') || name.includes('TAP'));
         const isLarge = name.includes('INVERTER') || name.includes('BMS') || name.includes('BATTERY') || name.includes('EI LINK');
 
         if (isAseries) {
@@ -108,8 +109,11 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
             for (let i = 0; i < item.quantity; i++) {
                 parcels.push({ weight: weight + 1.0 }); // heavier packaging for large items
             }
+        } else if (isCCAKit) {
+            // CCA Kit: 10 units per box (vol = 2.0 → 20/2 = 10)
+            scootable_items.push({ weight, qty: item.quantity, vol: 2.0 });
         } else if (isScootable) {
-            scootable_items.push({ weight, qty: item.quantity });
+            scootable_items.push({ weight, qty: item.quantity, vol: 4.0 });
         } else {
             otherWeight += weight * item.quantity;
         }
@@ -160,9 +164,9 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
 
     scootable_items.forEach(item => {
         for (let i = 0; i < item.qty; i++) {
-            if (!pack(4.0, item.weight)) {
+            if (!pack(item.vol, item.weight)) {
                 shipCurrentBox();
-                pack(4.0, item.weight);
+                pack(item.vol, item.weight);
             }
         }
     });
