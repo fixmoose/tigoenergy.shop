@@ -30,21 +30,61 @@ interface CustomerSnippet {
     payment_terms_days?: number | null
 }
 
-export default function AdminQuoteCreator({ onClose, onCreated }: { onClose: () => void, onCreated: () => void }) {
+interface PrefillItem {
+    product_id: string
+    product_name: string
+    sku: string
+    quantity: number
+    unit_price: number
+    weight_kg?: number
+}
+
+interface PrefillCustomer {
+    id?: string
+    email?: string | null
+    first_name?: string | null
+    last_name?: string | null
+    company_name?: string | null
+    vat_id?: string | null
+    phone?: string | null
+    is_b2b?: boolean
+    addresses?: any[]
+}
+
+interface AdminQuoteCreatorProps {
+    onClose: () => void
+    onCreated: () => void
+    prefillItems?: PrefillItem[]
+    prefillCustomer?: PrefillCustomer | null
+}
+
+export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, prefillCustomer }: AdminQuoteCreatorProps) {
     const [loading, setLoading] = useState(false)
 
     // Customer Data
     const [customerSearch, setCustomerSearch] = useState('')
     const [customerResults, setCustomerResults] = useState<CustomerSnippet[]>([])
-    const [selectedCustomer, setSelectedCustomer] = useState<Partial<CustomerSnippet>>({
-        email: '',
-        first_name: '',
-        last_name: '',
-        company_name: '',
-        vat_id: '',
-        phone: '',
-        is_b2b: false
-    })
+    const [selectedCustomer, setSelectedCustomer] = useState<Partial<CustomerSnippet>>(
+        prefillCustomer ? {
+            id: prefillCustomer.id,
+            email: prefillCustomer.email || '',
+            first_name: prefillCustomer.first_name || '',
+            last_name: prefillCustomer.last_name || '',
+            company_name: prefillCustomer.company_name || '',
+            vat_id: prefillCustomer.vat_id || '',
+            phone: prefillCustomer.phone || '',
+            is_b2b: !!prefillCustomer.is_b2b,
+            addresses: prefillCustomer.addresses || [],
+        } : {
+            email: '',
+            first_name: '',
+            last_name: '',
+            company_name: '',
+            vat_id: '',
+            phone: '',
+            is_b2b: false
+        }
+    )
 
     // Quote Data
     const [items, setItems] = useState<{
@@ -56,23 +96,44 @@ export default function AdminQuoteCreator({ onClose, onCreated }: { onClose: () 
         b2c_price?: number
         b2b_price?: number | null
         weight_kg?: number
-    }[]>([])
+    }[]>(prefillItems?.map(it => ({
+        product_id: it.product_id,
+        product_name: it.product_name,
+        sku: it.sku,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        weight_kg: it.weight_kg,
+    })) ?? [])
+    const prefillAddr = prefillCustomer?.addresses?.find((a: any) => a.isDefaultShipping && !a.isViesAddress)
+        || prefillCustomer?.addresses?.find((a: any) => !a.isViesAddress)
+        || prefillCustomer?.addresses?.[0]
+
     const [vatRate, setVatRate] = useState(22)
     const [shippingCost, setShippingCost] = useState(0)
-    const [market, setMarket] = useState('si')
+    const prefillCountry = prefillAddr?.country?.toUpperCase()
+    const prefillMarket = prefillCountry ? Object.values(MARKETS).find(m => m.country === prefillCountry) : null
+    const [market, setMarket] = useState(prefillMarket?.key.toLowerCase() || 'si')
     const [language, setLanguage] = useState('sl')
     const [expiresDays, setExpiresDays] = useState(30)
     const [internalNotes, setInternalNotes] = useState('')
-    const [includeAddress, setIncludeAddress] = useState(false)
+    const [includeAddress, setIncludeAddress] = useState(!!prefillCustomer?.addresses?.length)
     const [shippingAddrMode, setShippingAddrMode] = useState<'manual' | string>('manual')
 
-    const [shippingAddress, setShippingAddress] = useState({
-        street: '',
-        street2: '',
-        city: '',
-        postal_code: '',
-        country: 'SI'
-    })
+    const [shippingAddress, setShippingAddress] = useState(
+        prefillAddr ? {
+            street: prefillAddr.street || '',
+            street2: prefillAddr.street2 || '',
+            city: prefillAddr.city || '',
+            postal_code: prefillAddr.postalCode || prefillAddr.postal_code || '',
+            country: (prefillAddr.country || 'SI').toUpperCase()
+        } : {
+            street: '',
+            street2: '',
+            city: '',
+            postal_code: '',
+            country: 'SI'
+        }
+    )
 
     const normalizeAddr = (a: any) => ({
         street: a.street || '',
@@ -102,8 +163,29 @@ export default function AdminQuoteCreator({ onClose, onCreated }: { onClose: () 
 
     useEffect(() => {
         searchProductsAction('').then(r => {
-            if (r.success) setProductResults(r.data as any)
+            if (r.success) {
+                setProductResults(r.data as any)
+                // Enrich prefilled items with b2b/b2c prices from catalog
+                if (prefillItems && prefillItems.length > 0) {
+                    const catalog = r.data as ProductSnippet[]
+                    setItems(prev => prev.map(item => {
+                        if (item.b2c_price !== undefined) return item // already enriched
+                        const match = catalog.find(p => p.id === item.product_id || p.sku === item.sku)
+                        if (!match) return item
+                        const isB2B = !!selectedCustomer.is_b2b
+                        const b2bPrice = match.b2b_price_eur ?? null
+                        const b2cPrice = match.price_eur
+                        return {
+                            ...item,
+                            b2c_price: b2cPrice,
+                            b2b_price: b2bPrice,
+                            unit_price: isB2B && b2bPrice ? b2bPrice : b2cPrice,
+                        }
+                    }))
+                }
+            }
         })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const filteredProducts = productSearch.trim()

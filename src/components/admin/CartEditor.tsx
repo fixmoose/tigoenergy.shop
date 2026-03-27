@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import type { Cart } from '@/types/database'
 import Link from 'next/link'
+import AdminQuoteCreator from '@/components/admin/AdminQuoteCreator'
 
 interface CustomerInfo {
     id?: string
@@ -29,6 +30,7 @@ function getCustomerCountry(customer?: CustomerInfo | null): string {
 export default function CartEditor({ cart, customer }: { cart: Cart | null; customer?: CustomerInfo | null }) {
     const [localCart, setLocalCart] = useState<Cart | null>(cart ?? null)
     const [saving, setSaving] = useState(false)
+    const [showQuoteCreator, setShowQuoteCreator] = useState(false)
 
     useEffect(() => setLocalCart(cart ?? null), [cart])
 
@@ -226,6 +228,13 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
                     Convert to Order
                 </button>
                 <button
+                    onClick={() => setShowQuoteCreator(true)}
+                    disabled={saving || items.length === 0}
+                    className="px-5 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold hover:bg-amber-600 transition disabled:opacity-50 shadow-sm"
+                >
+                    Create Quote
+                </button>
+                <button
                     onClick={deleteCart}
                     disabled={saving}
                     className="px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm font-bold hover:bg-red-100 transition disabled:opacity-50 ml-auto"
@@ -241,6 +250,30 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
                     <> · Updated: {new Date(localCart.updated_at).toLocaleString()}</>
                 )}
             </p>
+
+            {showQuoteCreator && (
+                <AdminQuoteCreator
+                    onClose={() => setShowQuoteCreator(false)}
+                    onCreated={() => setShowQuoteCreator(false)}
+                    prefillItems={items.map((it: any) => ({
+                        product_id: it.product_id || '',
+                        product_name: it.product_name || it.name || it.sku || 'Unknown',
+                        sku: it.sku || '',
+                        quantity: it.quantity || 1,
+                        unit_price: Number(it.unit_price) || 0,
+                        weight_kg: it.weight_kg,
+                    }))}
+                    prefillCustomer={customer ? {
+                        id: customer.id,
+                        email: customer.email,
+                        first_name: customer.first_name,
+                        last_name: customer.last_name,
+                        company_name: customer.company_name,
+                        is_b2b: customer.is_b2b,
+                        addresses: customer.addresses ?? undefined,
+                    } : null}
+                />
+            )}
         </div>
     )
 }
