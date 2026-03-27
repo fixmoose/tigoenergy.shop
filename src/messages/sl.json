@@ -1,8 +1,8 @@
 {
   "topBanner": {
-    "title": "Neodvisen pooblaščen prodajalec",
-    "body": "To spletno mesto upravlja <strong>Initra Energija, Slovenija</strong>, neodvisen pooblaščen prodajalec izdelkov Tigo Energy. To spletno mesto ni povezano z, potrjeno s strani ali upravljano s strani Tigo Energy, Inc.",
-    "badgeReseller": "Pooblaščen prodajalec",
+    "title": "Neodvisen pooblaščeni prodajalec",
+    "body": "To spletno mesto upravlja <strong>Initra Energija, Slovenija</strong>, neodvisen pooblaščeni prodajalec izdelkov Tigo Energy. To spletno mesto ni povezano z, potrjeno s strani ali upravljano s strani Tigo Energy, Inc.",
+    "badgeReseller": "Pooblaščeni prodajalec",
     "badgeEU": "EU distributer · 21+ trgov",
     "understand": "Zapri",
     "welcome": "Dobrodošli na tigoenergy.shop!"
@@ -87,10 +87,10 @@
     "termsOfService": "Splošni pogoji",
     "cookiePolicy": "Politika piškotkov",
     "disclaimers": "Omejitve odgovornosti",
-    "companyDesc": "Initra Energija d.o.o. — Neodvisen pooblaščen prodajalec Tigo Energy izdelkov po vsej Evropi.",
-    "independentDisclaimer": "To spletno mesto upravlja Initra Energija d.o.o., neodvisen pooblaščen prodajalec. Ni povezano s podjetjem Tigo Energy, Inc. ali pod njegovim nadzorom.",
-    "operatedBy": "Upravlja: Initra Energija d.o.o. — Neodvisen pooblaščen prodajalec Tigo Energy",
-    "trustAuthorized": "Pooblaščen prodajalec",
+    "companyDesc": "Initra Energija d.o.o. — Neodvisen pooblaščeni prodajalec Tigo Energy izdelkov po vsej Evropi.",
+    "independentDisclaimer": "To spletno mesto upravlja Initra Energija d.o.o., neodvisen pooblaščeni prodajalec. Ni povezano s podjetjem Tigo Energy, Inc. ali pod njegovim nadzorom.",
+    "operatedBy": "Upravlja: Initra Energija d.o.o. — Neodvisen pooblaščeni prodajalec Tigo Energy",
+    "trustAuthorized": "Pooblaščeni prodajalec",
     "trustSecurePayments": "Varno plačevanje",
     "trustReturns": "14-dnevno vračilo",
     "trustEuShipping": "Dostava po EU",
@@ -102,7 +102,7 @@
     "trustpilotCta": "Oglejte si naše ocene na Trustpilotu"
   },
   "products": {
-    "authorizedDistributor": "Pooblaščen prodajalec",
+    "authorizedDistributor": "Pooblaščeni prodajalec",
     "shopAll": "Vsi izdelki",
     "description": "Opis",
     "downloads": "Prenosi",
@@ -951,7 +951,7 @@
       "hContact": "Kontaktni podatki",
       "emailLabel": "E-pošta:",
       "clickToReveal": "Kliknite za prikaz",
-      "hAuthorized": "Pooblaščen prodajalec Tigo Energy izdelkov",
+      "hAuthorized": "Pooblaščeni prodajalec Tigo Energy izdelkov",
       "pAuthorized1": "Initra Energija d.o.o. je neodvisno podjetje in pooblaščeni distributer izdelkov Tigo Energy v Evropi. To spletno stran upravlja Initra Energija d.o.o. in ni v lasti, upravljanju ali nadzoru podjetja Tigo Energy, Inc.",
       "hResponsible": "Odgovoren za vsebino",
       "pResponsible": "Dejan Obradović, Initra Energija d.o.o., Podsmreka 59A, 1356 Dobrova, Slovenija.",
