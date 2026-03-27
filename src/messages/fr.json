@@ -78,6 +78,7 @@
     "cookiePolicy": "Politique de cookies",
     "disclaimers": "Avertissements",
     "companyDesc": "Votre partenaire pour des solutions professionnelles d'optimisation solaire à travers l'Europe.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Exploité par : Initra Energija d.o.o. - Distributeur autorisé Tigo Energy",
     "trustAuthorized": "Distributeur Tigo agréé",
     "trustSecurePayments": "Paiement sécurisé",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Bonjour,",
     "bestRegards": "Cordialement,",
-    "team": "L'équipe Tigo Energy SHOP",
+    "team": "L'équipe Initra Energija",
     "verificationCode": {
       "title": "Vérifiez votre adresse e-mail",
-      "text": "Merci d'avoir rejoint Tigo Energy SHOP. Pour finaliser votre inscription et sécuriser votre compte, veuillez utiliser le code de vérification suivant :",
+      "text": "Merci d'avoir rejoint Initra Energija. Pour finaliser votre inscription et sécuriser votre compte, veuillez utiliser le code de vérification suivant :",
       "expire": "Ce code expirera dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet e-mail."
     },
     "verificationLink": {
       "title": "Vérifiez votre adresse e-mail",
       "helloWithName": "Bonjour {{name}},",
-      "text": "Bienvenue chez Tigo Energy SHOP ! Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse e-mail et activer votre compte.",
+      "text": "Bienvenue chez Initra Energija ! Veuillez cliquer sur le bouton ci-dessous pour vérifier votre adresse e-mail et activer votre compte.",
       "button": "Vérifier l'adresse e-mail",
       "linkHelp": "Si le bouton ci-dessus ne fonctionne pas, vous pouvez également copier et coller le lien suivant dans votre navigateur :",
       "ignore": "Si vous n'avez pas créé de compte, aucune autre action n'est requise."
     },
     "welcome": {
       "title": "Bienvenue dans la famille !",
-      "text": "Nous sommes ravis de vous compter parmi nous sur Tigo Energy SHOP. Vous êtes maintenant connecté au distributeur spécialisé européen pour les solutions solaires Tigo Energy.",
+      "text": "Nous sommes ravis de vous compter parmi nous sur Initra Energija. Vous êtes maintenant connecté au distributeur spécialisé européen pour les solutions solaires Tigo Energy.",
       "feature1": "Support Expert",
       "feature1Desc": "Accès direct à des experts techniques qui connaissent les produits Tigo sur le bout des doigts.",
       "feature2": "Distribution Directe",
@@ -363,7 +364,7 @@
       "amountPaid": "Montant payé (Produits) :",
       "shippingStatus": "Statut de la livraison :",
       "pending": "Calcul en cours",
-      "footerNote": "Merci de votre patience et d'avoir choisi Tigo Energy SHOP."
+      "footerNote": "Merci de votre patience et d'avoir choisi Initra Energija."
     },
     "cartAbandonment": {
       "title": "Avez-vous oublié quelque chose ?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Compte B2B créé",
       "greeting": "Bonjour",
-      "thankYou": "Merci d'avoir créé un compte B2B chez Tigo Energy SHOP. Nous sommes ravis de vous accueillir !",
+      "thankYou": "Merci d'avoir créé un compte B2B chez Initra Energija. Nous sommes ravis de vous accueillir !",
       "bannerTitle": "Votre compte est prêt !",
       "bannerText": "Votre compte B2B est maintenant actif. Vous pouvez commencer vos achats immédiatement et profiter des prix B2B et des outils professionnels.",
       "text": "Connectez-vous simplement à votre compte pour parcourir notre gamme complète de produits, accéder à vos prix B2B et passer des commandes.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Réinitialisez votre mot de passe",
-      "text": "Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Tigo Energy SHOP. Veuillez cliquer sur le bouton ci-dessous pour choisir un nouveau mot de passe.",
+      "text": "Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Initra Energija. Veuillez cliquer sur le bouton ci-dessous pour choisir un nouveau mot de passe.",
       "button": "Réinitialiser le mot de passe",
       "linkHelp": "Si le bouton ci-dessus ne fonctionne pas, vous pouvez également copier et coller le lien suivant dans votre navigateur :",
       "expire": "Ce lien expirera dans 1 heure. Si vous n'avez pas demandé de réinitialisation de mot de passe, veuillez ignorer cet e-mail."

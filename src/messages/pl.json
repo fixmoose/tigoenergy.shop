@@ -78,6 +78,7 @@
     "cookiePolicy": "Polityka plików cookie",
     "disclaimers": "Zastrzeżenia",
     "companyDesc": "Twój partner w zakresie profesjonalnych rozwiązań optymalizacji energii słonecznej w całej Europie.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Prowadzone przez: Initra Energija d.o.o. - Autoryzowany dystrybutor Tigo Energy",
     "trustAuthorized": "Autoryzowany dystrybutor Tigo",
     "trustSecurePayments": "Bezpieczne płatności",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Witaj,",
     "bestRegards": "Z poważaniem,",
-    "team": "Zespół Tigo Energy SHOP",
+    "team": "Zespół Initra Energija",
     "verificationCode": {
       "title": "Zweryfikuj swój adres e-mail",
-      "text": "Dziękujemy za rejestrację w Tigo Energy SHOP. Aby ukończyć proces rejestracji i zabezpieczyć swoje konto, użyj poniższego kodu weryfikacyjnego:",
+      "text": "Dziękujemy za rejestrację w Initra Energija. Aby ukończyć proces rejestracji i zabezpieczyć swoje konto, użyj poniższego kodu weryfikacyjnego:",
       "expire": "Kod wygaśnie za 10 minut. Jeśli to nie Ty prosiłeś o rejestrację, zignoruj tę wiadomość."
     },
     "verificationLink": {
       "title": "Zweryfikuj swój adres e-mail",
       "helloWithName": "Witaj {{name}},",
-      "text": "Witamy w Tigo Energy SHOP! Kliknij poniższy przycisk, aby zweryfikować swój adres e-mail i aktywować konto.",
+      "text": "Witamy w Initra Energija! Kliknij poniższy przycisk, aby zweryfikować swój adres e-mail i aktywować konto.",
       "button": "Zweryfikuj adres e-mail",
       "linkHelp": "Jeśli powyższy przycisk nie działa, możesz również skopiować i wkleić poniższy link do swojej przeglądarki:",
       "ignore": "Jeśli nie zakładałeś konta, żadne dalsze działania nie są wymagane."
     },
     "welcome": {
       "title": "Witaj w rodzinie!",
-      "text": "Cieszymy się, że jesteś z nami w Tigo Energy SHOP. Masz teraz dostęp do wyspecjalizowanego europejskiego dystrybutora rozwiązań solarnych Tigo Energy.",
+      "text": "Cieszymy się, że jesteś z nami w Initra Energija. Masz teraz dostęp do wyspecjalizowanego europejskiego dystrybutora rozwiązań solarnych Tigo Energy.",
       "feature1": "Wsparcie ekspertów",
       "feature1Desc": "Bezpośredni dostęp do specjalistów technicznych, którzy znają produkty Tigo od podszewki.",
       "feature2": "Bezpośrednia dystrybucja",
@@ -363,7 +364,7 @@
       "amountPaid": "Kwota zapłacona (produkty):",
       "shippingStatus": "Status wysyłki:",
       "pending": "Oczekiwanie na kalkulację",
-      "footerNote": "Dziękujemy za cierpliwość i wybranie Tigo Energy SHOP."
+      "footerNote": "Dziękujemy za cierpliwość i wybranie Initra Energija."
     },
     "cartAbandonment": {
       "title": "Czy o czymś zapomniałeś?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Konto B2B utworzone",
       "greeting": "Witaj",
-      "thankYou": "Dziękujemy za rejestrację konta B2B w Tigo Energy SHOP. Cieszymy się, że jesteś z nami!",
+      "thankYou": "Dziękujemy za rejestrację konta B2B w Initra Energija. Cieszymy się, że jesteś z nami!",
       "bannerTitle": "Twoje konto jest gotowe!",
       "bannerText": "Twoje konto B2B jest teraz aktywne. Możesz od razu rozpocząć zakupy i korzystać z cen B2B oraz profesjonalnych narzędzi.",
       "text": "Po prostu zaloguj się na swoje konto, aby przeglądać naszą pełną ofertę produktów, uzyskać dostęp do cen B2B i składać zamówienia.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Zresetuj swoje hasło",
-      "text": "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta Tigo Energy SHOP. Kliknij poniższy przycisk, aby wybrać nowe hasło.",
+      "text": "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta Initra Energija. Kliknij poniższy przycisk, aby wybrać nowe hasło.",
       "button": "Resetuj hasło",
       "linkHelp": "Jeśli powyższy przycisk nie działa, możesz również skopiować i wkleić poniższy link do swojej przeglądarki:",
       "expire": "Ten link wygaśnie za 1 godzinę. Jeśli nie prosiłeś o zresetowanie hasła, zignoruj tę wiadomość."

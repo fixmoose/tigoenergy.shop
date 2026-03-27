@@ -78,6 +78,7 @@
     "cookiePolicy": "Política de cookies",
     "disclaimers": "Isenções de responsabilidade",
     "companyDesc": "O seu parceiro para soluções profissionais de otimização solar em toda a Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Operado por: Initra Energija d.o.o. - Distribuidor autorizado Tigo Energy",
     "trustAuthorized": "Distribuidor Tigo autorizado",
     "trustSecurePayments": "Pagamentos seguros",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Olá,",
     "bestRegards": "Melhores cumprimentos,",
-    "team": "A Equipa Tigo Energy SHOP",
+    "team": "A Equipa Initra Energija",
     "verificationCode": {
       "title": "Verifique o seu endereço de email",
-      "text": "Obrigado por se juntar à Tigo Energy SHOP. Para concluir o seu registo e proteger a sua conta, utilize o seguinte código de verificação:",
+      "text": "Obrigado por se juntar à Initra Energija. Para concluir o seu registo e proteger a sua conta, utilize o seguinte código de verificação:",
       "expire": "Este código expirará em 10 minutos. Se não solicitou isto, por favor ignore este email."
     },
     "verificationLink": {
       "title": "Verifique o seu endereço de email",
       "helloWithName": "Olá {{name}},",
-      "text": "Bem-vindo à Tigo Energy SHOP! Por favor, clique no botão abaixo para verificar o seu endereço de email e ativar a sua conta.",
+      "text": "Bem-vindo à Initra Energija! Por favor, clique no botão abaixo para verificar o seu endereço de email e ativar a sua conta.",
       "button": "Verificar Endereço de Email",
       "linkHelp": "Se o botão acima não funcionar, também pode copiar e colar o seguinte link no seu navegador:",
       "ignore": "Se não criou uma conta, não é necessária mais nenhuma ação."
     },
     "welcome": {
       "title": "Bem-vindo à família!",
-      "text": "Estamos entusiasmados por tê-lo na Tigo Energy SHOP. Está agora ligado ao distribuidor especializado da Europa para soluções solares Tigo Energy.",
+      "text": "Estamos entusiasmados por tê-lo na Initra Energija. Está agora ligado ao distribuidor especializado da Europa para soluções solares Tigo Energy.",
       "feature1": "Suporte Especializado",
       "feature1Desc": "Acesso direto a especialistas técnicos que conhecem os produtos Tigo por dentro e por fora.",
       "feature2": "Distribuição Direta",
@@ -363,7 +364,7 @@
       "amountPaid": "Valor Pago (Produtos):",
       "shippingStatus": "Estado do Envio:",
       "pending": "Cálculo Pendente",
-      "footerNote": "Obrigado pela sua paciência e por escolher a Tigo Energy SHOP."
+      "footerNote": "Obrigado pela sua paciência e por escolher a Initra Energija."
     },
     "cartAbandonment": {
       "title": "Esqueceu-se de alguma coisa?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Conta B2B criada",
       "greeting": "Olá",
-      "thankYou": "Obrigado por registar uma conta B2B na Tigo Energy SHOP. Estamos entusiasmados por tê-lo connosco!",
+      "thankYou": "Obrigado por registar uma conta B2B na Initra Energija. Estamos entusiasmados por tê-lo connosco!",
       "bannerTitle": "A sua conta está pronta!",
       "bannerText": "A sua conta B2B está agora ativa. Pode começar a comprar imediatamente e usufruir de preços B2B e ferramentas profissionais.",
       "text": "Basta iniciar sessão na sua conta para explorar a nossa gama completa de produtos, aceder aos seus preços B2B e fazer encomendas.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Reponha a sua palavra-passe",
-      "text": "Recebemos um pedido para repor a sua palavra-passe da sua conta Tigo Energy SHOP. Por favor, clique no botão abaixo para escolher uma nova palavra-passe.",
+      "text": "Recebemos um pedido para repor a sua palavra-passe da sua conta Initra Energija. Por favor, clique no botão abaixo para escolher uma nova palavra-passe.",
       "button": "Repor Palavra-passe",
       "linkHelp": "Se o botão acima não funcionar, também pode copiar e colar o seguinte link no seu navegador:",
       "expire": "Este link expirará em 1 hora. Se não solicitou a reposição da palavra-passe, por favor ignore este email ou contacte o suporte se tiver preocupações."

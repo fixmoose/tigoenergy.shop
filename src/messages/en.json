@@ -59,8 +59,8 @@
     "loggedInAs": "Logged in as \"{role}\"",
     "inStockCount": "{count} in stock",
     "availToOrder": "Avail. to Order",
-    "tigoProductSupport": "Tigo Product Support",
-    "tigoProductSupportDesc": "Technical help with Tigo products",
+    "tigoProductSupport": "Product Support",
+    "tigoProductSupportDesc": "Technical help with Tigo products from our team",
     "onlineShopSupport": "Online Shop Support",
     "onlineShopSupportDesc": "Help with orders and shipping",
     "emptyCart": "Empty Cart"
@@ -78,9 +78,10 @@
     "termsOfService": "Terms of Service",
     "cookiePolicy": "Cookie Policy",
     "disclaimers": "Disclaimers",
-    "companyDesc": "Your partner for professional solar optimization solutions across Europe.",
-    "operatedBy": "Operated by: Initra Energija d.o.o. - Authorized Tigo Energy Distributor",
-    "trustAuthorized": "Authorized Tigo Distributor",
+    "companyDesc": "Initra Energija d.o.o. — Independent authorized reseller of Tigo Energy products across Europe.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
+    "operatedBy": "Operated by: Initra Energija d.o.o. — Independent Authorized Tigo Energy Reseller",
+    "trustAuthorized": "Authorized Reseller",
     "trustSecurePayments": "Secure Payments",
     "trustReturns": "14-Day Returns",
     "trustEuShipping": "EU-Wide Shipping",
@@ -92,7 +93,7 @@
     "disclaimer3": "Worry Free Returns applies to B2C customers for personal use within 14 days. Buyer is responsible for return shipping costs."
   },
   "products": {
-    "authorizedDistributor": "Authorized Tigo Distributor",
+    "authorizedDistributor": "Authorized Reseller",
     "shopAll": "Shop All",
     "description": "Description",
     "downloads": "Downloads",
@@ -238,7 +239,7 @@
     "Rapid Shutdown": "Rapid Shutdown"
   },
   "home": {
-    "heroTitle": "Specialized Online Store For Tigo Energy Products",
+    "heroTitle": "Buy Tigo Energy Products From an Authorized Reseller",
     "heroSubtitle": "No markups. No surprises. Just direct access.",
     "heroServing": "Serving the entire solar community: Installers, Retailers, and Homeowners.",
     "shopNow": "Shop Now",
@@ -301,29 +302,29 @@
     "returnPolicy": "Return Policy: We offer a 14-day return policy for all unused items in their original packaging. Please contact support@tigoenergy.com for return authorizations.",
     "warranty": "Warranty: All products listed on this invoice are covered by a 1-year standard limited warranty starting from the date of delivery.",
     "legalAgreement": "Legal Agreement: Customer electronically agreed to the Terms & Conditions on: {date}.",
-    "thankYou": "Thank you for choosing Tigo Energy. Sustainability is our mission.",
+    "thankYou": "Thank you for choosing Initra Energija. Sustainability is our mission.",
     "officialShopInvoice": "Official Shop Invoice"
   },
   "email": {
     "hello": "Hello,",
     "bestRegards": "Best regards,",
-    "team": "The Tigo Energy SHOP Team",
+    "team": "The Initra Energija Team",
     "verificationCode": {
       "title": "Verify your email address",
-      "text": "Thank you for joining Tigo Energy SHOP. To complete your registration and secure your account, please use the following verification code:",
+      "text": "Thank you for joining Initra Energija. To complete your registration and secure your account, please use the following verification code:",
       "expire": "This code will expire in 10 minutes. If you did not request this, please ignore this email."
     },
     "verificationLink": {
       "title": "Verify your email address",
       "helloWithName": "Hello {{name}},",
-      "text": "Welcome to Tigo Energy SHOP! Please click the button below to verify your email address and activate your account.",
+      "text": "Welcome to Initra Energija! Please click the button below to verify your email address and activate your account.",
       "button": "Verify Email Address",
       "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
       "ignore": "If you did not create an account, no further action is required."
     },
     "welcome": {
       "title": "Welcome to the family!",
-      "text": "We're thrilled to have you at Tigo Energy SHOP. You're now connected to Europe's specialized distributor for Tigo Energy solar solutions.",
+      "text": "We're thrilled to have you at Initra Energija. You're now connected to Europe's specialized reseller of Tigo Energy solar solutions.",
       "feature1": "Expert Support",
       "feature1Desc": "Direct access to technical experts who know Tigo products inside out.",
       "feature2": "Direct Distribution",
@@ -374,7 +375,7 @@
       "amountPaid": "Amount Paid (Products):",
       "shippingStatus": "Shipping Status:",
       "pending": "Pending Calculation",
-      "footerNote": "Thank you for your patience and for choosing Tigo Energy SHOP."
+      "footerNote": "Thank you for your patience and for choosing Initra Energija."
     },
     "cartAbandonment": {
       "title": "Did you forget something?",
@@ -412,7 +413,7 @@
     "b2bApplication": {
       "title": "B2B Account Created",
       "greeting": "Hello",
-      "thankYou": "Thank you for registering a B2B account with Tigo Energy SHOP. We are excited to have you on board!",
+      "thankYou": "Thank you for registering a B2B account with Initra Energija. We are excited to have you on board!",
       "bannerTitle": "Your account is ready!",
       "bannerText": "Your B2B account is now active. You can start shopping immediately and enjoy B2B pricing and professional tools.",
       "text": "Simply log in to your account to browse our full product range, access your B2B pricing, and place orders.",
@@ -420,7 +421,7 @@
     },
     "passwordReset": {
       "title": "Reset your password",
-      "text": "We received a request to reset your password for your Tigo Energy SHOP account. Please click the button below to choose a new password.",
+      "text": "We received a request to reset your password for your Initra Energija account. Please click the button below to choose a new password.",
       "button": "Reset Password",
       "linkHelp": "If the button above doesn't work, you can also copy and paste the following link into your browser:",
       "expire": "This link will expire in 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns."
@@ -520,7 +521,7 @@
         "checkPhoneCode": "Check your phone for the 6-digit code",
         "emailVerified": "Email verified successfully",
         "phoneVerified": "Phone verified successfully",
-        "registrationSuccess": "Registration successful! Welcome to Tigo Energy.",
+        "registrationSuccess": "Registration successful! Welcome to Initra Energija.",
         "viesLocked": "This address is locked — it must match your VIES registration and will appear on all official invoices.",
         "addShipping": "Add separate shipping address (optional)",
         "addBilling": "Add a separate address for receiving invoices (optional). All invoices are sent via email regardless."
@@ -788,7 +789,7 @@
     "saveAndConnect": "Save & Connect",
     "termsConditions": "Terms & Conditions",
     "termsVersion": "v2.4 (2025)",
-    "termsDesc": "General terms of service for Tigo Energy Shop.",
+    "termsDesc": "General terms of service for Initra Energija.",
     "privacyPolicy": "Privacy Policy",
     "privacyVersion": "v1.2 (2024)",
     "privacyDesc": "How we handle and protect your personal data.",
@@ -996,8 +997,8 @@
       "prefillTitle": "Contact Tigo Sales"
     },
     "productSupport": {
-      "title": "Tigo Product Support",
-      "intro": "Get technical help with your Tigo Energy products via Shop Messenger"
+      "title": "Product Support",
+      "intro": "Get technical help with your Tigo Energy products via our support team"
     },
     "shopSupport": {
       "title": "Online Shop Support"
@@ -1087,7 +1088,7 @@
   },
   "mobileLanding": {
     "welcomeBack": "Welcome back",
-    "brandName": "Tigo Energy",
+    "brandName": "Initra Energija",
     "brandTagline": "Solar optimization & safety",
     "signIn": "Sign In",
     "signInSub": "Existing account",
@@ -1111,7 +1112,7 @@
     "dashboardSub": "Account & settings",
     "signingOut": "Signing out...",
     "signOut": "Sign Out",
-    "brand": "Tigo Energy Europe Shop by Initra Slovenia"
+    "brand": "Initra Energija — Authorized Tigo Energy Reseller"
   },
   "orderSuccess": {
     "title": "Order Confirmed!",

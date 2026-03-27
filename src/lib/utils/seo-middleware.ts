@@ -159,21 +159,21 @@ export function generateSEOMetaTags({
     const alternates = buildHreflangAlternates(url)
 
     return {
-        title: `${title} | Tigo Energy ${market.countryName}`,
+        title: `${title} | Initra Energija — ${market.countryName}`,
         description: description,
-        keywords: [...keywords, 'Tigo Energy', market.countryName, 'solar', 'photovoltaic'].join(', '),
+        keywords: [...keywords, 'Initra Energija', 'Tigo Energy', market.countryName, 'solar', 'photovoltaic'].join(', '),
         robots: robots,
         alternates: {
             canonical: canonicalUrl,
             languages: alternates
         },
         openGraph: {
-            title: `${title} | Tigo Energy ${market.countryName}`,
+            title: `${title} | Initra Energija — ${market.countryName}`,
             description: description,
             url: canonicalUrl,
             type: 'website',
             locale: market.locale,
-            site_name: 'Tigo Energy',
+            site_name: 'Initra Energija',
             images: image ? [
                 {
                     url: image,
@@ -218,7 +218,7 @@ export function generateStructuredData({
                 mpn: data.mpn,
                 brand: {
                     '@type': 'Brand',
-                    name: 'Tigo Energy'
+                    name: 'Initra Energija'
                 },
                 offers: {
                     '@type': 'Offer',
@@ -233,8 +233,8 @@ export function generateStructuredData({
             return {
                 '@context': 'https://schema.org',
                 '@type': 'Organization',
-                name: 'Tigo Energy',
-                alternateName: 'Tigo Energy Solutions',
+                name: 'Initra Energija',
+                alternateName: 'Initra Energija',
                 description: 'Professional solar energy solutions provider',
                 url: `https://${MARKET_DOMAINS[market.key]}`,
                 logo: `https://${MARKET_DOMAINS[market.key]}/tigo-logo.png`,
@@ -287,7 +287,7 @@ export function generateStructuredData({
                 url: `https://${MARKET_DOMAINS[market.key]}${data.path}`,
                 isPartOf: {
                     '@type': 'WebSite',
-                    name: 'Tigo Energy',
+                    name: 'Initra Energija',
                     url: `https://${MARKET_DOMAINS[market.key]}`
                 },
                 inLanguage: market.locale,

@@ -109,7 +109,7 @@ export async function sendWarehouseEmail(
     <div style="text-align:center;margin:20px 0 8px;">
       <a href="${warehouseUrl}" style="display:inline-block;background:#f97316;color:#fff;font-weight:700;font-size:14px;padding:12px 28px;border-radius:8px;text-decoration:none;">Odpri skladiščni portal</a>
     </div>
-    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Poslano iz Tigo Energy SHOP</p>
+    <p style="color:#9ca3af;font-size:11px;margin-top:24px;text-align:center;">Poslano iz Initra Energija</p>
   </div>
 </div></body></html>`
 

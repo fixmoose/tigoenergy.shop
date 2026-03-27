@@ -78,6 +78,7 @@
     "cookiePolicy": "Politika kolačića",
     "disclaimers": "Odricanja od odgovornosti",
     "companyDesc": "Vaš partner za profesionalna rešenja za optimizaciju solarne energije širom Evrope.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Upravlja: Initra Energija d.o.o. - Ovlašćeni Tigo Energy distributer",
     "trustAuthorized": "Ovlašćeni Tigo distributer",
     "trustSecurePayments": "Sigurno plaćanje",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Zdravo,",
     "bestRegards": "Srdačan pozdrav,",
-    "team": "Tigo Energy SHOP tim",
+    "team": "Initra Energija tim",
     "verificationCode": {
       "title": "Potvrdite vašu email adresu",
-      "text": "Hvala vam što ste se pridružili Tigo Energy SHOP-u. Da biste završili registraciju i osigurali svoj nalog, molimo vas da koristite sledeći kod za verifikaciju:",
+      "text": "Hvala vam što ste se pridružili Initra Energija-u. Da biste završili registraciju i osigurali svoj nalog, molimo vas da koristite sledeći kod za verifikaciju:",
       "expire": "Ovaj kod će isteći za 10 minuta. Ako niste zatražili ovo, molimo vas da ignorišete ovaj email."
     },
     "verificationLink": {
       "title": "Potvrdite vašu email adresu",
       "helloWithName": "Zdravo {{name}},",
-      "text": "Dobrodošli u Tigo Energy SHOP! Molimo kliknite na dugme ispod da potvrdite svoju email adresu i aktivirate svoj nalog.",
+      "text": "Dobrodošli u Initra Energija! Molimo kliknite na dugme ispod da potvrdite svoju email adresu i aktivirate svoj nalog.",
       "button": "Potvrdi email adresu",
       "linkHelp": "Ako dugme iznad ne radi, možete takođe kopirati i zalepiti sledeći link u svoj pretraživač:",
       "ignore": "Ako niste kreirali nalog, nije potrebna nikakva dalja radnja."
     },
     "welcome": {
       "title": "Dobrodošli u porodicu!",
-      "text": "Oduševljeni smo što ste uz Tigo Energy SHOP. Sada ste povezani sa specijalizovanim distributerom u Evropi za solarne rešenja Tigo Energy.",
+      "text": "Oduševljeni smo što ste uz Initra Energija. Sada ste povezani sa specijalizovanim distributerom u Evropi za solarne rešenja Tigo Energy.",
       "feature1": "Ekspertska podrška",
       "feature1Desc": "Direktan pristup tehničkim ekspertima koji poznaju Tigo proizvode do detalja.",
       "feature2": "Direktna distribucija",
@@ -363,7 +364,7 @@
       "amountPaid": "Plaćeni iznos (Proizvodi):",
       "shippingStatus": "Status isporuke:",
       "pending": "Obračun u toku",
-      "footerNote": "Hvala vam na strpljenju i što ste izabrali Tigo Energy SHOP."
+      "footerNote": "Hvala vam na strpljenju i što ste izabrali Initra Energija."
     },
     "cartAbandonment": {
       "title": "Zaboravili ste nešto?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B nalog kreiran",
       "greeting": "Zdravo",
-      "thankYou": "Hvala što ste registrovali B2B nalog na Tigo Energy SHOP. Drago nam je što ste sa nama!",
+      "thankYou": "Hvala što ste registrovali B2B nalog na Initra Energija. Drago nam je što ste sa nama!",
       "bannerTitle": "Vaš nalog je spreman!",
       "bannerText": "Vaš B2B nalog je sada aktivan. Možete odmah početi sa kupovinom i uživati u B2B cenama i profesionalnim alatima.",
       "text": "Jednostavno se prijavite na svoj nalog da pregledate našu kompletnu ponudu proizvoda, pristupite B2B cenama i napravite porudžbine.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Resetujte svoju lozinku",
-      "text": "Primili smo zahtev za resetovanje lozinke za vaš Tigo Energy SHOP nalog. Molimo kliknite na dugme ispod da izaberete novu lozinku.",
+      "text": "Primili smo zahtev za resetovanje lozinke za vaš Initra Energija nalog. Molimo kliknite na dugme ispod da izaberete novu lozinku.",
       "button": "Resetuj lozinku",
       "linkHelp": "Ako dugme iznad ne radi, možete takođe kopirati i zalepiti sledeći link u svoj pretraživač:",
       "expire": "Ovaj link će isteći za 1 sat. Ako niste zatražili resetovanje lozinke, molimo vas da ignorišete ovaj email ili kontaktirajte podršku ako imate nedoumice."

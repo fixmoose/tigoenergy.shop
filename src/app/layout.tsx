@@ -30,8 +30,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(`${protocol}://${hostname}`),
-    title: `Tigo Energy Shop ${market.countryName} | Authorized Distributor`,
-    description: 'Authorized Tigo Energy distributor. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets.',
+    title: `Initra Energija — Tigo Energy Products ${market.countryName}`,
+    description: 'Independent authorized reseller of Tigo Energy products. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets. Operated by Initra Energija d.o.o.',
     alternates: {
       canonical: buildCanonicalUrl(marketKey, '/'),
       languages: buildHreflangAlternates('/'),
@@ -52,17 +52,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     manifest: '/site.webmanifest',
     openGraph: {
-      title: `Tigo Energy Shop ${market.countryName} | Authorized Distributor`,
-      description: 'Authorized Tigo Energy distributor. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets.',
-      siteName: 'Tigo Energy Shop',
+      title: `Initra Energija — Tigo Energy Products ${market.countryName}`,
+      description: 'Independent authorized reseller of Tigo Energy products. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets. Operated by Initra Energija d.o.o.',
+      siteName: 'Initra Energija',
       locale: market.locale,
       type: 'website',
-      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Tigo Energy Shop — Authorized Distributor' }],
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Initra Energija — Authorized Tigo Energy Reseller' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `Tigo Energy Shop ${market.countryName} | Authorized Distributor`,
-      description: 'Authorized Tigo Energy distributor. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets.',
+      title: `Initra Energija — Tigo Energy Products ${market.countryName}`,
+      description: 'Independent authorized reseller of Tigo Energy products. Shop optimizers, inverters, batteries and monitoring solutions across 21+ European markets. Operated by Initra Energija d.o.o.',
       images: ['/og-image.png'],
     },
   }
@@ -90,11 +90,11 @@ export default async function RootLayout({
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Tigo Energy Shop',
+    name: 'Initra Energija',
     url: baseUrl,
     legalName: 'Initra Energija d.o.o.',
     logo: `${baseUrl}/tigo-logo.png`,
-    description: 'Authorized Tigo Energy distributor — solar optimizers, inverters, batteries and monitoring solutions across Europe.',
+    description: 'Independent authorized reseller of Tigo Energy products — solar optimizers, inverters, batteries and monitoring solutions across Europe. This site is not affiliated with or operated by Tigo Energy, Inc.',
     contactPoint: {
       '@type': 'ContactPoint',
       email: 'support@tigoenergy.shop',
@@ -114,7 +114,7 @@ export default async function RootLayout({
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: `Tigo Energy Shop ${market.countryName}`,
+    name: `Initra Energija — Tigo Products ${market.countryName}`,
     url: baseUrl,
     potentialAction: {
       '@type': 'SearchAction',

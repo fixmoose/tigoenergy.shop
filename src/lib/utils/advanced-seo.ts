@@ -27,7 +27,7 @@ export const buildProductSchema = (product: any, market: any) => {
             url: `https://${MARKET_DOMAINS[market.key]}/products/${product.slug}`,
             seller: {
                 '@type': 'Organization',
-                name: 'Tigo Energy',
+                name: 'Initra Energija d.o.o.',
                 url: `https://${MARKET_DOMAINS[market.key]}`
             }
         },
@@ -43,16 +43,12 @@ export const buildOrganizationSchema = (market: any) => {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'Tigo Energy',
-        alternateName: 'Tigo Energy Solutions',
-        description: 'Professional solar energy solutions provider',
+        name: 'Initra Energija d.o.o.',
+        alternateName: 'Initra Energija',
+        description: 'Independent authorized reseller of Tigo Energy products. This site is operated by Initra Energija d.o.o. and is not affiliated with Tigo Energy, Inc.',
         url: `https://${MARKET_DOMAINS[market.key]}`,
         logo: `https://${MARKET_DOMAINS[market.key]}/tigo-logo.png`,
-        sameAs: [
-            'https://www.facebook.com/tigoenergy',
-            'https://www.linkedin.com/company/tigo-energy',
-            'https://www.instagram.com/tigoenergy'
-        ],
+        sameAs: [],
         contactPoint: {
             '@type': 'ContactPoint',
             telephone: market.phone,
@@ -101,12 +97,12 @@ export const buildBreadcrumbSchema = (path: string, market: any) => {
 // Open Graph and Twitter Card builders
 export const buildOpenGraphData = (title: string, description: string, image: string, url: string, market: any) => {
     return {
-        title: `${title} | Tigo Energy ${market.countryName}`,
+        title: `${title} | Initra Energija — ${market.countryName}`,
         description: description,
         url: url,
         type: 'website',
         locale: market.locale,
-        site_name: 'Tigo Energy',
+        site_name: 'Initra Energija',
         images: [
             {
                 url: image,
@@ -124,8 +120,8 @@ export const buildTwitterCardData = (title: string, description: string, image: 
         title: title,
         description: description,
         image: image,
-        site: '@tigoenergy',
-        creator: '@tigoenergy'
+        site: '@initraenergija',
+        creator: '@initraenergija'
     }
 }
 

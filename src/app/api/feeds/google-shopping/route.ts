@@ -125,9 +125,9 @@ ${weightTag}
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
-    <title>Tigo Energy Shop - ${market.countryName}</title>
+    <title>Initra Energija - ${market.countryName}</title>
     <link>${baseUrl}</link>
-    <description>Tigo Energy solar optimization products - Authorized distributor for ${market.countryName}</description>
+    <description>Tigo Energy solar optimization products - Initra Energija, authorized reseller for ${market.countryName}</description>
 ${items}
   </channel>
 </rss>`

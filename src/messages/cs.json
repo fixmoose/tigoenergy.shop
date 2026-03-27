@@ -78,6 +78,7 @@
     "cookiePolicy": "Zásady používání cookies",
     "disclaimers": "Právní upozornění",
     "companyDesc": "Váš partner pro profesionální solární optimalizační řešení v celé Evropě.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Provozuje: Initra Energija d.o.o. - Autorizovaný distributor Tigo Energy",
     "trustAuthorized": "Autorizovaný distributor Tigo",
     "trustSecurePayments": "Bezpečné platby",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Dobrý den,",
     "bestRegards": "S pozdravem,",
-    "team": "Tým Tigo Energy SHOP",
+    "team": "Tým Initra Energija",
     "verificationCode": {
       "title": "Ověřte svou e-mailovou adresu",
-      "text": "Děkujeme, že jste se připojili k Tigo Energy SHOP. Pro dokončení registrace a zabezpečení vašeho účtu použijte prosím následující ověřovací kód:",
+      "text": "Děkujeme, že jste se připojili k Initra Energija. Pro dokončení registrace a zabezpečení vašeho účtu použijte prosím následující ověřovací kód:",
       "expire": "Tento kód vyprší za 10 minut. Pokud jste tuto žádost neodeslali, ignorujte prosím tento e-mail."
     },
     "verificationLink": {
       "title": "Ověřte svou e-mailovou adresu",
       "helloWithName": "Dobrý den {{name}},",
-      "text": "Vítejte v Tigo Energy SHOP! Kliknutím na tlačítko níže ověřte svou e-mailovou adresu a aktivujte svůj účet.",
+      "text": "Vítejte v Initra Energija! Kliknutím na tlačítko níže ověřte svou e-mailovou adresu a aktivujte svůj účet.",
       "button": "Ověřit e-mailovou adresu",
       "linkHelp": "Pokud tlačítko výše nefunguje, můžete také zkopírovat a vložit následující odkaz do svého prohlížeče:",
       "ignore": "Pokud jste si účet nevytvořili, není vyžadována žádná další akce."
     },
     "welcome": {
       "title": "Vítejte v rodině!",
-      "text": "Jsme nadšeni, že vás máme v Tigo Energy SHOP. Nyní jste spojeni s úzce specializovaným evropským distributorem solárních řešení Tigo Energy.",
+      "text": "Jsme nadšeni, že vás máme v Initra Energija. Nyní jste spojeni s úzce specializovaným evropským distributorem solárních řešení Tigo Energy.",
       "feature1": "Odborná podpora",
       "feature1Desc": "Přímý přístup k technickým expertům, kteří znají produkty Tigo do detailu.",
       "feature2": "Přímá distribuce",
@@ -363,7 +364,7 @@
       "amountPaid": "Zaplacená částka (produkty):",
       "shippingStatus": "Stav dopravy:",
       "pending": "Čeká na výpočet",
-      "footerNote": "Děkujeme za trpělivost a za to, že jste si vybrali Tigo Energy SHOP."
+      "footerNote": "Děkujeme za trpělivost a za to, že jste si vybrali Initra Energija."
     },
     "cartAbandonment": {
       "title": "Zapomněli jste na něco?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B účet vytvořen",
       "greeting": "Dobrý den",
-      "thankYou": "Děkujeme za registraci B2B účtu v Tigo Energy SHOP. Jsme rádi, že jste s námi!",
+      "thankYou": "Děkujeme za registraci B2B účtu v Initra Energija. Jsme rádi, že jste s námi!",
       "bannerTitle": "Váš účet je připraven!",
       "bannerText": "Váš B2B účet je nyní aktivní. Můžete okamžitě začít nakupovat a využívat B2B ceny a profesionální nástroje.",
       "text": "Jednoduše se přihlaste ke svému účtu a prohlédněte si naši kompletní nabídku produktů, získejte přístup k B2B cenám a zadávejte objednávky.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Obnovení hesla",
-      "text": "Obdrželi jsme žádost o obnovení hesla k vašemu účtu Tigo Energy SHOP. Kliknutím na tlačítko níže si vyberte nové heslo.",
+      "text": "Obdrželi jsme žádost o obnovení hesla k vašemu účtu Initra Energija. Kliknutím na tlačítko níže si vyberte nové heslo.",
       "button": "Obnovit heslo",
       "linkHelp": "Pokud tlačítko výše nefunguje, můžete také zkopírovat a vložit následující odkaz do svého prohlížeče:",
       "expire": "Tento odkaz vyprší za 1 hodinu. Pokud jste o obnovení hesla nežádali, tento e-mail prosím ignorujte nebo kontaktujte podporu, pokud máte obavy."

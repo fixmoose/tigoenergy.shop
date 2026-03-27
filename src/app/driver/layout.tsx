@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Driver Portal — Tigo Energy SHOP',
+    title: 'Driver Portal — Initra Energija',
     robots: { index: false, follow: false },
 }
 

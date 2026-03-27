@@ -78,6 +78,7 @@
     "cookiePolicy": "Cookie szabályzat",
     "disclaimers": "Jogi nyilatkozatok",
     "companyDesc": "Az Ön partnere professzionális napenergia optimalizálási megoldásokhoz Európa-szerte.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Üzemelteti: Initra Energija d.o.o. - Hivatalos Tigo Energy forgalmazó",
     "trustAuthorized": "Hivatalos Tigo forgalmazó",
     "trustSecurePayments": "Biztonságos fizetés",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Üdvözöljük,",
     "bestRegards": "Üdvözlettel,",
-    "team": "A Tigo Energy SHOP csapata",
+    "team": "A Initra Energija csapata",
     "verificationCode": {
       "title": "E-mail cím megerősítése",
-      "text": "Köszönjük, hogy csatlakozott a Tigo Energy SHOP-hoz. A regisztráció befejezéséhez és fiókja biztonságához kérjük, használja az alábbi ellenőrző kódot:",
+      "text": "Köszönjük, hogy csatlakozott a Initra Energija-hoz. A regisztráció befejezéséhez és fiókja biztonságához kérjük, használja az alábbi ellenőrző kódot:",
       "expire": "Ez a kód 10 perc múlva lejár. Ha nem Ön kérte ezt, kérjük, hagyja figyelmen kívül ezt az e-mailt."
     },
     "verificationLink": {
       "title": "E-mail cím megerősítése",
       "helloWithName": "Üdvözöljük {{name}},",
-      "text": "Üdvözöljük a Tigo Energy SHOP-ban! Kérjük, kattintson az alábbi gombra e-mail címe megerősítéséhez és fiókja aktiválásához.",
+      "text": "Üdvözöljük a Initra Energija-ban! Kérjük, kattintson az alábbi gombra e-mail címe megerősítéséhez és fiókja aktiválásához.",
       "button": "E-mail cím megerősítése",
       "linkHelp": "Ha a fenti gomb nem működik, másolhatja és beillesztheti az alábbi linket a böngészőjébe:",
       "ignore": "Ha nem hozott létre fiókot, nincs szükség további intézkedésre."
     },
     "welcome": {
       "title": "Üdvözöljük a családban!",
-      "text": "Örülünk, hogy a Tigo Energy SHOP vásárlói között üdvözölhetjük. Mostantól kapcsolatban áll Európa specializált Tigo Energy napelem megoldások forgalmazójával.",
+      "text": "Örülünk, hogy a Initra Energija vásárlói között üdvözölhetjük. Mostantól kapcsolatban áll Európa specializált Tigo Energy napelem megoldások forgalmazójával.",
       "feature1": "Szakértői támogatás",
       "feature1Desc": "Közvetlen hozzáférés műszaki szakértőkhöz, akik kívül-belül ismerik a Tigo termékeket.",
       "feature2": "Közvetlen disztribúció",
@@ -363,7 +364,7 @@
       "amountPaid": "Fizetett összeg (termékek):",
       "shippingStatus": "Szállítás állapota:",
       "pending": "Számítás alatt",
-      "footerNote": "Köszönjük türelmét, és hogy a Tigo Energy SHOP-ot választotta."
+      "footerNote": "Köszönjük türelmét, és hogy a Initra Energija-ot választotta."
     },
     "cartAbandonment": {
       "title": "Elfelejtett valamit?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B fiók létrehozva",
       "greeting": "Üdvözöljük",
-      "thankYou": "Köszönjük, hogy B2B fiókot regisztrált a Tigo Energy SHOP-ban. Örülünk, hogy velünk van!",
+      "thankYou": "Köszönjük, hogy B2B fiókot regisztrált a Initra Energija-ban. Örülünk, hogy velünk van!",
       "bannerTitle": "Fiókja készen áll!",
       "bannerText": "B2B fiókja most aktív. Azonnal elkezdheti a vásárlást, és élvezheti a B2B árakat és professzionális eszközöket.",
       "text": "Egyszerűen jelentkezzen be fiókjába, hogy böngészhesse teljes termékkínálatunkat, hozzáférjen B2B áraihoz és rendeléseket adjon le.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Jelszó visszaállítása",
-      "text": "Kérést kaptunk a Tigo Energy SHOP fiókjához tartozó jelszó visszaállítására. Kérjük, kattintson az alábbi gombra új jelszó megadásához.",
+      "text": "Kérést kaptunk a Initra Energija fiókjához tartozó jelszó visszaállítására. Kérjük, kattintson az alábbi gombra új jelszó megadásához.",
       "button": "Jelszó visszaállítása",
       "linkHelp": "Ha a fenti gomb nem működik, másolhatja és beillesztheti az alábbi linket a böngészőjébe:",
       "expire": "Ez a link 1 óra múlva lejár. Ha nem kérte a jelszó visszaállítását, kérjük, hagyja figyelmen kívül ezt az e-mailt, vagy forduljon az ügyfélszolgálathoz, ha aggályai vannak."

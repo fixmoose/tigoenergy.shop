@@ -62,7 +62,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: 'Return Policy: We offer a 14-day return policy for all unused items in their original packaging. Please contact support@tigoenergy.com for return authorizations.',
         warranty: 'Warranty: All products listed on this invoice are covered by a 1-year standard limited warranty starting from the date of delivery.',
         legalAgreement: 'Legal Agreement: Customer electronically agreed to the Terms & Conditions on:',
-        thankYou: 'Thank you for choosing Tigo Energy. Sustainability is our mission.',
+        thankYou: 'Thank you for choosing Initra Energija. Sustainability is our mission.',
     },
     de: {
         officialShopInvoice: 'Offizielle Shop-Rechnung',
@@ -84,7 +84,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: 'Rückgaberecht: Wir bieten ein 14-tägiges Rückgaberecht für alle unbenutzten Artikel in der Originalverpackung. Bitte kontaktieren Sie support@tigoenergy.com für Rücksendegenehmigungen.',
         warranty: 'Garantie: Alle auf dieser Rechnung aufgeführten Produkte sind durch eine 1-jährige Standard-Garantie ab Lieferdatum abgedeckt.',
         legalAgreement: 'Rechtsvereinbarung: Der Kunde hat den Allgemeinen Geschäftsbedingungen elektronisch zugestimmt am:',
-        thankYou: 'Vielen Dank, dass Sie sich für Tigo Energy entschieden haben. Nachhaltigkeit ist unsere Mission.',
+        thankYou: 'Vielen Dank, dass Sie sich für Initra Energija entschieden haben. Nachhaltigkeit ist unsere Mission.',
     },
     fr: {
         officialShopInvoice: 'Facture officielle de la boutique',
@@ -106,7 +106,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: "Politique de retour : Nous offrons un retour sous 14 jours pour tous les articles non utilisés dans leur emballage d'origine. Veuillez contacter support@tigoenergy.com pour les autorisations de retour.",
         warranty: "Garantie : Tous les produits figurant sur cette facture sont couverts par une garantie limitée standard d'un an à compter de la date de livraison.",
         legalAgreement: 'Accord juridique : Le client a accepté électroniquement les conditions générales le :',
-        thankYou: "Merci d'avoir choisi Tigo Energy. La durabilité est notre mission.",
+        thankYou: "Merci d'avoir choisi Initra Energija. La durabilité est notre mission.",
     },
     it: {
         officialShopInvoice: 'Fattura ufficiale del negozio',
@@ -128,7 +128,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: "Politica di reso: Offriamo un reso entro 14 giorni per tutti gli articoli non utilizzati nella confezione originale. Contattare support@tigoenergy.com per le autorizzazioni al reso.",
         warranty: "Garanzia: Tutti i prodotti elencati in questa fattura sono coperti da una garanzia limitata standard di 1 anno dalla data di consegna.",
         legalAgreement: 'Accordo legale: Il cliente ha accettato elettronicamente i Termini e Condizioni il:',
-        thankYou: 'Grazie per aver scelto Tigo Energy. La sostenibilità è la nostra missione.',
+        thankYou: 'Grazie per aver scelto Initra Energija. La sostenibilità è la nostra missione.',
     },
     sl: {
         officialShopInvoice: 'Uradni račun spletne trgovine',
@@ -150,7 +150,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: 'Politika vračil: Ponujamo 14-dnevno politiko vračil za vse neuporabljene izdelke v originalni embalaži. Za odobritve vračil kontaktirajte support@tigoenergy.com.',
         warranty: 'Garancija: Vsi izdelki na tem računu so zajeti z 1-letno standardno omejeno garancijo od datuma dostave.',
         legalAgreement: 'Pravni dogovor: Stranka je elektronsko sprejela Splošne pogoje dne:',
-        thankYou: 'Hvala, ker ste izbrali Tigo Energy. Trajnost je naše poslanstvo.',
+        thankYou: 'Hvala, ker ste izbrali Initra Energija. Trajnost je naše poslanstvo.',
     },
     es: {
         officialShopInvoice: 'Factura oficial de la tienda',
@@ -172,7 +172,7 @@ const INVOICE_LABELS: Record<string, Record<string, string>> = {
         returnPolicy: 'Política de devolución: Ofrecemos una política de devolución de 14 días para todos los artículos sin usar en su embalaje original. Contacte support@tigoenergy.com para autorizaciones de devolución.',
         warranty: 'Garantía: Todos los productos en esta factura están cubiertos por una garantía limitada estándar de 1 año desde la fecha de entrega.',
         legalAgreement: 'Acuerdo legal: El cliente aceptó electrónicamente los Términos y Condiciones el:',
-        thankYou: 'Gracias por elegir Tigo Energy. La sostenibilidad es nuestra misión.',
+        thankYou: 'Gracias por elegir Initra Energija. La sostenibilidad es nuestra misión.',
     },
 }
 

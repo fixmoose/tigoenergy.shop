@@ -124,10 +124,10 @@ export const AccountingReportPDF = ({ orders, summary, period }: AccountingRepor
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.title}>Accounting Report</Text>
-                        <Text style={styles.subtitle}>Tigo Energy Shop — {period}</Text>
+                        <Text style={styles.subtitle}>Initra Energija — {period}</Text>
                     </View>
                     <View style={{ textAlign: 'right' }}>
-                        <Text style={{ fontSize: 10, fontWeight: 'bold' }}>Tigo Energy SI</Text>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold' }}>Initra Energija d.o.o.</Text>
                         <Text style={{ fontSize: 8 }}>Internal Financial Document</Text>
                     </View>
                 </View>
@@ -182,7 +182,7 @@ export const AccountingReportPDF = ({ orders, summary, period }: AccountingRepor
 
                 <View style={styles.footer}>
                     <Text>Generated on {new Date().toLocaleString()} • Page 1 of 1</Text>
-                    <Text style={{ marginTop: 2 }}>Tigo Energy Shop Administrative Portal</Text>
+                    <Text style={{ marginTop: 2 }}>Initra Energija — Administrative Portal</Text>
                 </View>
             </Page>
         </Document>

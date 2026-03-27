@@ -78,6 +78,7 @@
     "cookiePolicy": "Politica de cookie-uri",
     "disclaimers": "Disclaimer-uri legale",
     "companyDesc": "Partenerul dvs. pentru soluții profesionale de optimizare solară în toată Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Operat de: Initra Energija d.o.o. - Distribuitor autorizat Tigo Energy",
     "trustAuthorized": "Distribuitor Tigo autorizat",
     "trustSecurePayments": "Plăți securizate",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Bună ziua,",
     "bestRegards": "Cu stimă,",
-    "team": "Echipa Tigo Energy SHOP",
+    "team": "Echipa Initra Energija",
     "verificationCode": {
       "title": "Verificați-vă adresa de e-mail",
-      "text": "Vă mulțumim că v-ați alăturat Tigo Energy SHOP. Pentru a finaliza înregistrarea și a vă securiza contul, vă rugăm să utilizați următorul cod de verificare:",
+      "text": "Vă mulțumim că v-ați alăturat Initra Energija. Pentru a finaliza înregistrarea și a vă securiza contul, vă rugăm să utilizați următorul cod de verificare:",
       "expire": "Acest cod va expira în 10 minute. Dacă nu ați solicitat acest lucru, vă rugăm să ignorați acest e-mail."
     },
     "verificationLink": {
       "title": "Verificați-vă adresa de e-mail",
       "helloWithName": "Bună ziua {{name}},",
-      "text": "Bine ați venit la Tigo Energy SHOP! Vă rugăm să faceți clic pe butonul de mai jos pentru a vă verifica adresa de e-mail și a vă activa contul.",
+      "text": "Bine ați venit la Initra Energija! Vă rugăm să faceți clic pe butonul de mai jos pentru a vă verifica adresa de e-mail și a vă activa contul.",
       "button": "Verifică adresa de e-mail",
       "linkHelp": "Dacă butonul de mai sus nu funcționează, puteți copia și lipi următorul link în browserul dvs.:",
       "ignore": "Dacă nu ați creat un cont, nu este necesară nicio altă acțiune."
     },
     "welcome": {
       "title": "Bine ați venit în familie!",
-      "text": "Suntem încântați să vă avem la Tigo Energy SHOP. Acum sunteți conectat la distribuitorul specializat din Europa pentru soluții solare Tigo Energy.",
+      "text": "Suntem încântați să vă avem la Initra Energija. Acum sunteți conectat la distribuitorul specializat din Europa pentru soluții solare Tigo Energy.",
       "feature1": "Suport de specialitate",
       "feature1Desc": "Acces direct la experți tehnici care cunosc produsele Tigo în detaliu.",
       "feature2": "Distribuție directă",
@@ -363,7 +364,7 @@
       "amountPaid": "Suma plătită (Produse):",
       "shippingStatus": "Starea expedierii:",
       "pending": "Calcul în așteptare",
-      "footerNote": "Vă mulțumim pentru răbdare și pentru că ați ales Tigo Energy SHOP."
+      "footerNote": "Vă mulțumim pentru răbdare și pentru că ați ales Initra Energija."
     },
     "cartAbandonment": {
       "title": "Ați uitat ceva?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Cont B2B creat",
       "greeting": "Bună ziua",
-      "thankYou": "Vă mulțumim că ați înregistrat un cont B2B la Tigo Energy SHOP. Suntem încântați să vă avem alături!",
+      "thankYou": "Vă mulțumim că ați înregistrat un cont B2B la Initra Energija. Suntem încântați să vă avem alături!",
       "bannerTitle": "Contul dvs. este pregătit!",
       "bannerText": "Contul dvs. B2B este acum activ. Puteți începe să faceți cumpărături imediat și să beneficiați de prețuri B2B și instrumente profesionale.",
       "text": "Pur și simplu conectați-vă la contul dvs. pentru a răsfoi gama noastră completă de produse, a accesa prețurile B2B și a plasa comenzi.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Resetați-vă parola",
-      "text": "Am primit o solicitare de resetare a parolei pentru contul dvs. Tigo Energy SHOP. Vă rugăm să faceți clic pe butonul de mai jos pentru a alege o parolă nouă.",
+      "text": "Am primit o solicitare de resetare a parolei pentru contul dvs. Initra Energija. Vă rugăm să faceți clic pe butonul de mai jos pentru a alege o parolă nouă.",
       "button": "Resetează parola",
       "linkHelp": "Dacă butonul de mai sus nu funcționează, puteți copia și lipi următorul link în browserul dvs.:",
       "expire": "Acest link va expira în o oră. Dacă nu ați solicitat resetarea parolei, vă rugăm să ignorați acest e-mail sau să contactați suportul dacă aveți nelămuriri."

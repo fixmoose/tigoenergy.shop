@@ -2,7 +2,7 @@ import AdminNavigation from '@/components/admin/AdminNavigation'
 import { cookies } from 'next/headers'
 
 export const metadata = {
-  title: 'Admin - Tigo Energy',
+  title: 'Admin - Initra Energija',
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

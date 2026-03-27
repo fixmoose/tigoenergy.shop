@@ -441,7 +441,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     SHOP: {
         key: 'SHOP',
         country: 'EU',
-        countryName: 'Tigo Energy Shop',
+        countryName: 'Initra Energija',
         defaultLanguage: 'en',
         availableLanguages: ['en', 'de', 'fr', 'it', 'es', 'nl', 'pl', 'cs', 'sl', 'hr', 'sk', 'sv', 'da', 'ro', 'sr', 'sr-Cyrl', 'mk', 'bg', 'no', 'hu', 'pt', 'lv', 'lt', 'et'],
         currency: 'EUR',

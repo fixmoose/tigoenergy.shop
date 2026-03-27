@@ -21,17 +21,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
+            <Link href="/" className="flex items-center gap-3 mb-4">
               <img
                 src="/tigo-distributor-logo.png"
-                alt="Tigo Distributor"
+                alt="Initra Energija — Tigo Products"
                 className="h-16"
               />
             </Link>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-3">
               {t('companyDesc')}
             </p>
-
+            <p className="text-[10px] text-gray-500 leading-relaxed border-t border-gray-800 pt-3">
+              {t('independentDisclaimer')}
+            </p>
           </div>
 
           {/* Products */}
@@ -86,8 +88,8 @@ export default function Footer() {
               <a href="https://www.shopauskunft.de/review/tigoenergy.de" target="_blank" rel="noopener noreferrer" className="block hover:opacity-90 transition">
                 <img
                   src="https://assets.shopauskunft.de/tigo-energy-shop/seal_listed_c3fbd4b2-8c83-4cce-b19f-679edbef947c.png"
-                  alt="Tigo Energy SHOP ist gelistet bei ShopAuskunft.de"
-                  title="Tigo Energy SHOP bei Shopauskunft.de"
+                  alt="Initra Energija ist gelistet bei ShopAuskunft.de"
+                  title="Initra Energija bei Shopauskunft.de"
                   className="h-16 mx-auto"
                 />
               </a>
@@ -135,7 +137,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
             <div className="text-center text-gray-400 text-sm mb-4">
-              <p>&copy; {new Date().getFullYear()} Tigo Energy Shop</p>
+              <p>&copy; {new Date().getFullYear()} Initra Energija d.o.o. — Authorized Tigo Energy Reseller</p>
             </div>
             <div className="flex flex-wrap justify-center gap-4 text-gray-400 items-center">
               <Link href="/impressum" className="hover:text-white transition">{t('impressum')}</Link>

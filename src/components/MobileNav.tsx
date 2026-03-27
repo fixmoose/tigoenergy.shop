@@ -75,5 +75,5 @@ function getPageTitle(pathname: string): string {
     if (pathname === '/returns') return 'Returns'
     if (pathname === '/terms') return 'Terms'
     if (pathname === '/privacy') return 'Privacy'
-    return 'Tigo Energy'
+    return 'Initra Energija'
 }

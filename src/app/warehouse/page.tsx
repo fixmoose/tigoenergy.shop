@@ -216,7 +216,7 @@ export default function WarehousePortal() {
                             </svg>
                         </div>
                         <h1 className="text-xl font-bold text-white">Skladišče</h1>
-                        <p className="text-slate-400 text-sm mt-1">Tigo Energy</p>
+                        <p className="text-slate-400 text-sm mt-1">Initra Energija</p>
                     </div>
                     <input
                         type="email"

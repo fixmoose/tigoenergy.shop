@@ -78,6 +78,7 @@
     "cookiePolicy": "Sīkdatņu politika",
     "disclaimers": "Atrunas",
     "companyDesc": "Jūsu partneris profesionāliem saules optimizācijas risinājumiem visā Eiropā.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Uztur: Initra Energija d.o.o. - Pilnvarots Tigo Energy izplatītājs",
     "trustAuthorized": "Pilnvarots Tigo izplatītājs",
     "trustSecurePayments": "Droši maksājumi",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Sveicināti,",
     "bestRegards": "Ar cieņu,",
-    "team": "Tigo Energy SHOP komanda",
+    "team": "Initra Energija komanda",
     "verificationCode": {
       "title": "Apstipriniet savu e-pasta adresi",
-      "text": "Paldies, ka pievienojāties Tigo Energy SHOP. Lai pabeigtu reģistrāciju un nodrošinātu savu kontu, lūdzu, izmantojiet šo verifikācijas kodu:",
+      "text": "Paldies, ka pievienojāties Initra Energija. Lai pabeigtu reģistrāciju un nodrošinātu savu kontu, lūdzu, izmantojiet šo verifikācijas kodu:",
       "expire": "Šis kods būs derīgs 10 minūtes. Ja jūs nepieprasījāt šo kodu, lūdzu, ignorējiet šo e-pastu."
     },
     "verificationLink": {
       "title": "Apstipriniet savu e-pasta adresi",
       "helloWithName": "Sveiki, {{name}}!",
-      "text": "Laipni lūdzam Tigo Energy SHOP! Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai apstiprinātu savu e-pasta adresi un aktivizētu savu kontu.",
+      "text": "Laipni lūdzam Initra Energija! Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai apstiprinātu savu e-pasta adresi un aktivizētu savu kontu.",
       "button": "Apstiprināt e-pasta adresi",
       "linkHelp": "Ja augstāk esošā poga nedarbojas, varat arī nokopēt un ielīmēt šo saiti savā pārlūkprogrammā:",
       "ignore": "Ja jūs neizveidojāt kontu, nekāda turpmāka rīcība nav nepieciešama."
     },
     "welcome": {
       "title": "Laipni lūdzam ģimenē!",
-      "text": "Mēs priecājamies, ka esat kopā ar mums Tigo Energy SHOP. Tagad jūs esat saistīts ar Eiropas specializēto Tigo Energy saules enerģijas risinājumu izplatītāju.",
+      "text": "Mēs priecājamies, ka esat kopā ar mums Initra Energija. Tagad jūs esat saistīts ar Eiropas specializēto Tigo Energy saules enerģijas risinājumu izplatītāju.",
       "feature1": "Ekspertu atbalsts",
       "feature1Desc": "Tieša piekļuve tehniskajiem ekspertiem, kuri pārzina Tigo produktus no iekšienes.",
       "feature2": "Tiešā izplatīšana",
@@ -363,7 +364,7 @@
       "amountPaid": "Apmaksātā summa (Produkti):",
       "shippingStatus": "Piegādes statuss:",
       "pending": "Gaida aprēķinu",
-      "footerNote": "Paldies par pacietību un par to, ka izvēlējāties Tigo Energy SHOP."
+      "footerNote": "Paldies par pacietību un par to, ka izvēlējāties Initra Energija."
     },
     "cartAbandonment": {
       "title": "Vai kaut ko aizmirsāt?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B konts izveidots",
       "greeting": "Sveiki",
-      "thankYou": "Paldies, ka reģistrējāt B2B kontu Tigo Energy SHOP. Mēs priecājamies, ka esat ar mums!",
+      "thankYou": "Paldies, ka reģistrējāt B2B kontu Initra Energija. Mēs priecājamies, ka esat ar mums!",
       "bannerTitle": "Jūsu konts ir gatavs!",
       "bannerText": "Jūsu B2B konts tagad ir aktīvs. Jūs varat nekavējoties sākt iepirkties un izmantot B2B cenas un profesionālos rīkus.",
       "text": "Vienkārši piesakieties savā kontā, lai pārlūkotu mūsu pilno produktu klāstu, piekļūtu B2B cenām un veiktu pasūtījumus.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Atiestatiet savu paroli",
-      "text": "Mēs saņēmām pieprasījumu atiestatīt jūsu Tigo Energy SHOP konta paroli. Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai izvēlētos jaunu paroli.",
+      "text": "Mēs saņēmām pieprasījumu atiestatīt jūsu Initra Energija konta paroli. Lūdzu, noklikšķiniet uz tālāk esošās pogas, lai izvēlētos jaunu paroli.",
       "button": "Atiestatīt paroli",
       "linkHelp": "Ja augstāk esošā poga nedarbojas, varat arī nokopēt un ielīmēt šo saiti savā pārlūkprogrammā:",
       "expire": "Šī saite būs derīga 1 stundu. Ja jūs nepieprasījāt paroles atiestatīšanu, lūdzu, ignorējiet šo e-pastu vai sazinieties ar atbalsta dienestu, ja jums ir bažas."

@@ -510,7 +510,7 @@ export async function adminSendOrderToClientAction(orderId: string) {
 
         await sendEmail({
             to: order.customer_email,
-            subject: `Your Order #${order.order_number} — Tigo Energy SHOP`,
+            subject: `Your Order #${order.order_number} — Initra Energija`,
             html,
             orderId,
             emailType: 'order_summary',

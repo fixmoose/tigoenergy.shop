@@ -80,7 +80,7 @@ export async function registerUserAction(formData: any) {
 
         try {
             const translations = await getEmailTranslations(locale)
-            const subject = translations.email?.welcome?.title || 'Welcome to Tigo Energy SHOP'
+            const subject = translations.email?.welcome?.title || 'Welcome to Initra Energija'
             const html = await renderTemplate('welcome', { name: firstName }, locale)
             await sendEmail({ to: email, subject, html, emailType: 'welcome' })
         } catch (emailError) {
@@ -215,7 +215,7 @@ export async function registerB2BUserAction(formData: any) {
                 company_name: companyName,
             }, locale)
             const translations = await getEmailTranslations(locale)
-            const subject = translations.email?.b2bApplication?.title || 'B2B Application Received — Tigo Energy SHOP'
+            const subject = translations.email?.b2bApplication?.title || 'B2B Application Received — Initra Energija'
             await sendEmail({ to: email, subject, html, emailType: 'b2b_application' })
         } catch (emailError) {
             console.error('Failed to send B2B application email:', emailError)

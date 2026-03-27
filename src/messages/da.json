@@ -78,6 +78,7 @@
     "cookiePolicy": "Cookiepolitik",
     "disclaimers": "Ansvarsfraskrivelser",
     "companyDesc": "Din partner for professionelle soloptimerings løsninger i hele Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Drevet af: Initra Energija d.o.o. - Autoriseret Tigo Energy distributør",
     "trustAuthorized": "Autoriseret Tigo distributør",
     "trustSecurePayments": "Sikre betalinger",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Hej,",
     "bestRegards": "Med venlig hilsen,",
-    "team": "Tigo Energy SHOP-teamet",
+    "team": "Initra Energija-teamet",
     "verificationCode": {
       "title": "Bekræft din e-mailadresse",
-      "text": "Tak fordi du har tilmeldt dig Tigo Energy SHOP. For at færdiggøre din registrering og sikre din konto skal du bruge følgende bekræftelseskode:",
+      "text": "Tak fordi du har tilmeldt dig Initra Energija. For at færdiggøre din registrering og sikre din konto skal du bruge følgende bekræftelseskode:",
       "expire": "Denne kode udløber om 10 minutter. Hvis du ikke har anmodet om dette, skal du ignorere denne e-mail."
     },
     "verificationLink": {
       "title": "Bekræft din e-mailadresse",
       "helloWithName": "Hej {{name}},",
-      "text": "Velkommen til Tigo Energy SHOP! Klik på knappen nedenfor for at bekræfte din e-mailadresse og aktivere din konto.",
+      "text": "Velkommen til Initra Energija! Klik på knappen nedenfor for at bekræfte din e-mailadresse og aktivere din konto.",
       "button": "Bekræft e-mailadresse",
       "linkHelp": "Hvis knappen ovenfor ikke virker, kan du også kopiere og indsætte følgende link i din browser:",
       "ignore": "Hvis du ikke har oprettet en konto, er der ikke brug for yderligere handling."
     },
     "welcome": {
       "title": "Velkommen til familien!",
-      "text": "Vi er glade for at have dig hos Tigo Energy SHOP. Du er nu forbundet med Europas specialiserede distributør af Tigo Energy solcelleløsninger.",
+      "text": "Vi er glade for at have dig hos Initra Energija. Du er nu forbundet med Europas specialiserede distributør af Tigo Energy solcelleløsninger.",
       "feature1": "Ekspertsupport",
       "feature1Desc": "Direkte adgang til tekniske eksperter, der kender Tigo-produkter ud og ind.",
       "feature2": "Direkte distribution",
@@ -363,7 +364,7 @@
       "amountPaid": "Betalt beløb (produkter):",
       "shippingStatus": "Forsendelsesstatus:",
       "pending": "Afventer beregning",
-      "footerNote": "Tak for din tålmodighed, og fordi du valgte Tigo Energy SHOP."
+      "footerNote": "Tak for din tålmodighed, og fordi du valgte Initra Energija."
     },
     "cartAbandonment": {
       "title": "Glemte du noget?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B-konto oprettet",
       "greeting": "Hej",
-      "thankYou": "Tak fordi du registrerede en B2B-konto hos Tigo Energy SHOP. Vi er glade for at have dig med!",
+      "thankYou": "Tak fordi du registrerede en B2B-konto hos Initra Energija. Vi er glade for at have dig med!",
       "bannerTitle": "Din konto er klar!",
       "bannerText": "Din B2B-konto er nu aktiv. Du kan begynde at handle med det samme og nyde B2B-priser og professionelle værktøjer.",
       "text": "Log blot ind på din konto for at gennemse vores fulde produktsortiment, få adgang til dine B2B-priser og afgive ordrer.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Nulstil din adgangskode",
-      "text": "Vi har modtaget en anmodning om at nulstille adgangskoden til din Tigo Energy SHOP-konto. Klik på knappen nedenfor for at vælge en ny adgangskode.",
+      "text": "Vi har modtaget en anmodning om at nulstille adgangskoden til din Initra Energija-konto. Klik på knappen nedenfor for at vælge en ny adgangskode.",
       "button": "Nulstil adgangskode",
       "linkHelp": "Hvis knappen ovenfor ikke virker, kan du også kopiere og indsætte følgende link i din browser:",
       "expire": "Dette link udløber om 1 time. Hvis du ikke har anmodet om en nulstilling af adgangskoden, skal du ignorere denne e-mail eller kontakte support, hvis du har spørgsmål."

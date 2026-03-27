@@ -48,13 +48,13 @@ export async function POST(req: NextRequest) {
 
         await sendEmail({
             to: email,
-            subject: `Accounting Documents - Tigo Energy Shop - ${periodName}`,
+            subject: `Accounting Documents - Initra Energija - ${periodName}`,
             emailType: 'accounting_share',
             html: `
                 <div style="font-family: sans-serif; color: #334155;">
                     <h2 style="color: #1e293b;">Accounting Data Request</h2>
                     <p>Hello,</p>
-                    <p>The Tigo Energy Shop administration has shared accounting documents with you for the following period:</p>
+                    <p>The Initra Energija administration has shared accounting documents with you for the following period:</p>
                     <p><strong>Period:</strong> ${periodName}</p>
                     <p>You can access and download all invoices in a single PDF document through the link below:</p>
                     <div style="margin: 25px 0;">
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
                     </p>
                     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
                     <p style="font-size: 12px; color: #94a3b8;">
-                        Tigo Energy Shop • Automated Accounting Notification
+                        Initra Energija • Automated Accounting Notification
                     </p>
                 </div>
             `

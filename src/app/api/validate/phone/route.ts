@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         // 5. SEND SMS
         const smsResult = await sendSMS({
             to: phone,
-            text: `Tigo Energy: Your verification code is ${code}`
+            text: `Initra: Your verification code is ${code}`
         })
 
         if (!smsResult.success) {

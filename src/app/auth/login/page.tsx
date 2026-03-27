@@ -3,8 +3,8 @@ import { Metadata } from 'next'
 import { useTranslations } from 'next-intl'
 
 export const metadata: Metadata = {
-    title: 'Sign In | Tigo Energy Shop',
-    description: 'Sign in to your Tigo Energy Shop account to manage orders, view pricing, and more.',
+    title: 'Sign In | Initra Energija',
+    description: 'Sign in to your Initra Energija account to manage orders, view pricing, and more.',
 }
 
 export default function LoginPage() {

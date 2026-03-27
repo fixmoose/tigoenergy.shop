@@ -180,7 +180,7 @@ export async function inviteAdminAction(email: string) {
 
         await sendEmail({
             to: email,
-            subject: 'Invitation to Tigo Energy SHOP Admin Team',
+            subject: 'Invitation to Initra Energija Admin Team',
             html,
             emailType: 'admin_invite',
         })
@@ -383,12 +383,12 @@ export async function adminVerifyB2BCustomerAction(customerId: string) {
         const locale = customer.preferred_language || 'en'
         const html = await renderTemplate('b2b-vies-verified', {}, locale)
         const subjectMap: Record<string, string> = {
-            sl: 'Vaš B2B račun je potrjen — Tigo Energy SHOP',
-            de: 'Ihr B2B-Konto wurde verifiziert — Tigo Energy SHOP',
-            it: 'Il tuo account B2B è stato verificato — Tigo Energy SHOP',
-            fr: 'Votre compte B2B a été vérifié — Tigo Energy SHOP',
+            sl: 'Vaš B2B račun je potrjen — Initra Energija',
+            de: 'Ihr B2B-Konto wurde verifiziert — Initra Energija',
+            it: 'Il tuo account B2B è stato verificato — Initra Energija',
+            fr: 'Votre compte B2B a été vérifié — Initra Energija',
         }
-        const subject = subjectMap[locale] || 'Your B2B Account is Verified — Tigo Energy SHOP'
+        const subject = subjectMap[locale] || 'Your B2B Account is Verified — Initra Energija'
         await sendEmail({ to: customer.email, subject, html, skipUnsubscribe: true, emailType: 'b2b_verification' })
 
         revalidatePath(`/admin/customers/${customerId}`)
@@ -1108,14 +1108,14 @@ export async function adminCreateOrderWithCustomerAction(payload: {
                     }, setupLocale);
 
                     const setupSubjectMap: Record<string, string> = {
-                        sl: 'Aktivirajte svoj račun Tigo Energy SHOP',
-                        de: 'Aktivieren Sie Ihr Tigo Energy SHOP-Konto',
-                        it: 'Attiva il tuo account Tigo Energy SHOP',
-                        fr: 'Activez votre compte Tigo Energy SHOP',
+                        sl: 'Aktivirajte svoj račun Initra Energija',
+                        de: 'Aktivieren Sie Ihr Initra Energija-Konto',
+                        it: 'Attiva il tuo account Initra Energija',
+                        fr: 'Activez votre compte Initra Energija',
                     };
                     await sendEmail({
                         to: customer.email,
-                        subject: setupSubjectMap[setupLocale] || 'Activate Your Tigo Energy SHOP Account',
+                        subject: setupSubjectMap[setupLocale] || 'Activate Your Initra Energija Account',
                         html: welcomeHtml,
                         emailType: 'account_setup',
                     });
@@ -1360,7 +1360,7 @@ export async function adminSendInvoiceEmailAction(orderId: string, { skipAdminCh
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Inter',-apple-system,sans-serif;background:#f9fafb;margin:0;padding:0;">
 <div style="max-width:600px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
     <div style="background:#7c3aed;padding:5px 0;text-align:center;">
-        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" style="height:20px;width:auto;display:block;margin:0 auto;">
+        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" style="height:20px;width:auto;display:block;margin:0 auto;">
     </div>
     <div style="padding:40px 30px;">
         <div style="text-align:center;font-size:48px;margin-bottom:20px;">📄</div>

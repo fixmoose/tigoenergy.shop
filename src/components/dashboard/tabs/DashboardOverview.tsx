@@ -36,7 +36,7 @@ export default function DashboardOverview({ user, customer }: Props) {
     }, [user.id])
 
     const handleSupportContact = () => {
-        let subject = `Support Request - Tigo Energy Shop`
+        let subject = `Support Request - Initra Energija`
         let body = `Hello Support,\n\nI need help with...`
 
         if (selectedOrder) {

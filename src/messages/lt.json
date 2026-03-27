@@ -78,6 +78,7 @@
     "cookiePolicy": "Slapukų politika",
     "disclaimers": "Atsakomybės apribojimai",
     "companyDesc": "Jūsų partneris profesionaliems saulės energijos optimizavimo sprendimams visoje Europoje.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Valdo: Initra Energija d.o.o. - Įgaliotas Tigo Energy platintojas",
     "trustAuthorized": "Įgaliotas Tigo platintojas",
     "trustSecurePayments": "Saugūs mokėjimai",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Sveiki,",
     "bestRegards": "Pagarbiai,",
-    "team": "„Tigo Energy SHOP“ komanda",
+    "team": "„Initra Energija“ komanda",
     "verificationCode": {
       "title": "Patvirtinkite savo el. pašto adresą",
-      "text": "Dėkojame, kad prisijungėte prie „Tigo Energy SHOP“. Norėdami užbaigti registraciją ir apsaugoti savo paskyrą, naudokite šį patvirtinimo kodą:",
+      "text": "Dėkojame, kad prisijungėte prie „Initra Energija“. Norėdami užbaigti registraciją ir apsaugoti savo paskyrą, naudokite šį patvirtinimo kodą:",
       "expire": "Šis kodas galios 10 minučių. Jei to neprašėte, ignoruokite šį el. laišką."
     },
     "verificationLink": {
       "title": "Patvirtinkite savo el. pašto adresą",
       "helloWithName": "Sveiki, {{name}},",
-      "text": "Sveiki atvykę į „Tigo Energy SHOP“! Spustelėkite žemiau esantį mygtuką, kad patvirtintumėte savo el. pašto adresą ir aktyvuotumėte savo paskyrą.",
+      "text": "Sveiki atvykę į „Initra Energija“! Spustelėkite žemiau esantį mygtuką, kad patvirtintumėte savo el. pašto adresą ir aktyvuotumėte savo paskyrą.",
       "button": "Patvirtinti el. pašto adresą",
       "linkHelp": "Jei aukščiau esantis mygtukas neveikia, taip pat galite nukopijuoti ir įklijuoti šią nuorodą į savo naršyklę:",
       "ignore": "Jei paskyros nesukūrėte, jokių tolesnių veiksmų imtis nereikia."
     },
     "welcome": {
       "title": "Sveiki atvykę į šeimą!",
-      "text": "Džiaugiamės, kad prisijungėte prie mūsų „Tigo Energy SHOP“. Dabar esate susieti su specializuotu Europos „Tigo Energy“ saulės energijos sprendimų platintoju.",
+      "text": "Džiaugiamės, kad prisijungėte prie mūsų „Initra Energija“. Dabar esate susieti su specializuotu Europos „Tigo Energy“ saulės energijos sprendimų platintoju.",
       "feature1": "Ekspertų pagalba",
       "feature1Desc": "Tiesioginė prieiga prie technikos ekspertų, kurie puikiai išmano „Tigo“ gaminius.",
       "feature2": "Tiesioginis platinimas",
@@ -363,7 +364,7 @@
       "amountPaid": "Sumokėta suma (produktai):",
       "shippingStatus": "Pristatymo būsena:",
       "pending": "Laukiama skaičiavimo",
-      "footerNote": "Dėkojame už kantrybę ir už tai, kad pasirinkote „Tigo Energy SHOP“."
+      "footerNote": "Dėkojame už kantrybę ir už tai, kad pasirinkote „Initra Energija“."
     },
     "cartAbandonment": {
       "title": "Ar ko nors nepamiršote?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B paskyra sukurta",
       "greeting": "Sveiki",
-      "thankYou": "Dėkojame, kad užsiregistravote B2B paskyrą Tigo Energy SHOP. Džiaugiamės, kad esate su mumis!",
+      "thankYou": "Dėkojame, kad užsiregistravote B2B paskyrą Initra Energija. Džiaugiamės, kad esate su mumis!",
       "bannerTitle": "Jūsų paskyra paruošta!",
       "bannerText": "Jūsų B2B paskyra dabar aktyvi. Galite iš karto pradėti apsipirkti ir naudotis B2B kainomis bei profesionaliais įrankiais.",
       "text": "Tiesiog prisijunkite prie savo paskyros, kad peržiūrėtumėte visą mūsų produktų asortimentą, pasiektumėte B2B kainas ir pateiktumėte užsakymus.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Iš naujo nustatykite slaptažodį",
-      "text": "Gavome prašymą iš naujo nustatyti jūsų „Tigo Energy SHOP“ paskyros slaptažodį. Spustelėkite žemiau esantį mygtuką, kad pasirinktumėte naują slaptažodį.",
+      "text": "Gavome prašymą iš naujo nustatyti jūsų „Initra Energija“ paskyros slaptažodį. Spustelėkite žemiau esantį mygtuką, kad pasirinktumėte naują slaptažodį.",
       "button": "Nustatyti slaptažodį iš naujo",
       "linkHelp": "Jei aukščiau esantis mygtukas neveikia, taip galite nukopijuoti ir įklijuoti šią nuorodą į savo naršyklę:",
       "ignore": "Jei neprašėte nustatyti slaptažodžio iš naujo, ignoruokite šį el. laišką arba susisiekite su palaikymo komanda, jei turite nuogąstavimų."

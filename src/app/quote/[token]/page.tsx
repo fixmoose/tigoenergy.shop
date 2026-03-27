@@ -32,7 +32,7 @@ const LABELS: Record<string, Record<string, string>> = {
     en: {
         title: 'Quote',
         greeting: 'Hello',
-        description: 'You have received a quote from Tigo Energy. Please review the details and choose how you would like to receive your order.',
+        description: 'You have received a quote from Initra Energija. Please review the details and choose how you would like to receive your order.',
         quoteNumber: 'Quote Number',
         date: 'Date',
         validUntil: 'Valid Until',
@@ -69,7 +69,7 @@ const LABELS: Record<string, Record<string, string>> = {
     sl: {
         title: 'Ponudba',
         greeting: 'Pozdravljeni',
-        description: 'Prejeli ste ponudbo od Tigo Energy. Preglejte podrobnosti in izberite, kako želite prejeti naročilo.',
+        description: 'Prejeli ste ponudbo od Initra Energija. Preglejte podrobnosti in izberite, kako želite prejeti naročilo.',
         quoteNumber: 'Številka ponudbe',
         date: 'Datum',
         validUntil: 'Veljavno do',
@@ -106,7 +106,7 @@ const LABELS: Record<string, Record<string, string>> = {
     hr: {
         title: 'Ponuda',
         greeting: 'Poštovani',
-        description: 'Primili ste ponudu od Tigo Energy. Pregledajte detalje i odaberite način dostave.',
+        description: 'Primili ste ponudu od Initra Energija. Pregledajte detalje i odaberite način dostave.',
         quoteNumber: 'Broj ponude',
         date: 'Datum',
         validUntil: 'Vrijedi do',
@@ -143,7 +143,7 @@ const LABELS: Record<string, Record<string, string>> = {
     de: {
         title: 'Angebot',
         greeting: 'Hallo',
-        description: 'Sie haben ein Angebot von Tigo Energy erhalten. Bitte überprüfen Sie die Details und wählen Sie, wie Sie Ihre Bestellung erhalten möchten.',
+        description: 'Sie haben ein Angebot von Initra Energija erhalten. Bitte überprüfen Sie die Details und wählen Sie, wie Sie Ihre Bestellung erhalten möchten.',
         quoteNumber: 'Angebotsnummer',
         date: 'Datum',
         validUntil: 'Gültig bis',
@@ -342,7 +342,7 @@ export default function QuoteAcceptPage() {
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" className="h-8 mx-auto mb-4 bg-green-600 px-4 py-2 rounded-lg" />
+                    <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" className="h-8 mx-auto mb-4 bg-green-600 px-4 py-2 rounded-lg" />
                     <h1 className="text-3xl font-bold text-gray-900">{l.title} {quote.quote_number}</h1>
                     <p className="text-gray-500 mt-2 max-w-lg mx-auto">{l.description}</p>
                 </div>

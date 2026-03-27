@@ -78,6 +78,7 @@
     "cookiePolicy": "Politica sui cookie",
     "disclaimers": "Disclaimer",
     "companyDesc": "Il vostro partner per soluzioni professionali di ottimizzazione solare in tutta Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Gestito da: Initra Energija d.o.o. - Distributore autorizzato Tigo Energy",
     "trustAuthorized": "Distributore Tigo autorizzato",
     "trustSecurePayments": "Pagamenti sicuri",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Ciao,",
     "bestRegards": "Cordiali saluti,",
-    "team": "Il team Tigo Energy SHOP",
+    "team": "Il team Initra Energija",
     "verificationCode": {
       "title": "Verifica il tuo indirizzo e-mail",
-      "text": "Grazie per esserti unito a Tigo Energy SHOP. Per completare la registrazione e mettere in sicurezza il tuo account, utilizza il seguente codice di verifica:",
+      "text": "Grazie per esserti unito a Initra Energija. Per completare la registrazione e mettere in sicurezza il tuo account, utilizza il seguente codice di verifica:",
       "expire": "Questo codice scadrà tra 10 minuti. Se non lo hai richiesto tu, ignora questa e-mail."
     },
     "verificationLink": {
       "title": "Verifica il tuo indirizzo e-mail",
       "helloWithName": "Gentile {{name}},",
-      "text": "Benvenuto in Tigo Energy SHOP! Fai clic sul pulsante qui sotto per verificare il tuo indirizzo e-mail e attivare il tuo account.",
+      "text": "Benvenuto in Initra Energija! Fai clic sul pulsante qui sotto per verificare il tuo indirizzo e-mail e attivare il tuo account.",
       "button": "Verifica indirizzo e-mail",
       "linkHelp": "Se il pulsante sopra non funziona, puoi anche copiare e incollare il seguente link nel tuo browser:",
       "ignore": "Se non hai creato un account, non è richiesta alcuna ulteriore azione."
     },
     "welcome": {
       "title": "Benvenuto in famiglia!",
-      "text": "Siamo entusiasti di averti con noi su Tigo Energy SHOP. Ora sei connesso al distributore specializzato europeo per le soluzioni solari Tigo Energy.",
+      "text": "Siamo entusiasti di averti con noi su Initra Energija. Ora sei connesso al distributore specializzato europeo per le soluzioni solari Tigo Energy.",
       "feature1": "Supporto Esperto",
       "feature1Desc": "Accesso diretto a esperti tecnici che conoscono i prodotti Tigo alla perfezione.",
       "feature2": "Distribuzione Diretta",
@@ -363,7 +364,7 @@
       "amountPaid": "Importo pagato (Prodotti):",
       "shippingStatus": "Stato della spedizione:",
       "pending": "In attesa di calcolo",
-      "footerNote": "Grazie per la pazienza e per aver scelto Tigo Energy SHOP."
+      "footerNote": "Grazie per la pazienza e per aver scelto Initra Energija."
     },
     "cartAbandonment": {
       "title": "Hai dimenticato qualcosa?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Account B2B creato",
       "greeting": "Salve",
-      "thankYou": "Grazie per aver registrato un account B2B presso Tigo Energy SHOP. Siamo entusiasti di averti a bordo!",
+      "thankYou": "Grazie per aver registrato un account B2B presso Initra Energija. Siamo entusiasti di averti a bordo!",
       "bannerTitle": "Il tuo account è pronto!",
       "bannerText": "Il tuo account B2B è ora attivo. Puoi iniziare a fare acquisti immediatamente e usufruire dei prezzi B2B e degli strumenti professionali.",
       "text": "Accedi semplicemente al tuo account per sfogliare la nostra gamma completa di prodotti, accedere ai prezzi B2B e effettuare ordini.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Reimposta la tua password",
-      "text": "Abbiamo ricevuto una richiesta di reimpostazione della password per il tuo account Tigo Energy SHOP. Fai clic sul pulsante qui sotto per scegliere una nuova password.",
+      "text": "Abbiamo ricevuto una richiesta di reimpostazione della password per il tuo account Initra Energija. Fai clic sul pulsante qui sotto per scegliere una nuova password.",
       "button": "Reimposta password",
       "linkHelp": "Se il pulsante sopra non funziona, puoi anche copiare e incollare il seguente link nel tuo browser:",
       "expire": "Questo link scadrà tra 1 ora. Se non hai richiesto la reimpostazione della password, ignora questa e-mail."

@@ -429,7 +429,7 @@ export async function placeQuickOrder(
             }
 
             await sendEmail({
-                from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+                from: 'Initra Energija <support@tigoenergy.shop>',
                 to: orderPayload.customer_email,
                 subject: finalSubject,
                 html: finalHtml,

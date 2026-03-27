@@ -21,7 +21,7 @@ const SH_LABELS: Record<string, Record<string, string>> = {
         tracking: 'Tracking Number',
         trackButton: 'Track Your Package',
         footer: 'If you have any questions, contact us at support@tigoenergy.shop',
-        thankYou: 'Thank you for choosing Tigo Energy!',
+        thankYou: 'Thank you for choosing Initra Energija!',
     },
     de: {
         subject: 'Ihre Bestellung #{orderNumber} wurde versandt!',
@@ -41,7 +41,7 @@ const SH_LABELS: Record<string, Record<string, string>> = {
         tracking: 'Številka za sledenje',
         trackButton: 'Sledi paketu',
         footer: 'Za vprašanja nas kontaktirajte na support@tigoenergy.shop',
-        thankYou: 'Hvala, ker ste izbrali Tigo Energy!',
+        thankYou: 'Hvala, ker ste izbrali Initra Energija!',
     }
 }
 
@@ -64,7 +64,7 @@ export function buildShippingUpdateEmail(data: ShippingEmailData) {
 
     <!-- Header -->
     <div style="background:#16a34a;padding:5px 0;text-align:center;border-radius:12px 12px 0 0;">
-        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" style="height:20px; width:auto; display:block; margin:0 auto;">
+        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" style="height:20px; width:auto; display:block; margin:0 auto;">
     </div>
     <div style="background:#f9fafb; padding:8px; text-align:center; border-bottom:1px solid #e5e7eb; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">
         <p style="color:#666;margin:0;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px">Shipping Confirmation: ${data.orderNumber}</p>

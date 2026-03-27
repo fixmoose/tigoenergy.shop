@@ -78,6 +78,7 @@
     "cookiePolicy": "Política de cookies",
     "disclaimers": "Descargos de responsabilidad",
     "companyDesc": "Su socio para soluciones profesionales de optimización solar en toda Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Operado por: Initra Energija d.o.o. - Distribuidor autorizado de Tigo Energy",
     "trustAuthorized": "Distribuidor Tigo autorizado",
     "trustSecurePayments": "Pagos seguros",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Hola,",
     "bestRegards": "Saludos cordiales,",
-    "team": "El equipo de Tigo Energy SHOP",
+    "team": "El equipo de Initra Energija",
     "verificationCode": {
       "title": "Verifica tu dirección de correo electrónico",
-      "text": "Gracias por unirte a Tigo Energy SHOP. Para completar tu registro y asegurar tu cuenta, utiliza el siguiente código de verificación:",
+      "text": "Gracias por unirte a Initra Energija. Para completar tu registro y asegurar tu cuenta, utiliza el siguiente código de verificación:",
       "expire": "Este código caducará en 10 minutos. Si no lo has solicitado, ignora este correo electrónico."
     },
     "verificationLink": {
       "title": "Verifica tu dirección de correo electrónico",
       "helloWithName": "Hola {{name}},",
-      "text": "¡Bienvenido a Tigo Energy SHOP! Haz clic en el botón de abajo para verificar tu dirección de correo electrónico y activar tu cuenta.",
+      "text": "¡Bienvenido a Initra Energija! Haz clic en el botón de abajo para verificar tu dirección de correo electrónico y activar tu cuenta.",
       "button": "Verificar dirección de correo",
       "linkHelp": "Si el botón de arriba no funciona, también puedes copiar y pegar el siguiente enlace en tu navegador:",
       "ignore": "Si no has creado una cuenta, no es necesaria ninguna otra acción."
     },
     "welcome": {
       "title": "¡Bienvenido a la familia!",
-      "text": "Estamos encantados de tenerte en Tigo Energy SHOP. Ahora estás conectado con el distribuidor especializado de Europa para soluciones solares de Tigo Energy.",
+      "text": "Estamos encantados de tenerte en Initra Energija. Ahora estás conectado con el distribuidor especializado de Europa para soluciones solares de Tigo Energy.",
       "feature1": "Soporte Experto",
       "feature1Desc": "Acceso directo a expertos técnicos che conocen los productos Tigo a la perfección.",
       "feature2": "Distribución Directa",
@@ -363,7 +364,7 @@
       "amountPaid": "Importo pagado (Productos):",
       "shippingStatus": "Estado del envío:",
       "pending": "Pendiente de cálculo",
-      "footerNote": "Gracias por tu paciencia y por elegir Tigo Energy SHOP."
+      "footerNote": "Gracias por tu paciencia y por elegir Initra Energija."
     },
     "cartAbandonment": {
       "title": "¿Olvidaste algo?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "Cuenta B2B creada",
       "greeting": "Hola",
-      "thankYou": "Gracias por registrar una cuenta B2B en Tigo Energy SHOP. ¡Estamos encantados de tenerte!",
+      "thankYou": "Gracias por registrar una cuenta B2B en Initra Energija. ¡Estamos encantados de tenerte!",
       "bannerTitle": "¡Tu cuenta está lista!",
       "bannerText": "Tu cuenta B2B ya está activa. Puedes empezar a comprar inmediatamente y disfrutar de precios B2B y herramientas profesionales.",
       "text": "Simplemente inicia sesión en tu cuenta para explorar nuestra gama completa de productos, acceder a tus precios B2B y realizar pedidos.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Restablecer tu contraseña",
-      "text": "Recibimos una solicitud para restablecer la contraseña de tu cuenta de Tigo Energy SHOP. Haz clic en el botón de abajo para elegir una nueva contraseña.",
+      "text": "Recibimos una solicitud para restablecer la contraseña de tu cuenta de Initra Energija. Haz clic en el botón de abajo para elegir una nueva contraseña.",
       "button": "Restablecer contraseña",
       "linkHelp": "Si el botón de arriba no funciona, también puedes copiar y pegar el siguiente enlace en tu navegador:",
       "expire": "Este enlace caducará en 1 hour. Si no solicitaste un restablecimiento de contraseña, ignora este correo electrónico."

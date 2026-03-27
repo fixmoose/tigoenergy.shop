@@ -60,7 +60,7 @@ export async function submitSupportRequest(formData: {
         if (admins.length > 0) {
             const isShopHelp = formData.type === 'shipping' || formData.type === 'return'
             const isTigoProduct = formData.type === 'tigo_product'
-            const subjectPrefix = isShopHelp ? 'Tigo Energy SHOP> Shopping help' : isTigoProduct ? 'Tigo Energy SHOP> Tigo Product Support' : 'Tigo Energy SHOP> Tigo Support'
+            const subjectPrefix = isShopHelp ? 'Initra Energija> Shopping help' : isTigoProduct ? 'Initra Energija> Tigo Product Support' : 'Initra Energija> Tigo Support'
             const userEmail = user.email
             const userName = `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || userEmail
 

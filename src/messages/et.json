@@ -78,6 +78,7 @@
     "cookiePolicy": "Küpsiste poliitika",
     "disclaimers": "Vastutuse piirangud",
     "companyDesc": "Teie partner professionaalsete päikeseenergia optimeerimislahenduste jaoks üle Euroopa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Opereerib: Initra Energija d.o.o. - Volitatud Tigo Energy levitaja",
     "trustAuthorized": "Volitatud Tigo levitaja",
     "trustSecurePayments": "Turvalised maksed",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Tere,",
     "bestRegards": "Parimate soovidega,",
-    "team": "Tigo Energy SHOP meeskond",
+    "team": "Initra Energija meeskond",
     "verificationCode": {
       "title": "Kinnitage oma e-posti aadress",
-      "text": "Täname, et liitusite Tigo Energy SHOP-iga. Registreerimise lõpuleviimiseks ja konto turvamiseks kasutage järgmist kinnituskoodi:",
+      "text": "Täname, et liitusite Initra Energija-iga. Registreerimise lõpuleviimiseks ja konto turvamiseks kasutage järgmist kinnituskoodi:",
       "expire": "See kood aegub 10 minuti jooksul. Kui te ei ole seda taotlenud, ignoreerige seda e-kirja."
     },
     "verificationLink": {
       "title": "Kinnitage oma e-posti aadress",
       "helloWithName": "Tere {{name}},",
-      "text": "Tere tulemast Tigo Energy SHOP-i! Klõpsake allolevat nuppu, et kinnitada oma e-posti aadress ja aktiveerida oma konto.",
+      "text": "Tere tulemast Initra Energija-i! Klõpsake allolevat nuppu, et kinnitada oma e-posti aadress ja aktiveerida oma konto.",
       "button": "Kinnita e-posti aadress",
       "linkHelp": "Kui ülaltoodud nupp ei tööta, saate kopeerida ja kleepida järgmise lingi oma brauserisse:",
       "ignore": "Kui te ei ole kontot loonud, ei ole vaja rohkem tegutseda."
     },
     "welcome": {
       "title": "Tere tulemast perre!",
-      "text": "Meil on hea meel, et liitusite meiega Tigo Energy SHOP-is. Olete nüüd ühenduses Euroopa spetsialiseeritud Tigo Energy päikeseenergia lahenduste turustajaga.",
+      "text": "Meil on hea meel, et liitusite meiega Initra Energija-is. Olete nüüd ühenduses Euroopa spetsialiseeritud Tigo Energy päikeseenergia lahenduste turustajaga.",
       "feature1": "Eksperttugi",
       "feature1Desc": "Otsene juurdepääs tehnilistele ekspertidele, kes tunnevad Tigo tooteid läbi ja lõhki.",
       "feature2": "Otsene jaotus",
@@ -363,7 +364,7 @@
       "amountPaid": "Tasutud summa (tooted):",
       "shippingStatus": "Tarne olek:",
       "pending": "Ootab arvutamist",
-      "footerNote": "Täname kannatlikkuse eest ja selle eest, et valisite Tigo Energy SHOP-i."
+      "footerNote": "Täname kannatlikkuse eest ja selle eest, et valisite Initra Energija-i."
     },
     "cartAbandonment": {
       "title": "Kas unustasite midagi?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B konto loodud",
       "greeting": "Tere",
-      "thankYou": "Täname, et registreerisite B2B konto Tigo Energy SHOP-is. Meil on hea meel, et olete meiega!",
+      "thankYou": "Täname, et registreerisite B2B konto Initra Energija-is. Meil on hea meel, et olete meiega!",
       "bannerTitle": "Teie konto on valmis!",
       "bannerText": "Teie B2B konto on nüüd aktiivne. Saate kohe alustada ostlemist ning kasutada B2B hindu ja professionaalseid tööriistu.",
       "text": "Lihtsalt logige oma kontole sisse, et sirvida meie täielikku tootevalikut, pääseda ligi B2B hindadele ja esitada tellimusi.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Lähtestage oma parool",
-      "text": "Saime taotluse teie Tigo Energy SHOP-i konto parooli lähtestamiseks. Uue parooli valimiseks klõpsake allolevat nuppu.",
+      "text": "Saime taotluse teie Initra Energija-i konto parooli lähtestamiseks. Uue parooli valimiseks klõpsake allolevat nuppu.",
       "button": "Lähtesta parool",
       "linkHelp": "Kui ülaltoodud nupp ei tööta, saate kopeerida ja kleepida järgmise lingi oma brauserisse:",
       "expire": "See link aegub 1 tunni jooksul. Kui te ei ole parooli lähtestamist taotlenud, ignoreerige seda e-kirja."

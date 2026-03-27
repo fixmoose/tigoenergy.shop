@@ -92,7 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 </div></body></html>`
 
             await sendEmail({
-                from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+                from: 'Initra Energija <support@tigoenergy.shop>',
                 to: order.customer_email,
                 subject: l.subject,
                 html,

@@ -78,6 +78,7 @@
     "cookiePolicy": "Cookiebeleid",
     "disclaimers": "Disclaimers",
     "companyDesc": "Uw partner voor professionele zonne-optimalisatie oplossingen in heel Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Geëxploiteerd door: Initra Energija d.o.o. - Geautoriseerde Tigo Energy distributeur",
     "trustAuthorized": "Geautoriseerde Tigo distributeur",
     "trustSecurePayments": "Veilig betalen",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Hallo,",
     "bestRegards": "Met vriendelijke groet,",
-    "team": "Het Tigo Energy SHOP Team",
+    "team": "Het Initra Energija Team",
     "verificationCode": {
       "title": "Verifieer uw e-mailadres",
-      "text": "Bedankt voor het aanmelden bij Tigo Energy SHOP. Om uw registratie te voltooien en uw account te beveiligen, gebruikt u de volgende verificatiecode:",
+      "text": "Bedankt voor het aanmelden bij Initra Energija. Om uw registratie te voltooien en uw account te beveiligen, gebruikt u de volgende verificatiecode:",
       "expire": "Deze code verloopt over 10 minuten. Als u dit niet heeft aangevraagd, kunt u deze e-mail negeren."
     },
     "verificationLink": {
       "title": "Verifieer uw e-mailadres",
       "helloWithName": "Hallo {{name}},",
-      "text": "Welkom bij Tigo Energy SHOP! Klik op de onderstaande knop om uw e-mailadres te verifiëren en uw account te activeren.",
+      "text": "Welkom bij Initra Energija! Klik op de onderstaande knop om uw e-mailadres te verifiëren en uw account te activeren.",
       "button": "E-mailadres verifiëren",
       "linkHelp": "Als de bovenstaande knop niet werkt, kunt u ook de volgende link kopiëren en in uw browser plakken:",
       "ignore": "Als u geen account heeft aangemaakt, is er geen verdere actie vereist."
     },
     "welcome": {
       "title": "Welkom bij de familie!",
-      "text": "We zijn verheugd u te verwelkomen bij Tigo Energy SHOP. U bent nu verbonden met de gespecialiseerde Europese distributeur voor Tigo Energy zonne-energieoplossingen.",
+      "text": "We zijn verheugd u te verwelkomen bij Initra Energija. U bent nu verbonden met de gespecialiseerde Europese distributeur voor Tigo Energy zonne-energieoplossingen.",
       "feature1": "Expert Ondersteuning",
       "feature1Desc": "Directe toegang tot technische experts die Tigo-producten door en door kennen.",
       "feature2": "Directe Distributie",
@@ -363,7 +364,7 @@
       "amountPaid": "Betaald bedrag (producten):",
       "shippingStatus": "Verzendstatus:",
       "pending": "Berekening in afwachting",
-      "footerNote": "Bedankt voor uw geduld en voor het kiezen van Tigo Energy SHOP."
+      "footerNote": "Bedankt voor uw geduld en voor het kiezen van Initra Energija."
     },
     "cartAbandonment": {
       "title": "Bent u iets vergeten?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B-account aangemaakt",
       "greeting": "Hallo",
-      "thankYou": "Bedankt voor het registreren van een B2B-account bij Tigo Energy SHOP. We zijn blij dat u erbij bent!",
+      "thankYou": "Bedankt voor het registreren van een B2B-account bij Initra Energija. We zijn blij dat u erbij bent!",
       "bannerTitle": "Uw account is gereed!",
       "bannerText": "Uw B2B-account is nu actief. U kunt direct beginnen met winkelen en profiteren van B2B-prijzen en professionele tools.",
       "text": "Log eenvoudig in op uw account om ons volledige productassortiment te bekijken, toegang te krijgen tot uw B2B-prijzen en bestellingen te plaatsen.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Stel je wachtwoord opnieuw in",
-      "text": "We hebben een verzoek ontvangen om het wachtwoord van uw Tigo Energy SHOP-account opnieuw in te stellen. Klik op de onderstaande knop om een nieuw wachtwoord te kiezen.",
+      "text": "We hebben een verzoek ontvangen om het wachtwoord van uw Initra Energija-account opnieuw in te stellen. Klik op de onderstaande knop om een nieuw wachtwoord te kiezen.",
       "button": "Wachtwoord opnieuw instellen",
       "linkHelp": "Als de bovenstaande knop niet werkt, kunt u ook de volgende link kopiëren en in uw browser plakken:",
       "expire": "Deze link verloopt over 1 uur. Als u geen wachtwoordreset heeft aangevraagd, negeer deze e-mail dan."

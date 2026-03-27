@@ -41,7 +41,7 @@ const PricelistDocument = ({ products }: { products: Product[] }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             <View style={styles.header}>
-                <Text style={styles.title}>Tigo Energy Shop - B2B Pricelist</Text>
+                <Text style={styles.title}>Initra Energija — B2B Pricelist</Text>
                 <Text style={styles.subtitle}>Current Pricing (EUR) - {new Date().toLocaleDateString()}</Text>
             </View>
 

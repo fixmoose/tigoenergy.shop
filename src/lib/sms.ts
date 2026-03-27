@@ -12,7 +12,7 @@ interface SendSMSParams {
 /**
  * Sends an SMS using Infobip gateway.
  */
-export async function sendSMS({ to, text, from = 'TigoEnergy' }: SendSMSParams) {
+export async function sendSMS({ to, text, from = 'Initra' }: SendSMSParams) {
     const apiKey = process.env.INFOBIP_API_KEY
     const baseUrl = process.env.INFOBIP_BASE_URL || '8vgvx9.api.infobip.com'
 

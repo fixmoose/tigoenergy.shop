@@ -166,11 +166,11 @@ export async function submitSupportRequestV2(formData: {
             // shipping/return => Online Shop Support => Shopping help
             // general => Tigo Product Support => Tigo Support
             // sales => Contact Sales
-            let subjectPrefix = 'Tigo Energy SHOP> Tigo Support'
+            let subjectPrefix = 'Initra Energija> Tigo Support'
             if (formData.type === 'shipping' || formData.type === 'return') {
-                subjectPrefix = 'Tigo Energy SHOP> Shopping help'
+                subjectPrefix = 'Initra Energija> Shopping help'
             } else if (formData.type === 'sales') {
-                subjectPrefix = 'Tigo Energy SHOP> Contact Sales'
+                subjectPrefix = 'Initra Energija> Contact Sales'
             }
 
             const userEmail = user?.email || formData.email

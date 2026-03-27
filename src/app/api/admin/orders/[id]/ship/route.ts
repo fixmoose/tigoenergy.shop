@@ -128,7 +128,7 @@ export async function POST(
         })
 
         await sendEmail({
-            from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+            from: 'Initra Energija <support@tigoenergy.shop>',
             to: order.customer_email,
             subject,
             html,

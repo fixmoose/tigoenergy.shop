@@ -275,13 +275,13 @@ export default function Header() {
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
               <img
                 src="/tigo-logo.png"
-                alt="Tigo Energy"
+                alt="Tigo Energy Products"
                 className="h-10"
                 style={{ filter: 'brightness(0) invert(1)' }}
               />
               <div className="flex flex-col leading-tight">
-                <span className="text-green-100 text-xs font-medium tracking-wider">AUTHORIZED DISTRIBUTOR</span>
-                <span className="text-green-100 text-xs font-medium tracking-wider">INITRA ENERGIJA d.o.o.</span>
+                <span className="text-white text-xs font-bold tracking-wider">INITRA ENERGIJA</span>
+                <span className="text-green-100 text-[10px] font-medium tracking-wider">AUTHORIZED RESELLER</span>
               </div>
             </Link>
 

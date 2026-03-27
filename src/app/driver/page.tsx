@@ -194,7 +194,7 @@ export default function DriverPortal() {
                                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
                             </div>
                             <h1 className="text-xl font-bold text-slate-800">Driver Portal</h1>
-                            <p className="text-sm text-slate-500 mt-1">Tigo Energy SHOP</p>
+                            <p className="text-sm text-slate-500 mt-1">Initra Energija</p>
                         </div>
                         <form onSubmit={(e) => { e.preventDefault(); handleLogin() }} className="space-y-4">
                             <input
@@ -340,7 +340,7 @@ export default function DriverPortal() {
                 <div className="bg-slate-800 text-white px-4 py-4">
                     <div className="max-w-lg mx-auto">
                         <h1 className="font-bold text-lg">Driver Portal</h1>
-                        <p className="text-xs text-slate-400">Tigo Energy SHOP</p>
+                        <p className="text-xs text-slate-400">Initra Energija</p>
                     </div>
                 </div>
 

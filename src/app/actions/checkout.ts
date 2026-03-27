@@ -560,7 +560,7 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
             }
 
             await sendEmail({
-                from: 'Tigo Energy Shop <support@tigoenergy.shop>',
+                from: 'Initra Energija <support@tigoenergy.shop>',
                 to: email,
                 subject: finalSubject,
                 html: finalHtml,

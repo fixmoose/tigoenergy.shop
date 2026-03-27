@@ -43,7 +43,7 @@ export default function B2BTerms({ customer }: Props) {
                     These terms and conditions apply to all commercial sales between <strong>Initra Energija d.o.o.</strong> ("Seller") and <strong>{customer.company_name || 'Client'}</strong> ("Buyer"). By placing an order, the Buyer acknowledges and agrees to these terms.
                 </div>
 
-                <h1 className="text-xl font-black text-gray-900 mb-6 uppercase tracking-tight border-b-2 border-gray-100 pb-2">Tigo Energy Commercial Terms and Conditions</h1>
+                <h1 className="text-xl font-black text-gray-900 mb-6 uppercase tracking-tight border-b-2 border-gray-100 pb-2">Initra Energija — Commercial Terms and Conditions</h1>
 
                 <section className="mb-8">
                     <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2">

@@ -55,7 +55,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Shipping To',
         payment: 'Payment Method',
         footer: 'If you have any questions, contact us at support@tigoenergy.shop',
-        thankYou: 'Thank you for choosing Tigo Energy!',
+        thankYou: 'Thank you for choosing Initra Energija!',
         customsTitle: 'Important: Customs & Import Duties',
         customsBody: 'This order is shipping outside the European Union. Customs duties, import taxes, and other fees are NOT included in the order total and are the sole responsibility of the buyer. Please contact your local customs authority to determine any additional charges before your shipment arrives. If delivery fails due to unpaid customs duties and goods are returned to us, a restocking fee will apply.',
         paymentInstructions: 'Payment Instructions',
@@ -115,7 +115,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Adresse de livraison',
         payment: 'Mode de paiement',
         footer: 'Pour toute question, contactez-nous à support@tigoenergy.shop',
-        thankYou: 'Merci d\'avoir choisi Tigo Energy !',
+        thankYou: 'Merci d\'avoir choisi Initra Energija !',
         customsTitle: 'Important : Droits de douane et taxes d\'importation',
         customsBody: 'Cette commande est expédiée en dehors de l\'Union européenne. Les droits de douane, taxes d\'importation et autres frais ne sont PAS inclus dans le montant total et sont à la charge exclusive de l\'acheteur. Veuillez contacter votre autorité douanière locale pour connaître les frais supplémentaires avant l\'arrivée de votre envoi. En cas d\'échec de livraison dû au non-paiement des droits de douane et de retour des marchandises, des frais de réapprovisionnement seront appliqués.',
         paymentInstructions: 'Instructions de paiement',
@@ -145,7 +145,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Indirizzo di spedizione',
         payment: 'Metodo di pagamento',
         footer: 'Per domande, contattaci a support@tigoenergy.shop',
-        thankYou: 'Grazie per aver scelto Tigo Energy!',
+        thankYou: 'Grazie per aver scelto Initra Energija!',
         customsTitle: 'Importante: Dazi doganali e tasse di importazione',
         customsBody: 'Questo ordine viene spedito al di fuori dell\'Unione Europea. Dazi doganali, tasse di importazione e altri oneri NON sono inclusi nel totale dell\'ordine e sono a carico esclusivo dell\'acquirente. Si prega di contattare l\'autorità doganale locale per determinare eventuali costi aggiuntivi prima dell\'arrivo della spedizione. In caso di mancata consegna per mancato pagamento dei dazi doganali e restituzione della merce, verrà applicata una tariffa di riassortimento.',
         paymentInstructions: 'Istruzioni per il pagamento',
@@ -175,7 +175,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Naslov dostave',
         payment: 'Način plačila',
         footer: 'Za vprašanja nas kontaktirajte na support@tigoenergy.shop',
-        thankYou: 'Hvala, ker ste izbrali Tigo Energy!',
+        thankYou: 'Hvala, ker ste izbrali Initra Energija!',
         customsTitle: 'Pomembno: Carinske dajatve in uvozne takse',
         customsBody: 'To naročilo se pošilja izven Evropske unije. Carinske dajatve, uvozni davki in druge pristojbine NISO vključene v skupni znesek naročila in so izključno odgovornost kupca. Pred prihodom pošiljke se prosim obrnite na pristojni carinski organ za informacije o morebitnih dodatnih stroških. V primeru neuspešne dostave zaradi neplačanih carinskih dajatev in vračila blaga se zaračuna pristojbina za vračilo na zalogo.',
         paymentInstructions: 'Navodila za plačilo',
@@ -205,7 +205,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Dirección de envío',
         payment: 'Método de pago',
         footer: 'Si tienes preguntas, contáctanos en support@tigoenergy.shop',
-        thankYou: '¡Gracias por elegir Tigo Energy!',
+        thankYou: '¡Gracias por elegir Initra Energija!',
         customsTitle: 'Importante: Aranceles aduaneros e impuestos de importación',
         customsBody: 'Este pedido se envía fuera de la Unión Europea. Los aranceles aduaneros, impuestos de importación y otros cargos NO están incluidos en el total del pedido y son responsabilidad exclusiva del comprador. Contacte con su autoridad aduanera local para conocer los posibles cargos adicionales antes de la llegada de su envío. Si la entrega falla debido al impago de los derechos de aduana y la mercancía nos es devuelta, se aplicará una tarifa de reposición.',
         paymentInstructions: 'Instrucciones de pago',
@@ -235,7 +235,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Adresa dostave',
         payment: 'Način plaćanja',
         footer: 'Za pitanja nas kontaktirajte na support@tigoenergy.shop',
-        thankYou: 'Hvala što ste odabrali Tigo Energy!',
+        thankYou: 'Hvala što ste odabrali Initra Energija!',
         customsTitle: 'Važno: Carine i uvozne pristojbe',
         customsBody: 'Ova narudžba se šalje izvan Europske unije. Carine, uvozni porezi i druge pristojbe NISU uključeni u ukupni iznos narudžbe i isključiva su odgovornost kupca. Molimo kontaktirajte lokalnu carinsku službu za informacije o dodatnim troškovima prije dolaska pošiljke. Ako dostava ne uspije zbog neplaćenih carina i roba nam bude vraćena, naplatit će se naknada za povrat na skladište.',
         paymentInstructions: 'Upute za plaćanje',
@@ -265,7 +265,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Adresa doručení',
         payment: 'Platební metoda',
         footer: 'Máte-li dotazy, kontaktujte nás na support@tigoenergy.shop',
-        thankYou: 'Děkujeme, že jste si vybrali Tigo Energy!',
+        thankYou: 'Děkujeme, že jste si vybrali Initra Energija!',
         customsTitle: 'Důležité: Cla a dovozní poplatky',
         customsBody: 'Tato objednávka je zasílána mimo Evropskou unii. Cla, dovozní daně a další poplatky NEJSOU zahrnuty v celkové částce objednávky a jsou výhradní odpovědností kupujícího. Před příjezdem zásilky kontaktujte místní celní úřad pro zjištění případných dodatečných poplatků. V případě neúspěšného doručení z důvodu nezaplacených cel a vrácení zboží bude účtován poplatek za naskladnění.',
         paymentInstructions: 'Platební pokyny',
@@ -295,7 +295,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Adresa doručenia',
         payment: 'Platobná metóda',
         footer: 'Máte otázky? Kontaktujte nás na support@tigoenergy.shop',
-        thankYou: 'Ďakujeme, že ste si vybrali Tigo Energy!',
+        thankYou: 'Ďakujeme, že ste si vybrali Initra Energija!',
         customsTitle: 'Dôležité: Clá a dovozné poplatky',
         customsBody: 'Táto objednávka je zasielaná mimo Európsku úniu. Clá, dovozné dane a ďalšie poplatky NIE SÚ zahrnuté v celkovej sume objednávky a sú výhradnou zodpovednosťou kupujúceho. Pred príchodom zásielky kontaktujte miestny colný úrad pre zistenie prípadných dodatočných poplatkov. V prípade neúspešného doručenia z dôvodu nezaplatených ciel a vrátenia tovaru bude účtovaný poplatok za naskladnenie.',
         paymentInstructions: 'Platobné pokyny',
@@ -325,7 +325,7 @@ const LABELS: Record<string, Record<string, string>> = {
         shippingTo: 'Leveransadress',
         payment: 'Betalningsmetod',
         footer: 'Har du frågor? Kontakta oss på support@tigoenergy.shop',
-        thankYou: 'Tack för att du valde Tigo Energy!',
+        thankYou: 'Tack för att du valde Initra Energija!',
         customsTitle: 'Viktigt: Tullavgifter och importskatter',
         customsBody: 'Denna beställning skickas utanför Europeiska unionen. Tullavgifter, importskatter och andra avgifter INGÅR INTE i ordertotalen och är köparens enskilda ansvar. Kontakta din lokala tullmyndighet för att fastställa eventuella tillkommande avgifter innan din leverans anländer. Om leveransen misslyckas på grund av obetalda tullavgifter och varorna returneras till oss, tillkommer en återlageringsavgift.',
         paymentInstructions: 'Betalningsinstruktioner',
@@ -379,7 +379,7 @@ export function buildOrderConfirmationEmail(data: OrderEmailData) {
 
     <!-- Header -->
     <div style="background:#16a34a;padding:5px 0;text-align:center;border-radius:12px 12px 0 0;">
-        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Tigo Energy" style="height:20px; width:auto; display:block; margin:0 auto;">
+        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" style="height:20px; width:auto; display:block; margin:0 auto;">
     </div>
     <div style="background:#f9fafb; padding:8px; text-align:center; border-bottom:1px solid #e5e7eb; border-left:1px solid #e5e7eb; border-right:1px solid #e5e7eb;">
         <p style="color:#666;margin:0;font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px">${l.orderNumber}: ${data.orderNumber}</p>

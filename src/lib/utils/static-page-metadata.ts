@@ -101,21 +101,21 @@ export async function generateStaticPageMetadata(pageName: string): Promise<Meta
     const meta = PAGE_META[pageName]?.[lang] || PAGE_META[pageName]?.en || { title: pageName, description: '' }
 
     return {
-        title: `${meta.title} | Tigo Energy Shop ${market.countryName}`,
+        title: `${meta.title} | Initra Energija ${market.countryName}`,
         description: meta.description,
         alternates: {
             canonical: buildCanonicalUrl(marketKey, path),
             languages: buildHreflangAlternates(path),
         },
         openGraph: {
-            title: `${meta.title} | Tigo Energy Shop ${market.countryName}`,
+            title: `${meta.title} | Initra Energija ${market.countryName}`,
             description: meta.description,
             locale: market.locale,
             type: 'website',
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${meta.title} | Tigo Energy Shop ${market.countryName}`,
+            title: `${meta.title} | Initra Energija ${market.countryName}`,
             description: meta.description,
         },
     }

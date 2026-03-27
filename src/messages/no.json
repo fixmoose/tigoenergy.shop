@@ -78,6 +78,7 @@
     "cookiePolicy": "Informasjonskapselregler",
     "disclaimers": "Ansvarsfraskrivelser",
     "companyDesc": "Din partner for profesjonelle soloptimaliseringsløsninger i hele Europa.",
+    "independentDisclaimer": "This site is operated by Initra Energija d.o.o., an independent authorized reseller. It is not affiliated with, endorsed by, or operated by Tigo Energy, Inc.",
     "operatedBy": "Drevet av: Initra Energija d.o.o. - Autorisert Tigo Energy-distributør",
     "trustAuthorized": "Autorisert Tigo-distributør",
     "trustSecurePayments": "Sikre betalinger",
@@ -296,23 +297,23 @@
   "email": {
     "hello": "Hei,",
     "bestRegards": "Med vennlig hilsen,",
-    "team": "Tigo Energy SHOP-teamet",
+    "team": "Initra Energija-teamet",
     "verificationCode": {
       "title": "Bekreft e-postadressen din",
-      "text": "Takk for at du ble med i Tigo Energy SHOP. For å fullføre registreringen og sikre kontoen din, vennligst bruk følgende bekreftelseskode:",
+      "text": "Takk for at du ble med i Initra Energija. For å fullføre registreringen og sikre kontoen din, vennligst bruk følgende bekreftelseskode:",
       "expire": "Denne koden utløper om 10 minutter. Hvis du ikke har bedt om dette, vennligst ignorer denne e-posten."
     },
     "verificationLink": {
       "title": "Bekreft e-postadressen din",
       "helloWithName": "Hei {{name}},",
-      "text": "Velkommen til Tigo Energy SHOP! Vennligst klikk på knappen nedenfor for å bekrefte e-postadressen din og aktivere kontoen din.",
+      "text": "Velkommen til Initra Energija! Vennligst klikk på knappen nedenfor for å bekrefte e-postadressen din og aktivere kontoen din.",
       "button": "Bekreft e-postadresse",
       "linkHelp": "Hvis knappen ovenfor ikke fungerer, kan du også kopiere og lime inn følgende lenke i nettleseren din:",
       "ignore": "Hvis du ikke har opprettet en konto, er ingen ytterligere handling nødvendig."
     },
     "welcome": {
       "title": "Velkommen til familien!",
-      "text": "Vi er glade for å ha deg hos Tigo Energy SHOP. Du er nå koblet til Europas spesialiserte distributør for Tigo Energy solcelleløsninger.",
+      "text": "Vi er glade for å ha deg hos Initra Energija. Du er nå koblet til Europas spesialiserte distributør for Tigo Energy solcelleløsninger.",
       "feature1": "Expert Support",
       "feature1Desc": "Direkte tilgang til tekniske eksperter som kjenner Tigo-produktene ut og inn.",
       "feature2": "Direkte distribusjon",
@@ -363,7 +364,7 @@
       "amountPaid": "Betalt beløp (produkter):",
       "shippingStatus": "Fraktstatus:",
       "pending": "Venter på beregning",
-      "footerNote": "Takk for tålmodigheten og for at du valgte Tigo Energy SHOP."
+      "footerNote": "Takk for tålmodigheten og for at du valgte Initra Energija."
     },
     "cartAbandonment": {
       "title": "Glemte du noe?",
@@ -401,7 +402,7 @@
     "b2bApplication": {
       "title": "B2B-konto opprettet",
       "greeting": "Hei",
-      "thankYou": "Takk for at du registrerte en B2B-konto hos Tigo Energy SHOP. Vi er glade for å ha deg med!",
+      "thankYou": "Takk for at du registrerte en B2B-konto hos Initra Energija. Vi er glade for å ha deg med!",
       "bannerTitle": "Kontoen din er klar!",
       "bannerText": "Din B2B-konto er nå aktiv. Du kan begynne å handle umiddelbart og nyte B2B-priser og profesjonelle verktøy.",
       "text": "Logg inn på kontoen din for å bla gjennom hele produktutvalget vårt, få tilgang til B2B-prisene dine og legge inn bestillinger.",
@@ -409,7 +410,7 @@
     },
     "passwordReset": {
       "title": "Tilbakestill passordet ditt",
-      "text": "Vi har mottatt en forespørsel om å tilbakestille passordet for din Tigo Energy SHOP-konto. Klikk på knappen nedenfor for å velge et nytt passord.",
+      "text": "Vi har mottatt en forespørsel om å tilbakestille passordet for din Initra Energija-konto. Klikk på knappen nedenfor for å velge et nytt passord.",
       "button": "Tilbakestill passord",
       "linkHelp": "Hvis knappen ovenfor ikke fungerer, kan du også kopiere og lime inn følgende lenke i nettleseren din:",
       "expire": "Denne lenken utløper om 1 time. Hvis du ikke ba om tilbakestilling av passord, vennligst ignorer denne e-posten eller kontakt support hvis du har bekymringer."
