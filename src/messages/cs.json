@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Nezávislý autorizovaný prodejce",
+    "body": "Tento web provozuje <strong>Initra Energija d.o.o.</strong>, nezávislý autorizovaný prodejce produktů Tigo Energy. Tento web není přidružen k Tigo Energy, Inc.",
+    "badgeReseller": "Autorizovaný prodejce",
+    "badgeEU": "EU distributor · 21+ trhů",
+    "understand": "Zavřít",
+    "welcome": "Vítejte na tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Přidat do košíku",
     "adding": "Přidávání...",

@@ -277,7 +277,6 @@ export default function Header() {
                 src="/initra-logo.png"
                 alt="Initra Energija"
                 className="h-10"
-                style={{ filter: 'brightness(0) invert(1)', mixBlendMode: 'screen' }}
               />
               <div className="flex flex-col leading-tight">
                 <span className="text-white text-xs font-bold tracking-wider">TIGO ENERGY</span>

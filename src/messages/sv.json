@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Oberoende auktoriserad återförsäljare",
+    "body": "Denna webbplats drivs av <strong>Initra Energija d.o.o.</strong>, en oberoende auktoriserad återförsäljare av Tigo Energy-produkter. Denna webbplats är inte ansluten till Tigo Energy, Inc.",
+    "badgeReseller": "Auktoriserad återförsäljare",
+    "badgeEU": "EU-distributör · 21+ marknader",
+    "understand": "Stäng",
+    "welcome": "Välkommen till tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Lägg till i varukorg",
     "adding": "Lägger till...",

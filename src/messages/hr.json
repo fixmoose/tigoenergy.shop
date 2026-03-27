@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Neovisni ovlašteni prodavač",
+    "body": "Ovu web stranicu vodi <strong>Initra Energija d.o.o.</strong>, neovisni ovlašteni prodavač Tigo Energy proizvoda. Ova stranica nije povezana s Tigo Energy, Inc.",
+    "badgeReseller": "Ovlašteni prodavač",
+    "badgeEU": "EU distributer · 21+ tržišta",
+    "understand": "Zatvori",
+    "welcome": "Dobrodošli na tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Dodaj u košaricu",
     "adding": "Dodajem...",

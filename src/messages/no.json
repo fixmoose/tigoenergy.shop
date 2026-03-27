@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Uavhengig autorisert forhandler",
+    "body": "Denne nettsiden drives av <strong>Initra Energija d.o.o.</strong>, en uavhengig autorisert forhandler av Tigo Energy-produkter. Denne nettsiden er ikke tilknyttet Tigo Energy, Inc.",
+    "badgeReseller": "Autorisert forhandler",
+    "badgeEU": "EU-distributør · 21+ markeder",
+    "understand": "Lukk",
+    "welcome": "Velkommen til tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Legg i handlekurv",
     "adding": "Legger til...",

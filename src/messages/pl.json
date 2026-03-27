@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Niezależny autoryzowany sprzedawca",
+    "body": "Ta strona jest prowadzona przez <strong>Initra Energija d.o.o.</strong>, niezależnego autoryzowanego sprzedawcę produktów Tigo Energy. Ta strona nie jest powiązana z Tigo Energy, Inc.",
+    "badgeReseller": "Autoryzowany sprzedawca",
+    "badgeEU": "Dystrybutor UE · 21+ rynków",
+    "understand": "Zamknij",
+    "welcome": "Witamy na tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Dodaj do koszyka",
     "adding": "Dodawanie...",

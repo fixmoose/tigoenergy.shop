@@ -12,6 +12,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import MobileNav from '@/components/MobileNav'
 import CookieConsent from '@/components/CookieConsent'
+import TopBanner from '@/components/TopBanner'
 import { buildHreflangAlternates, buildCanonicalUrl, MARKET_DOMAINS } from '@/lib/utils/seo'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -129,6 +130,7 @@ export default async function RootLayout({
             <MarketProvider initialMarket={market} initialLanguage={htmlLang}>
               <CurrencyProvider>
                 <CartProvider>
+                  <TopBanner />
                   <div className="hidden lg:contents">
                     <Header />
                   </div>

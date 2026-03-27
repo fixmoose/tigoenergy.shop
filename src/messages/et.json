@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Sõltumatu volitatud edasimüüja",
+    "body": "Seda veebisaiti haldab <strong>Initra Energija d.o.o.</strong>, Tigo Energy toodete sõltumatu volitatud edasimüüja. See sait ei ole seotud Tigo Energy, Inc.-ga.",
+    "badgeReseller": "Volitatud edasimüüja",
+    "badgeEU": "EL turustaja · 21+ turgu",
+    "understand": "Sulge",
+    "welcome": "Tere tulemast tigoenergy.shop-i!"
+  },
   "common": {
     "addToCart": "Lisa ostukorvi",
     "adding": "Lisamine...",

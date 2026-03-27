@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Revendeur autorisé indépendant",
+    "body": "Ce site est exploité par <strong>Initra Energija d.o.o.</strong>, un revendeur autorisé indépendant de produits Tigo Energy. Ce site n'est pas affilié à Tigo Energy, Inc.",
+    "badgeReseller": "Revendeur autorisé",
+    "badgeEU": "Distributeur UE · 21+ marchés",
+    "understand": "Fermer",
+    "welcome": "Bienvenue sur tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Ajouter au panier",
     "adding": "Ajout en cours...",

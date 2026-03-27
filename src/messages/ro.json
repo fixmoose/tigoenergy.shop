@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Revânzător autorizat independent",
+    "body": "Acest site este operat de <strong>Initra Energija d.o.o.</strong>, un revânzător autorizat independent de produse Tigo Energy. Acest site nu este afiliat cu Tigo Energy, Inc.",
+    "badgeReseller": "Revânzător autorizat",
+    "badgeEU": "Distribuitor UE · 21+ piețe",
+    "understand": "Închide",
+    "welcome": "Bine ați venit pe tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Adaugă în coș",
     "adding": "Se adaugă...",

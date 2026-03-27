@@ -1,4 +1,12 @@
 {
+  "topBanner": {
+    "title": "Neatkarīgs autorizēts pārdevējs",
+    "body": "Šo vietni pārvalda <strong>Initra Energija d.o.o.</strong>, neatkarīgs autorizēts Tigo Energy produktu pārdevējs. Šī vietne nav saistīta ar Tigo Energy, Inc.",
+    "badgeReseller": "Autorizēts pārdevējs",
+    "badgeEU": "ES izplatītājs · 21+ tirgi",
+    "understand": "Aizvērt",
+    "welcome": "Laipni lūdzam tigoenergy.shop!"
+  },
   "common": {
     "addToCart": "Pievienot grozam",
     "adding": "Pievieno...",
