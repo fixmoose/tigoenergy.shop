@@ -22,7 +22,8 @@ export function middleware(request: NextRequest) {
   const { cookies, nextUrl } = request
 
   // 0. Redirect inactive country domains to tigoenergy.com
-  const hostname = request.headers.get('host')?.replace(/:\d+$/, '') ?? ''
+  const rawHost = request.headers.get('host')?.replace(/:\d+$/, '') ?? ''
+  const hostname = rawHost.replace(/^www\./, '')
   if (REDIRECT_DOMAINS.has(hostname)) {
     return NextResponse.redirect(
       `https://www.tigoenergy.com${nextUrl.pathname}${nextUrl.search}`,
