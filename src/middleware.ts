@@ -3,8 +3,32 @@ import type { NextRequest } from 'next/server'
 import { getMarketKeyFromHostname } from '@/lib/constants/markets'
 import { seoMiddleware } from '@/lib/utils/seo-middleware'
 
+const REDIRECT_DOMAINS = new Set([
+  'tigoenergy.be',
+  'tigoenergy.ch',
+  'tigoenergy.dk',
+  'tigoenergy.se',
+  'tigoenergy.pl',
+  'tigoenergy.fr',
+  'tigoenergy.es',
+  'tigoenergy.ro',
+  'tigoenergy.rs',
+  'tigoenergy.mk',
+  'tigoenergy.me',
+  'tigoenergy.uk',
+])
+
 export function middleware(request: NextRequest) {
   const { cookies, nextUrl } = request
+
+  // 0. Redirect inactive country domains to tigoenergy.com
+  const hostname = request.headers.get('host')?.replace(/:\d+$/, '') ?? ''
+  if (REDIRECT_DOMAINS.has(hostname)) {
+    return NextResponse.redirect(
+      `https://www.tigoenergy.com${nextUrl.pathname}${nextUrl.search}`,
+      301
+    )
+  }
 
   // 1. Run SEO and Market detection middleware
   const response = seoMiddleware(request)

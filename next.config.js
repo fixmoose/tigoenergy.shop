@@ -38,37 +38,6 @@ const nextConfig = {
       transform: '@heroicons/react/{{kebabCase member}}/24/outline',
     },
   },
-  async redirects() {
-    const redirectDomains = [
-      'tigoenergy.be',
-      'tigoenergy.ch',
-      'tigoenergy.dk',
-      'tigoenergy.se',
-      'tigoenergy.pl',
-      'tigoenergy.fr',
-      'tigoenergy.es',
-      'tigoenergy.ro',
-      'tigoenergy.rs',
-      'tigoenergy.mk',
-      'tigoenergy.me',
-      'tigoenergy.uk',
-    ]
-
-    return redirectDomains.flatMap((domain) => [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: domain }],
-        destination: 'https://www.tigoenergy.com/:path*',
-        permanent: true,
-      },
-      {
-        source: '/',
-        has: [{ type: 'host', value: domain }],
-        destination: 'https://www.tigoenergy.com',
-        permanent: true,
-      },
-    ])
-  },
   webpack: (config) => {
     // Optimize bundle size
     config.resolve.fallback = {
