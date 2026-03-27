@@ -86,8 +86,8 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
         // Classify items
         const isAseries = name.includes('TS4-A-O') || name.includes('TS4-A-F') || name.includes('TS4-A-2F');
         const isXseries = name.startsWith('TS4-X');
-        const isCCAKit = name.includes('CCA') && name.includes('KIT');
-        const isScootable = !isCCAKit && (name.includes('CCA') || name.includes('RSS') || name.includes('TAP'));
+        const is10perBox = (name.includes('CCA') && name.includes('KIT')) || name.includes('TAP');
+        const isScootable = !is10perBox && (name.includes('CCA') || name.includes('RSS'));
         const isLarge = name.includes('INVERTER') || name.includes('BMS') || name.includes('BATTERY') || name.includes('EI LINK');
 
         if (isAseries) {
@@ -109,8 +109,8 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
             for (let i = 0; i < item.quantity; i++) {
                 parcels.push({ weight: weight + 1.0 }); // heavier packaging for large items
             }
-        } else if (isCCAKit) {
-            // CCA Kit: 10 units per box (vol = 2.0 → 20/2 = 10)
+        } else if (is10perBox) {
+            // CCA Kit, TAP: 10 units per box (vol = 2.0 → 20/2 = 10)
             scootable_items.push({ weight, qty: item.quantity, vol: 2.0 });
         } else if (isScootable) {
             scootable_items.push({ weight, qty: item.quantity, vol: 4.0 });
