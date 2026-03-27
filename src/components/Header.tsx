@@ -281,7 +281,7 @@ export default function Header() {
               />
               <div className="flex flex-col leading-tight">
                 <span className="text-white text-xs font-bold tracking-wider">INITRA ENERGIJA</span>
-                <span className="text-amber-100 text-[10px] font-medium tracking-wider">AUTHORIZED RESELLER</span>
+                <span className="text-amber-100 text-[10px] font-medium tracking-wider">TIGO ENERGY AUTHORIZED RESELLER</span>
               </div>
             </Link>
 
