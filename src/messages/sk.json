@@ -57,10 +57,10 @@
     "loggedInAs": "Prihlásený ako \"{role}\"",
     "inStockCount": "{count} skladom",
     "availToOrder": "Možnosť objednania",
-    "tigoProductSupport": "Tigo Energy podpora produktov",
-    "tigoProductSupportDesc": "Technická pomoc s produktmi Tigo Energy",
-    "onlineShopSupport": "Podpora internetového obchodu",
-    "onlineShopSupportDesc": "Pomoc s objednávkami a dopravou",
+    "tigoProductSupport": "Initra Podpora produktov",
+    "tigoProductSupportDesc": "Technická pomoc s produktmi Tigo od Initra Energija — nie sme oficiálna podpora Tigo Energy",
+    "onlineShopSupport": "Initra Podpora obchodu",
+    "onlineShopSupportDesc": "Pomoc s objednávkami a doručením od Initra Energija",
     "emptyCart": "Vyprázdniť košík"
   },
   "footer": {

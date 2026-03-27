@@ -57,10 +57,10 @@
     "loggedInAs": "Prijavljen kao \"{role}\"",
     "inStockCount": "{count} na stanju",
     "availToOrder": "Dost. za poruč.",
-    "tigoProductSupport": "Tigo Energy podrška za proizvode",
-    "tigoProductSupportDesc": "Tehnička pomoć za Tigo Energy proizvode",
-    "onlineShopSupport": "Podrška za online prodavnicu",
-    "onlineShopSupportDesc": "Pomoć sa porudžbinama i isporukom",
+    "tigoProductSupport": "Initra Podrška za proizvode",
+    "tigoProductSupportDesc": "Tehnička pomoć za Tigo proizvode od Initra Energija — nismo zvanična Tigo Energy podrška",
+    "onlineShopSupport": "Initra Podrška za prodavnicu",
+    "onlineShopSupportDesc": "Pomoć sa narudžbinama i dostavom od Initra Energija",
     "emptyCart": "Isprazni korpu"
   },
   "footer": {

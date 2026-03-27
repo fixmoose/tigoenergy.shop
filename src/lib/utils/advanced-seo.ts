@@ -47,7 +47,7 @@ export const buildOrganizationSchema = (market: any) => {
         alternateName: 'Initra Energija',
         description: 'Independent authorized reseller of Tigo Energy products. This site is operated by Initra Energija d.o.o. and is not affiliated with Tigo Energy, Inc.',
         url: `https://${MARKET_DOMAINS[market.key]}`,
-        logo: `https://${MARKET_DOMAINS[market.key]}/tigo-logo.png`,
+        logo: `https://${MARKET_DOMAINS[market.key]}/initra-logo.png`,
         sameAs: [],
         contactPoint: {
             '@type': 'ContactPoint',

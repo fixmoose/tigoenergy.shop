@@ -58,10 +58,10 @@
     "loggedInAs": "Angemeldet als \"{role}\"",
     "inStockCount": "{count} auf Lager",
     "availToOrder": "Bestellbar",
-    "tigoProductSupport": "Tigo Produkt-Support",
-    "tigoProductSupportDesc": "Technische Hilfe für Tigo-Produkte",
-    "onlineShopSupport": "Online-Shop Support",
-    "onlineShopSupportDesc": "Hilfe bei Bestellungen und Versand",
+    "tigoProductSupport": "Initra Produktsupport",
+    "tigoProductSupportDesc": "Technische Hilfe für Tigo-Produkte von Initra Energija — wir sind nicht der offizielle Tigo Energy Support",
+    "onlineShopSupport": "Initra Shop-Support",
+    "onlineShopSupportDesc": "Hilfe bei Bestellungen und Versand von Initra Energija",
     "emptyCart": "Warenkorb leeren"
   },
   "footer": {

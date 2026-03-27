@@ -57,10 +57,10 @@
     "loggedInAs": "Inloggad som \"{role}\"",
     "inStockCount": "{count} i lager",
     "availToOrder": "Tillgänglig att beställa",
-    "tigoProductSupport": "Tigo Energy produktsupport",
-    "tigoProductSupportDesc": "Teknisk hjälp med Tigo-produkter",
-    "onlineShopSupport": "Support för nätbutiken",
-    "onlineShopSupportDesc": "Hjälp med beställningar och frakt",
+    "tigoProductSupport": "Initra Produktsupport",
+    "tigoProductSupportDesc": "Teknisk hjälp för Tigo-produkter från Initra Energija — vi är inte Tigo Energys officiella support",
+    "onlineShopSupport": "Initra Butikssupport",
+    "onlineShopSupportDesc": "Hjälp med beställningar och frakt från Initra Energija",
     "emptyCart": "Töm varukorg"
   },
   "footer": {

@@ -38,16 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [
-        { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
         { url: '/favicon.ico', sizes: 'any' },
       ],
       apple: [
         { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-      ],
-      other: [
-        { rel: 'android-chrome-192x192', url: '/android-chrome-192x192.png' },
-        { rel: 'android-chrome-512x512', url: '/android-chrome-512x512.png' },
       ],
     },
     manifest: '/site.webmanifest',
@@ -93,7 +89,7 @@ export default async function RootLayout({
     name: 'Initra Energija',
     url: baseUrl,
     legalName: 'Initra Energija d.o.o.',
-    logo: `${baseUrl}/tigo-logo.png`,
+    logo: `${baseUrl}/initra-logo.png`,
     description: 'Independent authorized reseller of Tigo Energy products — solar optimizers, inverters, batteries and monitoring solutions across Europe. This site is not affiliated with or operated by Tigo Energy, Inc.',
     contactPoint: {
       '@type': 'ContactPoint',

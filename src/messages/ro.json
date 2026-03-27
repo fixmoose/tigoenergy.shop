@@ -57,10 +57,10 @@
     "loggedInAs": "Autentificat ca \"{role}\"",
     "inStockCount": "{count} în stoc",
     "availToOrder": "Disponibil pentru comandă",
-    "tigoProductSupport": "Tigo Energy suport produse",
-    "tigoProductSupportDesc": "Asistență tehnică pentru produsele Tigo Energy",
-    "onlineShopSupport": "Suport magazin online",
-    "onlineShopSupportDesc": "Ajutor cu comenzile și livrarea",
+    "tigoProductSupport": "Initra Suport Produse",
+    "tigoProductSupportDesc": "Ajutor tehnic pentru produse Tigo de la Initra Energija — nu suntem suportul oficial Tigo Energy",
+    "onlineShopSupport": "Initra Suport Magazin",
+    "onlineShopSupportDesc": "Ajutor cu comenzi și livrări de la Initra Energija",
     "emptyCart": "Golește coșul"
   },
   "footer": {

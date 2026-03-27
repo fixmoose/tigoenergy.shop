@@ -57,10 +57,10 @@
     "loggedInAs": "Pierakstījies kā \"{role}\"",
     "inStockCount": "{count} noliktavā",
     "availToOrder": "Pieejams pasūtīšanai",
-    "tigoProductSupport": "Tigo Energy produktu atbalsts",
-    "tigoProductSupportDesc": "Tehniskā palīdzība ar Tigo Energy produktiem",
-    "onlineShopSupport": "Tiešsaistes veikala atbalsts",
-    "onlineShopSupportDesc": "Palīdzība ar pasūtījumiem un piegādi",
+    "tigoProductSupport": "Initra Produktu atbalsts",
+    "tigoProductSupportDesc": "Tehniskā palīdzība Tigo produktiem no Initra Energija — mēs neesam oficiālais Tigo Energy atbalsts",
+    "onlineShopSupport": "Initra Veikala atbalsts",
+    "onlineShopSupportDesc": "Palīdzība ar pasūtījumiem un piegādi no Initra Energija",
     "emptyCart": "Iztukšot grozu"
   },
   "footer": {

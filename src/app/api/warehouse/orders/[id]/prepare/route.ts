@@ -69,7 +69,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
   <div style="background:#16a34a;padding:24px 32px;color:#fff;">
-    <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
+    <img src="${siteUrl}/initra-logo.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
     <h1 style="font-size:20px;font-weight:300;margin:0;">${l.heading}</h1>
   </div>
   <div style="padding:24px 32px;">

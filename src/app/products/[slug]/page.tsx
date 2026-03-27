@@ -94,7 +94,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     '@type': 'Product',
     name: productName,
     description: productDescription?.slice(0, 300) || `${productName} — available at Initra Energija, authorized distributor.`,
-    image: product.images?.[0] || `${baseUrl}/tigo-logo.png`,
+    image: product.images?.[0] || `${baseUrl}/initra-logo.png`,
     sku: product.sku,
     brand: { '@type': 'Brand', name: 'Tigo Energy' },
     offers: {

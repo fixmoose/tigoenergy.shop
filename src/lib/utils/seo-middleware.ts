@@ -237,7 +237,7 @@ export function generateStructuredData({
                 alternateName: 'Initra Energija',
                 description: 'Professional solar energy solutions provider',
                 url: `https://${MARKET_DOMAINS[market.key]}`,
-                logo: `https://${MARKET_DOMAINS[market.key]}/tigo-logo.png`,
+                logo: `https://${MARKET_DOMAINS[market.key]}/initra-logo.png`,
                 sameAs: [
                     'https://www.facebook.com/tigoenergy',
                     'https://www.linkedin.com/company/tigo-energy',

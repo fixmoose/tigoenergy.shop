@@ -212,7 +212,7 @@ export default function QuickOrderPage() {
         return (
             <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col overflow-y-auto">
                 <div className="flex-1 flex flex-col justify-center px-6 py-8">
-                    <img src="/tigo-leaf.png" alt="" className="w-12 h-12 brightness-0 invert opacity-80 mb-6" />
+                    <img src="/initra-logo.png" alt="" className="w-12 h-12 brightness-0 invert opacity-80 mb-6" />
                     <h1 className="text-2xl font-bold text-white mb-4">{t('termsTitle')}</h1>
                     <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 mb-6">
                         <p className="text-slate-300 text-sm leading-relaxed mb-3">

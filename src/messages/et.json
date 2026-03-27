@@ -57,10 +57,10 @@
     "loggedInAs": "Sisse logitud kui \"{role}\"",
     "inStockCount": "{count} laos",
     "availToOrder": "Saadaval tellimiseks",
-    "tigoProductSupport": "Tigo Energy toodete tugi",
-    "tigoProductSupportDesc": "Tehniline abi Tigo Energy toodetega",
-    "onlineShopSupport": "Veebipoe tugi",
-    "onlineShopSupportDesc": "Abi tellimuste ja tarnimisega",
+    "tigoProductSupport": "Initra Tootetetugi",
+    "tigoProductSupportDesc": "Tehniline abi Tigo toodetele Initra Energija-lt — me ei ole Tigo Energy ametlik tugi",
+    "onlineShopSupport": "Initra Poetugi",
+    "onlineShopSupportDesc": "Abi tellimuste ja tarnimisega Initra Energija-lt",
     "emptyCart": "Tühjenda ostukorv"
   },
   "footer": {

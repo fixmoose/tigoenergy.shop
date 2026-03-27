@@ -274,7 +274,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
               <img
-                src="/tigo-logo.png"
+                src="/initra-logo.png"
                 alt="Tigo Energy Products"
                 className="h-10"
                 style={{ filter: 'brightness(0) invert(1)' }}

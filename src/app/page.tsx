@@ -168,7 +168,7 @@ export default async function Home() {
               >
                 <div className="w-14 h-14 bg-amber-50 rounded-lg flex items-center justify-center mb-4 border border-transparent group-hover:border-amber-500 group-hover:bg-amber-100 transition-all duration-300">
                   <img
-                    src="/tigo-leaf.png"
+                    src="/initra-logo.png"
                     alt="Tigo"
                     className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
                   />

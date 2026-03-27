@@ -57,10 +57,10 @@
     "loggedInAs": "Prisijungęs kaip \"{role}\"",
     "inStockCount": "{count} sandėlyje",
     "availToOrder": "Galima užsakyti",
-    "tigoProductSupport": "Tigo Energy produktų palaikymas",
-    "tigoProductSupportDesc": "Techninė pagalba su Tigo Energy produktais",
-    "onlineShopSupport": "Internetinės parduotuvės pagalba",
-    "onlineShopSupportDesc": "Pagalba su užsakymais ir pristatymu",
+    "tigoProductSupport": "Initra Produktų palaikymas",
+    "tigoProductSupportDesc": "Techninė pagalba Tigo produktams iš Initra Energija — mes nesame oficiali Tigo Energy palaikymo tarnyba",
+    "onlineShopSupport": "Initra Parduotuvės palaikymas",
+    "onlineShopSupportDesc": "Pagalba su užsakymais ir pristatymu iš Initra Energija",
     "emptyCart": "Ištuštinti krepšelį"
   },
   "footer": {

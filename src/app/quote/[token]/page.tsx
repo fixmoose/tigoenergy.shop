@@ -342,7 +342,7 @@ export default function QuoteAcceptPage() {
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" className="h-8 mx-auto mb-4 bg-amber-600 px-4 py-2 rounded-lg" />
+                    <img src="https://tigoenergy.shop/initra-logo.png" alt="Initra Energija" className="h-8 mx-auto mb-4 bg-amber-600 px-4 py-2 rounded-lg" />
                     <h1 className="text-3xl font-bold text-gray-900">{l.title} {quote.quote_number}</h1>
                     <p className="text-gray-500 mt-2 max-w-lg mx-auto">{l.description}</p>
                 </div>

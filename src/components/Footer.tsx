@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4">
               <img
-                src="/tigo-distributor-logo.png"
+                src="/initra-logo.png"
                 alt="Initra Energija — Tigo Products"
                 className="h-16"
               />

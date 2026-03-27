@@ -1360,7 +1360,7 @@ export async function adminSendInvoiceEmailAction(orderId: string, { skipAdminCh
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:'Inter',-apple-system,sans-serif;background:#f9fafb;margin:0;padding:0;">
 <div style="max-width:600px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
     <div style="background:#7c3aed;padding:5px 0;text-align:center;">
-        <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" style="height:20px;width:auto;display:block;margin:0 auto;">
+        <img src="https://tigoenergy.shop/initra-logo.png" alt="Initra Energija" style="height:20px;width:auto;display:block;margin:0 auto;">
     </div>
     <div style="padding:40px 30px;">
         <div style="text-align:center;font-size:48px;margin-bottom:20px;">📄</div>
@@ -1796,7 +1796,7 @@ export async function adminSendDeliveryToDriverAction(orderId: string, driverEma
         const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
 <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
   <div style="background:#1a2b3c;padding:24px 32px;color:#fff;">
-    <img src="${siteUrl}/tigo-logo-white.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
+    <img src="${siteUrl}/initra-logo.png" alt="Tigo" style="height:24px;margin-bottom:8px;">
     <h1 style="font-size:20px;font-weight:300;margin:0;">Delivery Assignment</h1>
   </div>
   <div style="padding:24px 32px;">

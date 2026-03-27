@@ -85,7 +85,7 @@ export default function MobileLanding() {
         <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col lg:hidden overflow-y-auto">
             {/* Header */}
             <div className="px-5 pt-8 pb-4">
-                <img src="/tigo-leaf.png" alt="Initra Energija" className="w-10 h-10 brightness-0 invert opacity-90 mb-4" />
+                <img src="/initra-logo.png" alt="Initra Energija" className="w-10 h-10 brightness-0 invert opacity-90 mb-4" />
                 <h1 className="text-2xl font-light text-white tracking-wide">
                     {user ? t('welcomeBack') : t('brandName')}
                 </h1>

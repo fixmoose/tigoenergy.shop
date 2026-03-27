@@ -59,10 +59,10 @@
     "loggedInAs": "Logged in as \"{role}\"",
     "inStockCount": "{count} in stock",
     "availToOrder": "Avail. to Order",
-    "tigoProductSupport": "Product Support",
-    "tigoProductSupportDesc": "Technical help with Tigo products from our team",
-    "onlineShopSupport": "Online Shop Support",
-    "onlineShopSupportDesc": "Help with orders and shipping",
+    "tigoProductSupport": "Initra Product Support",
+    "tigoProductSupportDesc": "Technical help with Tigo products from Initra Energija — we are not Tigo Energy support",
+    "onlineShopSupport": "Initra Shop Support",
+    "onlineShopSupportDesc": "Help with orders and shipping from Initra Energija",
     "emptyCart": "Empty Cart"
   },
   "footer": {
@@ -989,19 +989,19 @@
       "q1": "How fast is shipping?",
       "a1": "Standard shipping takes 2-4 business days.",
       "q2": "Do you offer technical support?",
-      "a2": "Yes, our experts are available to help you with Tigo product selection and configuration."
+      "a2": "Yes, Initra Energija provides reseller support for Tigo product selection and configuration. Please note: we are not Tigo Energy's official support — for manufacturer warranty claims, contact Tigo Energy directly."
     },
     "contact": {
       "title": "Contact Sales",
       "intro": "Looking for volume pricing or have questions about your solar installation? Verify your email below to start a conversation with our sales team.",
-      "prefillTitle": "Contact Tigo Sales"
+      "prefillTitle": "Contact Initra Sales"
     },
     "productSupport": {
-      "title": "Product Support",
-      "intro": "Get technical help with your Tigo Energy products via our support team"
+      "title": "Initra Product Support",
+      "intro": "Get reseller support for your Tigo Energy products from the Initra Energija team. Note: we are an independent reseller, not Tigo Energy's official support."
     },
     "shopSupport": {
-      "title": "Online Shop Support"
+      "title": "Initra Shop Support"
     }
   },
   "cookieConsent": {

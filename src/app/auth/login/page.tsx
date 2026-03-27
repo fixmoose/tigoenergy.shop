@@ -14,7 +14,7 @@ export default function LoginPage() {
         <>
             {/* Mobile version — dark theme matching Metro UI */}
             <div className="lg:hidden min-h-screen bg-slate-900 flex flex-col items-center justify-center px-5 py-8 -mt-12">
-                <img src="/tigo-leaf.png" alt="Tigo" className="w-10 h-10 brightness-0 invert opacity-80 mb-6" />
+                <img src="/initra-logo.png" alt="Tigo" className="w-10 h-10 brightness-0 invert opacity-80 mb-6" />
                 <LoginForm />
             </div>
             {/* Desktop version */}

@@ -57,10 +57,10 @@
     "loggedInAs": "Bejelentkezve mint \"{role}\"",
     "inStockCount": "{count} db raktáron",
     "availToOrder": "Rendelhető",
-    "tigoProductSupport": "Tigo Energy termék támogatás",
-    "tigoProductSupportDesc": "Műszaki segítség Tigo termékekhez",
-    "onlineShopSupport": "Online áruház támogatás",
-    "onlineShopSupportDesc": "Segítség rendelésekkel és szállítással",
+    "tigoProductSupport": "Initra Terméktámogatás",
+    "tigoProductSupportDesc": "Technikai segítség Tigo termékekhez az Initra Energija-tól — nem vagyunk a Tigo Energy hivatalos támogatása",
+    "onlineShopSupport": "Initra Bolti támogatás",
+    "onlineShopSupportDesc": "Segítség rendelésekkel és szállítással az Initra Energija-tól",
     "emptyCart": "Kosár ürítése"
   },
   "footer": {
