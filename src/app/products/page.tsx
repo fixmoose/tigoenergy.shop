@@ -220,7 +220,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<{ 
                       key={p}
                       href={{ pathname: '/products', query: { ...params, page: p } }}
                       className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors ${page === p
-                        ? 'bg-green-600 border-green-600 text-white'
+                        ? 'bg-amber-600 border-amber-600 text-white'
                         : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                     >

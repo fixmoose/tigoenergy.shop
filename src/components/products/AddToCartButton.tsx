@@ -93,7 +93,7 @@ export default function AddToCartButton({ product, userId, pricing }: { product:
           onClick={handleAdd}
           disabled={loading || !canAddToCart}
           className={`px-6 py-2 rounded font-medium transition-colors ${canAddToCart
-            ? 'bg-green-600 text-white hover:bg-green-700'
+            ? 'bg-amber-600 text-white hover:bg-amber-700'
             : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
         >
           {isComingSoon ? tc('comingSoon') : isOutOfStock ? tc('outOfStock') : loading ? tc('adding') : tc('addToCart')}

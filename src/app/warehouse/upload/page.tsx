@@ -101,12 +101,12 @@ export default function WarehouseUploadMobile() {
 
                 {status === 'done' && (
                     <div className="text-center py-8">
-                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                             </svg>
                         </div>
-                        <p className="text-green-400 font-bold text-lg">Dobavnica naložena!</p>
+                        <p className="text-amber-400 font-bold text-lg">Dobavnica naložena!</p>
                         <p className="text-slate-400 text-sm mt-2">Lahko zaprete to stran.</p>
                         <button
                             onClick={() => { setStatus('ready'); setErrorMsg('') }}

@@ -79,8 +79,8 @@ export default function ContactSupportModal({ isOpen, onClose, order, items, typ
 
                     {success ? (
                         <div className="py-12 text-center">
-                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                             </div>
                             <h4 className="text-xl font-black text-gray-900 mb-2">Message Sent!</h4>
                             <p className="text-gray-500 font-medium">Our team will get back to you shortly.</p>
@@ -104,7 +104,7 @@ export default function ContactSupportModal({ isOpen, onClose, order, items, typ
                                     onChange={(e) => setMessage(e.target.value)}
                                     placeholder="Please describe your inquiry in detail..."
                                     rows={5}
-                                    className="w-full bg-gray-50 border-gray-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all p-4"
+                                    className="w-full bg-gray-50 border-gray-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all p-4"
                                 />
                             </div>
 
@@ -121,7 +121,7 @@ export default function ContactSupportModal({ isOpen, onClose, order, items, typ
                             <button
                                 type="submit"
                                 disabled={submitting || !recaptchaToken}
-                                className="w-full bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-green-100 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-amber-100 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                             >
                                 {submitting ? (
                                     <>

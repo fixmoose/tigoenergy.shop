@@ -101,7 +101,7 @@ export default function SavedCartsList() {
                             <button
                                 onClick={() => handleLoad(cart)}
                                 disabled={!!actionLoading}
-                                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
+                                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
                             >
                                 {actionLoading === cart.id ? 'Loading...' : 'Load Cart'}
                             </button>

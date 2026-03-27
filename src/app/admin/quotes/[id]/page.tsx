@@ -14,7 +14,7 @@ const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-slate-100 text-slate-700',
     sent: 'bg-blue-100 text-blue-700',
     viewed: 'bg-yellow-100 text-yellow-700',
-    accepted: 'bg-green-100 text-green-700',
+    accepted: 'bg-amber-100 text-amber-700',
     expired: 'bg-red-100 text-red-700',
     declined: 'bg-red-100 text-red-700',
 }
@@ -135,7 +135,7 @@ export default function AdminQuoteDetailPage() {
                                 </tr>
                                 <tr>
                                     <td colSpan={4} className="text-right px-4 py-3 font-bold text-lg">Total</td>
-                                    <td className="text-right px-6 py-3 font-bold text-lg text-green-600">{formatCurrency(quote.total)}</td>
+                                    <td className="text-right px-6 py-3 font-bold text-lg text-amber-600">{formatCurrency(quote.total)}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -177,7 +177,7 @@ export default function AdminQuoteDetailPage() {
 
                         {(quote.status === 'draft') && (
                             <button onClick={handleSend} disabled={!!actionLoading}
-                                className="w-full py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 text-sm">
+                                className="w-full py-2.5 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 disabled:opacity-50 text-sm">
                                 {actionLoading === 'send' ? 'Sending...' : 'Send to Customer'}
                             </button>
                         )}
@@ -191,7 +191,7 @@ export default function AdminQuoteDetailPage() {
 
                         {quote.status === 'accepted' && quote.order_id && (
                             <Link href={`/admin/orders/${quote.order_id}`}
-                                className="block w-full py-2.5 bg-green-50 text-green-700 rounded-lg font-medium hover:bg-green-100 text-sm text-center border border-green-200">
+                                className="block w-full py-2.5 bg-amber-50 text-amber-700 rounded-lg font-medium hover:bg-amber-100 text-sm text-center border border-amber-200">
                                 View Order →
                             </Link>
                         )}
@@ -289,7 +289,7 @@ export default function AdminQuoteDetailPage() {
                             )}
                             {quote.accepted_at && (
                                 <div className="flex items-start gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-green-400 mt-1.5 shrink-0" />
+                                    <div className="w-2 h-2 rounded-full bg-amber-400 mt-1.5 shrink-0" />
                                     <div>
                                         <div className="text-slate-700">Accepted — Order created</div>
                                         <div className="text-xs text-slate-400">{new Date(quote.accepted_at).toLocaleString('en-GB')}</div>

@@ -748,7 +748,7 @@ export default function CheckoutPage() {
         const isInvalid = invalidFields.includes(fieldName)
         return `w-full border rounded-lg px-3 py-2.5 transition-all duration-300 ${baseClass} ${isInvalid
             ? 'border-red-500 bg-red-50/50 ring-4 ring-red-100 placeholder-red-300'
-            : 'border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100'
+            : 'border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100'
             }`
     }
 
@@ -775,7 +775,7 @@ export default function CheckoutPage() {
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold mb-4">{t('cartIsEmpty')}</h1>
-                    <Link href="/products" className="text-green-600 hover:underline">{tc('continueShop')}</Link>
+                    <Link href="/products" className="text-amber-600 hover:underline">{tc('continueShop')}</Link>
                 </div>
             </div>
         )
@@ -815,7 +815,7 @@ export default function CheckoutPage() {
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                                <span className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
                                 {t('contactInfo')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -833,26 +833,26 @@ export default function CheckoutPage() {
                                                 type="button"
                                                 onClick={handleSendEmailCode}
                                                 disabled={sendingEmailCode}
-                                                className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-700 transition shrink-0 shadow-sm"
+                                                className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-700 transition shrink-0 shadow-sm"
                                             >
                                                 {sendingEmailCode ? '...' : 'Verify'}
                                             </button>
                                         )}
                                         {emailVerified && (
-                                            <div className="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shrink-0">
+                                            <div className="bg-amber-100 text-amber-700 px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shrink-0">
                                                 ✓ Verified
                                             </div>
                                         )}
                                     </div>
 
                                     {!user && emailCodeSent && !emailVerified && (
-                                        <div className="mt-3 p-4 bg-green-50 rounded-xl border border-green-100 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="mt-3 p-4 bg-amber-50 rounded-xl border border-amber-100 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center justify-between">
-                                                <p className="text-[11px] font-bold text-green-800 uppercase tracking-wider">Verification Code Sent</p>
+                                                <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Verification Code Sent</p>
                                                 <button
                                                     type="button"
                                                     onClick={() => setEmailCodeSent(false)}
-                                                    className="text-[10px] text-green-600 hover:text-green-800 font-bold uppercase tracking-widest bg-white px-2 py-1 rounded border border-green-200"
+                                                    className="text-[10px] text-amber-600 hover:text-amber-800 font-bold uppercase tracking-widest bg-white px-2 py-1 rounded border border-amber-200"
                                                 >
                                                     Change Email
                                                 </button>
@@ -862,7 +862,7 @@ export default function CheckoutPage() {
                                                     type="text"
                                                     value={emailCode}
                                                     onChange={(e) => setEmailCode(e.target.value)}
-                                                    className="flex-1 border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm text-center tracking-[0.5em] font-black"
+                                                    className="flex-1 border-amber-200 focus:border-amber-500 focus:ring-amber-500 rounded-lg px-3 py-2 text-sm text-center tracking-[0.5em] font-black"
                                                     placeholder="000000"
                                                     maxLength={6}
                                                 />
@@ -870,7 +870,7 @@ export default function CheckoutPage() {
                                                     type="button"
                                                     onClick={handleVerifyEmail}
                                                     disabled={verifyingEmail || emailCode.length < 6}
-                                                    className="bg-green-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-green-700 transition shadow-sm"
+                                                    className="bg-amber-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-amber-700 transition shadow-sm"
                                                 >
                                                     {verifyingEmail ? '...' : 'Confirm'}
                                                 </button>
@@ -894,21 +894,21 @@ export default function CheckoutPage() {
                             {!user && (
                                 <div className="mt-4 pt-4 border-t border-gray-100">
                                     <label className="flex items-center gap-2 cursor-pointer group">
-                                        <input type="checkbox" name="create_account" className="rounded text-green-600 focus:ring-green-500" checked={createAccount} onChange={e => setCreateAccount(e.target.checked)} />
+                                        <input type="checkbox" name="create_account" className="rounded text-amber-600 focus:ring-amber-500" checked={createAccount} onChange={e => setCreateAccount(e.target.checked)} />
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-gray-900 group-hover:text-green-700 transition-colors">{t('createAccountFaster')}</span>
+                                            <span className="text-sm font-bold text-gray-900 group-hover:text-amber-700 transition-colors">{t('createAccountFaster')}</span>
                                             <span className="text-xs text-gray-500">{tc('createAccountBenefits')}</span>
                                         </div>
                                     </label>
                                     {createAccount && (
-                                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-green-50/50 p-6 rounded-xl border border-green-100 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50/50 p-6 rounded-xl border border-amber-100 animate-in slide-in-from-top-2 duration-300">
                                             <div>
-                                                <label className="block text-xs font-bold text-green-800 mb-1 uppercase tracking-wider">{t('password')}</label>
-                                                <input ref={passwordRef} type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
+                                                <label className="block text-xs font-bold text-amber-800 mb-1 uppercase tracking-wider">{t('password')}</label>
+                                                <input ref={passwordRef} type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full border-amber-200 focus:border-amber-500 focus:ring-amber-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-green-800 mb-1 uppercase tracking-wider">{t('confirmPassword')}</label>
-                                                <input type="password" name="confirm_password" required value={formData.confirm_password} onChange={handleChange} className="w-full border-green-200 focus:border-green-500 focus:ring-green-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
+                                                <label className="block text-xs font-bold text-amber-800 mb-1 uppercase tracking-wider">{t('confirmPassword')}</label>
+                                                <input type="password" name="confirm_password" required value={formData.confirm_password} onChange={handleChange} className="w-full border-amber-200 focus:border-amber-500 focus:ring-amber-500 rounded-lg px-3 py-2 text-sm" placeholder="••••••••" />
                                             </div>
                                         </div>
                                     )}
@@ -918,13 +918,13 @@ export default function CheckoutPage() {
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                <span className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
                                 {t('shippingAddress')}
                             </h2>
                             {savedAddresses.filter(a => !a.isViesAddress).length > 0 && (
                                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {savedAddresses.filter(a => !a.isViesAddress).map(addr => (
-                                        <button key={addr.id} type="button" onClick={() => handleSelectAddress(addr)} className={`text-left p-3 border-2 rounded-lg ${selectedAddressId === addr.id ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
+                                        <button key={addr.id} type="button" onClick={() => handleSelectAddress(addr)} className={`text-left p-3 border-2 rounded-lg ${selectedAddressId === addr.id ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}>
                                             {(addr.label || addr.isDefaultShipping) && (
                                                 <div className="flex items-center gap-2 mb-1">
                                                     {addr.label && <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">{addr.label}</span>}
@@ -954,7 +954,7 @@ export default function CheckoutPage() {
                                         </button>
                                     </div>
                                     {vatResult && (
-                                        <div className={`mt-2 text-xs p-2 rounded ${vatResult.valid ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                                        <div className={`mt-2 text-xs p-2 rounded ${vatResult.valid ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>
                                             {vatResult.valid ? `✓ Valid: ${vatResult.name}` : `✗ ${vatResult.error || 'Invalid VAT'}`}
                                         </div>
                                     )}
@@ -1055,7 +1055,7 @@ export default function CheckoutPage() {
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                                <span className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
                                 {t('shippingMethod')}
                             </h2>
                             {loadingRates ? (
@@ -1069,14 +1069,14 @@ export default function CheckoutPage() {
                                             ? calculateDPDShippingCost(parcels, allDpdRates)
                                             : rate.rate_eur
                                         return (
-                                            <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? (isIE ? 'border-blue-500 bg-blue-50' : 'border-green-500 bg-green-50') : 'border-gray-200 hover:border-green-300'}`}>
+                                            <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? (isIE ? 'border-blue-500 bg-blue-50' : 'border-amber-500 bg-amber-50') : 'border-gray-200 hover:border-amber-300'}`}>
                                                 <div className="flex items-center gap-3">
-                                                    <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-green-600" />
+                                                    <input type="radio" name="shipping_id" value={rate.id} checked={selectedShippingId === rate.id} onChange={() => setSelectedShippingId(rate.id)} className="text-amber-600" />
                                                     <div>
                                                         <div className="font-bold text-gray-900">
                                                             {isPickup ? t('personalPickup') : isIE ? 'InterEuropa Pallet' : `${rate.carrier} ${t('standard')}`}
                                                             {rate.carrier === 'DPD' && boxCount > 1 && (
-                                                                <span className="ml-2 text-xs font-normal text-green-600 bg-green-100 px-1.5 py-0.5 rounded">
+                                                                <span className="ml-2 text-xs font-normal text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">
                                                                     ({boxCount} {t('boxes')})
                                                                 </span>
                                                             )}
@@ -1120,7 +1120,7 @@ export default function CheckoutPage() {
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
+                                <span className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
                                 {t('billingAddress')}
                             </h2>
                             {effectiveIsB2B ? (
@@ -1141,7 +1141,7 @@ export default function CheckoutPage() {
                             ) : (
                             <>
                             <label className="flex items-center gap-2 mb-4 cursor-pointer">
-                                <input type="checkbox" name="billing_same" checked={billingSame} onChange={e => setBillingSame(e.target.checked)} className="rounded text-green-600" />
+                                <input type="checkbox" name="billing_same" checked={billingSame} onChange={e => setBillingSame(e.target.checked)} className="rounded text-amber-600" />
                                 <span className="text-sm font-medium">{t('sameAsShipping')}</span>
                             </label>
                             {!billingSame && (
@@ -1186,15 +1186,15 @@ export default function CheckoutPage() {
 
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <span className="bg-green-100 text-green-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">5</span>
+                                <span className="bg-amber-100 text-amber-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">5</span>
                                 {t('paymentMethod')}
                             </h2>
                             <div className="space-y-3">
                                 {sortedPaymentMethods.map((method) => (
-                                    <label key={method.id} className={`flex items-center gap-3 p-4 border rounded-xl transition-all ${method.enabled ? 'cursor-pointer hover:border-green-300 hover:bg-green-50/30' : 'opacity-50 cursor-not-allowed bg-gray-50'} ${method.id === preferredPayment && method.enabled ? 'border-green-500 bg-green-50/50' : 'border-gray-200'}`}>
-                                        <input type="radio" name="payment_method" value={method.id} defaultChecked={method.id === preferredPayment} disabled={!method.enabled} className="text-green-600" />
+                                    <label key={method.id} className={`flex items-center gap-3 p-4 border rounded-xl transition-all ${method.enabled ? 'cursor-pointer hover:border-amber-300 hover:bg-amber-50/30' : 'opacity-50 cursor-not-allowed bg-gray-50'} ${method.id === preferredPayment && method.enabled ? 'border-amber-500 bg-amber-50/50' : 'border-gray-200'}`}>
+                                        <input type="radio" name="payment_method" value={method.id} defaultChecked={method.id === preferredPayment} disabled={!method.enabled} className="text-amber-600" />
                                         <div className="flex-1">
-                                            <div className="font-bold text-gray-900">{t(method.labelKey)} {method.id === preferredPayment && <span className="ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded">{t('preferred')}</span>}</div>
+                                            <div className="font-bold text-gray-900">{t(method.labelKey)} {method.id === preferredPayment && <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{t('preferred')}</span>}</div>
                                             <div className="text-xs text-gray-500">{t(method.descKey)}</div>
                                         </div>
                                         <div className="text-xl">{method.icon}</div>
@@ -1219,7 +1219,7 @@ export default function CheckoutPage() {
                                 {items.map(item => (
                                     <div key={item.sku} className="flex gap-3 text-sm">
                                         <div className="w-14 h-14 bg-gray-50 rounded-lg shrink-0 flex items-center justify-center border border-gray-100 relative">
-                                            <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">{item.quantity}</span>
+                                            <span className="absolute -top-1 -right-1 bg-amber-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">{item.quantity}</span>
                                             {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full object-contain p-1" /> : <span>📦</span>}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -1272,10 +1272,10 @@ export default function CheckoutPage() {
                                         required
                                         checked={formData.terms_agreement}
                                         onChange={handleChange}
-                                        className="mt-1 rounded text-green-600 focus:ring-green-500"
+                                        className="mt-1 rounded text-amber-600 focus:ring-amber-500"
                                     />
                                     <span className={`text-xs ${invalidFields.includes('terms_agreement') ? 'text-red-800 font-bold' : 'text-gray-500'} group-hover:text-gray-700 transition`}>
-                                        {t('termsAgree')} <a href="/terms" target="_blank" className="text-green-600 hover:underline">{t('termsConditions')}</a> {t('privacyAcknowledge')} <a href="/privacy" target="_blank" className="text-green-600 hover:underline">{t('privacyPolicy')}</a>.
+                                        {t('termsAgree')} <a href="/terms" target="_blank" className="text-amber-600 hover:underline">{t('termsConditions')}</a> {t('privacyAcknowledge')} <a href="/privacy" target="_blank" className="text-amber-600 hover:underline">{t('privacyPolicy')}</a>.
                                         {effectiveIsB2B
                                             ? ` ${t('b2bTermsNote')}`
                                             : ` ${t('warrantyReturnInfo')}`}
@@ -1287,7 +1287,7 @@ export default function CheckoutPage() {
                                         name="newsletter_subscribe"
                                         checked={formData.newsletter_subscribe}
                                         onChange={handleChange}
-                                        className="rounded text-green-600 focus:ring-green-500"
+                                        className="rounded text-amber-600 focus:ring-amber-500"
                                     />
                                     <span className="text-xs text-gray-500 group-hover:text-gray-700 transition">
                                         {t('newsletterSubscribe')}
@@ -1305,7 +1305,7 @@ export default function CheckoutPage() {
                                 </div>
                             )}
 
-                            <button type="submit" disabled={submitting} className="w-full mt-6 bg-green-600 text-white font-bold py-4 rounded-xl hover:bg-green-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={submitting} className="w-full mt-6 bg-amber-600 text-white font-bold py-4 rounded-xl hover:bg-amber-700 transition shadow-lg disabled:opacity-70 flex items-center justify-center gap-2">
                                 {submitting ? t('processing') : t('placeOrder')}
                             </button>
                             <Link href="/cart" className="block w-full mt-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium py-2 transition-colors">

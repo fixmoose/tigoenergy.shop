@@ -263,7 +263,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
           </div>
           <div className="flex items-center gap-4 bg-gray-50 p-2 rounded border">
             <div className="flex items-center gap-2">
-              <input type="checkbox" checked={product.active ?? false} onChange={(e) => setField('active', e.target.checked)} className="w-4 h-4 text-green-600" />
+              <input type="checkbox" checked={product.active ?? false} onChange={(e) => setField('active', e.target.checked)} className="w-4 h-4 text-amber-600" />
               <label className="text-xs font-semibold">Active</label>
             </div>
             <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                   id="is_electrical"
                   checked={product.is_electrical_equipment ?? false}
                   onChange={(e) => setField('is_electrical_equipment', e.target.checked)}
-                  className="w-4 h-4 text-green-600 rounded"
+                  className="w-4 h-4 text-amber-600 rounded"
                 />
                 <label htmlFor="is_electrical" className="text-xs font-bold text-gray-700">Electrical / Electronic Equipment (WEEE)</label>
               </div>
@@ -537,7 +537,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
         <div className="bg-white p-6 rounded-xl border shadow-sm space-y-4 h-fit">
           <div className="flex justify-between items-center border-b pb-2">
             <h3 className="font-semibold text-gray-800">Supplier Invoices</h3>
-            <button onClick={() => { setEditingInvoiceId(null); document.getElementById('invoice-modal')?.classList.remove('hidden') }} className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-lg border border-green-200 font-bold">+ Add Invoice</button>
+            <button onClick={() => { setEditingInvoiceId(null); document.getElementById('invoice-modal')?.classList.remove('hidden') }} className="text-xs bg-amber-50 text-amber-700 px-3 py-1 rounded-lg border border-amber-200 font-bold">+ Add Invoice</button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {(product.supplier_invoices as any[] ?? []).sort((a, b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime()).map(inv => (
@@ -628,7 +628,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start">
                         <p className="text-xs font-bold text-gray-900 truncate">{p.name_en}</p>
-                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${p.stock_quantity && p.stock_quantity > 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${p.stock_quantity && p.stock_quantity > 0 ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
                           {p.stock_quantity || 0} in stock
                         </span>
                       </div>
@@ -695,20 +695,20 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Invoice Number</label>
-              <input name="inv_num" placeholder="INV-12345" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+              <input name="inv_num" placeholder="INV-12345" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Date</label>
-                <input name="inv_date" type="date" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+                <input name="inv_date" type="date" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quantity</label>
-                <input name="inv_qty" type="number" placeholder="20" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+                <input name="inv_qty" type="number" placeholder="20" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none" />
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Country of Purchase</label>
-                <input name="inv_origin" placeholder="DE" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+                <input name="inv_origin" placeholder="DE" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -717,7 +717,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                 <select
                   value={invoiceCurrency}
                   onChange={e => setInvoiceCurrency(e.target.value)}
-                  className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none"
+                  className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none"
                 >
                   <option value="EUR">EUR</option>
                   <option value="USD">USD</option>
@@ -732,20 +732,20 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
                   step="0.000001"
                   value={conversionRate}
                   onChange={e => setConversionRate(Number(e.target.value))}
-                  className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none font-mono"
+                  className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none font-mono"
                 />
               </div>
             </div>
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Cost Gross ({invoiceCurrency})</label>
-              <input name="inv_cost" type="number" step="0.0001" placeholder="42.50" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none" />
+              <input name="inv_cost" type="number" step="0.0001" placeholder="42.50" className="border rounded-xl w-full px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none" />
             </div>
             <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 italic text-[11px] text-gray-500">
               Note: Updating invoices will automatically recalculate total stock and weighted average cost for this product.
             </div>
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Upload File (PDF/Image)</label>
-              <input name="inv_file" type="file" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+              <input name="inv_file" type="file" className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer" />
             </div>
           </div>
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
@@ -788,7 +788,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
               m?.classList.add('hidden');
               btn.disabled = false;
               btn.innerText = 'SAVE';
-            }} className="bg-green-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-green-100 hover:bg-green-700 transition">Save Invoice</button>
+            }} className="bg-amber-600 text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-amber-100 hover:bg-amber-700 transition">Save Invoice</button>
           </div>
         </div>
       </div>

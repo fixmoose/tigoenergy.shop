@@ -70,7 +70,7 @@ export default function CookieConsent() {
                                             <p className="text-xs font-bold text-gray-900">{t('essentialTitle')}</p>
                                             <p className="text-[11px] text-gray-500 mt-0.5">{t('essentialDesc')}</p>
                                         </div>
-                                        <span className="flex-shrink-0 text-[10px] font-black text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full uppercase tracking-wide mt-0.5">{t('alwaysOn')}</span>
+                                        <span className="flex-shrink-0 text-[10px] font-black text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full uppercase tracking-wide mt-0.5">{t('alwaysOn')}</span>
                                     </div>
 
                                     {/* Analytics */}

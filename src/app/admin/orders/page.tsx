@@ -32,13 +32,13 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   processing: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
-  delivered: 'bg-green-100 text-green-800',
+  delivered: 'bg-amber-100 text-amber-800',
   cancelled: 'bg-red-100 text-red-800',
 }
 
 const PAYMENT_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
-  paid: 'bg-green-100 text-green-800',
+  paid: 'bg-amber-100 text-amber-800',
   net30: 'bg-blue-100 text-blue-800',
   failed: 'bg-red-100 text-red-800',
   refunded: 'bg-gray-100 text-gray-800',
@@ -217,7 +217,7 @@ export default function AdminOrdersPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700"
+            className="px-3 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700"
           >
             + Create Order
           </button>
@@ -249,7 +249,7 @@ export default function AdminOrdersPage() {
               <button
                 onClick={markAsReported}
                 disabled={bulkLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50"
               >
                 {bulkLoading ? 'Processing...' : `Mark ${selectedEligibleCount} as Intrastat Reported`}
               </button>
@@ -426,7 +426,7 @@ export default function AdminOrdersPage() {
                   <td className="text-center px-4 py-4">
                     {['eu', 'intra_eu_distance_sale', 'intra_eu_service'].includes(o.transaction_type || '') ? (
                       o.intrastat_reported ? (
-                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded font-medium">Reported</span>
+                        <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded font-medium">Reported</span>
                       ) : (
                         <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium">Active</span>
                       )

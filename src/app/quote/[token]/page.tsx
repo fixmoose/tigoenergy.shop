@@ -256,7 +256,7 @@ export default function QuoteAcceptPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
             </div>
         )
     }
@@ -270,7 +270,7 @@ export default function QuoteAcceptPage() {
                     </div>
                     <h1 className="text-xl font-bold text-gray-900 mb-2">{l.invalid}</h1>
                     <p className="text-gray-500">{error}</p>
-                    <p className="mt-4 text-sm text-gray-400">{l.contact} <a href="mailto:support@tigoenergy.shop" className="text-green-600">support@tigoenergy.shop</a></p>
+                    <p className="mt-4 text-sm text-gray-400">{l.contact} <a href="mailto:support@tigoenergy.shop" className="text-amber-600">support@tigoenergy.shop</a></p>
                 </div>
             </div>
         )
@@ -280,16 +280,16 @@ export default function QuoteAcceptPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
                 <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{l.successTitle}</h1>
                     <p className="text-gray-500 mb-4">{l.successDesc}</p>
-                    <div className="bg-green-50 rounded-lg p-4 mb-6">
-                        <div className="text-sm text-green-700">{l.orderNumber}</div>
-                        <div className="text-xl font-bold text-green-800">{success.orderNumber}</div>
+                    <div className="bg-amber-50 rounded-lg p-4 mb-6">
+                        <div className="text-sm text-amber-700">{l.orderNumber}</div>
+                        <div className="text-xl font-bold text-amber-800">{success.orderNumber}</div>
                     </div>
-                    <a href="https://tigoenergy.shop" className="inline-block px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700">
+                    <a href="https://tigoenergy.shop" className="inline-block px-6 py-3 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700">
                         {l.backToShop}
                     </a>
                 </div>
@@ -304,8 +304,8 @@ export default function QuoteAcceptPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
                 <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <h1 className="text-xl font-bold text-gray-900 mb-2">{l.alreadyAccepted}</h1>
                     <p className="text-gray-500">{l.alreadyAcceptedDesc}</p>
@@ -324,7 +324,7 @@ export default function QuoteAcceptPage() {
                     </div>
                     <h1 className="text-xl font-bold text-gray-900 mb-2">{l.expired}</h1>
                     <p className="text-gray-500">{l.expiredDesc}</p>
-                    <p className="mt-4 text-sm text-gray-400">{l.contact} <a href="mailto:support@tigoenergy.shop" className="text-green-600">support@tigoenergy.shop</a></p>
+                    <p className="mt-4 text-sm text-gray-400">{l.contact} <a href="mailto:support@tigoenergy.shop" className="text-amber-600">support@tigoenergy.shop</a></p>
                 </div>
             </div>
         )
@@ -342,7 +342,7 @@ export default function QuoteAcceptPage() {
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" className="h-8 mx-auto mb-4 bg-green-600 px-4 py-2 rounded-lg" />
+                    <img src="https://tigoenergy.shop/tigo-logo-white.png" alt="Initra Energija" className="h-8 mx-auto mb-4 bg-amber-600 px-4 py-2 rounded-lg" />
                     <h1 className="text-3xl font-bold text-gray-900">{l.title} {quote.quote_number}</h1>
                     <p className="text-gray-500 mt-2 max-w-lg mx-auto">{l.description}</p>
                 </div>
@@ -400,7 +400,7 @@ export default function QuoteAcceptPage() {
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{l.shipping}</span>
                                 {delivery === 'pickup' ? (
-                                    <span className="font-medium text-green-600 line-through decoration-gray-400">
+                                    <span className="font-medium text-amber-600 line-through decoration-gray-400">
                                         {quote.shipping_cost > 0 ? formatCurrency(quote.shipping_cost) : formatCurrency(0)}
                                         <span className="no-underline ml-2 font-bold">{formatCurrency(0)}</span>
                                     </span>
@@ -414,7 +414,7 @@ export default function QuoteAcceptPage() {
                             </div>
                             <div className="flex justify-between text-lg pt-2 border-t">
                                 <span className="font-bold text-gray-900">{l.grandTotal}</span>
-                                <span className="font-bold text-green-600">{formatCurrency(effectiveTotal)}</span>
+                                <span className="font-bold text-amber-600">{formatCurrency(effectiveTotal)}</span>
                             </div>
                         </div>
                     </div>
@@ -427,15 +427,15 @@ export default function QuoteAcceptPage() {
 
                     {/* Delivery Options */}
                     <div className="space-y-3 mb-6">
-                        <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${delivery === 'shipping' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                            <input type="radio" name="delivery" value="shipping" checked={delivery === 'shipping'} onChange={() => setDelivery('shipping')} className="text-green-600" />
+                        <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${delivery === 'shipping' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                            <input type="radio" name="delivery" value="shipping" checked={delivery === 'shipping'} onChange={() => setDelivery('shipping')} className="text-amber-600" />
                             <div>
                                 <div className="font-medium text-gray-900">{l.optionShipping}</div>
                             </div>
                         </label>
 
-                        <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${delivery === 'pickup' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                            <input type="radio" name="delivery" value="pickup" checked={delivery === 'pickup'} onChange={() => setDelivery('pickup')} className="text-green-600" />
+                        <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors ${delivery === 'pickup' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                            <input type="radio" name="delivery" value="pickup" checked={delivery === 'pickup'} onChange={() => setDelivery('pickup')} className="text-amber-600" />
                             <div>
                                 <div className="font-medium text-gray-900">{l.optionPickup}</div>
                             </div>
@@ -447,15 +447,15 @@ export default function QuoteAcceptPage() {
                         <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-3">
                             <h3 className="font-medium text-gray-800 text-sm">{l.addressTitle}</h3>
                             <input placeholder={l.street} value={address.street} onChange={e => setAddress({ ...address, street: e.target.value })}
-                                className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none" />
+                                className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
                             <div className="grid grid-cols-2 gap-3">
                                 <input placeholder={l.city} value={address.city} onChange={e => setAddress({ ...address, city: e.target.value })}
-                                    className="px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none" />
+                                    className="px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
                                 <input placeholder={l.postalCode} value={address.postal_code} onChange={e => setAddress({ ...address, postal_code: e.target.value })}
-                                    className="px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none" />
+                                    className="px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
                             </div>
                             <input placeholder={l.country} value={address.country} onChange={e => setAddress({ ...address, country: e.target.value.toUpperCase() })}
-                                className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none" />
+                                className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
                         </div>
                     )}
 
@@ -463,13 +463,13 @@ export default function QuoteAcceptPage() {
                     <button
                         onClick={handleAccept}
                         disabled={submitting}
-                        className="w-full py-4 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                        className="w-full py-4 bg-amber-600 text-white rounded-xl font-bold text-lg hover:bg-amber-700 disabled:opacity-50 transition-colors"
                     >
                         {submitting ? l.processing : l.acceptBtn}
                     </button>
 
                     <p className="text-center text-xs text-gray-400 mt-4">
-                        {l.contact} <a href="mailto:support@tigoenergy.shop" className="text-green-600">support@tigoenergy.shop</a>
+                        {l.contact} <a href="mailto:support@tigoenergy.shop" className="text-amber-600">support@tigoenergy.shop</a>
                     </p>
                 </div>
             </div>

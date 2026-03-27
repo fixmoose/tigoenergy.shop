@@ -64,14 +64,14 @@ export default function CustomerOrderActions({ orderId, orderNumber, isPaid, has
                 <button
                     onClick={() => handleAction('Confirmation', confirmOrderAction)}
                     disabled={!!loading}
-                    className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 transition-colors disabled:opacity-50"
                 >
                     {loading === 'Confirmation' ? 'Confirming...' : 'Confirm Order'}
                 </button>
             </div>
 
             {message && (
-                <p className={`text-[10px] font-bold uppercase tracking-widest ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-widest ${message.type === 'success' ? 'text-amber-600' : 'text-red-600'}`}>
                     {message.text}
                 </p>
             )}

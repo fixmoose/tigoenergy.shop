@@ -36,15 +36,15 @@ export default async function Home() {
 
       {/* Hero Section */}
       <section
-        className="relative bg-cover bg-center bg-no-repeat text-white overflow-hidden"
-        style={{ backgroundImage: "url('/hero-bg-pattern.png')" }}
+        className="relative text-white overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #78350f 0%, #b45309 40%, #d97706 70%, #f59e0b 100%)' }}
       >
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 lg:pt-72 lg:pb-32">
           <div className="max-w-4xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               {t('heroTitle')}
             </h1>
-            <p className="text-xl sm:text-2xl text-green-100 mb-8">
+            <p className="text-xl sm:text-2xl text-amber-100 mb-8">
               {t('heroSubtitle')}<br />
               {t('heroServing')}
             </p>
@@ -54,13 +54,13 @@ export default async function Home() {
               </Link>
               {!user && (
                 <>
-                  <Link href="/auth/login" className="bg-white text-green-700 hover:bg-green-50 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors">
+                  <Link href="/auth/login" className="bg-white text-amber-700 hover:bg-amber-50 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors">
                     {t('signIn')}
                   </Link>
-                  <Link href="/auth/register?type=b2c" className="bg-white text-green-700 hover:bg-green-50 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors">
+                  <Link href="/auth/register?type=b2c" className="bg-white text-amber-700 hover:bg-amber-50 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors">
                     {t('createAccount')}
                   </Link>
-                  <Link href="/auth/register?type=b2b" className="bg-green-800 text-white hover:bg-green-900 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors border border-green-700">
+                  <Link href="/auth/register?type=b2b" className="bg-amber-800 text-white hover:bg-amber-900 text-md sm:text-lg py-3 px-6 sm:px-8 rounded-lg font-medium transition-colors border border-amber-700">
                     {t('createB2BAccount')}
                   </Link>
                 </>
@@ -75,31 +75,31 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
             <div className="flex flex-col items-center">
-              <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
               <span className="text-sm font-medium text-gray-700">{t('authorizedDealer')}</span>
             </div>
             <div className="flex flex-col items-center">
-              <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-sm font-medium text-gray-700">{t('fastShipping')}<sup className="text-[10px]">1</sup></span>
             </div>
             <div className="flex flex-col items-center">
-              <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <span className="text-sm font-medium text-gray-700">{t('warranty25')}<sup className="text-[10px]">2</sup></span>
             </div>
             <div className="flex flex-col items-center">
-              <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               <span className="text-sm font-medium text-gray-700">{t('worryFreeReturns')}<sup className="text-[10px]">3</sup></span>
             </div>
             <div className="flex flex-col items-center">
-              <svg className="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-amber-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
               <span className="text-sm font-medium text-gray-700">{t('securePayment')}</span>
@@ -125,10 +125,10 @@ export default async function Home() {
               {/* View All "Card" */}
               <Link
                 href="/products"
-                className="group relative bg-white rounded-xl border-2 border-dashed border-gray-200 p-8 flex flex-col items-center justify-center text-center hover:border-green-500 hover:bg-green-50 transition-all duration-300"
+                className="group relative bg-white rounded-xl border-2 border-dashed border-gray-200 p-8 flex flex-col items-center justify-center text-center hover:border-amber-500 hover:bg-amber-50 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </div>
@@ -139,13 +139,13 @@ export default async function Home() {
           ) : (
             <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
               <p className="text-gray-500">{t('noProductsYet')}</p>
-              <Link href="/admin/products" className="inline-block mt-4 text-green-600 font-medium hover:underline">
+              <Link href="/admin/products" className="inline-block mt-4 text-amber-600 font-medium hover:underline">
                 {t('goToAdmin')}
               </Link>
             </div>
           )}
           <div className="mt-8 text-center sm:hidden">
-            <Link href="/products" className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-medium transition-colors inline-block">
+            <Link href="/products" className="bg-amber-600 hover:bg-amber-700 text-white py-3 px-8 rounded-lg font-medium transition-colors inline-block">
               {t('viewAllProducts')}
             </Link>
           </div>
@@ -164,9 +164,9 @@ export default async function Home() {
               <Link
                 key={info.slug}
                 href={`/products?category=${info.slug}`}
-                className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-green-600 hover:shadow-lg transition-all duration-300"
+                className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-amber-600 hover:shadow-lg transition-all duration-300"
               >
-                <div className="w-14 h-14 bg-green-50 rounded-lg flex items-center justify-center mb-4 border border-transparent group-hover:border-green-500 group-hover:bg-green-100 transition-all duration-300">
+                <div className="w-14 h-14 bg-amber-50 rounded-lg flex items-center justify-center mb-4 border border-transparent group-hover:border-amber-500 group-hover:bg-amber-100 transition-all duration-300">
                   <img
                     src="/tigo-leaf.png"
                     alt="Tigo"
@@ -189,10 +189,10 @@ export default async function Home() {
           <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
             {/* Text Content */}
             <div className="mb-12 lg:mb-0">
-              <span className="text-green-600 font-bold tracking-wider uppercase text-sm mb-2 block">{t('globalReach')}</span>
+              <span className="text-amber-600 font-bold tracking-wider uppercase text-sm mb-2 block">{t('globalReach')}</span>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                 {t('logisticsTitle')} <br />
-                <span className="text-green-600">{t('logisticsHighlight')}</span>
+                <span className="text-amber-600">{t('logisticsHighlight')}</span>
               </h2>
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p dangerouslySetInnerHTML={{ __html: t.raw('logisticsP1') }} />
@@ -211,14 +211,14 @@ export default async function Home() {
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Link href="/products" className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200">
+                <Link href="/products" className="bg-amber-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-amber-700 transition shadow-lg shadow-amber-200">
                   {t('orderNow')}
                 </Link>
               </div>
             </div>
             {/* Map Image */}
             <div className="relative">
-              <div className="absolute inset-0 bg-green-200 rounded-3xl transform rotate-2 scale-95 opacity-30 blur-2xl"></div>
+              <div className="absolute inset-0 bg-amber-200 rounded-3xl transform rotate-2 scale-95 opacity-30 blur-2xl"></div>
               <img
                 src="/images/logistics-map.jpg"
                 alt={t('mapAlt')}
@@ -247,8 +247,8 @@ export default async function Home() {
               <p className="text-gray-600">{t('moreEnergyDesc')}</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
@@ -256,8 +256,8 @@ export default async function Home() {
               <p className="text-gray-600">{t('enhancedSafetyDesc')}</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -269,18 +269,18 @@ export default async function Home() {
       </section>
 
       {/* CTA */}
-      <section className="bg-green-600">
+      <section className="bg-amber-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center text-white">
             <h2 className="text-3xl font-bold mb-4">{t('ctaTitle')}</h2>
-            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-amber-100 mb-8 max-w-2xl mx-auto">
               {t('ctaSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/products" className="bg-orange-500 hover:bg-orange-600 text-white text-lg py-3 px-8 rounded-lg font-medium transition-colors">
                 {t('browseProducts')}
               </Link>
-              <Link href="/contact" className="bg-white text-green-600 font-medium py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors text-lg">
+              <Link href="/contact" className="bg-white text-amber-600 font-medium py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors text-lg">
                 {t('contactSales')}
               </Link>
             </div>

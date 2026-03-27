@@ -15,7 +15,7 @@ interface Props {
 const QUOTE_STATUS_STYLES: Record<string, string> = {
     sent: 'bg-blue-100 text-blue-700',
     viewed: 'bg-blue-100 text-blue-700',
-    accepted: 'bg-green-100 text-green-700',
+    accepted: 'bg-amber-100 text-amber-700',
     expired: 'bg-gray-100 text-gray-500',
     declined: 'bg-red-100 text-red-700',
     draft: 'bg-gray-100 text-gray-500',
@@ -191,7 +191,7 @@ export default function MyOrders({ user, customer }: Props) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 text-green-700 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-amber-100 text-amber-700 rounded-lg flex items-center justify-center">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                     </div>
                     <h3 className="font-bold text-lg text-gray-900">{t('orderHistory')}</h3>
@@ -206,7 +206,7 @@ export default function MyOrders({ user, customer }: Props) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder={t('searchOrders')}
-                            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         />
                         {search && (
                             <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -219,7 +219,7 @@ export default function MyOrders({ user, customer }: Props) {
 
             {loading ? (
                 <div className="p-12 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
                     <p className="text-gray-400">{t('loadingOrders')}</p>
                 </div>
             ) : filtered.length > 0 ? (
@@ -238,7 +238,7 @@ export default function MyOrders({ user, customer }: Props) {
                                                 P.O.: {(order as any).po_number}
                                             </span>
                                         )}
-                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                                        <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' ? 'bg-amber-100 text-amber-700' :
                                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                                 'bg-blue-100 text-blue-700'
                                             }`}>{order.status || 'Pending'}</span>
@@ -294,7 +294,7 @@ export default function MyOrders({ user, customer }: Props) {
             ) : orders.length > 0 ? (
                 <div className="p-12 text-center">
                     <p className="text-gray-500 font-medium">{t('noOrdersMatch')}</p>
-                    <button onClick={() => setSearch('')} className="mt-2 text-sm text-green-600 hover:underline">{t('clearSearch')}</button>
+                    <button onClick={() => setSearch('')} className="mt-2 text-sm text-amber-600 hover:underline">{t('clearSearch')}</button>
                 </div>
             ) : (
                 <div className="p-20 text-center">
@@ -303,7 +303,7 @@ export default function MyOrders({ user, customer }: Props) {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{t('noOrders')}</h3>
                     <p className="text-gray-500 mb-8 max-w-xs mx-auto">{t('noOrdersDesc')}</p>
-                    <Link href="/products" className="inline-block bg-green-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-green-200 hover:bg-green-700 transition-all">
+                    <Link href="/products" className="inline-block bg-amber-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-amber-200 hover:bg-amber-700 transition-all">
                         {t('startShopping')}
                     </Link>
                 </div>

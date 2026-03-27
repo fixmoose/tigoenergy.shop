@@ -213,7 +213,7 @@ export default function OrderDetailsPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
             </div>
         )
     }
@@ -282,7 +282,7 @@ export default function OrderDetailsPage() {
                             <h2 className="text-sm font-black text-gray-900 truncate">{t('orderTitle', { orderNumber: order.order_number })}</h2>
                             <p className="text-[10px] text-gray-500 font-medium">{new Date(order.created_at || '').toLocaleDateString()}</p>
                         </div>
-                        <span className={`text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' || order.confirmed_at ? 'bg-green-100 text-green-700' :
+                        <span className={`text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' || order.confirmed_at ? 'bg-amber-100 text-amber-700' :
                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                             }`}>
                             {order.status === 'completed' ? t('delivered') : order.status === 'delivered' ? t('delivered') : order.status === 'shipped' ? t('inTransit') : order.confirmed_at ? t('confirmed') : (order.status || t('pending'))}
@@ -292,7 +292,7 @@ export default function OrderDetailsPage() {
                     <div className="flex items-center gap-3 md:gap-8">
                         <div className="text-right">
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">{t('grandTotal')}</p>
-                            <p className="text-lg font-black text-green-600 leading-none">{order.currency} {order.total.toFixed(2)}</p>
+                            <p className="text-lg font-black text-amber-600 leading-none">{order.currency} {order.total.toFixed(2)}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <button
@@ -311,7 +311,7 @@ export default function OrderDetailsPage() {
                             <button
                                 onClick={handleBuyAgain}
                                 disabled={buyAgainLoading}
-                                className="px-4 py-2 bg-green-600 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-green-700 transition shadow-md shadow-green-100 disabled:opacity-50"
+                                className="px-4 py-2 bg-amber-600 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-amber-700 transition shadow-md shadow-amber-100 disabled:opacity-50"
                             >
                                 {buyAgainLoading ? '...' : t('buyAgain')}
                             </button>
@@ -324,15 +324,15 @@ export default function OrderDetailsPage() {
                 {/* Header Section */}
                 <div className="mb-8">
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                        <Link href="/dashboard" className="hover:text-green-600 transition-colors">{t('dashboard')}</Link>
+                        <Link href="/dashboard" className="hover:text-amber-600 transition-colors">{t('dashboard')}</Link>
                         <span>/</span>
-                        <Link href="/dashboard#orders" className="hover:text-green-600 transition-colors">{t('orders')}</Link>
+                        <Link href="/dashboard#orders" className="hover:text-amber-600 transition-colors">{t('orders')}</Link>
                         <span>/</span>
                         <span className="text-gray-900 font-medium">#{order.order_number}</span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <Link href="/dashboard" className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-200 transition shadow-sm group">
+                            <Link href="/dashboard" className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-600 hover:border-amber-200 transition shadow-sm group">
                                 <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                             </Link>
                             <div>
@@ -363,7 +363,7 @@ export default function OrderDetailsPage() {
                                 <div className="grid sm:grid-cols-2 gap-4 mb-4">
                                     {/* Delavska Hranilnica d.d. — Slovenia */}
                                     <div className="bg-white rounded-xl p-4 border border-amber-100">
-                                        <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-3">{t('delavskaBank')}</p>
+                                        <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-3">{t('delavskaBank')}</p>
                                         <div className="space-y-2">
                                             <div>
                                                 <p className="text-[9px] font-bold text-gray-400 uppercase">{t('iban')}</p>
@@ -425,10 +425,10 @@ export default function OrderDetailsPage() {
                             <div className="flex flex-col gap-1">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('orderStatus')}</span>
                                 <div className="flex items-center gap-3 group/status relative">
-                                    <span className={`text-sm px-4 py-1.5 rounded-full font-black uppercase tracking-widest cursor-help flex items-center gap-2 ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' || order.confirmed_at ? 'bg-green-100 text-green-700' :
+                                    <span className={`text-sm px-4 py-1.5 rounded-full font-black uppercase tracking-widest cursor-help flex items-center gap-2 ${order.status === 'completed' || order.status === 'paid' || order.status === 'delivered' || order.confirmed_at ? 'bg-amber-100 text-amber-700' :
                                         order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                                         }`}>
-                                        <div className={`w-2 h-2 rounded-full animate-pulse ${order.status === 'cancelled' ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                                        <div className={`w-2 h-2 rounded-full animate-pulse ${order.status === 'cancelled' ? 'bg-red-500' : 'bg-amber-500'}`}></div>
                                         {order.status === 'completed' ? t('delivered') : order.status === 'delivered' ? t('delivered') : order.status === 'shipped' ? t('inTransit') : order.confirmed_at ? t('orderConfirmed') : (order.status || 'Pending')}
                                     </span>
                                     {/* Tooltip */}
@@ -547,7 +547,7 @@ export default function OrderDetailsPage() {
                                             <button
                                                 onClick={handleBuyAgain}
                                                 disabled={buyAgainLoading}
-                                                className="flex items-center gap-2 px-5 py-2 bg-green-600 rounded-xl text-xs font-bold text-white hover:bg-green-700 transition-all duration-200 shadow-md shadow-green-100 hover:shadow-green-200 disabled:opacity-50"
+                                                className="flex items-center gap-2 px-5 py-2 bg-amber-600 rounded-xl text-xs font-bold text-white hover:bg-amber-700 transition-all duration-200 shadow-md shadow-amber-100 hover:shadow-amber-200 disabled:opacity-50"
                                             >
                                                 {buyAgainLoading ? (
                                                     <span className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></span>
@@ -576,23 +576,23 @@ export default function OrderDetailsPage() {
                             <div className="flex justify-between relative">
                                 <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-100 -z-10"></div>
                                 <div className="flex flex-col items-center gap-2 bg-white px-2">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status !== 'cancelled' ? 'bg-green-600 text-white shadow-md shadow-green-100' : 'bg-gray-200 text-gray-400'}`}>✓</div>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status !== 'cancelled' ? 'bg-amber-600 text-white shadow-md shadow-amber-100' : 'bg-gray-200 text-gray-400'}`}>✓</div>
                                     <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">{t('confirmed')}</span>
                                 </div>
                                 <div className="flex flex-col items-center gap-2 bg-white px-2">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'processing' || order.status === 'shipped' || order.status === 'completed' || order.status === 'delivered' ? 'bg-green-600 text-white shadow-md shadow-green-100' : 'bg-gray-100 text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'processing' || order.status === 'shipped' || order.status === 'completed' || order.status === 'delivered' ? 'bg-amber-600 text-white shadow-md shadow-amber-100' : 'bg-gray-100 text-gray-400'}`}>
                                         {['processing', 'shipped', 'completed', 'delivered'].includes(order.status || '') ? '✓' : '2'}
                                     </div>
                                     <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">{t('processing')}</span>
                                 </div>
                                 <div className="flex flex-col items-center gap-2 bg-white px-2 text-center">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'shipped' || order.status === 'completed' || order.status === 'delivered' ? 'bg-green-600 text-white shadow-md shadow-green-100' : 'bg-gray-100 text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'shipped' || order.status === 'completed' || order.status === 'delivered' ? 'bg-amber-600 text-white shadow-md shadow-amber-100' : 'bg-gray-100 text-gray-400'}`}>
                                         {['shipped', 'completed', 'delivered'].includes(order.status || '') ? '✓' : '3'}
                                     </div>
                                     <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">{t('inTransit')}</span>
                                 </div>
                                 <div className="flex flex-col items-center gap-2 bg-white px-2">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'delivered' || order.status === 'completed' ? 'bg-green-600 text-white shadow-md shadow-green-100' : 'bg-gray-100 text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${order.status === 'delivered' || order.status === 'completed' ? 'bg-amber-600 text-white shadow-md shadow-amber-100' : 'bg-gray-100 text-gray-400'}`}>
                                         {order.status === 'delivered' || order.status === 'completed' ? '✓' : '4'}
                                     </div>
                                     <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">{t('delivered')}</span>
@@ -644,7 +644,7 @@ export default function OrderDetailsPage() {
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-gray-900 group-hover:text-green-600 transition truncate">{item.product_name}</h4>
+                                                <h4 className="font-bold text-gray-900 group-hover:text-amber-600 transition truncate">{item.product_name}</h4>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{item.sku}</p>
                                                 </div>
@@ -653,7 +653,7 @@ export default function OrderDetailsPage() {
                                                 {/* Individual Item Actions */}
                                                 <button
                                                     onClick={() => handleOrderSingleItem(item)}
-                                                    className="mt-3 text-[10px] font-black text-green-600 uppercase tracking-widest flex items-center gap-1 hover:text-green-700 transition"
+                                                    className="mt-3 text-[10px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-1 hover:text-amber-700 transition"
                                                 >
                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                                                     {t('orderAgain')}
@@ -689,8 +689,8 @@ export default function OrderDetailsPage() {
                                 <div className="px-5 pb-5 border-t border-gray-50">
                                     {tigoSupport.done ? (
                                         <div className="pt-4 text-center">
-                                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                                            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                                             </div>
                                             <p className="text-sm font-bold text-gray-900">{t('requestSent')}</p>
                                             <p className="text-xs text-gray-500 mt-1">{t('tigoNotified')}</p>
@@ -772,7 +772,7 @@ export default function OrderDetailsPage() {
                                 </div>
                                 <div className="pt-6 border-t border-gray-100 flex justify-between items-center bg-gray-50 -mx-8 px-8 py-5 mt-4">
                                     <span className="text-xs font-black text-gray-900 uppercase tracking-widest">{t('grandTotal')}</span>
-                                    <span className="text-3xl font-black text-green-600">{order.currency} {order.total.toFixed(2)}</span>
+                                    <span className="text-3xl font-black text-amber-600">{order.currency} {order.total.toFixed(2)}</span>
                                 </div>
                             </div>
 
@@ -806,12 +806,12 @@ export default function OrderDetailsPage() {
                                 </div>
 
                                 {order.tracking_number && (
-                                    <div className="bg-green-50 p-5 rounded-2xl border border-green-100 space-y-3">
+                                    <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100 space-y-3">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                            <span className="text-[10px] font-black text-green-800 uppercase tracking-widest">{t('trackingInfo')}</span>
+                                            <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                            <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest">{t('trackingInfo')}</span>
                                         </div>
-                                        <p className="text-xs text-green-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
+                                        <p className="text-xs text-amber-700 mb-1 font-bold">{order.shipping_carrier || ''}</p>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <a
                                                 href={order.shipping_carrier === 'DPD' && order.tracking_number
@@ -819,7 +819,7 @@ export default function OrderDetailsPage() {
                                                     : (order.tracking_url || '#')}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-sm font-black text-green-600 hover:underline flex items-center gap-1"
+                                                className="text-sm font-black text-amber-600 hover:underline flex items-center gap-1"
                                             >
                                                 {order.tracking_number}
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -828,7 +828,7 @@ export default function OrderDetailsPage() {
                                                 <button
                                                     onClick={handleCheckDpdStatus}
                                                     disabled={dpdStatusLoading}
-                                                    className="text-[10px] font-black text-white bg-green-600 hover:bg-green-700 px-2.5 py-1 rounded-lg transition disabled:opacity-50 uppercase tracking-wider"
+                                                    className="text-[10px] font-black text-white bg-amber-600 hover:bg-amber-700 px-2.5 py-1 rounded-lg transition disabled:opacity-50 uppercase tracking-wider"
                                                 >
                                                     {dpdStatusLoading ? '...' : t('checkLiveStatus') || 'Live Status'}
                                                 </button>
@@ -838,12 +838,12 @@ export default function OrderDetailsPage() {
                                         {dpdStatus && dpdStatus.length > 0 && (
                                             <div className="space-y-2 mt-2">
                                                 {dpdStatus.map((p: any, i: number) => (
-                                                    <div key={i} className="bg-white border border-green-100 rounded-xl p-3">
+                                                    <div key={i} className="bg-white border border-amber-100 rounded-xl p-3">
                                                         <div className="flex items-center justify-between gap-2">
                                                             <span className="text-[10px] font-mono text-gray-400">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
                                                             <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
                                                                 (p.status || '').toUpperCase() === 'DELIVERED'
-                                                                    ? 'bg-green-100 text-green-700'
+                                                                    ? 'bg-amber-100 text-amber-700'
                                                                     : ['IN_DELIVERY', 'ON_THE_ROAD', 'INBOUND', 'AT_DELIVERY_DEPOT'].includes((p.status || '').toUpperCase())
                                                                         ? 'bg-yellow-100 text-yellow-700'
                                                                         : 'bg-gray-100 text-gray-600'
@@ -852,7 +852,7 @@ export default function OrderDetailsPage() {
                                                             </span>
                                                         </div>
                                                         {(p.delivered_at || p.deliveryDate) && (
-                                                            <p className="text-[10px] text-green-600 mt-1 font-bold">Delivered: {p.delivered_at || p.deliveryDate}</p>
+                                                            <p className="text-[10px] text-amber-600 mt-1 font-bold">Delivered: {p.delivered_at || p.deliveryDate}</p>
                                                         )}
                                                         {p.depot && (
                                                             <p className="text-[10px] text-gray-400 mt-0.5">Depot: {p.depot}</p>
@@ -873,9 +873,9 @@ export default function OrderDetailsPage() {
                                 <li>
                                     <button
                                         onClick={() => handleContactSupport('shipping')}
-                                        className="text-sm font-bold text-gray-700 hover:text-green-600 transition flex items-center gap-3 group w-full text-left"
+                                        className="text-sm font-bold text-gray-700 hover:text-amber-600 transition flex items-center gap-3 group w-full text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-green-50 transition">
+                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-amber-50 transition">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
                                         {t('shippingInquiry')}
@@ -884,9 +884,9 @@ export default function OrderDetailsPage() {
                                 <li>
                                     <button
                                         onClick={() => handleContactSupport('return')}
-                                        className="text-sm font-bold text-gray-700 hover:text-green-600 transition flex items-center gap-3 group w-full text-left"
+                                        className="text-sm font-bold text-gray-700 hover:text-amber-600 transition flex items-center gap-3 group w-full text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-green-50 transition">
+                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-amber-50 transition">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" /></svg>
                                         </div>
                                         {t('returnInquiry')}
@@ -895,9 +895,9 @@ export default function OrderDetailsPage() {
                                 <li>
                                     <button
                                         onClick={() => handleContactSupport('general')}
-                                        className="text-sm font-bold text-gray-700 hover:text-green-600 transition flex items-center gap-3 group w-full text-left"
+                                        className="text-sm font-bold text-gray-700 hover:text-amber-600 transition flex items-center gap-3 group w-full text-left"
                                     >
-                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-green-50 transition">
+                                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-amber-50 transition">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                         </div>
                                         {t('contactSupport')}

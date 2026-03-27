@@ -438,7 +438,7 @@ export default function SettingsPage() {
                                                 <span className="text-[9px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded font-bold uppercase">Warehouse</span>
                                             )}
                                             {d.is_auto_pickup && (
-                                                <span className="text-[9px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-bold uppercase">Auto-pickup</span>
+                                                <span className="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-bold uppercase">Auto-pickup</span>
                                             )}
                                         </div>
                                         <div className="text-xs text-gray-500">{d.email}{d.phone ? ` · ${d.phone}` : ''}</div>
@@ -465,7 +465,7 @@ export default function SettingsPage() {
                                                 const { error } = await supabase.from('drivers').update({ is_auto_pickup: e.target.checked }).eq('id', d.id)
                                                 if (!error) fetchDrivers()
                                             }}
-                                            className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                            className="w-3.5 h-3.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                                         />
                                         <span className="text-[10px] font-bold text-gray-400 uppercase">Auto-pickup</span>
                                     </label>

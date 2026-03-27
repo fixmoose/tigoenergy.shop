@@ -282,10 +282,10 @@ export default function CatalogGenerator({ products, categories = [] }: { produc
                     <button
                         onClick={handleDownloadPricelist}
                         disabled={isGenerating === 'pricelist'}
-                        className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all group disabled:opacity-50"
+                        className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-amber-400 hover:bg-amber-50 transition-all group disabled:opacity-50"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center group-hover:bg-green-200">
+                            <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center group-hover:bg-amber-200">
                                 {isGenerating === 'pricelist' ? '⏳' : '💰'}
                             </div>
                             <div className="text-left">
@@ -293,7 +293,7 @@ export default function CatalogGenerator({ products, categories = [] }: { produc
                                 <div className="text-xs text-gray-500">Simple lines, Base + Volume Pricing</div>
                             </div>
                         </div>
-                        <span className="text-gray-400 group-hover:text-green-500">⬇️</span>
+                        <span className="text-gray-400 group-hover:text-amber-500">⬇️</span>
                     </button>
                 </div>
 

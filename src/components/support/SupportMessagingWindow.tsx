@@ -213,7 +213,7 @@ export default function SupportMessagingWindow({ type = 'general', title, orderI
                         />
                         <button
                             onClick={handleSubmitRequest} disabled={loading || !name || !message}
-                            className="w-full bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 disabled:opacity-50 transition shadow-lg shadow-green-100 uppercase tracking-wider text-xs"
+                            className="w-full bg-amber-600 text-white py-4 rounded-xl font-bold hover:bg-amber-700 disabled:opacity-50 transition shadow-lg shadow-amber-100 uppercase tracking-wider text-xs"
                         >
                             {loading ? 'Sending...' : 'Send Message'}
                         </button>

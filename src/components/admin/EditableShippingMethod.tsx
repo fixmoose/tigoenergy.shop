@@ -87,7 +87,7 @@ export default function EditableShippingMethod({
                 <div>
                     <span className="text-slate-500">Method:</span>
                     {isPickup ? (
-                        <span className="ml-2 font-bold text-green-700">🏪 Lastni prevzem</span>
+                        <span className="ml-2 font-bold text-amber-700">🏪 Lastni prevzem</span>
                     ) : isInterEuropa ? (
                         <span className="ml-2 font-bold text-purple-700">🚛 InterEuropa paleta</span>
                     ) : (
@@ -143,7 +143,7 @@ export default function EditableShippingMethod({
                             <button
                                 onClick={() => changeShipping('pickup')}
                                 disabled={loading}
-                                className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700 transition disabled:opacity-50"
+                                className="w-full py-2 bg-amber-600 text-white rounded-lg font-bold text-xs hover:bg-amber-700 transition disabled:opacity-50"
                             >
                                 {loading ? 'Switching...' : '🏪 Switch to Lastni prevzem'}
                             </button>

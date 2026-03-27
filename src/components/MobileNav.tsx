@@ -47,7 +47,7 @@ export default function MobileNav() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-5.98.286h5.98zm0 0h9m-9 0a3 3 0 01-5.98.286M16.5 14.25a3 3 0 005.98.286h-5.98zm0 0a3 3 0 015.98.286M7.106 5.272H20.25a1.125 1.125 0 011.07 1.472l-2.14 6.726a1.125 1.125 0 01-1.07.78H7.5" />
                     </svg>
                     {count > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                             {count > 9 ? '9+' : count}
                         </span>
                     )}

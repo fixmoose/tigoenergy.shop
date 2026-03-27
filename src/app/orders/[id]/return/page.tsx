@@ -159,7 +159,7 @@ export default function ReturnFlowPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
             </div>
         )
     }
@@ -170,7 +170,7 @@ export default function ReturnFlowPage() {
         <div className="min-h-screen bg-gray-50 py-12 px-4">
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
-                    <Link href={`/orders/${orderId}`} className="text-sm font-bold text-gray-500 hover:text-green-600 flex items-center gap-2 mb-4">
+                    <Link href={`/orders/${orderId}`} className="text-sm font-bold text-gray-500 hover:text-amber-600 flex items-center gap-2 mb-4">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                         {t('backToOrder')}
                     </Link>
@@ -182,7 +182,7 @@ export default function ReturnFlowPage() {
                 <div className="flex justify-between mb-12 relative">
                     <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10 -translate-y-1/2"></div>
                     {[1, 2, 3].map(s => (
-                        <div key={s} className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm z-10 transition-colors ${step >= s ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <div key={s} className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm z-10 transition-colors ${step >= s ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
                             {s}
                         </div>
                     ))}
@@ -193,13 +193,13 @@ export default function ReturnFlowPage() {
                         <div className="p-8">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-black text-gray-900">{t('selectItems')}</h3>
-                                <button onClick={toggleAll} className="text-xs font-black text-green-600 uppercase tracking-widest hover:underline">
+                                <button onClick={toggleAll} className="text-xs font-black text-amber-600 uppercase tracking-widest hover:underline">
                                     {Object.values(selectedItems).every((q, i) => q === items[i].quantity) ? t('deselectAll') : t('selectAll')}
                                 </button>
                             </div>
                             <div className="space-y-4 mb-8">
                                 {items.map(item => (
-                                    <div key={item.id} className={`p-4 rounded-2xl border transition-all ${selectedItems[item.id] > 0 ? 'border-green-200 bg-green-50/30' : 'border-gray-100'}`}>
+                                    <div key={item.id} className={`p-4 rounded-2xl border transition-all ${selectedItems[item.id] > 0 ? 'border-amber-200 bg-amber-50/30' : 'border-gray-100'}`}>
                                         <div className="flex items-center gap-4">
                                             <div className="w-16 h-16 bg-white rounded-xl border border-gray-100 flex-shrink-0 p-2">
                                                 <img
@@ -230,7 +230,7 @@ export default function ReturnFlowPage() {
                             <button
                                 onClick={() => setStep(2)}
                                 disabled={Object.values(selectedItems).every(q => q === 0)}
-                                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-600 transition shadow-xl disabled:opacity-50 disabled:hover:bg-gray-900"
+                                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-amber-600 transition shadow-xl disabled:opacity-50 disabled:hover:bg-gray-900"
                             >
                                 {t('continueToReason')}
                             </button>
@@ -247,7 +247,7 @@ export default function ReturnFlowPage() {
                                     <select
                                         value={reason}
                                         onChange={(e) => setReason(e.target.value as ReturnReason)}
-                                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-green-500 outline-none"
+                                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-900 focus:ring-2 focus:ring-amber-500 outline-none"
                                     >
                                         <option value="">{t('selectReason')}</option>
                                         {REASON_KEYS.map(r => (
@@ -261,10 +261,10 @@ export default function ReturnFlowPage() {
                                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('evidencePhotos')}</label>
                                         <div
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-green-400 hover:bg-green-50/30 transition cursor-pointer group"
+                                            className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-amber-400 hover:bg-amber-50/30 transition cursor-pointer group"
                                         >
-                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-100 transition">
-                                                <svg className="w-6 h-6 text-gray-400 group-hover:text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-amber-100 transition">
+                                                <svg className="w-6 h-6 text-gray-400 group-hover:text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                                             </div>
                                             <p className="text-sm font-bold text-gray-500">{t('uploadPhotos')}</p>
                                             <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple accept="image/*" className="hidden" />
@@ -291,7 +291,7 @@ export default function ReturnFlowPage() {
                                     <textarea
                                         value={customerNotes}
                                         onChange={(e) => setCustomerNotes(e.target.value)}
-                                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-medium text-gray-900 h-32 outline-none focus:ring-2 focus:ring-green-500"
+                                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-medium text-gray-900 h-32 outline-none focus:ring-2 focus:ring-amber-500"
                                         placeholder={t('notesPlaceholder')}
                                     ></textarea>
                                 </div>
@@ -325,7 +325,7 @@ export default function ReturnFlowPage() {
                                     <button
                                         onClick={handleSubmit}
                                         disabled={submitting || !reason || (reason === 'damaged' && files.length === 0)}
-                                        className="flex-[2] py-4 bg-green-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-700 transition shadow-xl shadow-green-100 disabled:opacity-50"
+                                        className="flex-[2] py-4 bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-amber-700 transition shadow-xl shadow-amber-100 disabled:opacity-50"
                                     >
                                         {submitting ? t('submitting') : t('completeReturn')}
                                     </button>
@@ -336,7 +336,7 @@ export default function ReturnFlowPage() {
 
                     {step === 3 && (
                         <div className="p-8 text-center animate-in zoom-in duration-500">
-                            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                             </div>
                             <h3 className="text-3xl font-black text-gray-900 mb-4">{t('returnRequested')}</h3>
@@ -374,7 +374,7 @@ export default function ReturnFlowPage() {
 
                             <Link
                                 href="/dashboard"
-                                className="inline-block px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-green-600 transition"
+                                className="inline-block px-8 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-amber-600 transition"
                             >
                                 {t('backToDashboard')}
                             </Link>

@@ -125,7 +125,7 @@ export default function EnvironmentalPage() {
               (activeTab === 'etrod' && (!etrodReport || etrodReport.rows.length === 0)) ||
               (activeTab === 'packaging' && (!packagingReport || packagingReport.rows.length === 0))
             }
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Download CSV
           </button>
@@ -162,7 +162,7 @@ export default function EnvironmentalPage() {
             <select
               value={year}
               onChange={(e) => setYear(parseInt(e.target.value))}
-              className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             >
               {[currentYear - 1, currentYear, currentYear + 1].map((y) => (
                 <option key={y} value={y}>{y}</option>
@@ -176,7 +176,7 @@ export default function EnvironmentalPage() {
                 <select
                   value={periodType}
                   onChange={(e) => setPeriodType(e.target.value as any)}
-                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   <option value="quarter">Quarterly</option>
                   <option value="half_year">Bi-Annually (WEEE)</option>
@@ -189,7 +189,7 @@ export default function EnvironmentalPage() {
                 <select
                   value={quarter ?? ''}
                   onChange={(e) => setQuarter(parseInt(e.target.value))}
-                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   {periodType === 'quarter' ? (
                     quarters.map((q) => <option key={q.value} value={q.value}>{q.label}</option>)
@@ -209,7 +209,7 @@ export default function EnvironmentalPage() {
                 <select
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   <option value="SI">Slovenia (SI)</option>
                   <option value="DE">Germany (DE)</option>
@@ -235,7 +235,7 @@ export default function EnvironmentalPage() {
                       setQuarter(null)
                     }
                   }}
-                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   <option value="annual">Annual</option>
                   <optgroup label="Quarterly (SI)">
@@ -286,7 +286,7 @@ export default function EnvironmentalPage() {
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
               <p className="text-sm text-slate-500">eTROD Fee Due</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(etrodReport.summary.total_fee_eur)}</p>
+              <p className="text-2xl font-bold text-amber-600">{formatCurrency(etrodReport.summary.total_fee_eur)}</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
               <p className="text-sm text-slate-500">Authority</p>
@@ -324,7 +324,7 @@ export default function EnvironmentalPage() {
                       <td className="text-right px-4 py-3 text-slate-800">{formatNumber(row.units_sold)}</td>
                       <td className="text-right px-4 py-3 text-slate-600">{formatWeight(row.total_weight_kg)}</td>
                       <td className="text-right px-4 py-3 text-slate-500">{formatCurrency(row.fee_rate_per_kg)}</td>
-                      <td className="text-right px-4 py-3 text-green-600 font-medium">{formatCurrency(row.total_fee_eur)}</td>
+                      <td className="text-right px-4 py-3 text-amber-600 font-medium">{formatCurrency(row.total_fee_eur)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -334,7 +334,7 @@ export default function EnvironmentalPage() {
                     <td className="text-right px-4 py-3 text-slate-800">{formatNumber(etrodReport.summary.total_units)}</td>
                     <td className="text-right px-4 py-3 text-slate-800">{formatWeight(etrodReport.summary.total_weight_kg)}</td>
                     <td className="px-4 py-3"></td>
-                    <td className="text-right px-4 py-3 text-green-600">{formatCurrency(etrodReport.summary.total_fee_eur)}</td>
+                    <td className="text-right px-4 py-3 text-amber-600">{formatCurrency(etrodReport.summary.total_fee_eur)}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -342,16 +342,16 @@ export default function EnvironmentalPage() {
           </div>
 
           {/* eTROD Categories Reference */}
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4">
-            <h4 className="font-semibold text-green-800 mb-2">eTROD WEEE Categories</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <h4 className="font-semibold text-amber-800 mb-2">eTROD WEEE Categories</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-amber-700">
               <div className="flex gap-2"><strong>1</strong> <span>Oprema za toplotno izmenjavo</span></div>
               <div className="flex gap-2"><strong>2</strong> <span>Zasloni, monitorji in oprema z zasloni (&gt;100 cm²)</span></div>
               <div className="flex gap-2"><strong>3</strong> <span>Sijalke (Lamps)</span></div>
               <div className="flex gap-2"><strong>4</strong> <span>Velika oprema (&gt;50 cm)</span></div>
               <div className="flex gap-2"><strong>5</strong> <span>Majhna oprema (≤50 cm)</span></div>
               <div className="flex gap-2"><strong>6</strong> <span>Majhna oprema za IT in telekomunikacije</span></div>
-              <div className="flex gap-2 font-bold bg-green-100/50 px-2 py-1 rounded"><strong>7-PBA</strong> <span>Prenosne baterije in akumulatorji</span></div>
+              <div className="flex gap-2 font-bold bg-amber-100/50 px-2 py-1 rounded"><strong>7-PBA</strong> <span>Prenosne baterije in akumulatorji</span></div>
             </div>
           </div>
         </>
@@ -368,11 +368,11 @@ export default function EnvironmentalPage() {
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
               <p className="text-sm text-slate-500">Packaging Fee Due</p>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(packagingReport.summary.total_fee_eur)}</p>
+              <p className="text-2xl font-bold text-amber-600">{formatCurrency(packagingReport.summary.total_fee_eur)}</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
               <p className="text-sm text-slate-500">Threshold</p>
-              <p className={`text-2xl font-bold ${packagingReport.summary.threshold_exceeded ? 'text-red-600' : 'text-green-600'}`}>
+              <p className={`text-2xl font-bold ${packagingReport.summary.threshold_exceeded ? 'text-red-600' : 'text-amber-600'}`}>
                 {formatWeight(packagingReport.summary.threshold_kg)}
               </p>
               <p className="text-xs text-slate-400 mt-1">
@@ -432,7 +432,7 @@ export default function EnvironmentalPage() {
                       <td className="text-right px-4 py-3 text-slate-800">{formatWeight(row.total_weight_kg)}</td>
                       <td className="text-right px-4 py-3 text-slate-500">{row.percentage_of_total.toFixed(1)}%</td>
                       <td className="text-right px-4 py-3 text-slate-500">{formatCurrency(row.fee_rate_per_kg)}</td>
-                      <td className="text-right px-4 py-3 text-green-600 font-medium">{formatCurrency(row.total_fee_eur)}</td>
+                      <td className="text-right px-4 py-3 text-amber-600 font-medium">{formatCurrency(row.total_fee_eur)}</td>
                       <td className="text-right px-4 py-3 text-slate-600">{formatNumber(row.order_count)}</td>
                     </tr>
                   ))}
@@ -443,7 +443,7 @@ export default function EnvironmentalPage() {
                     <td className="text-right px-4 py-3 text-slate-800">{formatWeight(packagingReport.summary.total_weight_kg)}</td>
                     <td className="text-right px-4 py-3 text-slate-800">100%</td>
                     <td className="px-4 py-3"></td>
-                    <td className="text-right px-4 py-3 text-green-600">{formatCurrency(packagingReport.summary.total_fee_eur)}</td>
+                    <td className="text-right px-4 py-3 text-amber-600">{formatCurrency(packagingReport.summary.total_fee_eur)}</td>
                     <td className="px-4 py-3"></td>
                   </tr>
                 </tfoot>
@@ -452,9 +452,9 @@ export default function EnvironmentalPage() {
           </div>
 
           {/* Packaging Info */}
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4">
-            <h4 className="font-semibold text-green-800 mb-2">Packaging Waste Reporting (Slovenia)</h4>
-            <ul className="text-sm text-green-700 space-y-1 list-disc list-inside">
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <h4 className="font-semibold text-amber-800 mb-2">Packaging Waste Reporting (Slovenia)</h4>
+            <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
               <li>Reporting threshold: {formatWeight(packagingReport.summary.threshold_kg)} per year</li>
               <li>Above threshold: Register with ARSO and submit annual report</li>
               <li>Fees calculated based on material type and weight</li>

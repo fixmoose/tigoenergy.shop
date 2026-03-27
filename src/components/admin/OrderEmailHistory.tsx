@@ -8,7 +8,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
     payment_request: { label: 'Payment Request', color: 'bg-amber-100 text-amber-700' },
     payment_reminder: { label: 'Payment Reminder', color: 'bg-orange-100 text-orange-700' },
     order_summary: { label: 'Order Summary', color: 'bg-blue-100 text-blue-700' },
-    order_confirmation: { label: 'Order Confirmed', color: 'bg-green-100 text-green-700' },
+    order_confirmation: { label: 'Order Confirmed', color: 'bg-amber-100 text-amber-700' },
     shipping_notification: { label: 'Shipping Update', color: 'bg-indigo-100 text-indigo-700' },
     delivery_notification: { label: 'Delivered', color: 'bg-emerald-100 text-emerald-700' },
     shipping_label_admin: { label: 'Label (Admin)', color: 'bg-slate-100 text-slate-600' },
@@ -107,7 +107,7 @@ export default function OrderEmailHistory({ orderId }: { orderId: string }) {
                                 key={log.id}
                                 className={`flex items-start gap-3 p-3 rounded-lg border ${isFailed ? 'border-red-200 bg-red-50' : 'border-slate-100 bg-slate-50'}`}
                             >
-                                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isFailed ? 'bg-red-500' : 'bg-green-500'}`} />
+                                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isFailed ? 'bg-red-500' : 'bg-amber-500'}`} />
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${typeInfo.color}`}>

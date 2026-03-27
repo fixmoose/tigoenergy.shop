@@ -90,10 +90,10 @@ export default function CustomerCustomPricing({
                         <p className="text-sm text-gray-400 italic">No direct item overrides for this customer.</p>
                     ) : (
                         initialCustomPricing.map(cp => (
-                            <div key={cp.id} className="flex items-center justify-between p-4 bg-green-50/50 rounded-2xl border border-green-100">
+                            <div key={cp.id} className="flex items-center justify-between p-4 bg-amber-50/50 rounded-2xl border border-amber-100">
                                 <div>
-                                    <div className="font-bold text-green-900">{cp.product?.name_en || 'Unknown Product'}</div>
-                                    <div className="text-[10px] font-black text-green-400 uppercase tracking-widest mt-0.5">
+                                    <div className="font-bold text-amber-900">{cp.product?.name_en || 'Unknown Product'}</div>
+                                    <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mt-0.5">
                                         {cp.pricing_type === 'simple'
                                             ? `Fixed: ${cp.price_eur} EUR`
                                             : `Tiered: ${cp.tier_prices?.length} scales`}
@@ -101,7 +101,7 @@ export default function CustomerCustomPricing({
                                     {cp.pricing_type === 'tiered' && cp.tier_prices && (
                                         <div className="mt-1 flex flex-wrap gap-1">
                                             {cp.tier_prices.map((t, idx) => (
-                                                <span key={idx} className="bg-white px-1.5 py-0.5 rounded text-[9px] font-bold text-green-600 border border-green-100">
+                                                <span key={idx} className="bg-white px-1.5 py-0.5 rounded text-[9px] font-bold text-amber-600 border border-amber-100">
                                                     {t.min_qty}+: {t.price} EUR
                                                 </span>
                                             ))}
@@ -110,7 +110,7 @@ export default function CustomerCustomPricing({
                                 </div>
                                 <button
                                     onClick={() => handleDelete(cp.id)}
-                                    className="text-green-300 hover:text-red-500 transition-colors font-bold text-xl"
+                                    className="text-amber-300 hover:text-red-500 transition-colors font-bold text-xl"
                                 >
                                     &times;
                                 </button>
@@ -127,7 +127,7 @@ export default function CustomerCustomPricing({
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Select Product</label>
                                 <select
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-amber-500"
                                     value={selectedProductId}
                                     onChange={e => setSelectedProductId(e.target.value)}
                                 >
@@ -142,13 +142,13 @@ export default function CustomerCustomPricing({
                                 <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-200">
                                     <button
                                         onClick={() => setPricingType('simple')}
-                                        className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${pricingType === 'simple' ? 'bg-white shadow-sm text-green-600' : 'text-gray-400'}`}
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${pricingType === 'simple' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-400'}`}
                                     >
                                         Fixed
                                     </button>
                                     <button
                                         onClick={() => setPricingType('tiered')}
-                                        className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${pricingType === 'tiered' ? 'bg-white shadow-sm text-green-600' : 'text-gray-400'}`}
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${pricingType === 'tiered' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-400'}`}
                                     >
                                         Tiered
                                     </button>
@@ -162,7 +162,7 @@ export default function CustomerCustomPricing({
                                 <input
                                     type="number"
                                     step="0.01"
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-amber-500"
                                     placeholder="Enter price..."
                                     value={fixedPrice}
                                     onChange={e => setFixedPrice(Number(e.target.value))}
@@ -174,7 +174,7 @@ export default function CustomerCustomPricing({
                                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Quantity Tiers</label>
                                     <button
                                         onClick={handleAddTier}
-                                        className="text-[10px] font-black text-green-600 uppercase hover:underline"
+                                        className="text-[10px] font-black text-amber-600 uppercase hover:underline"
                                     >
                                         + Add Scale
                                     </button>
@@ -218,7 +218,7 @@ export default function CustomerCustomPricing({
                         <button
                             onClick={handleSave}
                             disabled={loading || !selectedProductId}
-                            className="w-full bg-green-600 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-green-700 transition shadow-lg disabled:opacity-50"
+                            className="w-full bg-amber-600 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-amber-700 transition shadow-lg disabled:opacity-50"
                         >
                             {loading ? 'Saving Override...' : 'Save Override'}
                         </button>

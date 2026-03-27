@@ -403,7 +403,7 @@ export default function B2BRegistrationForm() {
                             placeholder={t('placeholders.vat')}
                             value={formData.vatNumber}
                             onChange={e => { setFormData({ ...formData, vatNumber: e.target.value.toUpperCase() }); setVatMismatch(null) }}
-                            className="flex-1 border p-2.5 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-mono"
+                            className="flex-1 border p-2.5 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none font-mono"
                         />
                         <button
                             type="button"
@@ -565,7 +565,7 @@ export default function B2BRegistrationForm() {
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, commercialAccess: true })}
-                                className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${formData.commercialAccess === true ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border-2 transition-all ${formData.commercialAccess === true ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'}`}
                             >
                                 {t('labels.truckYes')}
                             </button>
@@ -648,7 +648,7 @@ export default function B2BRegistrationForm() {
                             </div>
                         </div>
                     )}
-                    {emailVerified && <div className="text-green-600 text-sm font-medium">✓ {t('messages.emailVerified')}</div>}
+                    {emailVerified && <div className="text-amber-600 text-sm font-medium">✓ {t('messages.emailVerified')}</div>}
 
                     <div className="space-y-2">
                         <label htmlFor="contact-phone" className="text-xs font-medium text-gray-500">{t('labels.mobilePhone')}</label>
@@ -687,7 +687,7 @@ export default function B2BRegistrationForm() {
                             </div>
                         </div>
                     )}
-                    {phoneVerified && <div className="text-green-600 text-sm font-medium">✓ {t('messages.phoneVerified')}</div>}
+                    {phoneVerified && <div className="text-amber-600 text-sm font-medium">✓ {t('messages.phoneVerified')}</div>}
 
                     {(emailVerified && phoneVerified) && (
                         <div className="space-y-3 animate-in fade-in slide-in-from-top-1 mt-4">
@@ -696,7 +696,7 @@ export default function B2BRegistrationForm() {
                                 <button
                                     type="button"
                                     onClick={() => setStep(5)}
-                                    className="flex-[2] bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition-all shadow-sm"
+                                    className="flex-[2] bg-amber-600 text-white py-2.5 rounded-lg font-bold hover:bg-amber-700 transition-all shadow-sm"
                                 >
                                     {t('buttons.continueToFinalStep')}
                                 </button>

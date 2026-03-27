@@ -435,14 +435,14 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                 setPickupInPerson(e.target.checked)
                                                 if (e.target.checked) setShippingCost(0)
                                             }}
-                                            className="w-4 h-4 text-green-600 rounded cursor-pointer"
+                                            className="w-4 h-4 text-amber-600 rounded cursor-pointer"
                                         />
                                         <span className="text-xs font-bold text-slate-600 uppercase">Pickup in Person</span>
                                     </label>
                                 </div>
 
                                 {pickupInPerson && (
-                                    <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-medium">
+                                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 font-medium">
                                         Customer will pick up at: Podsmreka, 1356 (shipping cost €0)
                                     </div>
                                 )}
@@ -630,7 +630,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                         {/* Order Items Section */}
                         <section className="space-y-4">
                             <div className="flex items-center gap-2 mb-4">
-                                <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center font-bold">3</span>
+                                <span className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold">3</span>
                                 <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Add Products</h3>
                             </div>
 
@@ -642,7 +642,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                         placeholder="Filter by name or SKU..."
                                         value={productSearch}
                                         onChange={(e) => setProductSearch(e.target.value)}
-                                        className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all hover:border-slate-300"
+                                        className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all hover:border-slate-300"
                                     />
                                     {productSearch && (
                                         <button type="button" onClick={() => setProductSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -653,7 +653,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                 <button
                                     type="button"
                                     onClick={addCustomItem}
-                                    className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-green-100 transition-colors border border-green-200 whitespace-nowrap"
+                                    className="bg-amber-50 text-amber-700 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-amber-100 transition-colors border border-amber-200 whitespace-nowrap"
                                 >
                                     + Custom Item
                                 </button>
@@ -682,11 +682,11 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                 key={p.id}
                                                 type="button"
                                                 onClick={() => addItem(p)}
-                                                className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-3 transition-colors group"
+                                                className="w-full text-left px-4 py-3 hover:bg-amber-50 flex items-center gap-3 transition-colors group"
                                             >
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className="font-medium text-slate-900 group-hover:text-green-700 text-sm truncate">{p.name_en}</span>
+                                                        <span className="font-medium text-slate-900 group-hover:text-amber-700 text-sm truncate">{p.name_en}</span>
                                                         {!inStock && (
                                                             <span className="text-[9px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded uppercase">Out of stock</span>
                                                         )}
@@ -705,7 +705,7 @@ export default function AdminManualOrderCreator({ onClose, onCreated, isInvoiceM
                                                             €{price.toFixed(2)}
                                                         </span>
                                                     </div>
-                                                    <svg className="w-4 h-4 text-slate-300 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                                    <svg className="w-4 h-4 text-slate-300 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
                                                 </div>
                                             </button>
                                         )

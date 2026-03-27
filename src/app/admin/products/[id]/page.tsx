@@ -127,7 +127,7 @@ export default function EditProductPage() {
                 href={`/products/${product.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[green-600] hover:underline flex items-center gap-1"
+                className="text-xs text-[amber-600] hover:underline flex items-center gap-1"
                 title="Open in Public Store"
               >
                 <span>Store Link</span>

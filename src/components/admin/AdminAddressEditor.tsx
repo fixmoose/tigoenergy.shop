@@ -140,7 +140,7 @@ export default function AdminAddressEditor({ customerId, addresses: initial }: A
                                         <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-full">Default Shipping</span>
                                     )}
                                     {addr.isDefaultBilling && (
-                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 rounded-full">Default Billing</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full">Default Billing</span>
                                     )}
                                 </div>
                                 <p className="text-sm font-bold text-gray-900">{addr.street}</p>
@@ -168,7 +168,7 @@ export default function AdminAddressEditor({ customerId, addresses: initial }: A
                                         <button
                                             onClick={() => setDefault(addr.id, 'billing')}
                                             disabled={saving}
-                                            className="text-[10px] font-bold px-2 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg border border-green-100 disabled:opacity-50"
+                                            className="text-[10px] font-bold px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg border border-amber-100 disabled:opacity-50"
                                         >
                                             Set Billing Default
                                         </button>

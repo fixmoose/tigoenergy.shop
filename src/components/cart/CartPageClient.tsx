@@ -137,7 +137,7 @@ export default function CartPageClient() {
               <div className="text-6xl mb-4">🛒</div>
               <div className="text-xl font-medium text-gray-900 mb-2">{t('cartEmpty')}</div>
               <p className="text-gray-500 mb-6">{t('cartEmptyDesc')}</p>
-              <Link href="/products" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors">{tc('startShopping')}</Link>
+              <Link href="/products" className="inline-block bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700 transition-colors">{tc('startShopping')}</Link>
             </div>
           ) : (
             <div className="space-y-6">
@@ -205,8 +205,8 @@ export default function CartPageClient() {
                     <span>{t('total')}</span>
                     <span>{formatPriceGross(subtotal)}</span>
                   </div>
-                  <div className="bg-green-50 border border-green-100 rounded-lg p-3 mt-2">
-                    <p className="text-xs text-green-700">
+                  <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mt-2">
+                    <p className="text-xs text-amber-700">
                       <strong>{t('priceIncludesVat')}</strong> {t('priceIncludesVatDesc', { rate: (vatRate * 100).toFixed(0) })}
                     </p>
                   </div>
@@ -217,7 +217,7 @@ export default function CartPageClient() {
             {hasOverStock && <div className="mb-4"><LowStockWarning title={tc('lowStockTitle')} note={tc('lowStockNote')} /></div>}
 
             <div className="space-y-3">
-              <Link href="/checkout" className="block w-full text-center bg-green-600 text-white text-lg font-bold py-3.5 rounded-lg hover:bg-green-700 transition-all shadow-lg shadow-green-200">
+              <Link href="/checkout" className="block w-full text-center bg-amber-600 text-white text-lg font-bold py-3.5 rounded-lg hover:bg-amber-700 transition-all shadow-lg shadow-amber-200">
                 {t('secureCheckout')}
               </Link>
 
@@ -254,7 +254,7 @@ export default function CartPageClient() {
               value={saveName}
               onChange={e => setSaveName(e.target.value)}
               placeholder={t('enterCartName')}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6 focus:ring-2 focus:ring-green-500 outline-none"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-6 focus:ring-2 focus:ring-amber-500 outline-none"
               autoFocus
             />
 
@@ -268,7 +268,7 @@ export default function CartPageClient() {
               <button
                 onClick={performSave}
                 disabled={!saveName.trim() || saving}
-                className="px-2 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 disabled:opacity-50 min-w-[100px]"
+                className="px-2 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 disabled:opacity-50 min-w-[100px]"
               >
                 {saving ? t('saving') : t('saveCart')}
               </button>

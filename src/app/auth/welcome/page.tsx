@@ -96,15 +96,15 @@ export default async function WelcomePage() {
     const firstName = user.user_metadata?.first_name || 'there'
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 pt-24 pb-12">
+        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-emerald-50 px-4 pt-24 pb-12">
             <div className="max-w-lg w-full text-center mx-auto">
                 {/* Client component to clear cart for new users */}
                 <WelcomeClientActions />
 
                 {/* Success Icon */}
-                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg animate-in zoom-in duration-500">
+                <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg animate-in zoom-in duration-500">
                     <svg
-                        className="w-12 h-12 text-green-600"
+                        className="w-12 h-12 text-amber-600"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -124,7 +124,7 @@ export default async function WelcomePage() {
                 </h1>
 
                 <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-                    <div className="flex items-center justify-center gap-2 text-green-600 mb-4">
+                    <div className="flex items-center justify-center gap-2 text-amber-600 mb-4">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -132,14 +132,14 @@ export default async function WelcomePage() {
                     </div>
 
                     <p className="text-lg text-gray-600 leading-relaxed">
-                        {t.rich('message', { highlight: (chunks) => <span className="font-semibold text-green-700">{chunks}</span> })}
+                        {t.rich('message', { highlight: (chunks) => <span className="font-semibold text-amber-700">{chunks}</span> })}
                     </p>
                 </div>
 
                 {/* CTA Button */}
                 <Link
                     href="/"
-                    className="inline-flex items-center gap-2 bg-green-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300"
+                    className="inline-flex items-center gap-2 bg-amber-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-amber-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300"
                 >
                     <span>{t('shopNow')}</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +149,7 @@ export default async function WelcomePage() {
 
                 <p className="mt-6 text-sm text-gray-500 animate-in fade-in duration-500 delay-500">
                     {t('orGoTo')}{' '}
-                    <Link href="/dashboard" className="text-green-600 hover:underline font-medium">
+                    <Link href="/dashboard" className="text-amber-600 hover:underline font-medium">
                         {t('dashboard')}
                     </Link>
                 </p>

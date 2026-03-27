@@ -168,7 +168,7 @@ function ToggleStatus({ id, active, type }: { id: string, active: boolean, type:
         }
     }
 
-    const activeColor = type === 'active' ? 'bg-green-500 text-white' : 'bg-orange-400 text-white'
+    const activeColor = type === 'active' ? 'bg-amber-500 text-white' : 'bg-orange-400 text-white'
     const inactiveColor = 'bg-gray-200 text-gray-400'
 
     let title = ''

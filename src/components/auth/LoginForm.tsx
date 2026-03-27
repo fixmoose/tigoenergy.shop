@@ -98,7 +98,7 @@ export default function LoginForm() {
                         onChange={e => setEmail(e.target.value)}
                         required
                         autoComplete="email"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         placeholder="john@example.com"
                     />
                 </div>
@@ -106,7 +106,7 @@ export default function LoginForm() {
                 <div>
                     <div className="flex items-center justify-between mb-1">
                         <label htmlFor="login-pwd" className="block text-sm font-medium text-gray-700">{t('password')}</label>
-                        <Link href="/auth/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-medium">{t('forgotPassword')}</Link>
+                        <Link href="/auth/forgot-password" className="text-xs text-amber-600 hover:text-amber-700 font-medium">{t('forgotPassword')}</Link>
                     </div>
                     <input
                         id="login-pwd"
@@ -115,7 +115,7 @@ export default function LoginForm() {
                         onChange={e => setPassword(e.target.value)}
                         required
                         autoComplete="current-password"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                         placeholder="••••••••"
                     />
                 </div>
@@ -127,7 +127,7 @@ export default function LoginForm() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
+                    className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition shadow-lg shadow-amber-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
                 >
                     {loading ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -137,7 +137,7 @@ export default function LoginForm() {
 
             <div className="mt-6 text-center text-sm text-gray-500">
                 {t('noAccount')}{' '}
-                <Link href="/auth/register" className="text-green-600 font-bold hover:underline">
+                <Link href="/auth/register" className="text-amber-600 font-bold hover:underline">
                     {t('createAccount')}
                 </Link>
             </div>

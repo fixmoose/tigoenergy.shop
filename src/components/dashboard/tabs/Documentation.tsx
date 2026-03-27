@@ -108,7 +108,7 @@ export default function Documentation({ customer }: Props) {
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                 </div>
                                 {doc.agreed && (
-                                    <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded-full border border-green-100 flex items-center gap-1">
+                                    <span className="bg-amber-50 text-amber-700 text-xs font-bold px-2 py-1 rounded-full border border-amber-100 flex items-center gap-1">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                                         {t('agreed')}
                                     </span>
@@ -136,8 +136,8 @@ export default function Documentation({ customer }: Props) {
                 ))}
 
                 {/* Upload Card */}
-                <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-300 p-6 flex flex-col justify-center items-center text-center hover:border-green-400 transition-colors group">
-                    <div className="p-4 bg-gray-50 text-gray-400 rounded-full mb-4 group-hover:bg-green-50 group-hover:text-green-500 transition-colors">
+                <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-300 p-6 flex flex-col justify-center items-center text-center hover:border-amber-400 transition-colors group">
+                    <div className="p-4 bg-gray-50 text-gray-400 rounded-full mb-4 group-hover:bg-amber-50 group-hover:text-amber-500 transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                     </div>
                     <h3 className="font-bold text-gray-900 text-lg mb-2">{t('uploadDocument')}</h3>
@@ -180,7 +180,7 @@ export default function Documentation({ customer }: Props) {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
-                                        doc.status === 'reviewed' ? 'bg-green-100 text-green-700' :
+                                        doc.status === 'reviewed' ? 'bg-amber-100 text-amber-700' :
                                         doc.status === 'rejected' ? 'bg-red-100 text-red-700' :
                                         'bg-yellow-100 text-yellow-700'
                                     }`}>

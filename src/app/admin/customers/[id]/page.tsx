@@ -51,13 +51,13 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
     pending: 'bg-yellow-50 text-yellow-700 border-yellow-100',
     processing: 'bg-blue-50 text-blue-700 border-blue-100',
     shipped: 'bg-purple-50 text-purple-700 border-purple-100',
-    delivered: 'bg-green-50 text-green-700 border-green-100',
+    delivered: 'bg-amber-50 text-amber-700 border-amber-100',
     cancelled: 'bg-red-50 text-red-700 border-red-100',
   }
 
   const PAYMENT_COLORS: Record<string, string> = {
     pending: 'bg-yellow-50 text-yellow-700 border-yellow-100',
-    paid: 'bg-green-50 text-green-700 border-green-100',
+    paid: 'bg-amber-50 text-amber-700 border-amber-100',
     failed: 'bg-red-50 text-red-700 border-red-100',
     refunded: 'bg-gray-50 text-gray-700 border-gray-100',
   }
@@ -76,7 +76,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <DeleteCustomerButton customerId={id} customerName={`${customer.first_name} ${customer.last_name}`} />
             {customer.is_b2b && customer.account_status !== 'active' && (
               <form action={async () => { 'use server'; await adminVerifyB2BCustomerAction(id) }}>
-                <button type="submit" className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">
+                <button type="submit" className="px-5 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-bold hover:bg-amber-700 transition shadow-sm">
                   Verify B2B & Notify
                 </button>
               </form>
@@ -96,7 +96,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Orders</h3>
                   <p className="text-sm font-bold text-gray-900 mt-0.5">Sales & Status tracking</p>
                 </div>
-                <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-green-600 border border-green-100 uppercase tracking-widest">
+                <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-amber-600 border border-amber-100 uppercase tracking-widest">
                   {orders?.length || 0} Orders
                 </span>
               </div>
@@ -123,7 +123,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                               <div className="flex items-center gap-3">
                                 <Link
                                   href={`/admin/orders/${order.id}`}
-                                  className="text-lg font-black text-gray-900 hover:text-green-600 transition-colors"
+                                  className="text-lg font-black text-gray-900 hover:text-amber-600 transition-colors"
                                 >
                                   #{order.order_number}
                                 </Link>
@@ -168,7 +168,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                               </div>
                               <Link
                                 href={`/admin/orders/${order.id}`}
-                                className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-green-600 hover:border-green-100 transition shadow-sm group/btn"
+                                className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-amber-600 hover:border-amber-100 transition shadow-sm group/btn"
                               >
                                 <svg className="w-5 h-5 group-hover/btn:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                               </Link>
@@ -209,7 +209,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                       draft: 'bg-slate-50 text-slate-600 border-slate-100',
                       sent: 'bg-blue-50 text-blue-700 border-blue-100',
                       viewed: 'bg-yellow-50 text-yellow-700 border-yellow-100',
-                      accepted: 'bg-green-50 text-green-700 border-green-100',
+                      accepted: 'bg-amber-50 text-amber-700 border-amber-100',
                       expired: 'bg-red-50 text-red-600 border-red-100',
                       declined: 'bg-red-50 text-red-600 border-red-100',
                     }
@@ -232,7 +232,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                           <div className="flex items-center gap-3">
                             <p className="text-lg font-black text-gray-900">{q.currency || '€'} {q.total?.toFixed(2)}</p>
                             {q.order_id && (
-                              <Link href={`/admin/orders/${q.order_id}`} className="text-[10px] font-black text-green-600 bg-green-50 border border-green-100 px-2 py-1 rounded-lg hover:bg-green-100">
+                              <Link href={`/admin/orders/${q.order_id}`} className="text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg hover:bg-amber-100">
                                 View Order →
                               </Link>
                             )}
@@ -277,7 +277,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 ) : (
                   <div className="space-y-6">
                     {supportRequests.map((req: any) => (
-                      <div key={req.id} className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-green-100 transition-colors group">
+                      <div key={req.id} className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-amber-100 transition-colors group">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex items-center gap-3">
                             <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${req.type === 'shipping' ? 'bg-blue-50 text-blue-700' :
@@ -291,10 +291,10 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                             </span>
                           </div>
                           {req.status === 'new' && (
-                            <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+                            <span className="flex h-2 w-2 rounded-full bg-amber-500"></span>
                           )}
                         </div>
-                        <h4 className="text-lg font-black text-gray-900 mb-2 group-hover:text-green-600 transition-colors">{req.subject}</h4>
+                        <h4 className="text-lg font-black text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">{req.subject}</h4>
                         <p className="text-sm text-gray-600 font-medium leading-relaxed whitespace-pre-wrap">{req.message}</p>
 
                         {req.metadata?.orderNumber && (
@@ -302,7 +302,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                             <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Linked Order:</div>
                             <Link
                               href={`/admin/orders/${req.order_id}`}
-                              className="text-xs font-black text-green-600 hover:underline"
+                              className="text-xs font-black text-amber-600 hover:underline"
                             >
                               #{req.metadata.orderNumber}
                             </Link>
@@ -339,7 +339,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-3">
                               <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${ret.status === 'requested' ? 'bg-blue-50 text-blue-700' :
-                                ret.status === 'refunded' ? 'bg-green-50 text-green-700' :
+                                ret.status === 'refunded' ? 'bg-amber-50 text-amber-700' :
                                   'bg-gray-50 text-gray-700'
                                 }`}>
                                 {ret.status}
@@ -350,7 +350,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                             </div>
                             <Link
                               href={`/admin/orders/${ret.order_id}`}
-                              className="text-xs font-black text-green-600 hover:underline"
+                              className="text-xs font-black text-amber-600 hover:underline"
                             >
                               Order #{ret.orders?.order_number}
                             </Link>

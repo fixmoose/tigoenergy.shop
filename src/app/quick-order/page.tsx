@@ -230,7 +230,7 @@ export default function QuickOrderPage() {
                     </div>
                     <button
                         onClick={() => { localStorage.setItem('quick-order-terms', 'accepted'); setTermsAccepted(true) }}
-                        className="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-green-700 transition-all"
+                        className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-amber-700 transition-all"
                     >
                         {t('agreeBtn')}
                     </button>
@@ -246,8 +246,8 @@ export default function QuickOrderPage() {
     if (view === 'success' && orderResult?.orderId) {
         return (
             <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
-                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mb-6">
-                    <svg className="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mb-6">
+                    <svg className="w-10 h-10 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
@@ -272,7 +272,7 @@ export default function QuickOrderPage() {
                         {t('viewOrder')}
                     </button>
                     <button onClick={() => { setView('catalog'); setOrderResult(null) }}
-                        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold active:bg-green-700 transition-all">
+                        className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold active:bg-amber-700 transition-all">
                         {t('newOrder')}
                     </button>
                     <button onClick={() => router.push('/')}
@@ -329,10 +329,10 @@ export default function QuickOrderPage() {
                             onClick={() => { setShippingMode('pickup'); handlePlaceOrder('pickup') }}
                             disabled={submitting}
                             className="bg-slate-800 border border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center gap-3
-                                active:scale-[0.95] active:border-green-500 transition-all disabled:opacity-50"
+                                active:scale-[0.95] active:border-amber-500 transition-all disabled:opacity-50"
                         >
-                            <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center">
-                                <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <div className="w-14 h-14 bg-amber-500/20 rounded-full flex items-center justify-center">
+                                <svg className="w-7 h-7 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
@@ -340,7 +340,7 @@ export default function QuickOrderPage() {
                             <div className="text-center">
                                 <div className="text-white font-bold text-sm">{t('pickupTitle')}</div>
                                 <div className="text-slate-400 text-[11px] mt-1">{t('pickupSubtitle')}</div>
-                                <div className="text-green-400 text-xs font-semibold mt-1">{t('pickupFree')}</div>
+                                <div className="text-amber-400 text-xs font-semibold mt-1">{t('pickupFree')}</div>
                             </div>
                             {submitting && shippingMode === 'pickup' && (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -467,7 +467,7 @@ export default function QuickOrderPage() {
                         </div>
                     </div>
                     <button onClick={() => addMLPEToCart(boxQtyProduct, boxQty)}
-                        className="w-full mt-4 bg-green-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-green-700 transition-all">
+                        className="w-full mt-4 bg-amber-600 text-white py-4 rounded-lg font-bold text-lg active:scale-[0.98] active:bg-amber-700 transition-all">
                         {t('addToOrder', { qty: boxQty })}
                     </button>
                 </div>
@@ -521,9 +521,9 @@ export default function QuickOrderPage() {
                     <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
                         {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" title={t('lowStockSomeItems')} note={t('lowStockNote')} /></div>}
                         <button onClick={() => setView('shipping')} disabled={submitting}
-                            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+                            className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold text-base active:bg-amber-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
                             <span>{t('checkout')}</span>
-                            <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
+                            <span className="bg-amber-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
                         </button>
                     </div>
                 )}
@@ -626,9 +626,9 @@ export default function QuickOrderPage() {
                 <div className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 z-[70]">
                     {hasOverStock && <div className="mb-2"><LowStockWarning variant="dark" title={t('lowStockSomeItems')} note={t('lowStockNote')} /></div>}
                     <button onClick={() => setView('shipping')} disabled={submitting}
-                        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-base active:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+                        className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold text-base active:bg-amber-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
                         <span>{t('checkout')}</span>
-                        <span className="bg-green-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
+                        <span className="bg-amber-700 px-2 py-0.5 rounded text-sm">{cartItemCount} {t('items')} &middot; {fmtPrice(cartTotal)}</span>
                     </button>
                 </div>
             )}
@@ -669,12 +669,12 @@ function ProductTile({
             onClick={onTap}
             className={`bg-slate-800 border rounded-lg overflow-hidden relative
                 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex flex-col
-                ${qty > 0 ? 'border-green-500' : 'border-slate-700'}
+                ${qty > 0 ? 'border-amber-500' : 'border-slate-700'}
                 ${isAnimating ? 'scale-[0.93]' : 'active:scale-[0.97]'}`}
         >
             {/* Qty badge */}
             {qty > 0 && (
-                <div className="absolute top-2 right-2 z-10 bg-green-500 rounded-full min-w-[24px] h-6 flex items-center justify-center px-1"
+                <div className="absolute top-2 right-2 z-10 bg-amber-500 rounded-full min-w-[24px] h-6 flex items-center justify-center px-1"
                     onClick={e => { e.stopPropagation(); onDecrement() }}>
                     <span className="text-white text-xs font-bold">{qty}</span>
                 </div>

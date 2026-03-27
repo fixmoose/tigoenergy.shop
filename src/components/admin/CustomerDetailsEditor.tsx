@@ -118,14 +118,14 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
             </div>
 
             {resetLink && (
-                <div className="mx-8 mt-6 p-3 bg-green-50 border border-green-200 rounded-xl">
-                    <p className="text-xs font-bold text-green-800 mb-2">Reset email sent! If customer didn't receive it, copy the link below and send it directly:</p>
+                <div className="mx-8 mt-6 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <p className="text-xs font-bold text-amber-800 mb-2">Reset email sent! If customer didn't receive it, copy the link below and send it directly:</p>
                     <div className="flex items-center gap-2">
                         <input
                             type="text"
                             readOnly
                             value={resetLink}
-                            className="flex-1 text-[11px] text-gray-700 bg-white border border-green-200 rounded-lg px-2 py-1.5 font-mono"
+                            className="flex-1 text-[11px] text-gray-700 bg-white border border-amber-200 rounded-lg px-2 py-1.5 font-mono"
                             onClick={e => (e.target as HTMLInputElement).select()}
                         />
                         <button
@@ -134,12 +134,12 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                                 setLinkCopied(true)
                                 setTimeout(() => setLinkCopied(false), 2000)
                             }}
-                            className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 whitespace-nowrap"
+                            className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 whitespace-nowrap"
                         >
                             {linkCopied ? 'Copied!' : 'Copy Link'}
                         </button>
                     </div>
-                    <p className="text-[10px] text-green-600 mt-1">Link expires in 1 hour</p>
+                    <p className="text-[10px] text-amber-600 mt-1">Link expires in 1 hour</p>
                 </div>
             )}
 
@@ -220,7 +220,7 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                         <div className="flex items-center gap-2">
                             <p className="text-sm font-bold text-gray-900">{customer.vat_id || 'N/A'}</p>
                             {customer.vat_validated && (
-                                <span className="text-[9px] font-black bg-green-50 text-green-700 px-1.5 py-0.5 rounded border border-green-100 uppercase tracking-widest">VIES Verified</span>
+                                <span className="text-[9px] font-black bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-100 uppercase tracking-widest">VIES Verified</span>
                             )}
                         </div>
                     )}
@@ -287,7 +287,7 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</label>
-                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${customer.account_status === 'banned' ? 'bg-red-50 text-red-700' : customer.account_status === 'active' ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${customer.account_status === 'banned' ? 'bg-red-50 text-red-700' : customer.account_status === 'active' ? 'bg-amber-50 text-amber-700' : 'bg-yellow-50 text-yellow-700'}`}>
                                     {customer.account_status || 'pending'}
                                 </span>
                             </div>
@@ -296,7 +296,7 @@ export default function CustomerDetailsEditor({ customer }: CustomerDetailsEdito
                         {customer.terms_agreed_at && (
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Terms Agreed</label>
-                                <p className="text-sm font-bold text-green-700">{new Date(customer.terms_agreed_at).toLocaleString()}</p>
+                                <p className="text-sm font-bold text-amber-700">{new Date(customer.terms_agreed_at).toLocaleString()}</p>
                             </div>
                         )}
 

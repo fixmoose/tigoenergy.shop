@@ -223,7 +223,7 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
                 <button
                     onClick={convert}
                     disabled={saving}
-                    className="px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition disabled:opacity-50 shadow-sm"
+                    className="px-5 py-2.5 bg-amber-600 text-white rounded-xl text-sm font-bold hover:bg-amber-700 transition disabled:opacity-50 shadow-sm"
                 >
                     Convert to Order
                 </button>

@@ -252,14 +252,14 @@ export default function PaymentMethods({ customer }: Props) {
                         className={`relative p-6 rounded-xl border-2 flex flex-col md:flex-row md:items-center gap-4 transition-all ${enabledMethods[method.id]
                             ? 'border-gray-300 bg-white'
                             : 'border-gray-100 bg-gray-50 opacity-75'
-                            } ${preferredMethod === method.id ? 'ring-2 ring-green-500 border-green-500' : ''}`}
+                            } ${preferredMethod === method.id ? 'ring-2 ring-amber-500 border-amber-500' : ''}`}
                     >
                         <div className="flex items-center gap-4 flex-1">
                             <input
                                 type="checkbox"
                                 checked={enabledMethods[method.id]}
                                 onChange={() => toggleEnable(method.id)}
-                                className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                             />
 
                             <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${enabledMethods[method.id] ? 'bg-gray-50' : 'bg-gray-200'}`}>
@@ -276,7 +276,7 @@ export default function PaymentMethods({ customer }: Props) {
                                     </p>
                                 )}
                                 {methodDetails[method.id].connected && (
-                                    <div className="mt-1 text-xs font-medium text-green-600 flex items-center gap-1">
+                                    <div className="mt-1 text-xs font-medium text-amber-600 flex items-center gap-1">
                                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                                         {t('connected')}: {methodDetails[method.id].details}
                                     </div>
@@ -308,9 +308,9 @@ export default function PaymentMethods({ customer }: Props) {
                                         name="preferred_method"
                                         checked={preferredMethod === method.id}
                                         onChange={() => setPreferred(method.id)}
-                                        className="w-4 h-4 text-green-600 focus:ring-green-500"
+                                        className="w-4 h-4 text-amber-600 focus:ring-amber-500"
                                     />
-                                    <span className={`text-sm font-medium ${preferredMethod === method.id ? 'text-green-700' : 'text-gray-500'}`}>
+                                    <span className={`text-sm font-medium ${preferredMethod === method.id ? 'text-amber-700' : 'text-gray-500'}`}>
                                         {t('preferred')}
                                     </span>
                                 </label>
@@ -349,7 +349,7 @@ export default function PaymentMethods({ customer }: Props) {
                                         href="https://wise.com/pay/business/initraenergijadoo?utm_source=quick_pay"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="bg-[#9fe870] text-gray-900 px-6 py-4 rounded-xl font-black flex items-center justify-center gap-3 w-full hover:bg-[#8ed85f] transition shadow-lg shadow-green-100 group"
+                                        className="bg-[#9fe870] text-gray-900 px-6 py-4 rounded-xl font-black flex items-center justify-center gap-3 w-full hover:bg-[#8ed85f] transition shadow-lg shadow-amber-100 group"
                                     >
                                         <span>Pay Securely with Wise</span>
                                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ export default function PaymentMethods({ customer }: Props) {
                                             type="checkbox"
                                             checked={sepaEnabled}
                                             onChange={e => setSepaEnabled(e.target.checked)}
-                                            className="w-5 h-5 rounded text-green-600 focus:ring-green-500"
+                                            className="w-5 h-5 rounded text-amber-600 focus:ring-amber-500"
                                         />
                                     </label>
                                 </div>
@@ -458,13 +458,13 @@ export default function PaymentMethods({ customer }: Props) {
                                                     </button>
                                                 </div>
                                                 {mandateDocs.length > 0 ? (
-                                                    <div className="flex items-center justify-between bg-green-50 p-2 rounded text-sm">
-                                                        <span className="text-green-700">{mandateDocs[0].name}</span>
+                                                    <div className="flex items-center justify-between bg-amber-50 p-2 rounded text-sm">
+                                                        <span className="text-amber-700">{mandateDocs[0].name}</span>
                                                         <button onClick={() => removeSepaUpload(mandateDocs[0].id)} className="text-red-500 hover:text-red-700">Remove</button>
                                                     </div>
                                                 ) : (
                                                     <label
-                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'mandate' ? 'border-green-500 bg-green-50' : 'hover:bg-gray-50'}`}
+                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'mandate' ? 'border-amber-500 bg-amber-50' : 'hover:bg-gray-50'}`}
                                                         onDragOver={e => handleDragOver(e, 'mandate')}
                                                         onDragLeave={handleDragLeave}
                                                         onDrop={e => handleDrop(e, 'mandate')}
@@ -479,7 +479,7 @@ export default function PaymentMethods({ customer }: Props) {
                                             <div className="border rounded-lg p-3">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <span className="text-sm font-medium">Verification Documents <span className="text-gray-400">(min. 2)</span></span>
-                                                    <span className={`text-xs ${verificationDocs.length >= 2 ? 'text-green-600' : 'text-amber-600'}`}>
+                                                    <span className={`text-xs ${verificationDocs.length >= 2 ? 'text-amber-600' : 'text-amber-600'}`}>
                                                         {verificationDocs.length}/2
                                                     </span>
                                                 </div>
@@ -491,7 +491,7 @@ export default function PaymentMethods({ customer }: Props) {
                                                 ))}
                                                 {verificationDocs.length < 2 && (
                                                     <label
-                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'verification' ? 'border-green-500 bg-green-50' : 'hover:bg-gray-50'}`}
+                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'verification' ? 'border-amber-500 bg-amber-50' : 'hover:bg-gray-50'}`}
                                                         onDragOver={e => handleDragOver(e, 'verification')}
                                                         onDragLeave={handleDragLeave}
                                                         onDrop={e => handleDrop(e, 'verification')}
@@ -506,13 +506,13 @@ export default function PaymentMethods({ customer }: Props) {
                                             <div className="border rounded-lg p-3">
                                                 <span className="text-sm font-medium block mb-2">Bank Card Photo</span>
                                                 {cardDocs.length > 0 ? (
-                                                    <div className="flex items-center justify-between bg-green-50 p-2 rounded text-sm">
-                                                        <span className="text-green-700">{cardDocs[0].name}</span>
+                                                    <div className="flex items-center justify-between bg-amber-50 p-2 rounded text-sm">
+                                                        <span className="text-amber-700">{cardDocs[0].name}</span>
                                                         <button onClick={() => removeSepaUpload(cardDocs[0].id)} className="text-red-500 hover:text-red-700">Remove</button>
                                                     </div>
                                                 ) : (
                                                     <label
-                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'card' ? 'border-green-500 bg-green-50' : 'hover:bg-gray-50'}`}
+                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'card' ? 'border-amber-500 bg-amber-50' : 'hover:bg-gray-50'}`}
                                                         onDragOver={e => handleDragOver(e, 'card')}
                                                         onDragLeave={handleDragLeave}
                                                         onDrop={e => handleDrop(e, 'card')}
@@ -527,13 +527,13 @@ export default function PaymentMethods({ customer }: Props) {
                                             <div className="border rounded-lg p-3">
                                                 <span className="text-sm font-medium block mb-2">Latest Account Statement</span>
                                                 {statementDocs.length > 0 ? (
-                                                    <div className="flex items-center justify-between bg-green-50 p-2 rounded text-sm">
-                                                        <span className="text-green-700">{statementDocs[0].name}</span>
+                                                    <div className="flex items-center justify-between bg-amber-50 p-2 rounded text-sm">
+                                                        <span className="text-amber-700">{statementDocs[0].name}</span>
                                                         <button onClick={() => removeSepaUpload(statementDocs[0].id)} className="text-red-500 hover:text-red-700">Remove</button>
                                                     </div>
                                                 ) : (
                                                     <label
-                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'statement' ? 'border-green-500 bg-green-50' : 'hover:bg-gray-50'}`}
+                                                        className={`flex items-center justify-center border-2 border-dashed rounded-lg p-3 cursor-pointer transition-colors ${dragOver === 'statement' ? 'border-amber-500 bg-amber-50' : 'hover:bg-gray-50'}`}
                                                         onDragOver={e => handleDragOver(e, 'statement')}
                                                         onDragLeave={handleDragLeave}
                                                         onDrop={e => handleDrop(e, 'statement')}
@@ -572,7 +572,7 @@ export default function PaymentMethods({ customer }: Props) {
                             {modal.type !== 'wise' && (
                                 <button
                                     onClick={handleSaveDetails}
-                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                                    className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
                                 >
                                     {modal.type === 'iban' ? t('save') : t('saveAndConnect')}
                                 </button>

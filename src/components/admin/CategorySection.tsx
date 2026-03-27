@@ -30,13 +30,13 @@ function SubCategoryGroup({ subcategory, products }: { subcategory: string, prod
                         <Link
                             key={p.id}
                             href={`/admin/products/${p.id}`}
-                            className="p-3 border rounded flex justify-between items-center hover:bg-green-50 hover:border-green-200 ml-2 bg-gray-50/50 transition-all cursor-pointer group"
+                            className="p-3 border rounded flex justify-between items-center hover:bg-amber-50 hover:border-amber-200 ml-2 bg-gray-50/50 transition-all cursor-pointer group"
                         >
                             <div>
-                                <div className="font-medium group-hover:text-green-700 transition-colors">
+                                <div className="font-medium group-hover:text-amber-700 transition-colors">
                                     {p.name_en}
                                     {!p.active && <span className="ml-2 text-xs bg-gray-200 text-gray-800 px-1 rounded">Inactive</span>}
-                                    {p.active && <span className="ml-2 text-xs bg-green-200 text-green-800 px-1 rounded">Active</span>}
+                                    {p.active && <span className="ml-2 text-xs bg-amber-200 text-amber-800 px-1 rounded">Active</span>}
                                 </div>
                                 <div className="text-sm text-muted-foreground flex gap-3">
                                     <span>SKU: {p.sku}</span>
@@ -46,7 +46,7 @@ function SubCategoryGroup({ subcategory, products }: { subcategory: string, prod
                             <div className="flex items-center gap-3">
                                 {/* Compliance badges */}
                                 {p.is_electrical_equipment && p.trod_category_code && (
-                                    <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-mono" title="TROD/WEEE Category">
+                                    <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-mono" title="TROD/WEEE Category">
                                         TROD-{p.trod_category_code}
                                     </span>
                                 )}
@@ -73,7 +73,7 @@ function SubCategoryGroup({ subcategory, products }: { subcategory: string, prod
                                     <span className="text-sm text-gray-500">Stock: {p.stock_quantity ?? 0}</span>
                                 )}
 
-                                <span className="text-gray-400 group-hover:text-green-600 transition-transform group-hover:translate-x-1">
+                                <span className="text-gray-400 group-hover:text-amber-600 transition-transform group-hover:translate-x-1">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                     </svg>

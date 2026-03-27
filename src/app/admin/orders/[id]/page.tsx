@@ -82,7 +82,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               {transactionType.label}
             </span>
             {order.shipping_carrier === 'Personal Pick-up' ? (
-              <span className="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800 border border-green-300">
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-amber-100 text-amber-800 border border-amber-300">
                 🏪 Lastni prevzem
               </span>
             ) : order.shipping_carrier === 'InterEuropa' ? (
@@ -189,7 +189,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-              <span className="text-green-600">♻️</span> Compliance Data
+              <span className="text-amber-600">♻️</span> Compliance Data
             </h3>
 
             <div className="space-y-4">
@@ -208,14 +208,14 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               <div className="pt-3 border-t">
                 <p className="text-xs text-slate-500 mb-2">eTROD (WEEE & Packaging)</p>
                 {complianceTotals.etrodUnits > 0 ? (
-                  <div className="bg-green-50 rounded-lg p-3">
+                  <div className="bg-amber-50 rounded-lg p-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-green-700">Units:</span>
-                      <span className="font-medium text-green-800">{complianceTotals.etrodUnits}</span>
+                      <span className="text-amber-700">Units:</span>
+                      <span className="font-medium text-amber-800">{complianceTotals.etrodUnits}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
-                      <span className="text-green-700">Weight:</span>
-                      <span className="font-medium text-green-800">{formatWeight(complianceTotals.etrodWeight)}</span>
+                      <span className="text-amber-700">Weight:</span>
+                      <span className="font-medium text-amber-800">{formatWeight(complianceTotals.etrodWeight)}</span>
                     </div>
                   </div>
                 ) : (
@@ -241,7 +241,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 <p className="text-xs text-slate-500 mb-2">Intrastat</p>
                 <div className="flex items-center gap-2">
                   {order.intrastat_reported ? (
-                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                    <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium">
                       Reported {order.intrastat_report_date}
                     </span>
                   ) : order.transaction_type === 'eu' ? (

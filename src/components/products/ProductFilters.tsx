@@ -52,7 +52,7 @@ function FiltersContent({ currentCategory, currentSubcategory, search }: { curre
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search products..."
-          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[green-600] focus:ring-2 focus:ring-green-100 transition"
+          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[amber-600] focus:ring-2 focus:ring-amber-100 transition"
         />
         <button type="submit" className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -66,7 +66,7 @@ function FiltersContent({ currentCategory, currentSubcategory, search }: { curre
             {/* Main Category Header - Filters by Category only */}
             <button
               onClick={() => updateFilters(info.slug, undefined)}
-              className={`font-bold text-lg hover:text-[green-600] transition-colors ${currentCategory === info.slug && !currentSubcategory ? 'text-[green-600]' : 'text-gray-900'}`}
+              className={`font-bold text-lg hover:text-[amber-600] transition-colors ${currentCategory === info.slug && !currentSubcategory ? 'text-[amber-600]' : 'text-gray-900'}`}
             >
               {label}
             </button>
@@ -84,7 +84,7 @@ function FiltersContent({ currentCategory, currentSubcategory, search }: { curre
                       // Use `undefined` for category to clear it.
                       updateFilters(undefined, sub)
                     }}
-                    className={`text-sm hover:text-[green-600] transition-colors ${currentSubcategory === sub ? 'text-[green-600] font-medium' : 'text-gray-600'}`}
+                    className={`text-sm hover:text-[amber-600] transition-colors ${currentSubcategory === sub ? 'text-[amber-600] font-medium' : 'text-gray-600'}`}
                   >
                     {sub}
                   </button>
@@ -100,10 +100,10 @@ function FiltersContent({ currentCategory, currentSubcategory, search }: { curre
         <div className="flex items-center gap-2 text-sm pt-4 border-t">
           <span className="text-gray-500">Active filters:</span>
           {currentCategory && (
-            <span className="bg-green-50 text-green-700 px-2 py-1 rounded">{Object.entries(PRODUCT_CATEGORIES).find(([_, v]) => v.slug === currentCategory)?.[0] || currentCategory}</span>
+            <span className="bg-amber-50 text-amber-700 px-2 py-1 rounded">{Object.entries(PRODUCT_CATEGORIES).find(([_, v]) => v.slug === currentCategory)?.[0] || currentCategory}</span>
           )}
           {currentSubcategory && (
-            <span className="bg-green-50 text-green-700 px-2 py-1 rounded">{currentSubcategory}</span>
+            <span className="bg-amber-50 text-amber-700 px-2 py-1 rounded">{currentSubcategory}</span>
           )}
           <Link href="/products" className="text-gray-500 hover:text-gray-700 underline ml-auto">
             Clear all

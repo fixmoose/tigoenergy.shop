@@ -44,7 +44,7 @@ export default function ReportingDashboard() {
       case 'WARNING':
         return <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded font-medium">Warning</span>
       default:
-        return <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">OK</span>
+        return <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded font-medium">OK</span>
     }
   }
 
@@ -138,7 +138,7 @@ export default function ReportingDashboard() {
                       <div
                         className={`h-2 rounded-full ${(thresholds.find((t) => t.report_type === 'Intrastat')?.percentage_of_threshold || 0) >= 80
                           ? 'bg-amber-500'
-                          : 'bg-green-500'
+                          : 'bg-amber-500'
                           }`}
                         style={{
                           width: `${Math.min(100, thresholds.find((t) => t.report_type === 'Intrastat')?.percentage_of_threshold || 0)}%`,
@@ -166,7 +166,7 @@ export default function ReportingDashboard() {
           <Link href="/admin/reporting/environmental" className="flex-1">
             <div className="flex items-center justify-between mb-4">
               <span className="text-2xl">♻️</span>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-medium">Quarterly/Annual</span>
+              <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded font-medium">Quarterly/Annual</span>
             </div>
             <h3 className="text-lg font-bold text-slate-800 mb-2">Environmental (SI)</h3>
             <p className="text-sm text-slate-500">eTROD (WEEE & Packaging) waste reporting for Slovenian authorities.</p>
@@ -186,7 +186,7 @@ export default function ReportingDashboard() {
                       <div
                         className={`h-2 rounded-full ${(thresholds.find((t) => t.report_type === 'Packaging Waste')?.percentage_of_threshold || 0) >= 80
                           ? 'bg-amber-500'
-                          : 'bg-green-500'
+                          : 'bg-amber-500'
                           }`}
                         style={{
                           width: `${Math.min(100, thresholds.find((t) => t.report_type === 'Packaging Waste')?.percentage_of_threshold || 0)}%`,

@@ -66,15 +66,15 @@ export default function TestRecaptchaPage() {
                 </button>
 
                 {result && (
-                    <div className={`p-6 rounded-2xl border ${result.success ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
-                        <h3 className={`font-bold mb-2 ${result.success ? 'text-green-800' : 'text-red-800'}`}>
+                    <div className={`p-6 rounded-2xl border ${result.success ? 'bg-amber-50 border-amber-100' : 'bg-red-50 border-red-100'}`}>
+                        <h3 className={`font-bold mb-2 ${result.success ? 'text-amber-800' : 'text-red-800'}`}>
                             {result.success ? '✅ Success!' : '❌ Verification Failed'}
                         </h3>
                         <pre className="text-xs overflow-auto bg-white/50 p-3 rounded-xl border border-black/5 max-h-64">
                             {JSON.stringify(result, null, 2)}
                         </pre>
                         {result.success && (
-                            <p className="text-sm text-green-700 mt-3 italic">
+                            <p className="text-sm text-amber-700 mt-3 italic">
                                 reCAPTCHA verification passed successfully.
                             </p>
                         )}

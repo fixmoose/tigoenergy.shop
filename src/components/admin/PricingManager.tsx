@@ -266,7 +266,7 @@ function RulesTable({ schema, products, categories, subcategories, onUpdate }: {
                                 </td>
                                 <td className="px-4 py-3">
                                     {rule.discount_percentage ? (
-                                        <span className="text-green-600 font-bold">-{rule.discount_percentage}%</span>
+                                        <span className="text-amber-600 font-bold">-{rule.discount_percentage}%</span>
                                     ) : rule.fixed_price_eur ? (
                                         <span className="text-slate-900 font-bold">{rule.fixed_price_eur} EUR</span>
                                     ) : '-'}

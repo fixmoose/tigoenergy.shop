@@ -25,7 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-slate-100 text-slate-700',
     sent: 'bg-blue-100 text-blue-700',
     viewed: 'bg-yellow-100 text-yellow-700',
-    accepted: 'bg-green-100 text-green-700',
+    accepted: 'bg-amber-100 text-amber-700',
     expired: 'bg-red-100 text-red-700',
     declined: 'bg-red-100 text-red-700',
 }
@@ -86,7 +86,7 @@ export default function AdminQuotesPage() {
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-slate-800">Quotes / Ponudbe</h1>
                 <button onClick={() => setIsCreateOpen(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">
+                    className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700">
                     + Create Quote
                 </button>
             </div>
@@ -146,7 +146,7 @@ export default function AdminQuotesPage() {
                                             {STATUS_LABELS[effectiveStatus] || effectiveStatus}
                                         </span>
                                         {q.order_id && (
-                                            <Link href={`/admin/orders/${q.order_id}`} className="block text-xs text-green-600 hover:underline mt-1">
+                                            <Link href={`/admin/orders/${q.order_id}`} className="block text-xs text-amber-600 hover:underline mt-1">
                                                 View Order →
                                             </Link>
                                         )}

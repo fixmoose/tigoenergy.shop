@@ -152,7 +152,7 @@ export default function MarketingManager() {
                         <div className="flex gap-2">
                             <button onClick={() => setFilterType('all')} className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${filterType === 'all' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>All</button>
                             <button onClick={() => setFilterType('b2b')} className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${filterType === 'b2b' ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>B2B</button>
-                            <button onClick={() => setFilterType('b2c')} className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${filterType === 'b2c' ? 'bg-green-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>B2C</button>
+                            <button onClick={() => setFilterType('b2c')} className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${filterType === 'b2c' ? 'bg-amber-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>B2C</button>
                         </div>
                         <input
                             type="text"
@@ -209,7 +209,7 @@ export default function MarketingManager() {
                                             {c.is_b2b ? (
                                                 <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-[10px] font-black uppercase tracking-widest">B2B</span>
                                             ) : (
-                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-black uppercase tracking-widest">B2C</span>
+                                                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-[10px] font-black uppercase tracking-widest">B2C</span>
                                             )}
                                         </td>
                                     </tr>
@@ -349,7 +349,7 @@ export default function MarketingManager() {
                                                 rows={18}
                                                 value={editingLetter.content_html}
                                                 onChange={e => setEditingLetter({ ...editingLetter, content_html: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-900 text-green-400 border border-slate-700 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition font-mono leading-relaxed resize-y"
+                                                className="w-full px-4 py-3 bg-slate-900 text-amber-400 border border-slate-700 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition font-mono leading-relaxed resize-y"
                                                 placeholder="Hello {first_name}, <br><br> We have a new promotion..."
                                             />
                                         )}

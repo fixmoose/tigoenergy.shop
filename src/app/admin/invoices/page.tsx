@@ -142,7 +142,7 @@ export default function InvoicesPage() {
                 </td>
                 <td className="px-6 py-4 text-center">
                     {order.invoice_url ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase">Issued</span>
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold uppercase">Issued</span>
                     ) : (
                         <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold uppercase">Pending</span>
                     )}

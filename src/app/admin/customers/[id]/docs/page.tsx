@@ -17,7 +17,7 @@ interface DocEntry {
 
 const DOC_ICONS: Record<string, { bg: string; text: string; label: string }> = {
     proforma: { bg: 'bg-amber-50', text: 'text-amber-600', label: 'Proforma / Predračun' },
-    invoice: { bg: 'bg-green-50', text: 'text-green-600', label: 'Invoice / Račun' },
+    invoice: { bg: 'bg-amber-50', text: 'text-amber-600', label: 'Invoice / Račun' },
     packing_slip: { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Packing Slip / Dobavnica' },
     shipping_label: { bg: 'bg-purple-50', text: 'text-purple-600', label: 'Shipping Label' },
     storno: { bg: 'bg-red-50', text: 'text-red-600', label: 'Storno / Credit Note' },

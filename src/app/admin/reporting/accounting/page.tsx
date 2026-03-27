@@ -447,7 +447,7 @@ export default function AccountingReportPage() {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${record.status === 'completed' ? 'bg-green-50 text-green-700 border-green-100' :
+                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${record.status === 'completed' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                                                             record.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-100' :
                                                                 'bg-blue-50 text-blue-700 border-blue-100'
                                                             }`}>
@@ -516,7 +516,7 @@ export default function AccountingReportPage() {
                                                 <td className="px-6 py-4 text-xs">{record.orders?.customer_email || 'Loading...'}</td>
                                                 <td className="px-6 py-4 text-xs italic text-slate-500 max-w-[200px] truncate">{record.reason || 'No reason provided'}</td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${record.status === 'received' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${record.status === 'received' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
                                                         {record.status}
                                                     </span>
                                                 </td>
@@ -616,7 +616,7 @@ export default function AccountingReportPage() {
                                                     <div className="text-[10px] text-slate-400 font-medium uppercase mt-1">
                                                         {new Date(record.created_at).toLocaleDateString()}
                                                     </div>
-                                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase mt-1 ${record.status === 'delivered' || record.status === 'completed' ? 'bg-green-50 text-green-700' : record.status === 'shipped' ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-600'}`}>
+                                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase mt-1 ${record.status === 'delivered' || record.status === 'completed' ? 'bg-amber-50 text-amber-700' : record.status === 'shipped' ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-600'}`}>
                                                         {record.status}
                                                     </span>
                                                 </td>

@@ -189,7 +189,7 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
                                         isCompleted
                                             ? step.warehouseStep
                                                 ? 'bg-orange-500 border-orange-100 text-white'
-                                                : 'bg-green-500 border-green-100 text-white'
+                                                : 'bg-amber-500 border-amber-100 text-white'
                                             : isActive
                                                 ? step.warehouseStep
                                                     ? 'bg-orange-100 border-orange-400 text-orange-600 animate-pulse'
@@ -203,7 +203,7 @@ export default function OrderWorkflowTracker({ order }: OrderWorkflowTrackerProp
                                 <div className="mt-4 text-center px-1">
                                     <p className={`text-[10px] font-black uppercase tracking-wider mb-1 ${
                                         isCompleted
-                                            ? step.warehouseStep ? 'text-orange-600' : 'text-green-600'
+                                            ? step.warehouseStep ? 'text-orange-600' : 'text-amber-600'
                                             : isActive
                                                 ? step.warehouseStep ? 'text-orange-600' : 'text-amber-600'
                                                 : 'text-slate-400'

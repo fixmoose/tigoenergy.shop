@@ -118,7 +118,7 @@ export default function B2BDashboard({ user, customer }: Props) {
                         </div>
                         <div className="text-center">
                             <h3 className="font-bold text-gray-900 truncate">{customer.company_name || t('businessPartner')}</h3>
-                            <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">{customer.vat_id ? t('verifiedB2B') : t('b2bPartner')}</p>
+                            <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">{customer.vat_id ? t('verifiedB2B') : t('b2bPartner')}</p>
                         </div>
                     </div>
                     <nav className="p-2 space-y-1">

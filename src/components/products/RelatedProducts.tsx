@@ -32,7 +32,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                             )}
                         </div>
 
-                        <h3 className="font-semibold text-gray-900 group-hover:text-[green-600] transition line-clamp-2 sm:h-12 text-sm sm:text-base">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-[amber-600] transition line-clamp-2 sm:h-12 text-sm sm:text-base">
                             {product.name_en}
                         </h3>
 

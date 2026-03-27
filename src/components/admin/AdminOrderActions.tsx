@@ -53,7 +53,7 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
 
     const colorMap: Record<string, { border: string, text: string, bg: string }> = {
         slate: { border: 'border-slate-200', text: 'text-slate-700', bg: 'bg-slate-50' },
-        green: { border: 'border-green-300', text: 'text-green-800', bg: 'bg-green-50' },
+        green: { border: 'border-amber-300', text: 'text-amber-800', bg: 'bg-amber-50' },
         amber: { border: 'border-amber-300', text: 'text-amber-800', bg: 'bg-amber-50' },
         blue: { border: 'border-blue-300', text: 'text-blue-800', bg: 'bg-blue-50' },
         red: { border: 'border-red-300', text: 'text-red-800', bg: 'bg-red-50' },
@@ -64,12 +64,12 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
 
     if (isCompleted) {
         return (
-            <div className="rounded-xl border border-green-200 bg-green-50/50 p-3 opacity-70 min-w-0">
+            <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3 opacity-70 min-w-0">
                 <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">&#10003;</span>
-                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider truncate">{title}</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">&#10003;</span>
+                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider truncate">{title}</span>
                 </div>
-                <p className="text-[9px] text-green-600 mt-1 ml-7 truncate">{subtitle}</p>
+                <p className="text-[9px] text-amber-600 mt-1 ml-7 truncate">{subtitle}</p>
             </div>
         )
     }
@@ -310,7 +310,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 const isPreDelivery = !dueDate && !isPaidFull
                 return (
                     <div className={`rounded-xl px-4 py-3 mb-4 text-sm flex items-center justify-between ${
-                        isPaidFull ? 'bg-green-50 border-2 border-green-300 text-green-800'
+                        isPaidFull ? 'bg-amber-50 border-2 border-amber-300 text-amber-800'
                         : isPreDelivery ? 'bg-blue-50 border-2 border-blue-300 text-blue-800'
                         : isOverdue ? 'bg-red-50 border-2 border-red-300 text-red-800'
                         : diffDays !== null && diffDays <= 7 ? 'bg-amber-50 border-2 border-amber-300 text-amber-800'
@@ -347,7 +347,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             })
                                         }
                                     }}
-                                    className="py-1.5 px-4 rounded-lg text-xs font-bold transition bg-green-600 text-white hover:bg-green-700"
+                                    className="py-1.5 px-4 rounded-lg text-xs font-bold transition bg-amber-600 text-white hover:bg-amber-700"
                                 >Record Payment</button>
                             )}
                             {!isPaidFull && (
@@ -391,7 +391,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                     disabled={loading}
                                     className={`py-1.5 px-3 rounded-lg text-[10px] font-bold transition border ${
                                         autoReminderEnabled
-                                            ? 'bg-green-100 border-green-300 text-green-700 hover:bg-green-200'
+                                            ? 'bg-amber-100 border-amber-300 text-amber-700 hover:bg-amber-200'
                                             : 'bg-slate-100 border-slate-300 text-slate-500 hover:bg-slate-200'
                                     }`}
                                     title={autoReminderEnabled ? 'Auto-reminder ON — will email 1 day before due' : 'Auto-reminder OFF'}
@@ -423,7 +423,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 <span className="animate-pulse">&#9203;</span> Customer can cancel for <strong>{formatTime(remainingMs)}</strong>
                             </div>
                         )}
-                        <button onClick={handleConfirm} disabled={loading} className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                        <button onClick={handleConfirm} disabled={loading} className="w-full py-2 bg-amber-600 text-white rounded-lg font-bold text-sm hover:bg-amber-700 transition disabled:opacity-50">
                             {loading ? 'Processing...' : 'Confirm Order'}
                         </button>
                         {modificationUnlocked ? (
@@ -449,7 +449,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <StepCard step="payment" currentStep={currentStep} title="Payment" subtitle="Send payment request & confirm receipt" icon="3" color="amber">
                     <div className="space-y-2">
                         <div className={`rounded-lg px-3 py-2 text-xs font-medium flex justify-between items-center ${
-                            paymentStatus === 'paid' ? 'bg-green-100 border border-green-200 text-green-800' :
+                            paymentStatus === 'paid' ? 'bg-amber-100 border border-amber-200 text-amber-800' :
                             paymentStatus === 'net30' ? 'bg-blue-100 border border-blue-200 text-blue-800' :
                             paymentStatus === 'partially_paid' ? 'bg-amber-100 border border-amber-200 text-amber-800' :
                             'bg-red-100 border border-red-200 text-red-700'
@@ -500,18 +500,18 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                         })
                                     }
                                 }}
-                                className="w-full py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition"
+                                className="w-full py-2 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition"
                             >Record Payment</button>
                         )}
 
                         {showPaymentForm && (
-                            <div className="bg-white border border-green-200 rounded-lg p-3 space-y-2">
+                            <div className="bg-white border border-amber-200 rounded-lg p-3 space-y-2">
                                 {paymentsLoaded && payments.length > 0 && (
                                     <div className="space-y-1 mb-2">
                                         {payments.map(p => (
                                             <div key={p.id} className="flex items-center justify-between bg-slate-50 rounded px-2 py-1.5 text-[10px] border">
                                                 <div>
-                                                    <span className="font-bold text-green-700">&euro;{Number(p.amount).toFixed(2)}</span>
+                                                    <span className="font-bold text-amber-700">&euro;{Number(p.amount).toFixed(2)}</span>
                                                     <span className="text-slate-400 mx-1">&middot;</span>
                                                     <span className="text-slate-600">{new Date(p.payment_date).toLocaleDateString('en-GB')}</span>
                                                     <span className="text-slate-400 mx-1">&middot;</span>
@@ -563,7 +563,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                             } finally { setLoading(false) }
                                         }}
                                         disabled={loading}
-                                        className="flex-1 py-1.5 bg-green-600 text-white rounded text-xs font-bold hover:bg-green-700 disabled:opacity-50"
+                                        className="flex-1 py-1.5 bg-amber-600 text-white rounded text-xs font-bold hover:bg-amber-700 disabled:opacity-50"
                                     >{loading ? 'Saving...' : 'Confirm'}</button>
                                     <button onClick={() => setShowPaymentForm(false)} className="px-3 py-1.5 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
                                 </div>
@@ -651,7 +651,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                         router.refresh()
                                     } catch { alert('Failed') } finally { setLoading(false) }
                                 }} disabled={loading}
-                                    className="w-full py-2.5 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition disabled:opacity-50">
+                                    className="w-full py-2.5 bg-amber-600 text-white rounded-lg font-bold text-sm hover:bg-amber-700 transition disabled:opacity-50">
                                     {loading ? 'Processing...' : 'Skip to Pickup'}
                                 </button>
                                 <p className="text-[10px] text-slate-400 text-center">Customer picks up — no shipping needed</p>
@@ -765,10 +765,10 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             <>
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or</span></div>
+                                    <div className="relative flex justify-center"><span className="bg-amber-50 px-2 text-[10px] text-slate-400 font-bold uppercase">or</span></div>
                                 </div>
                                 <button onClick={handleMarkDelivered} disabled={loading}
-                                    className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700 transition disabled:opacity-50">
+                                    className="w-full py-2 bg-amber-600 text-white rounded-lg font-bold text-xs hover:bg-amber-700 transition disabled:opacity-50">
                                     {loading ? 'Processing...' : 'Mark as Picked Up (no signature)'}
                                 </button>
                                 <button onClick={() => handleShipOrder('DPD')} disabled={loading}
@@ -808,7 +808,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                     <span className="text-[10px] font-mono text-slate-500">{p.parcel_number || p.parcelnumber || `Parcel ${i + 1}`}</span>
                                                     <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
                                                         (p.status || '').toUpperCase() === 'DELIVERED'
-                                                            ? 'bg-green-100 text-green-700'
+                                                            ? 'bg-amber-100 text-amber-700'
                                                             : ['IN_DELIVERY', 'ON_THE_ROAD', 'INBOUND', 'AT_DELIVERY_DEPOT'].includes((p.status || '').toUpperCase())
                                                                 ? 'bg-yellow-100 text-yellow-700'
                                                                 : 'bg-slate-100 text-slate-600'
@@ -820,7 +820,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                                     <p className="text-[10px] text-slate-500 mt-0.5">{p.status}</p>
                                                 )}
                                                 {(p.delivered_at || p.deliveryDate) && (
-                                                    <p className="text-[10px] text-green-600 mt-0.5">Delivered: {p.delivered_at || p.deliveryDate}</p>
+                                                    <p className="text-[10px] text-amber-600 mt-0.5">Delivered: {p.delivered_at || p.deliveryDate}</p>
                                                 )}
                                                 {p.depot && (
                                                     <p className="text-[10px] text-slate-400 mt-0.5">Depot: {p.depot}</p>
@@ -841,12 +841,12 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             <>
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-                                    <div className="relative flex justify-center"><span className="bg-green-50 px-2 text-[10px] text-slate-400 font-bold uppercase">{shippingCarrier === 'DPD' ? 'or override' : 'or'}</span></div>
+                                    <div className="relative flex justify-center"><span className="bg-amber-50 px-2 text-[10px] text-slate-400 font-bold uppercase">{shippingCarrier === 'DPD' ? 'or override' : 'or'}</span></div>
                                 </div>
 
                                 {/* Manual confirmation — secondary/override path */}
                                 <button onClick={handleMarkDelivered} disabled={loading}
-                                    className="w-full py-2 bg-green-600 text-white rounded-lg font-bold text-xs hover:bg-green-700 transition disabled:opacity-50">
+                                    className="w-full py-2 bg-amber-600 text-white rounded-lg font-bold text-xs hover:bg-amber-700 transition disabled:opacity-50">
                                     {loading ? 'Processing...' : 'Mark as Delivered (Manual)'}
                                 </button>
                             </>
@@ -863,7 +863,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 {loading ? 'Wait...' : 'Issue Official Invoice'}
                             </button>
                         ) : (
-                            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-xs text-green-800 font-medium">
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 font-medium">
                                 &#10003; Invoice issued
                             </div>
                         )}

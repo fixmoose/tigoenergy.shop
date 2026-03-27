@@ -63,10 +63,10 @@ export default function DashboardOverview({ user, customer }: Props) {
     return (
         <div className="space-y-8">
             {/* Welcome Hero */}
-            <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
                 <div className="relative z-10">
                     <h1 className="text-3xl font-bold mb-2">{t('welcomeBack', { name: firstName })}</h1>
-                    <p className="text-green-50 opacity-90">{t('welcomeDesc')}</p>
+                    <p className="text-amber-50 opacity-90">{t('welcomeDesc')}</p>
                 </div>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                 <div className="absolute bottom-0 right-10 w-32 h-32 bg-white opacity-5 rounded-full translate-y-1/3 pointer-events-none"></div>

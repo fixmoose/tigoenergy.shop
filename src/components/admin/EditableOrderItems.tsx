@@ -298,7 +298,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                             <td className="px-4 py-4">
                                 <div className="flex flex-col items-center gap-1">
                                     {item.applies_trod_fee && (
-                                        <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                                        <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded">
                                             eTROD-{item.trod_category_code}
                                         </span>
                                     )}
@@ -327,7 +327,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                             <button
                                                 onClick={() => saveEdit(item.id)}
                                                 disabled={saving}
-                                                className="text-green-600 hover:text-green-800 font-bold text-xs disabled:opacity-50"
+                                                className="text-amber-600 hover:text-amber-800 font-bold text-xs disabled:opacity-50"
                                             >
                                                 {saving ? '...' : 'Save'}
                                             </button>
@@ -400,7 +400,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                             } finally { setSaving(false) }
                                         }}
                                         disabled={saving}
-                                        className="text-green-600 hover:text-green-800 font-bold text-xs disabled:opacity-50"
+                                        className="text-amber-600 hover:text-amber-800 font-bold text-xs disabled:opacity-50"
                                     >{saving ? '...' : 'Save'}</button>
                                     <button onClick={() => setEditingShipping(false)} className="text-slate-400 hover:text-slate-600 text-xs">Cancel</button>
                                 </div>

@@ -57,7 +57,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
   }
 
   return (
-    <article className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-green-600 hover:shadow-xl transition-all duration-300">
+    <article className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-amber-600 hover:shadow-xl transition-all duration-300">
       <Link href={`/products/${product.slug ?? product.id}`} className="block">
         {/* Image */}
         <div className="relative h-52 bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -76,7 +76,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
           )}
           {/* Category Badge */}
           {product.category && (
-            <span className="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 left-3 bg-amber-600 text-white text-xs font-medium px-2 py-1 rounded">
               {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
             </span>
           )}
@@ -107,7 +107,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
             </span>
           )}
           {!isAvailableToOrder && !isSpecialOrder && isNormalStock && (
-            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('inStock')}
             </span>
           )}
@@ -119,7 +119,7 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{product.sku}</p>
 
           {/* Title */}
-          <h3 className="font-medium text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-green-600 transition-colors">
+          <h3 className="font-medium text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-amber-600 transition-colors">
             {productName}
           </h3>
 
@@ -135,10 +135,10 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
                     <PriceWithTooltip
                       netEur={pricing.discountedPrice}
                       displayPrice={formatPrice(pricing.discountedPrice)}
-                      className="text-xl font-bold text-green-600"
+                      className="text-xl font-bold text-amber-600"
                     />
                     {pricing?.appliedSchemaName && (
-                      <span className="text-[8px] bg-green-50 text-green-700 px-1 py-0.5 rounded font-black uppercase border border-green-100">
+                      <span className="text-[8px] bg-amber-50 text-amber-700 px-1 py-0.5 rounded font-black uppercase border border-amber-100">
                         {pricing.appliedSchemaName.split(' ')[0]}
                       </span>
                     )}
@@ -164,9 +164,9 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
               onClick={handleAddToCart}
               disabled={!canAddToCart}
               className={`p-2 rounded-lg transition-all duration-300 ${justAdded
-                ? 'bg-green-500 text-white scale-110'
+                ? 'bg-amber-500 text-white scale-110'
                 : canAddToCart
-                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  ? 'bg-amber-600 text-white hover:bg-amber-700'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               title={canAddToCart ? 'Add to cart' : 'Not available'}

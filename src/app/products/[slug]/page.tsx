@@ -138,15 +138,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Breadcrumbs */}
       <nav className="flex items-center flex-wrap gap-2 text-sm text-gray-500 mb-8 animate-in fade-in duration-500">
-        <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
+        <Link href="/" className="hover:text-amber-600 transition-colors">Home</Link>
         <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
 
-        <Link href="/products" className="hover:text-green-600 transition-colors">Products</Link>
+        <Link href="/products" className="hover:text-amber-600 transition-colors">Products</Link>
 
         {categorySlug && categoryName && (
           <>
             <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            <Link href={`/products?category=${categorySlug}`} className="hover:text-green-600 transition-colors uppercase tracking-wide font-semibold text-xs text-gray-600 hover:text-green-700">
+            <Link href={`/products?category=${categorySlug}`} className="hover:text-amber-600 transition-colors uppercase tracking-wide font-semibold text-xs text-gray-600 hover:text-amber-700">
               {categoryName}
             </Link>
           </>
@@ -155,7 +155,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         {subcategorySlug && subcategoryName && (
           <>
             <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            <Link href={`/products?category=${categorySlug}&subcategory=${subcategorySlug}`} className="hover:text-green-600 transition-colors font-medium text-gray-700 hover:text-green-700">
+            <Link href={`/products?category=${categorySlug}&subcategory=${subcategorySlug}`} className="hover:text-amber-600 transition-colors font-medium text-gray-700 hover:text-amber-700">
               {tsub.has(subcategoryName) ? tsub(subcategoryName) : subcategoryName}
             </Link>
           </>

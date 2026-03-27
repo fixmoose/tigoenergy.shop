@@ -103,7 +103,7 @@ export default function B2CDashboard({ user, customer }: Props) {
         <div className="flex flex-col md:flex-row gap-8 relative">
             <button
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="fixed bottom-6 right-6 z-50 bg-green-600 text-white rounded-full p-3 shadow-lg md:hidden hover:bg-green-700 transition-colors"
+                className="fixed bottom-6 right-6 z-50 bg-amber-600 text-white rounded-full p-3 shadow-lg md:hidden hover:bg-amber-700 transition-colors"
                 aria-label="Back to Top"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
@@ -130,7 +130,7 @@ export default function B2CDashboard({ user, customer }: Props) {
                                 key={tab.id}
                                 onClick={() => handleScrollTo(tab.id)}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeHash === tab.id
-                                    ? 'bg-green-50 text-green-700'
+                                    ? 'bg-amber-50 text-amber-700'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                     }`}
                             >

@@ -301,7 +301,7 @@ export default function TemplateManager() {
                                     <button
                                         onClick={handleSyncToAll}
                                         disabled={syncing}
-                                        className="text-xs px-3 py-1.5 border border-green-200 rounded font-medium text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-50"
+                                        className="text-xs px-3 py-1.5 border border-amber-200 rounded font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50"
                                         title="Re-translate this master template to all saved language variants"
                                     >
                                         {syncing ? 'Syncing…' : 'Sync to All Languages'}
@@ -335,7 +335,7 @@ export default function TemplateManager() {
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                         >
-                            <span className={`w-1.5 h-1.5 rounded-full ${exists ? 'bg-green-500' : 'bg-gray-300'}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${exists ? 'bg-amber-500' : 'bg-gray-300'}`} />
                             {dt.label}
                         </button>
                     )

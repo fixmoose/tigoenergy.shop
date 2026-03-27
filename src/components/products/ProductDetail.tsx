@@ -52,7 +52,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
           // Check if it looks like a list item (starts with bullet or just short text in these sections)
           details.push(
             <div key={i} className="flex items-start mb-2">
-              <span className="text-[green-600] mr-2">•</span>
+              <span className="text-[amber-600] mr-2">•</span>
               <span className="text-gray-700">{trimmed}</span>
             </div>
           )
@@ -88,7 +88,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                   <button
                     key={i}
                     onClick={() => setActiveImage(src)}
-                    className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition ${activeImage === src ? 'border-[green-600]' : 'border-gray-200 hover:border-gray-300'}`}
+                    className={`relative w-16 h-16 rounded-md overflow-hidden border-2 transition ${activeImage === src ? 'border-[amber-600]' : 'border-gray-200 hover:border-gray-300'}`}
                   >
                     <img
                       src={src}
@@ -128,7 +128,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
             )}
             {/* In Stock Badge */}
             {product.stock_status !== 'out_of_stock' && product.stock_status !== 'coming_soon' && product.stock_status !== 'special_order' && product.stock_status !== 'available_to_order' && (product.stock_quantity ?? 0) > (product.low_stock_threshold ?? 10) && (
-              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">{tc('inStock')}</span>
+              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded border border-amber-200">{tc('inStock')}</span>
             )}
           </div>
 
@@ -156,10 +156,10 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                     <PriceWithTooltip
                       netEur={pricing.discountedPrice}
                       displayPrice={formatPrice(pricing.discountedPrice)}
-                      className="text-green-600"
+                      className="text-amber-600"
                     />
                     {pricing?.appliedSchemaName && (
-                      <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-100">
+                      <span className="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-100">
                         {pricing.appliedSchemaName}
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
 
             <button
               onClick={() => setIsDescExpanded(!isDescExpanded)}
-              className="mt-4 text-[green-600] font-medium hover:text-[green-700] hover:underline flex items-center gap-1 text-sm outline-none"
+              className="mt-4 text-[amber-600] font-medium hover:text-[amber-700] hover:underline flex items-center gap-1 text-sm outline-none"
             >
               {isDescExpanded ? tp('showLess') : tp('readMore')}
               <svg className={`w-4 h-4 transition-transform ${isDescExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,7 +268,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
                           href={lang.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 py-1 text-xs font-semibold text-gray-500 hover:text-[green-600] uppercase hover:underline transition-colors"
+                          className="px-2 py-1 text-xs font-semibold text-gray-500 hover:text-[amber-600] uppercase hover:underline transition-colors"
                         >
                           {lang.lang}
                         </a>
@@ -281,7 +281,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
               {product.downloads.length > 3 && (
                 <button
                   onClick={() => setIsDownloadsExpanded(!isDownloadsExpanded)}
-                  className="mt-4 text-[green-600] font-medium hover:text-[green-700] hover:underline flex items-center gap-1 text-sm outline-none"
+                  className="mt-4 text-[amber-600] font-medium hover:text-[amber-700] hover:underline flex items-center gap-1 text-sm outline-none"
                 >
                   {isDownloadsExpanded ? tp('showLess') : tp('showAllDownloads', { count: product.downloads.length })}
                   <svg className={`w-4 h-4 transition-transform ${isDownloadsExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,7 +297,7 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
             <div className="mt-8 pt-6 border-t border-gray-100">
               <a
                 href="https://www.tigoenergy.com/inverter-compatibility"
-                className="flex items-center gap-2 text-green-600 font-medium hover:text-green-700 hover:underline group w-fit"
+                className="flex items-center gap-2 text-amber-600 font-medium hover:text-amber-700 hover:underline group w-fit"
               >
                 <span>{tp('checkInverterCompatibility')}</span>
                 <svg className="w-4 h-4 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">

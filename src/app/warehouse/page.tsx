@@ -364,11 +364,11 @@ export default function WarehousePortal() {
                                         <span className="text-slate-300 truncate flex-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</span>
                                         <span className="text-slate-500">EUR {order.total?.toFixed(2)}</span>
                                         {completedAt && (
-                                            <span className="text-green-500/70">
+                                            <span className="text-amber-500/70">
                                                 {new Date(completedAt).toLocaleDateString('sl-SI')} {new Date(completedAt).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         )}
-                                        <span className="text-green-500">✓</span>
+                                        <span className="text-amber-500">✓</span>
                                     </div>
                                 )
                             })}
@@ -408,7 +408,7 @@ function OrderCard({
 
     return (
         <div className={`bg-slate-800 rounded-xl border mb-3 overflow-hidden transition-all ${
-            isPrepared ? 'border-green-600/50' : 'border-slate-700'
+            isPrepared ? 'border-amber-600/50' : 'border-slate-700'
         }`}>
             {/* Payment proof warning */}
             {order.pickup_payment_proof_required && !isPaymentVerified && (
@@ -485,28 +485,28 @@ function OrderCard({
 
                 {/* Prepared checkbox — toggleable */}
                 <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
-                    isPrepared ? 'bg-green-900/30 border border-green-700/40' : 'bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60'
+                    isPrepared ? 'bg-amber-900/30 border border-amber-700/40' : 'bg-slate-700/40 border border-slate-600/30 hover:bg-slate-700/60'
                 }`}>
                     <input
                         type="checkbox"
                         checked={isPrepared}
                         disabled={actionLoading[order.id + '_marked_prepared']}
                         onChange={() => onToggleAction(order.id, 'marked_prepared', isPrepared)}
-                        className="w-6 h-6 rounded border-2 border-slate-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
+                        className="w-6 h-6 rounded border-2 border-slate-500 text-amber-500 focus:ring-amber-500 bg-slate-700 cursor-pointer"
                     />
-                    <span className={`font-bold text-sm ${isPrepared ? 'text-green-400' : 'text-slate-300'}`}>
+                    <span className={`font-bold text-sm ${isPrepared ? 'text-amber-400' : 'text-slate-300'}`}>
                         {actionLoading[order.id + '_marked_prepared'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
                     </span>
                 </label>
 
                 {/* Upload dobavnica — drag & drop, browse, or phone camera via QR */}
                 {dobavnica ? (
-                    <div className="p-2.5 rounded-lg border bg-green-900/20 border-green-700/30">
+                    <div className="p-2.5 rounded-lg border bg-amber-900/20 border-amber-700/30">
                         <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span className="text-green-400 text-sm font-medium">Dobavnica naložena</span>
+                            <span className="text-amber-400 text-sm font-medium">Dobavnica naložena</span>
                             {dobavnica.file_url && (
                                 <a
                                     href={`${dobavnica.file_url}${dobavnica.file_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
@@ -533,7 +533,7 @@ function OrderCard({
                 {order.pickup_payment_proof_required && (
                     <label className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${
                         isPaymentVerified
-                            ? 'bg-green-900/30 border border-green-700/40'
+                            ? 'bg-amber-900/30 border border-amber-700/40'
                             : 'bg-red-900/20 border border-red-700/30 hover:bg-red-900/30'
                     }`}>
                         <input
@@ -541,9 +541,9 @@ function OrderCard({
                             checked={isPaymentVerified}
                             disabled={actionLoading[order.id + '_payment_verified']}
                             onChange={() => onToggleAction(order.id, 'payment_verified', isPaymentVerified)}
-                            className="w-6 h-6 rounded border-2 border-red-500 text-green-500 focus:ring-green-500 bg-slate-700 cursor-pointer"
+                            className="w-6 h-6 rounded border-2 border-red-500 text-amber-500 focus:ring-amber-500 bg-slate-700 cursor-pointer"
                         />
-                        <span className={`font-bold text-sm ${isPaymentVerified ? 'text-green-400' : 'text-red-300'}`}>
+                        <span className={`font-bold text-sm ${isPaymentVerified ? 'text-amber-400' : 'text-red-300'}`}>
                             {actionLoading[order.id + '_payment_verified'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno' : 'Preveri dokazilo o plačilu'}
                         </span>
                     </label>

@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100 text-center">
-          <div className="w-8 h-8 border-3 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-3 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-sm text-gray-500">{t('subtitle')}</p>
         </div>
       </div>
@@ -140,7 +140,7 @@ export default function ResetPasswordPage() {
               </p>
               <Link
                 href="/auth/forgot-password"
-                className="w-full inline-block bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200"
+                className="w-full inline-block bg-amber-600 text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition shadow-lg shadow-amber-200"
               >
                 {t('requestNew')}
               </Link>
@@ -149,7 +149,7 @@ export default function ResetPasswordPage() {
         ) : (
           <>
             {message && (
-              <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100 mb-6 font-medium text-center">
+              <div className="bg-amber-50 text-amber-700 p-4 rounded-xl border border-amber-100 mb-6 font-medium text-center">
                 {message}
               </div>
             )}
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('pwdPlaceholder')}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
                   disabled={loading}
                 />
               </div>
@@ -175,7 +175,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
+                className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition shadow-lg shadow-amber-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

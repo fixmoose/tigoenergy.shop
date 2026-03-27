@@ -115,7 +115,7 @@ export default function EditableShippingAddress({
                 <h3 className="font-semibold text-slate-800">Shipping Address</h3>
                 <div className="flex gap-1">
                     <button onClick={handleSave} disabled={saving}
-                        className="text-[10px] font-bold text-green-600 hover:text-green-800 uppercase tracking-wider px-2 py-1 rounded hover:bg-green-50 transition disabled:opacity-50">
+                        className="text-[10px] font-bold text-amber-600 hover:text-amber-800 uppercase tracking-wider px-2 py-1 rounded hover:bg-amber-50 transition disabled:opacity-50">
                         {saving ? 'Saving...' : 'Save'}
                     </button>
                     <button onClick={() => setEditing(false)}

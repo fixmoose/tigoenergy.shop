@@ -45,9 +45,9 @@ function RegisterContent() {
         <div className="max-w-4xl mx-auto py-12 px-4">
             <h1 className="text-3xl font-bold text-center mb-8">{t('title')}</h1>
             <div className="grid md:grid-cols-2 gap-6">
-                <Link href="/auth/register?type=b2c" className="block p-8 bg-white rounded-xl shadow-md border hover:border-green-500 hover:shadow-lg transition-all text-center group">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <Link href="/auth/register?type=b2c" className="block p-8 bg-white rounded-xl shadow-md border hover:border-amber-500 hover:shadow-lg transition-all text-center group">
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     </div>
                     <h2 className="text-xl font-bold mb-2">{t('personalAccount')}</h2>
                     <p className="text-gray-500">{t('personalDesc')}</p>

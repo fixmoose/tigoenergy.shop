@@ -62,10 +62,10 @@ export default function ForgotPasswordPage() {
 
                 {message ? (
                     <div className="text-center space-y-6">
-                        <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-100 font-medium">
+                        <div className="bg-amber-50 text-amber-700 p-4 rounded-xl border border-amber-100 font-medium">
                             {message}
                         </div>
-                        <Link href="/auth/login" className="inline-block text-green-600 font-bold hover:underline">
+                        <Link href="/auth/login" className="inline-block text-amber-600 font-bold hover:underline">
                             {t('backToLogin')}
                         </Link>
                     </div>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+                                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
                                 placeholder="john@example.com"
                             />
                         </div>
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
+                            className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold hover:bg-amber-700 transition shadow-lg shadow-amber-200 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center"
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

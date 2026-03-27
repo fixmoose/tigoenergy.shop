@@ -293,7 +293,7 @@ export const enhanceAccessibility = () => {
     // Add skip links
     const skipLink = document.createElement('a')
     skipLink.href = '#main-content'
-    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-green-600 focus:text-white focus:p-2 focus:rounded'
+    skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-amber-600 focus:text-white focus:p-2 focus:rounded'
     skipLink.textContent = 'Skip to main content'
     document.body.insertBefore(skipLink, document.body.firstChild)
 

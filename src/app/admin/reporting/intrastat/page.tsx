@@ -97,7 +97,7 @@ export default function IntrastatPage() {
   const getThresholdColor = (percentage: number, exceeded: boolean) => {
     if (exceeded) return 'text-red-600'
     if (percentage >= 80) return 'text-amber-600'
-    return 'text-green-600'
+    return 'text-amber-600'
   }
 
   return (
@@ -169,7 +169,7 @@ export default function IntrastatPage() {
       )}
 
       {saveMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+        <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg mb-6">
           {saveMessage}
         </div>
       )}

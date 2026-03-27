@@ -25,7 +25,7 @@ type UnmatchedTransaction = {
 }
 
 const CONFIDENCE_STYLES = {
-    high: { bg: 'bg-green-50 border-green-200', badge: 'bg-green-100 text-green-700', label: 'High' },
+    high: { bg: 'bg-amber-50 border-amber-200', badge: 'bg-amber-100 text-amber-700', label: 'High' },
     medium: { bg: 'bg-amber-50 border-amber-200', badge: 'bg-amber-100 text-amber-700', label: 'Medium' },
     low: { bg: 'bg-red-50 border-red-200', badge: 'bg-red-100 text-red-700', label: 'Low' },
 }
@@ -174,7 +174,7 @@ export default function BankStatementUpload() {
 
                 {/* Confirm Result */}
                 {confirmResult && (
-                    <div className={`rounded-lg p-3 text-sm border ${confirmResult.failed > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-green-50 border-green-200 text-green-800'}`}>
+                    <div className={`rounded-lg p-3 text-sm border ${confirmResult.failed > 0 ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
                         {confirmResult.succeeded > 0 && <p>{confirmResult.succeeded} payment(s) recorded successfully.</p>}
                         {confirmResult.failed > 0 && <p>{confirmResult.failed} payment(s) failed to record.</p>}
                     </div>
@@ -195,9 +195,9 @@ export default function BankStatementUpload() {
                             <div className="text-lg font-bold text-gray-600">{stats.debits}</div>
                             <div className="text-[10px] text-gray-500 uppercase">Debits</div>
                         </div>
-                        <div className="bg-green-50 rounded-lg p-3 text-center">
-                            <div className="text-lg font-bold text-green-700">{stats.matchedCount}</div>
-                            <div className="text-[10px] text-green-500 uppercase">Matched</div>
+                        <div className="bg-amber-50 rounded-lg p-3 text-center">
+                            <div className="text-lg font-bold text-amber-700">{stats.matchedCount}</div>
+                            <div className="text-[10px] text-amber-500 uppercase">Matched</div>
                         </div>
                         <div className="bg-amber-50 rounded-lg p-3 text-center">
                             <div className="text-lg font-bold text-amber-700">{stats.unmatchedCount}</div>
@@ -267,7 +267,7 @@ export default function BankStatementUpload() {
                             <button
                                 onClick={handleConfirm}
                                 disabled={selectedCount === 0 || confirming}
-                                className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {confirming ? 'Recording...' : `Confirm ${selectedCount} Payment${selectedCount !== 1 ? 's' : ''}`}
                             </button>

@@ -24,7 +24,7 @@ function ContactContent() {
             </div>
 
             <div className="w-full max-w-md relative">
-                <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500 to-green-500 rounded-[2rem] opacity-10 blur-2xl -z-10"></div>
+                <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500 to-amber-500 rounded-[2rem] opacity-10 blur-2xl -z-10"></div>
                 <SupportMessagingWindow
                     type="sales"
                     title={subject || t('prefillTitle')}

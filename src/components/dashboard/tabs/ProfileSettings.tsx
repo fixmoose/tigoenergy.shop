@@ -287,7 +287,7 @@ export default function ProfileSettings({ customer }: Props) {
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-sm font-bold text-gray-900">{t('emailAddresses')}</h3>
                             {contacts.filter(c => c.type === 'email').length < 2 && (
-                                <button onClick={() => setShowAddContact('email')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
+                                <button onClick={() => setShowAddContact('email')} className="text-amber-600 hover:text-amber-700 p-1 rounded-full hover:bg-amber-50 transition">
                                     <PlusIcon className="w-5 h-5" />
                                 </button>
                             )}
@@ -297,7 +297,7 @@ export default function ProfileSettings({ customer }: Props) {
                                 <div key={contact.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <span className="text-sm font-medium text-gray-700 truncate">{contact.value}</span>
-                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />}
+                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-amber-500 shrink-0" />}
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <button
@@ -325,7 +325,7 @@ export default function ProfileSettings({ customer }: Props) {
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-sm font-bold text-gray-900">{t('phoneNumbers')}</h3>
                             {contacts.filter(c => c.type === 'phone').length < 2 && (
-                                <button onClick={() => setShowAddContact('phone')} className="text-green-600 hover:text-green-700 p-1 rounded-full hover:bg-green-50 transition">
+                                <button onClick={() => setShowAddContact('phone')} className="text-amber-600 hover:text-amber-700 p-1 rounded-full hover:bg-amber-50 transition">
                                     <PlusIcon className="w-5 h-5" />
                                 </button>
                             )}
@@ -335,7 +335,7 @@ export default function ProfileSettings({ customer }: Props) {
                                 <div key={contact.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <span className="text-sm font-medium text-gray-700 truncate">{contact.value}</span>
-                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />}
+                                        {contact.verified_at && <CheckCircleIcon className="w-4 h-4 text-amber-500 shrink-0" />}
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <button
@@ -379,7 +379,7 @@ export default function ProfileSettings({ customer }: Props) {
                                         <input
                                             type={showAddContact === 'email' ? 'email' : 'tel'}
                                             placeholder={showAddContact === 'email' ? 'new@email.com' : '+00 000 000 000'}
-                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500"
                                             value={newContactValue}
                                             onChange={(e) => setNewContactValue(e.target.value)}
                                         />
@@ -388,7 +388,7 @@ export default function ProfileSettings({ customer }: Props) {
                                             <button
                                                 onClick={handleAddContact}
                                                 disabled={loading || !newContactValue}
-                                                className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                                                className="flex-1 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition disabled:opacity-50"
                                             >
                                                 {loading ? t('sending') : t('sendCode')}
                                             </button>
@@ -399,7 +399,7 @@ export default function ProfileSettings({ customer }: Props) {
                                         <input
                                             maxLength={6}
                                             placeholder="000000"
-                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest outline-none focus:ring-2 focus:ring-green-500"
+                                            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest outline-none focus:ring-2 focus:ring-amber-500"
                                             value={verificationCode}
                                             onChange={(e) => setVerificationCode(e.target.value)}
                                         />
@@ -408,7 +408,7 @@ export default function ProfileSettings({ customer }: Props) {
                                             <button
                                                 onClick={handleVerifyContact}
                                                 disabled={loading || verificationCode.length < 6}
-                                                className="flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                                                className="flex-1 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition disabled:opacity-50"
                                             >
                                                 {loading ? t('verifying') : t('verify')}
                                             </button>
@@ -461,7 +461,7 @@ export default function ProfileSettings({ customer }: Props) {
 
                 <div className="pt-6 border-t mt-2">
                     <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
+                        <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
                         {t('regionalSettings')}
                     </h3>
 
@@ -644,12 +644,12 @@ export default function ProfileSettings({ customer }: Props) {
                         )}
 
                         {pwStep === 'done' && (
-                            <div className="bg-green-50 border border-green-200 rounded-xl p-5 max-w-md">
-                                <p className="text-sm font-bold text-green-800">{t('pwChanged') || 'Password changed successfully!'}</p>
-                                <p className="text-xs text-green-600 mt-1">{t('pwChangedHint') || 'Your new password is now active. Use it next time you sign in.'}</p>
+                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 max-w-md">
+                                <p className="text-sm font-bold text-amber-800">{t('pwChanged') || 'Password changed successfully!'}</p>
+                                <p className="text-xs text-amber-600 mt-1">{t('pwChangedHint') || 'Your new password is now active. Use it next time you sign in.'}</p>
                                 <button
                                     onClick={resetPasswordFlow}
-                                    className="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition"
+                                    className="mt-3 px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-bold hover:bg-amber-700 transition"
                                 >
                                     {t('done') || 'Done'}
                                 </button>
@@ -704,7 +704,7 @@ export default function ProfileSettings({ customer }: Props) {
                     >
                         {loading ? t('saving') : t('updateProfile')}
                     </button>
-                    {success && <span className="text-green-600 font-medium text-sm animate-in fade-in">{success}</span>}
+                    {success && <span className="text-amber-600 font-medium text-sm animate-in fade-in">{success}</span>}
                 </div>
             </div>
             {/* Hidden reCAPTCHA badge container */}

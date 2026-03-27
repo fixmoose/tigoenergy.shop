@@ -8,7 +8,7 @@ import type { User } from '@supabase/supabase-js'
 import { useTranslations } from 'next-intl'
 
 const TILE_COLORS = {
-    green: 'bg-green-600',
+    green: 'bg-amber-600',
     teal: 'bg-teal-600',
     blue: 'bg-blue-600',
     orange: 'bg-orange-500',

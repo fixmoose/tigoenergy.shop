@@ -38,13 +38,13 @@ export default function ImpressumPage() {
                             <div className="flex items-center gap-2">
                                 <span>{t('emailLabel')}</span>
                                 {emailRevealed ? (
-                                    <a href={`mailto:${email}`} className="text-green-600 hover:text-green-700 font-medium">
+                                    <a href={`mailto:${email}`} className="text-amber-600 hover:text-amber-700 font-medium">
                                         {email}
                                     </a>
                                 ) : (
                                     <button
                                         onClick={() => setEmailRevealed(true)}
-                                        className="text-green-600 hover:text-green-700 font-medium filter blur-[4px] select-none cursor-pointer transition-all hover:blur-none"
+                                        className="text-amber-600 hover:text-amber-700 font-medium filter blur-[4px] select-none cursor-pointer transition-all hover:blur-none"
                                         title={t('clickToReveal')}
                                     >
                                         {email}
@@ -54,7 +54,7 @@ export default function ImpressumPage() {
                                     </button>
                                 )}
                             </div>
-                            <p>Website: <a href={`https://${companyWebsite}`} className="text-green-600 hover:text-green-700">{companyWebsite}</a></p>
+                            <p>Website: <a href={`https://${companyWebsite}`} className="text-amber-600 hover:text-amber-700">{companyWebsite}</a></p>
                         </div>
                     </section>
 
@@ -80,7 +80,7 @@ export default function ImpressumPage() {
                             <p>{t('pDispute1')}</p>
                             <p>
                                 {t('pDispute2')}{' '}
-                                <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 break-all">
+                                <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:text-amber-700 break-all">
                                     https://ec.europa.eu/consumers/odr/
                                 </a>
                             </p>

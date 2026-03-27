@@ -492,7 +492,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                         {/* Products Section */}
                         <section className="space-y-4">
                             <div className="flex items-center gap-2 mb-4">
-                                <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center font-bold">3</span>
+                                <span className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold">3</span>
                                 <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">Products</h3>
                             </div>
 
@@ -502,13 +502,13 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                                     placeholder="Search products..."
                                     value={productSearch}
                                     onChange={(e) => setProductSearch(e.target.value)}
-                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none"
+                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
                                 />
                                 {productSearch && filteredProducts.length > 0 && (
                                     <div className="absolute top-full left-0 right-0 z-30 mt-1 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto">
                                         {filteredProducts.slice(0, 20).map(p => (
                                             <button key={p.id} type="button" onClick={() => addItem(p)}
-                                                className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center justify-between border-b last:border-b-0">
+                                                className="w-full text-left px-4 py-3 hover:bg-amber-50 flex items-center justify-between border-b last:border-b-0">
                                                 <div>
                                                     <span className="font-medium text-sm">{p.name_en}</span>
                                                     <span className="text-xs text-slate-400 ml-2">{p.sku}</span>
@@ -516,7 +516,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                                                 <div className="text-right">
                                                     <span className="font-semibold text-sm">€{(selectedCustomer.is_b2b && p.b2b_price_eur ? p.b2b_price_eur : p.price_eur).toFixed(2)}</span>
                                                     {p.stock_quantity != null && (
-                                                        <span className={`ml-2 text-xs ${p.stock_quantity > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                        <span className={`ml-2 text-xs ${p.stock_quantity > 0 ? 'text-amber-600' : 'text-red-500'}`}>
                                                             ({p.stock_quantity})
                                                         </span>
                                                     )}
@@ -606,7 +606,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                             </div>
                             <div className="border-t pt-3 flex justify-between text-lg">
                                 <span className="font-bold text-slate-800">Total</span>
-                                <span className="font-bold text-green-600">€{total.toFixed(2)}</span>
+                                <span className="font-bold text-amber-600">€{total.toFixed(2)}</span>
                             </div>
                         </div>
 
@@ -618,7 +618,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                             <button
                                 onClick={() => handleSubmit(true)}
                                 disabled={loading || items.length === 0}
-                                className="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 disabled:opacity-50 transition-colors"
                             >
                                 {loading ? 'Creating...' : 'Save & Send to Customer'}
                             </button>
