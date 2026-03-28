@@ -195,15 +195,18 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
         )
         : productResults
 
-    // VAT auto-adjustment
+    // VAT auto-adjustment: B2B cross-border (non-SI) = 0%, otherwise use market rate
     useEffect(() => {
-        const region = MARKETS[market.toUpperCase()]
-        if (selectedCustomer.is_b2b && market !== 'si') {
+        const shipCountry = shippingAddress.country?.toUpperCase()
+        const effectiveCountry = shipCountry || market.toUpperCase()
+        const isNonSI = effectiveCountry !== 'SI' || market.toUpperCase() !== 'SI'
+        if (selectedCustomer.is_b2b && isNonSI) {
             setVatRate(0)
-        } else if (region) {
-            setVatRate(region.vatRate * 100)
+        } else {
+            const region = MARKETS[market.toUpperCase()]
+            if (region) setVatRate(region.vatRate * 100)
         }
-    }, [selectedCustomer.is_b2b, market])
+    }, [selectedCustomer.is_b2b, market, shippingAddress.country])
 
     // Reprice items on B2B toggle
     useEffect(() => {
