@@ -84,6 +84,13 @@ export default function InvoicesPage() {
                     <h2 className="text-3xl font-black mt-1">{orders.filter(o => !o.invoice_url).length}</h2>
                     <p className="text-blue-100 text-xs mt-2">Orders ready for financial processing.</p>
                 </div>
+                <div className="bg-red-600 rounded-2xl p-6 text-white shadow-lg shadow-red-100">
+                    <p className="text-red-100 text-sm font-medium uppercase tracking-wider">Open Invoices</p>
+                    <h2 className="text-3xl font-black mt-1">{orders.filter(o => o.invoice_url && o.payment_status !== 'paid').length}</h2>
+                    <p className="text-red-100 text-xs mt-2">
+                        {formatCurrency(orders.filter(o => o.invoice_url && o.payment_status !== 'paid').reduce((acc, o) => acc + (o.total || 0), 0))} outstanding
+                    </p>
+                </div>
                 <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                     <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Invoiced (Q1)</p>
                     <h2 className="text-3xl font-black text-slate-800 mt-1">
@@ -141,11 +148,20 @@ export default function InvoicesPage() {
                     {formatCurrency(order.total)}
                 </td>
                 <td className="px-6 py-4 text-center">
-                    {order.invoice_url ? (
-                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold uppercase">Issued</span>
-                    ) : (
-                        <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold uppercase">Pending</span>
-                    )}
+                    <div className="flex flex-col items-center gap-1">
+                        {order.invoice_url ? (
+                            <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold uppercase">Issued</span>
+                        ) : (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-bold uppercase">Pending</span>
+                        )}
+                        {order.invoice_url && (
+                            order.payment_status === 'paid' ? (
+                                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase">Paid</span>
+                            ) : (
+                                <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px] font-bold uppercase">Open</span>
+                            )
+                        )}
+                    </div>
                 </td>
                 <td className="px-6 py-4 text-right">
                     {order.invoice_url ? (
