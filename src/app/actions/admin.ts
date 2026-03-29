@@ -75,11 +75,11 @@ export async function adjustStockForOrderAction(orderId: string) {
             return { success: true, skipped: true }
         }
 
-        // Deduct stock for each item with a product_id
+        // Adjust stock for each item with a product_id
+        // Positive qty → deduct stock; Negative qty (returns) → add stock back
         for (const item of (order.order_items || [])) {
-            if (!item.product_id || item.quantity <= 0) continue
+            if (!item.product_id || item.quantity === 0) continue
 
-            // Use RPC or manual decrement
             const { data: product } = await supabase
                 .from('products')
                 .select('stock_quantity, reserved_quantity')
@@ -89,7 +89,10 @@ export async function adjustStockForOrderAction(orderId: string) {
             if (!product) continue
 
             const newStock = Math.max(0, (product.stock_quantity || 0) - item.quantity)
-            const newReserved = Math.max(0, (product.reserved_quantity || 0) - item.quantity)
+            // Only adjust reserved for positive qty items (not returns)
+            const newReserved = item.quantity > 0
+                ? Math.max(0, (product.reserved_quantity || 0) - item.quantity)
+                : (product.reserved_quantity || 0)
 
             await supabase
                 .from('products')

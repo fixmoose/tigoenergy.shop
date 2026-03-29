@@ -56,7 +56,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
     const saveEdit = async (itemId: string) => {
         const qty = parseInt(editQty)
         const price = parseFloat(editPrice)
-        if (!qty || qty < 1 || isNaN(price) || price < 0) {
+        if (qty === 0 || isNaN(qty) || isNaN(price) || price < 0) {
             alert('Invalid quantity or price')
             return
         }
@@ -117,7 +117,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
         if (!selectedProduct) return
         const qty = parseInt(addQty)
         const price = parseFloat(addPrice)
-        if (!qty || qty < 1 || isNaN(price) || price < 0) {
+        if (qty === 0 || isNaN(qty) || isNaN(price) || price < 0) {
             alert('Invalid quantity or price')
             return
         }
@@ -196,7 +196,6 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                     <label className="text-[9px] text-slate-500 font-bold uppercase block">Qty</label>
                                     <input
                                         type="number"
-                                        min="1"
                                         value={addQty}
                                         onChange={e => setAddQty(e.target.value)}
                                         className="w-16 border rounded px-2 py-1.5 text-sm text-right"
@@ -255,11 +254,10 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                 <div className="text-xs text-slate-500">{item.sku}</div>
                                 {item.cn_code && <div className="text-xs text-slate-400 font-mono">CN: {item.cn_code}</div>}
                             </td>
-                            <td className="text-right px-4 py-4 text-slate-800">
+                            <td className={`text-right px-4 py-4 ${item.quantity < 0 ? 'text-red-600 font-medium' : 'text-slate-800'}`}>
                                 {editingItem === item.id ? (
                                     <input
                                         type="number"
-                                        min="1"
                                         value={editQty}
                                         onChange={e => setEditQty(e.target.value)}
                                         className="w-16 border rounded px-2 py-1 text-sm text-right"
@@ -289,7 +287,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                     </>
                                 )}
                             </td>
-                            <td className="text-right px-4 py-4 font-medium text-slate-800">
+                            <td className={`text-right px-4 py-4 font-medium ${(item.total_price ?? 0) < 0 ? 'text-red-600' : 'text-slate-800'}`}>
                                 {editingItem === item.id
                                     ? formatCurrency((parseInt(editQty) || 0) * (parseFloat(editPrice) || 0))
                                     : formatCurrency(item.total_price)

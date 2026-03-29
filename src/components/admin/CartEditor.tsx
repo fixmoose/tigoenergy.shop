@@ -187,9 +187,8 @@ export default function CartEditor({ cart, customer }: { cart: Cart | null; cust
                                             <td className="px-4 py-4 text-center">
                                                 <input
                                                     type="number"
-                                                    min={1}
                                                     value={it.quantity || 1}
-                                                    onChange={e => updateItem(i, Math.max(1, Number(e.target.value)))}
+                                                    onChange={e => { const v = Number(e.target.value); if (v !== 0) updateItem(i, v) }}
                                                     className="w-16 text-center border border-slate-200 rounded-lg px-2 py-1 text-sm font-bold focus:outline-none focus:border-blue-400"
                                                 />
                                             </td>
