@@ -284,7 +284,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                 market,
                 language,
                 shipping_cost: shippingCost,
-                vat_rate: vatRate / 100,
+                vat_rate: vatRate,
                 items,
                 shipping_address: includeAddress ? shippingAddress : undefined,
                 internal_notes: internalNotes || undefined,
