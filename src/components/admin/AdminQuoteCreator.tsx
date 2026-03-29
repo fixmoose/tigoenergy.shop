@@ -182,7 +182,8 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
             if (r.success) {
                 setProductResults(r.data as any)
                 // Enrich prefilled items with b2b/b2c prices from catalog
-                if (prefillItems && prefillItems.length > 0) {
+                // Skip repricing in edit mode — keep the saved quote prices
+                if (prefillItems && prefillItems.length > 0 && !editQuoteId) {
                     const catalog = r.data as ProductSnippet[]
                     setItems(prev => prev.map(item => {
                         if (item.b2c_price !== undefined) return item // already enriched
