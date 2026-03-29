@@ -39,10 +39,6 @@ export default async function Home() {
         className="relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #faf7f2 0%, #f5ede3 40%, #f0e6d6 70%, #ebe0d0 100%)' }}
       >
-        {/* roboTigo background image */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] xl:w-[600px] xl:h-[600px] pointer-events-none opacity-30">
-          <img src="/roboTigo.png" alt="" className="w-full h-full object-contain" />
-        </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 lg:pt-72 lg:pb-32">
           <div className="max-w-4xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-stone-800">
