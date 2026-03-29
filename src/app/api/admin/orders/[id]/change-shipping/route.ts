@@ -88,7 +88,9 @@ export async function POST(
 
         // Check if this order was VAT exempt (B2B cross-border)
         const wasVatExempt = parseFloat(order.vat_amount || 0) === 0 && subtotal > 0
-        const vatAmount = wasVatExempt ? 0 : (subtotal + shippingCost) * vatRate
+        // vatRate may be stored as percentage (22) or decimal (0.22) — normalize
+        const vatDecimal = vatRate > 1 ? vatRate / 100 : vatRate
+        const vatAmount = wasVatExempt ? 0 : (subtotal + shippingCost) * vatDecimal
         const total = subtotal + shippingCost + vatAmount
 
         // Update order

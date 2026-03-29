@@ -116,7 +116,7 @@ export async function adminCreateQuoteAction(payload: {
                 } : null,
                 subtotal,
                 shipping_cost: shipCost,
-                vat_rate: vRate,
+                vat_rate: vRate / 100,
                 vat_amount: vatAmount,
                 total,
                 market: quote.market || 'si',
@@ -391,7 +391,8 @@ export async function acceptQuoteAction(token: string, delivery: {
 
         // Recalculate shipping cost for pickup
         const shippingCost = isPickup ? 0 : quote.shipping_cost
-        const vatAmount = (quote.subtotal + shippingCost) * (quote.vat_rate / 100)
+        // vat_rate stored as decimal (0.22) in DB
+        const vatAmount = (quote.subtotal + shippingCost) * quote.vat_rate
         const total = quote.subtotal + shippingCost + vatAmount
 
         // Create the order
@@ -587,7 +588,7 @@ export async function adminUpdateQuoteAction(quoteId: string, payload: {
             } : null,
             subtotal,
             shipping_cost: shipCost,
-            vat_rate: vRate,
+            vat_rate: vRate / 100,
             vat_amount: vatAmount,
             total,
             market: quote.market || 'si',
