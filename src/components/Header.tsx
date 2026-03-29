@@ -268,7 +268,7 @@ export default function Header() {
         </div>
 
         {/* 2. Main Header */}
-        <div className={`text-white transition-all duration-300 ${isHome && !isScrolled ? 'bg-transparent shadow-none' : 'bg-amber-600 shadow-md'} sticky top-0 z-50`}>
+        <div className={`transition-all duration-300 ${isHome && !isScrolled ? 'bg-transparent shadow-none text-stone-800' : 'bg-[#faf8f5] shadow-md text-stone-800 border-b border-stone-200/60'} sticky top-0 z-50`}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-[80px] flex items-center justify-between gap-8">
 
             {/* Logo */}
@@ -279,8 +279,8 @@ export default function Header() {
                 className="h-10"
               />
               <div className="flex flex-col leading-tight">
-                <span className="text-white text-xs font-bold tracking-wider">TIGO ENERGY</span>
-                <span className="text-amber-100 text-[10px] font-medium tracking-wider">AUTHORIZED RESELLER</span>
+                <span className="text-stone-800 text-xs font-bold tracking-wider">TIGO ENERGY</span>
+                <span className="text-stone-400 text-[10px] font-medium tracking-wider">AUTHORIZED RESELLER</span>
               </div>
             </Link>
 
@@ -290,7 +290,7 @@ export default function Header() {
                 <input
                   type="text"
                   placeholder={t('searchPlaceholder')}
-                  className="w-full h-[48px] pl-6 pr-12 rounded-full border-none text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-amber-500/30 shadow-lg"
+                  className="w-full h-[48px] pl-6 pr-12 rounded-full border border-stone-200 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-orange-400/20 shadow-sm"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length >= 3 && setShowSuggestions(true)}
@@ -356,8 +356,8 @@ export default function Header() {
               {/* User Info Label */}
               {mounted && user && (
                 <div className="hidden lg:flex flex-col text-right mr-2 leading-tight">
-                  <span className="text-[10px] text-amber-100 font-medium opacity-80">Logged in as &quot;{isAdmin ? 'Admin' : (user.user_metadata?.customer_type?.toUpperCase() || 'B2C')}&quot;</span>
-                  <span className="text-xs font-bold truncate max-w-[180px]" title={user.email}>{user.email}</span>
+                  <span className="text-[10px] text-stone-400 font-medium">Logged in as &quot;{isAdmin ? 'Admin' : (user.user_metadata?.customer_type?.toUpperCase() || 'B2C')}&quot;</span>
+                  <span className="text-xs font-bold text-stone-700 truncate max-w-[180px]" title={user.email}>{user.email}</span>
                 </div>
               )}
 
@@ -367,15 +367,15 @@ export default function Header() {
 
                 <Link href={mounted && user ? (isAdmin || user.email?.endsWith('@tigoenergy.com') ? "/admin" : "/dashboard") : "/auth/login"} className="flex flex-col items-center">
                   {mounted && user && !isAdmin ? (
-                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-amber-50 group-hover:border-white transition shadow-sm">
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-stone-200 group-hover:border-orange-400 transition shadow-sm">
                       <img src="/b2c-avatar.png" alt="Profile" className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <svg className="w-7 h-7 text-amber-50 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-7 h-7 text-stone-500 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   )}
-                  <span className="text-xs font-medium text-amber-50 group-hover:text-white transition mt-1">
+                  <span className="text-xs font-medium text-stone-500 group-hover:text-orange-600 transition mt-1">
                     {mounted && user ? t('account') : t('signIn')}
                   </span>
                 </Link>
@@ -434,10 +434,10 @@ export default function Header() {
               {/* Orders (Optional, mimicking iHerb) */}
               {hasActiveOrders && (
                 <Link href="/dashboard#orders" className="hidden sm:flex flex-col items-center group cursor-pointer">
-                  <svg className="w-7 h-7 text-amber-50 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-7 h-7 text-stone-500 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
-                  <span className="text-xs font-medium text-amber-50 group-hover:text-white transition mt-1">{t('orders')}</span>
+                  <span className="text-xs font-medium text-stone-500 group-hover:text-orange-600 transition mt-1">{t('orders')}</span>
                 </Link>
               )}
 
@@ -445,16 +445,16 @@ export default function Header() {
               <div className="relative group z-50">
                 <Link href="/cart" className="flex flex-col items-center cursor-pointer">
                   <div className={`relative transition-transform ${cartBounce ? 'animate-cart-bounce' : ''}`}>
-                    <svg className="w-7 h-7 text-amber-50 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-7 h-7 text-stone-500 group-hover:text-orange-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     {count > 0 && (
-                      <span className={`absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-amber-600 shadow-sm transition-transform ${cartBounce ? 'scale-125' : ''}`}>
+                      <span className={`absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#faf8f5] shadow-sm transition-transform ${cartBounce ? 'scale-125' : ''}`}>
                         {count}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs font-medium text-amber-50 group-hover:text-white transition mt-1">{t('cart')}</span>
+                  <span className="text-xs font-medium text-stone-500 group-hover:text-orange-600 transition mt-1">{t('cart')}</span>
                 </Link>
 
                 {/* Cart Hover Dropdown */}
@@ -518,7 +518,7 @@ export default function Header() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1 text-white hover:bg-amber-700/50 rounded-lg transition"
+                className="lg:hidden p-1 text-stone-600 hover:bg-stone-100 rounded-lg transition"
               >
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -606,13 +606,13 @@ export default function Header() {
         </div>
 
         {/* Mobile Search (Below header on mobile) */}
-        <div className="lg:hidden bg-amber-700/5 p-4 border-b border-gray-200">
+        <div className="lg:hidden bg-stone-50 p-4 border-b border-gray-200">
           <form action="/products" method="get" className="relative w-full">
             <input
               type="text"
               name="search"
               placeholder={t('searchProducts')}
-              className="w-full h-12 pl-4 pr-12 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-amber-500 shadow-sm"
+              className="w-full h-12 pl-4 pr-12 rounded-xl border border-gray-200 bg-white text-gray-900 focus:ring-2 focus:ring-orange-400/30 shadow-sm"
             />
             <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -633,12 +633,12 @@ export default function Header() {
 
             {/* Drawer */}
             <div className="fixed inset-y-0 left-0 w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
-              <div className="p-5 bg-amber-600 text-white flex justify-between items-center shadow-md border-b border-amber-700">
+              <div className="p-5 bg-[#faf8f5] text-stone-800 flex justify-between items-center shadow-sm border-b border-stone-200">
                 <div className="flex flex-col">
                   <span className="font-bold text-xl">{t('menu')}</span>
-                  <span className="text-amber-200 text-[10px] font-medium mt-1 w-fit uppercase tracking-wider">eStore</span>
+                  <span className="text-stone-400 text-[10px] font-medium mt-1 w-fit uppercase tracking-wider">eStore</span>
                 </div>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-1 hover:bg-amber-700 rounded-full transition">
+                <button onClick={() => setMobileMenuOpen(false)} className="p-1 hover:bg-stone-200 rounded-full transition">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
