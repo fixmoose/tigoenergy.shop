@@ -409,6 +409,74 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 )
             })()}
 
+            {/* Payment form for net30 orders — rendered outside StepCard so it's visible */}
+            {paymentTerms === 'net30' && showPaymentForm && (
+                <div className="bg-white border border-amber-200 rounded-xl p-4 mb-4 space-y-2">
+                    <h4 className="text-xs font-bold text-amber-800 uppercase mb-2">Record Payment</h4>
+                    {paymentsLoaded && payments.length > 0 && (
+                        <div className="space-y-1 mb-2">
+                            {payments.map(p => (
+                                <div key={p.id} className="flex items-center justify-between bg-slate-50 rounded px-2 py-1.5 text-[10px] border">
+                                    <div>
+                                        <span className="font-bold text-amber-700">&euro;{Number(p.amount).toFixed(2)}</span>
+                                        <span className="text-slate-400 mx-1">&middot;</span>
+                                        <span className="text-slate-600">{new Date(p.payment_date).toLocaleDateString('en-GB')}</span>
+                                        <span className="text-slate-400 mx-1">&middot;</span>
+                                        <span className="text-slate-500">{p.payment_method}</span>
+                                        {p.reference && <span className="text-slate-400 ml-1">({p.reference})</span>}
+                                    </div>
+                                    <button onClick={async () => {
+                                        if (!confirm('Delete this payment record?')) return
+                                        setLoading(true)
+                                        try {
+                                            const res = await adminDeletePaymentAction(orderId, p.id)
+                                            if (res.success) { setPaymentsLoaded(false); router.refresh() }
+                                            else alert('Failed: ' + res.error)
+                                        } finally { setLoading(false) }
+                                    }} className="text-red-400 hover:text-red-600 text-[10px]">&#10005;</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-2">
+                        <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase">Amount (€)</label>
+                            <input type="number" step="0.01" value={payAmount} onChange={e => setPayAmount(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs" />
+                        </div>
+                        <div>
+                            <label className="text-[9px] text-slate-500 font-bold uppercase">Date</label>
+                            <input type="date" value={payDate} onChange={e => setPayDate(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs" />
+                        </div>
+                    </div>
+                    <select value={payMethod} onChange={e => setPayMethod(e.target.value)} className="w-full border rounded px-2 py-1.5 text-xs">
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="net30">Net 30 (Invoice)</option>
+                        <option value="wise">Wise</option>
+                        <option value="stripe">Stripe</option>
+                        <option value="cash">Cash</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="text" value={payReference} onChange={e => setPayReference(e.target.value)} placeholder="Reference (optional)" className="w-full border rounded px-2 py-1.5 text-xs" />
+                    <div className="flex gap-2">
+                        <button
+                            onClick={async () => {
+                                const amt = parseFloat(payAmount)
+                                if (!amt || amt <= 0) { alert('Enter valid amount'); return }
+                                setLoading(true)
+                                try {
+                                    const res = await adminRecordPaymentAction(orderId, amt, payDate, payMethod, payReference, payNotes)
+                                    if (res.success) { setShowPaymentForm(false); setPayReference(''); setPayNotes(''); setPaymentsLoaded(false); router.refresh() }
+                                    else { alert('Failed: ' + res.error) }
+                                } finally { setLoading(false) }
+                            }}
+                            disabled={loading}
+                            className="flex-1 py-1.5 bg-amber-600 text-white rounded text-xs font-bold hover:bg-amber-700 disabled:opacity-50"
+                        >{loading ? 'Saving...' : 'Confirm'}</button>
+                        <button onClick={() => setShowPaymentForm(false)} className="px-3 py-1.5 bg-white border rounded text-xs text-slate-600 hover:bg-slate-50">Cancel</button>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-8 gap-2 items-start">
                 {/* Step 1: Order Received */}
                 <StepCard step="received" currentStep={currentStep} title="Order Received" subtitle={createdAt ? new Date(createdAt).toLocaleDateString('en-GB') : ''} icon="1" color="slate">
