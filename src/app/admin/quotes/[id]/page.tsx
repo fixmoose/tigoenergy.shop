@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { getQuoteAction, adminSendQuoteAction, adminUpdateQuoteStatusAction, adminDeleteQuoteAction, acceptQuoteAction } from '@/app/actions/quotes'
+import AdminQuoteCreator from '@/components/admin/AdminQuoteCreator'
 
 function formatCurrency(amount: number | null | undefined) {
     if (amount == null) return '€0.00'
@@ -25,6 +26,7 @@ export default function AdminQuoteDetailPage() {
     const [quote, setQuote] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [actionLoading, setActionLoading] = useState('')
+    const [isEditOpen, setIsEditOpen] = useState(false)
 
     async function loadQuote() {
         const res = await getQuoteAction(quoteId)
@@ -169,6 +171,13 @@ export default function AdminQuoteDetailPage() {
                     <div className="bg-white rounded-xl shadow-sm border p-6 space-y-3">
                         <h2 className="font-bold text-slate-800 mb-4">Actions</h2>
 
+                        {quote.status !== 'accepted' && (
+                            <button onClick={() => setIsEditOpen(true)}
+                                className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 text-sm">
+                                Edit Quote
+                            </button>
+                        )}
+
                         <a href={`/api/admin/quotes/${quoteId}/pdf`} target="_blank" rel="noopener noreferrer"
                             className="w-full py-2.5 bg-teal-50 text-teal-700 rounded-lg font-medium hover:bg-teal-100 text-sm text-center border border-teal-200 flex items-center justify-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
@@ -310,6 +319,47 @@ export default function AdminQuoteDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {isEditOpen && quote && (
+                <AdminQuoteCreator
+                    onClose={() => setIsEditOpen(false)}
+                    onCreated={() => { loadQuote(); setIsEditOpen(false) }}
+                    editQuoteId={quote.id}
+                    prefillItems={items.map((it: any) => ({
+                        product_id: it.product_id || 'custom-' + it.id,
+                        product_name: it.product_name,
+                        sku: it.sku,
+                        quantity: it.quantity,
+                        unit_price: it.unit_price,
+                        weight_kg: it.weight_kg,
+                    }))}
+                    prefillCustomer={{
+                        id: quote.customer_id,
+                        email: quote.customer_email,
+                        first_name: quote.shipping_address?.first_name || '',
+                        last_name: quote.shipping_address?.last_name || '',
+                        company_name: quote.company_name,
+                        vat_id: quote.vat_id,
+                        phone: quote.customer_phone,
+                        is_b2b: quote.is_b2b,
+                    }}
+                    editDefaults={{
+                        market: quote.market,
+                        language: quote.language,
+                        vatRate: typeof quote.vat_rate === 'number' && quote.vat_rate < 1 ? quote.vat_rate * 100 : quote.vat_rate,
+                        shippingCost: quote.shipping_cost,
+                        expiresDays: Math.max(1, Math.ceil((new Date(quote.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))),
+                        internalNotes: quote.internal_notes || '',
+                        shippingAddress: quote.shipping_address ? {
+                            street: quote.shipping_address.street || '',
+                            street2: quote.shipping_address.street2 || '',
+                            city: quote.shipping_address.city || '',
+                            postal_code: quote.shipping_address.postal_code || '',
+                            country: quote.shipping_address.country || 'SI',
+                        } : undefined,
+                    }}
+                />
+            )}
         </div>
     )
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { searchProductsAction } from '@/app/actions/products'
 import { searchCustomersAction, getCustomerLatestOrderAction } from '@/app/actions/customers'
-import { adminCreateQuoteAction } from '@/app/actions/quotes'
+import { adminCreateQuoteAction, adminUpdateQuoteAction } from '@/app/actions/quotes'
 import { MARKETS } from '@/lib/constants/markets'
 
 interface ProductSnippet {
@@ -56,9 +56,19 @@ interface AdminQuoteCreatorProps {
     onCreated: () => void
     prefillItems?: PrefillItem[]
     prefillCustomer?: PrefillCustomer | null
+    editQuoteId?: string | null
+    editDefaults?: {
+        market?: string
+        language?: string
+        vatRate?: number
+        shippingCost?: number
+        expiresDays?: number
+        internalNotes?: string
+        shippingAddress?: { street: string; street2?: string; city: string; postal_code: string; country: string }
+    }
 }
 
-export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, prefillCustomer }: AdminQuoteCreatorProps) {
+export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, prefillCustomer, editQuoteId, editDefaults }: AdminQuoteCreatorProps) {
     const [loading, setLoading] = useState(false)
 
     // Customer Data
@@ -108,19 +118,25 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
         || prefillCustomer?.addresses?.find((a: any) => !a.isViesAddress)
         || prefillCustomer?.addresses?.[0]
 
-    const [vatRate, setVatRate] = useState(22)
-    const [shippingCost, setShippingCost] = useState(0)
+    const [vatRate, setVatRate] = useState(editDefaults?.vatRate ?? 22)
+    const [shippingCost, setShippingCost] = useState(editDefaults?.shippingCost ?? 0)
     const prefillCountry = prefillAddr?.country?.toUpperCase()
     const prefillMarket = prefillCountry ? Object.values(MARKETS).find(m => m.country === prefillCountry) : null
-    const [market, setMarket] = useState(prefillMarket?.key.toLowerCase() || 'si')
-    const [language, setLanguage] = useState('sl')
-    const [expiresDays, setExpiresDays] = useState(30)
-    const [internalNotes, setInternalNotes] = useState('')
-    const [includeAddress, setIncludeAddress] = useState(!!prefillCustomer?.addresses?.length)
+    const [market, setMarket] = useState(editDefaults?.market || prefillMarket?.key.toLowerCase() || 'si')
+    const [language, setLanguage] = useState(editDefaults?.language || 'sl')
+    const [expiresDays, setExpiresDays] = useState(editDefaults?.expiresDays ?? 30)
+    const [internalNotes, setInternalNotes] = useState(editDefaults?.internalNotes || '')
+    const [includeAddress, setIncludeAddress] = useState(!!editDefaults?.shippingAddress || !!prefillCustomer?.addresses?.length)
     const [shippingAddrMode, setShippingAddrMode] = useState<'manual' | string>('manual')
 
     const [shippingAddress, setShippingAddress] = useState(
-        prefillAddr ? {
+        editDefaults?.shippingAddress ? {
+            street: editDefaults.shippingAddress.street || '',
+            street2: editDefaults.shippingAddress.street2 || '',
+            city: editDefaults.shippingAddress.city || '',
+            postal_code: editDefaults.shippingAddress.postal_code || '',
+            country: (editDefaults.shippingAddress.country || 'SI').toUpperCase()
+        } : prefillAddr ? {
             street: prefillAddr.street || '',
             street2: prefillAddr.street2 || '',
             city: prefillAddr.city || '',
@@ -258,27 +274,42 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
 
         setLoading(true)
         try {
-            const res = await adminCreateQuoteAction({
-                customer: selectedCustomer as any,
-                quote: {
-                    market,
-                    language,
-                    shipping_cost: shippingCost,
-                    vat_rate: vatRate / 100,
-                    items,
-                    shipping_address: includeAddress ? shippingAddress : undefined,
-                    internal_notes: internalNotes || undefined,
-                    expires_days: expiresDays,
-                },
-                sendImmediately,
-            })
+            const quotePayload = {
+                market,
+                language,
+                shipping_cost: shippingCost,
+                vat_rate: vatRate / 100,
+                items,
+                shipping_address: includeAddress ? shippingAddress : undefined,
+                internal_notes: internalNotes || undefined,
+                expires_days: expiresDays,
+            }
 
-            if (res.success) {
-                alert(sendImmediately ? `Quote ${res.quoteNumber} created and sent!` : `Quote ${res.quoteNumber} saved as draft`)
-                onCreated()
-                onClose()
+            if (editQuoteId) {
+                const res = await adminUpdateQuoteAction(editQuoteId, {
+                    customer: selectedCustomer as any,
+                    quote: quotePayload,
+                })
+                if (res.success) {
+                    alert('Quote updated!')
+                    onCreated()
+                    onClose()
+                } else {
+                    alert(res.error)
+                }
             } else {
-                alert(res.error)
+                const res = await adminCreateQuoteAction({
+                    customer: selectedCustomer as any,
+                    quote: quotePayload,
+                    sendImmediately,
+                })
+                if (res.success) {
+                    alert(sendImmediately ? `Quote ${res.quoteNumber} created and sent!` : `Quote ${res.quoteNumber} saved as draft`)
+                    onCreated()
+                    onClose()
+                } else {
+                    alert(res.error)
+                }
             }
         } catch (err: any) {
             alert(err.message)
@@ -312,8 +343,8 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                 {/* Header */}
                 <div className="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">Create Quote / Ponudba</h2>
-                        <p className="text-xs text-slate-500 mt-1">Create a quote for a customer. They will receive an email with a link to accept it.</p>
+                        <h2 className="text-xl font-bold text-slate-900">{editQuoteId ? 'Edit Quote / Uredi ponudbo' : 'Create Quote / Ponudba'}</h2>
+                        <p className="text-xs text-slate-500 mt-1">{editQuoteId ? 'Modify this quote. Changes will be saved immediately.' : 'Create a quote for a customer. They will receive an email with a link to accept it.'}</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -618,20 +649,32 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                         </div>
 
                         <div className="mt-auto pt-8 space-y-3">
-                            <button
-                                onClick={() => handleSubmit(true)}
-                                disabled={loading || items.length === 0}
-                                className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 disabled:opacity-50 transition-colors"
-                            >
-                                {loading ? 'Creating...' : 'Save & Send to Customer'}
-                            </button>
-                            <button
-                                onClick={() => handleSubmit(false)}
-                                disabled={loading || items.length === 0}
-                                className="w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 disabled:opacity-50 transition-colors"
-                            >
-                                Save as Draft
-                            </button>
+                            {editQuoteId ? (
+                                <button
+                                    onClick={() => handleSubmit(false)}
+                                    disabled={loading || items.length === 0}
+                                    className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => handleSubmit(true)}
+                                        disabled={loading || items.length === 0}
+                                        className="w-full py-3 bg-amber-600 text-white rounded-xl font-bold hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                                    >
+                                        {loading ? 'Creating...' : 'Save & Send to Customer'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleSubmit(false)}
+                                        disabled={loading || items.length === 0}
+                                        className="w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-300 disabled:opacity-50 transition-colors"
+                                    >
+                                        Save as Draft
+                                    </button>
+                                </>
+                            )}
                             <button
                                 onClick={onClose}
                                 className="w-full py-2 text-slate-400 text-sm hover:text-slate-600"

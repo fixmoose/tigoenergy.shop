@@ -503,6 +503,128 @@ export async function acceptQuoteAction(token: string, delivery: {
     }
 }
 
+// ─── Update Quote (edit fields + items) ─────────────────────────────────────
+
+export async function adminUpdateQuoteAction(quoteId: string, payload: {
+    customer: {
+        id?: string
+        email: string
+        first_name: string
+        last_name: string
+        company_name?: string
+        vat_id?: string
+        phone?: string
+        is_b2b?: boolean
+    }
+    quote: {
+        market: string
+        language?: string
+        shipping_cost: number
+        vat_rate: number
+        items: {
+            product_id: string
+            product_name: string
+            sku: string
+            quantity: number
+            unit_price: number
+            weight_kg?: number
+        }[]
+        shipping_address?: {
+            street: string
+            city: string
+            postal_code: string
+            country: string
+            street2?: string
+        }
+        billing_address?: {
+            street: string
+            city: string
+            postal_code: string
+            country: string
+            street2?: string
+        }
+        internal_notes?: string
+        expires_days?: number
+    }
+}) {
+    try {
+        if (!await checkIsAdmin()) throw new Error('Unauthorized')
+        const supabase = await createAdminClient()
+
+        // Only allow editing non-accepted quotes
+        const { data: existing } = await supabase.from('quotes').select('status').eq('id', quoteId).single()
+        if (!existing) throw new Error('Quote not found')
+        if (existing.status === 'accepted') throw new Error('Cannot edit an accepted quote')
+
+        const { customer, quote } = payload
+
+        // Recalculate totals
+        const subtotal = quote.items.reduce((acc, item) => acc + (item.unit_price * item.quantity), 0)
+        const shipCost = parseFloat(quote.shipping_cost as any) || 0
+        const vRate = parseFloat(quote.vat_rate as any) || 0
+        const vatAmount = (subtotal + shipCost) * (vRate / 100)
+        const total = subtotal + shipCost + vatAmount
+
+        const expiresDays = quote.expires_days || 30
+        const expiresAt = new Date(Date.now() + expiresDays * 24 * 60 * 60 * 1000).toISOString()
+
+        // Update quote record
+        const { error: updateErr } = await supabase.from('quotes').update({
+            customer_email: customer.email,
+            customer_phone: customer.phone || null,
+            company_name: customer.company_name || null,
+            vat_id: customer.vat_id || null,
+            is_b2b: !!customer.is_b2b,
+            shipping_address: quote.shipping_address ? {
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                ...quote.shipping_address,
+            } : null,
+            billing_address: quote.billing_address ? {
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                ...quote.billing_address,
+            } : null,
+            subtotal,
+            shipping_cost: shipCost,
+            vat_rate: vRate,
+            vat_amount: vatAmount,
+            total,
+            market: quote.market || 'si',
+            language: quote.language || 'en',
+            internal_notes: quote.internal_notes || null,
+            expires_at: expiresAt,
+            updated_at: new Date().toISOString(),
+        }).eq('id', quoteId)
+
+        if (updateErr) throw updateErr
+
+        // Replace items: delete old, insert new
+        await supabase.from('quote_items').delete().eq('quote_id', quoteId)
+
+        const quoteItems = quote.items.map(i => ({
+            quote_id: quoteId,
+            product_id: i.product_id?.startsWith('custom-') ? null : i.product_id,
+            sku: i.sku || 'CUSTOM',
+            product_name: i.product_name,
+            quantity: i.quantity,
+            unit_price: i.unit_price,
+            total_price: i.unit_price * i.quantity,
+            weight_kg: i.weight_kg || null,
+        }))
+
+        const { error: itemsErr } = await supabase.from('quote_items').insert(quoteItems)
+        if (itemsErr) throw itemsErr
+
+        revalidatePath('/admin/quotes')
+        revalidatePath(`/admin/quotes/${quoteId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error updating quote:', err)
+        return { success: false, error: err.message || 'Failed to update quote' }
+    }
+}
+
 // ─── Update Quote Status ────────────────────────────────────────────────────
 
 export async function adminUpdateQuoteStatusAction(quoteId: string, status: 'expired' | 'declined') {
