@@ -9,6 +9,10 @@ export default function TopBanner() {
   const t = useTranslations('topBanner')
 
   useEffect(() => {
+    // Hide on .si and .hr domains — those are our own branded stores
+    const host = window.location.hostname.replace(/^www\./, '')
+    if (host.endsWith('.si') || host.endsWith('.hr')) return
+
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) setVisible(true)
