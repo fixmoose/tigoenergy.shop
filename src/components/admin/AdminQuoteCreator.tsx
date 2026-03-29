@@ -263,9 +263,14 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
     }
 
     const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index))
-    const updateItemQty = (index: number, qty: number) => {
+    const updateItemQty = (index: number, raw: string) => {
         const newItems = [...items]
-        newItems[index].quantity = qty === 0 ? 1 : (isNaN(qty) ? 1 : qty)
+        if (raw === '' || raw === '-') {
+            newItems[index].quantity = 0
+        } else {
+            const qty = parseInt(raw)
+            if (!isNaN(qty)) newItems[index].quantity = qty
+        }
         setItems(newItems)
     }
 
@@ -594,7 +599,7 @@ export default function AdminQuoteCreator({ onClose, onCreated, prefillItems, pr
                                                     </td>
                                                     <td className="px-4 py-2 text-slate-400">{item.sku}</td>
                                                     <td className="px-4 py-2 text-center">
-                                                        <input type="number" value={item.quantity} onChange={e => updateItemQty(i, parseInt(e.target.value))}
+                                                        <input type="number" value={item.quantity} onChange={e => updateItemQty(i, e.target.value)}
                                                             className="w-16 text-center px-2 py-1 border rounded text-sm" />
                                                     </td>
                                                     <td className="px-4 py-2 text-right">
