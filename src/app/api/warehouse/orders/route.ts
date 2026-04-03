@@ -32,16 +32,20 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
     }
 
-    // Recently completed orders (shipped/delivered/completed in last 7 days)
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    const { data: completedOrders } = await supabase
+    // Recently completed orders (shipped/delivered/completed) with pagination
+    const completedDays = parseInt(req.nextUrl.searchParams.get('completed_days') || '30') || 30
+    const completedOffset = parseInt(req.nextUrl.searchParams.get('completed_offset') || '0') || 0
+    const completedLimit = parseInt(req.nextUrl.searchParams.get('completed_limit') || '20') || 20
+    const cutoff = new Date(Date.now() - completedDays * 24 * 60 * 60 * 1000).toISOString()
+
+    const { data: completedOrders, count: completedTotal } = await supabase
         .from('orders')
-        .select(selectFields)
+        .select(selectFields, { count: 'exact' })
         .in('status', ['shipped', 'delivered', 'completed'])
-        .gte('updated_at', sevenDaysAgo)
+        .gte('updated_at', cutoff)
         .not('warehouse_actions', 'eq', '[]')
         .order('updated_at', { ascending: false })
-        .limit(50)
+        .range(completedOffset, completedOffset + completedLimit - 1)
 
     const allOrders = orders || []
     const pickup = allOrders.filter((o: any) => o.shipping_carrier === 'Personal Pick-up')
@@ -51,6 +55,7 @@ export async function GET(req: NextRequest) {
         pickup,
         delivery,
         completed: completedOrders || [],
+        completedTotal: completedTotal || 0,
         driverName: driver.name,
     })
 }

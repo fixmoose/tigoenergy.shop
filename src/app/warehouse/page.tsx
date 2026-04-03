@@ -44,8 +44,12 @@ export default function WarehousePortal() {
     const [pickupOrders, setPickupOrders] = useState<WarehouseOrder[]>([])
     const [deliveryOrders, setDeliveryOrders] = useState<WarehouseOrder[]>([])
     const [completedOrders, setCompletedOrders] = useState<WarehouseOrder[]>([])
+    const [completedTotal, setCompletedTotal] = useState(0)
+    const [completedOffset, setCompletedOffset] = useState(0)
+    const [loadingMore, setLoadingMore] = useState(false)
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
+    const COMPLETED_PAGE_SIZE = 20
 
     // On mount, pre-fill email from localStorage
     useEffect(() => {
@@ -71,7 +75,7 @@ export default function WarehousePortal() {
         if (!email) return
         setLoading(true)
         try {
-            const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}`)
+            const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}&completed_days=30&completed_limit=${COMPLETED_PAGE_SIZE}&completed_offset=0`)
             if (!res.ok) {
                 if (res.status === 401) {
                     setEmailConfirmed(false)
@@ -86,6 +90,8 @@ export default function WarehousePortal() {
             setPickupOrders(data.pickup || [])
             setDeliveryOrders(data.delivery || [])
             setCompletedOrders(data.completed || [])
+            setCompletedTotal(data.completedTotal || 0)
+            setCompletedOffset(COMPLETED_PAGE_SIZE)
             setDriverName(data.driverName || '')
         } catch (err) {
             console.error('Failed to fetch orders:', err)
@@ -93,6 +99,23 @@ export default function WarehousePortal() {
             setLoading(false)
         }
     }, [email])
+
+    const loadMoreCompleted = useCallback(async () => {
+        if (!email) return
+        setLoadingMore(true)
+        try {
+            const res = await fetch(`/api/warehouse/orders?email=${encodeURIComponent(email)}&completed_days=30&completed_limit=${COMPLETED_PAGE_SIZE}&completed_offset=${completedOffset}`)
+            if (!res.ok) throw new Error('Failed to fetch')
+            const data = await res.json()
+            setCompletedOrders(prev => [...prev, ...(data.completed || [])])
+            setCompletedTotal(data.completedTotal || 0)
+            setCompletedOffset(prev => prev + COMPLETED_PAGE_SIZE)
+        } catch (err) {
+            console.error('Failed to load more:', err)
+        } finally {
+            setLoadingMore(false)
+        }
+    }, [email, completedOffset])
 
     // Auto-refresh every 30s — only after email is confirmed
     useEffect(() => {
@@ -338,9 +361,9 @@ export default function WarehousePortal() {
                         <div className="flex items-center gap-2 mb-3">
                             <div className="w-3 h-3 bg-slate-500 rounded-full" />
                             <h2 className="text-slate-400 font-bold text-sm uppercase tracking-wide">
-                                Zaključena naročila (zadnjih 7 dni)
+                                Zaključena naročila (zadnjih 30 dni)
                             </h2>
-                            <span className="text-slate-600 text-xs">({completedOrders.length})</span>
+                            <span className="text-slate-600 text-xs">({completedOrders.length}{completedTotal > completedOrders.length ? ` / ${completedTotal}` : ''})</span>
                         </div>
                         <div className="space-y-1">
                             {completedOrders.map(order => {
@@ -350,7 +373,6 @@ export default function WarehousePortal() {
                                     : order.customer_email
                                 const isPickup = order.shipping_carrier === 'Personal Pick-up'
                                 const actions = order.warehouse_actions || []
-                                const preparedAt = actions.find(a => a.action === 'marked_prepared')?.at
                                 const completedAt = actions.find(a => a.action === 'marked_picked_up' || a.action === 'marked_dpd_picked_up')?.at
 
                                 return (
@@ -373,6 +395,15 @@ export default function WarehousePortal() {
                                 )
                             })}
                         </div>
+                        {completedTotal > completedOrders.length && (
+                            <button
+                                onClick={loadMoreCompleted}
+                                disabled={loadingMore}
+                                className="w-full mt-3 py-2.5 bg-slate-800 border border-slate-700 text-slate-400 rounded-lg text-xs font-medium hover:bg-slate-700 hover:text-slate-300 transition disabled:opacity-50"
+                            >
+                                {loadingMore ? 'Nalagam...' : `Prikaži več (${completedTotal - completedOrders.length} preostalih)`}
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
