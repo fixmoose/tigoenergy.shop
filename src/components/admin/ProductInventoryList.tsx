@@ -1,12 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { Product } from '@/types/database'
 import { PRODUCT_CATEGORIES } from '@/lib/constants/categories'
-import { updateProductStatus, updateProductFeatured } from '@/app/actions/products'
+import { updateProductStatus, updateProductFeatured, getOrderedQuantities } from '@/app/actions/products'
 
 export default function ProductInventoryList({ products }: { products: Product[] }) {
+    const [orderedQty, setOrderedQty] = useState<Record<string, number>>({})
+
+    useEffect(() => {
+        getOrderedQuantities().then(res => {
+            if (res.success && res.data) setOrderedQty(res.data)
+        })
+    }, [])
     // Group products by Category
     const categoryOrder = Object.keys(PRODUCT_CATEGORIES)
     const productsByCategory = products.reduce((acc, p) => {
@@ -28,7 +35,7 @@ export default function ProductInventoryList({ products }: { products: Product[]
     return (
         <div className="space-y-4">
             {sortedCategories.map(([category, items]) => (
-                <CollapsibleCategory key={category} category={category} items={items} />
+                <CollapsibleCategory key={category} category={category} items={items} orderedQty={orderedQty} />
             ))}
             {products.length === 0 && (
                 <p className="text-gray-400 text-center text-sm py-4">No products found.</p>
@@ -37,7 +44,7 @@ export default function ProductInventoryList({ products }: { products: Product[]
     )
 }
 
-function CollapsibleCategory({ category, items }: { category: string, items: Product[] }) {
+function CollapsibleCategory({ category, items, orderedQty }: { category: string, items: Product[], orderedQty: Record<string, number> }) {
     const [isOpen, setIsOpen] = useState(false)
 
     // Subgroup Function
@@ -73,7 +80,7 @@ function CollapsibleCategory({ category, items }: { category: string, items: Pro
             {isOpen && (
                 <div className="p-2 space-y-2">
                     {sortedSubCategories.map(([sub, subItems]) => (
-                        <CollapsibleSubCategory key={sub} subcategory={sub} items={subItems} />
+                        <CollapsibleSubCategory key={sub} subcategory={sub} items={subItems} orderedQty={orderedQty} />
                     ))}
                 </div>
             )}
@@ -81,7 +88,7 @@ function CollapsibleCategory({ category, items }: { category: string, items: Pro
     )
 }
 
-function CollapsibleSubCategory({ subcategory, items }: { subcategory: string, items: Product[] }) {
+function CollapsibleSubCategory({ subcategory, items, orderedQty }: { subcategory: string, items: Product[], orderedQty: Record<string, number> }) {
     // Default open for convenience? Or closed?
     // User asked for "subcategories collapse", implying they exist.
     // Let's make them collapsible but maybe default open to see content easily.
@@ -123,9 +130,19 @@ function CollapsibleSubCategory({ subcategory, items }: { subcategory: string, i
                                 <div className="font-medium text-sm text-gray-800 truncate group-hover:text-blue-700">{p.name_en}</div>
                                 <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-0.5">
                                     <span className="font-mono bg-gray-100 px-1 rounded">{p.sku}</span>
-                                    <span className={`font-medium ${p.stock_quantity !== null && p.stock_quantity !== undefined && p.stock_quantity < (p.low_stock_threshold || 5) ? 'text-red-500' : 'text-gray-500'}`}>
-                                        {p.stock_quantity ?? 0}{p.reserved_quantity ? <span className="text-orange-500"> ({p.reserved_quantity} res)</span> : null}
-                                    </span>
+                                    {(() => {
+                                        const total = p.stock_quantity ?? 0
+                                        const ordered = orderedQty[p.id] || 0
+                                        const available = total - ordered
+                                        const isLow = available < (p.low_stock_threshold || 5)
+                                        return (
+                                            <span className={`font-medium ${isLow ? 'text-red-500' : 'text-gray-500'}`}>
+                                                {total} stk
+                                                {ordered > 0 && <span className="text-orange-500"> / {ordered} ord</span>}
+                                                {ordered > 0 && <span className={isLow ? 'text-red-600 font-bold' : 'text-green-600'}> / {available} avl</span>}
+                                            </span>
+                                        )
+                                    })()}
                                 </div>
                             </div>
 

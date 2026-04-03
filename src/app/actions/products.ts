@@ -1,7 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 
 export async function updateProductStatus(id: string, active: boolean) {
     try {
@@ -41,6 +42,54 @@ export async function updateProductFeatured(id: string, featured: boolean) {
     }
 }
 
+
+/**
+ * Get ordered quantities per product from active orders.
+ * Active = pending, processing, shipped (not cancelled, not delivered).
+ * Returns: { [product_id]: number }
+ */
+export async function getOrderedQuantities(): Promise<{ success: boolean; data?: Record<string, number>; error?: string }> {
+    try {
+        const cookieStore = await cookies()
+        if (cookieStore.get('tigo-admin')?.value !== '1') {
+            return { success: false, error: 'Unauthorized' }
+        }
+
+        const supabase = await createAdminClient()
+
+        // Fetch all order_items for active orders (pending, processing, shipped)
+        const { data: orders, error: ordersError } = await supabase
+            .from('orders')
+            .select('id')
+            .in('status', ['pending', 'processing', 'shipped'])
+
+        if (ordersError) throw ordersError
+        if (!orders || orders.length === 0) return { success: true, data: {} }
+
+        const orderIds = orders.map(o => o.id)
+
+        // Fetch items in batches if needed (Supabase .in() limit)
+        const { data: items, error: itemsError } = await supabase
+            .from('order_items')
+            .select('product_id, quantity')
+            .in('order_id', orderIds)
+            .not('product_id', 'is', null)
+
+        if (itemsError) throw itemsError
+
+        const quantities: Record<string, number> = {}
+        for (const item of items || []) {
+            if (item.product_id && item.quantity > 0) {
+                quantities[item.product_id] = (quantities[item.product_id] || 0) + item.quantity
+            }
+        }
+
+        return { success: true, data: quantities }
+    } catch (err: any) {
+        console.error('Error in getOrderedQuantities:', err)
+        return { success: false, error: err.message || 'Failed to get ordered quantities' }
+    }
+}
 
 export async function searchProductsAction(query: string) {
     try {

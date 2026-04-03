@@ -23,7 +23,7 @@ export async function generatePdfFromHtml(html: string) {
             <head>
                 <meta charset="UTF-8">
                 <style>
-                    body { margin: 0; padding: 0; }
+                    html, body { margin: 0; padding: 0; height: auto; overflow: hidden; }
                     @page { size: A4; margin: 0; }
                     * { -webkit-print-color-adjust: exact; }
                     .no-break { page-break-inside: avoid; }

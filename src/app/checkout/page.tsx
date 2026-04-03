@@ -93,6 +93,7 @@ export default function CheckoutPage() {
     const [shippingRates, setShippingRates] = useState<any[]>([])
     const [allDpdRates, setAllDpdRates] = useState<{ min_weight_kg: number; max_weight_kg: number; rate_eur: number }[]>([])
     const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
+    const [bulkShippingMethod, setBulkShippingMethod] = useState<'intereuropa' | 'pickup' | null>(null)
     const [loadingRates, setLoadingRates] = useState(false)
     const [customerPaymentTerms, setCustomerPaymentTerms] = useState<string>('prepayment')
     const [pickupPaymentAcknowledged, setPickupPaymentAcknowledged] = useState(false)
@@ -377,6 +378,16 @@ export default function CheckoutPage() {
     const boxCount = parcels.length
     const showInterEuropa = totalWeight > 100 || boxCount > 5
 
+    // Split shipping detection: items producing >10 boxes individually are "bulk"
+    const bulkItems: typeof items = []
+    const standardItems: typeof items = []
+    for (const item of items) {
+        const itemParcels = calculateTigoParcels([{ name: item.name, sku: item.sku || '', quantity: item.quantity, weight_kg: item.weight_kg || 0 }])
+        if (itemParcels.length > 10) bulkItems.push(item)
+        else standardItems.push(item)
+    }
+    const hasSplitShipping = bulkItems.length > 0 && standardItems.length > 0 && !isPalletMode
+
     useEffect(() => {
         const fetchRates = async () => {
             if (!formData.shipping_country) return
@@ -629,6 +640,10 @@ export default function CheckoutPage() {
             setError(t('selectShippingMethod'))
             return false
         }
+        if (hasSplitShipping && !bulkShippingMethod) {
+            setError('Please select a shipping method for bulk items')
+            return false
+        }
         const missing = requiredFields.filter(field => {
             const val = formData[field as keyof typeof formData]
             if (typeof val === 'boolean') return !val
@@ -720,6 +735,10 @@ export default function CheckoutPage() {
             if (selectedShippingId) data.append('shipping_id', selectedShippingId)
             if (modifyingOrder) data.append('original_order_id', modifyingOrder.orderId)
             if (pickupPaymentAcknowledged) data.append('pickup_payment_proof_required', 'true')
+            if (hasSplitShipping && bulkShippingMethod) {
+                data.append('bulk_shipping_method', bulkShippingMethod)
+                data.append('bulk_item_skus', JSON.stringify(bulkItems.map(i => i.sku)))
+            }
 
             const res = await placeOrder({}, data)
             if (res.error) {
@@ -1062,11 +1081,31 @@ export default function CheckoutPage() {
                                 <div className="space-y-3"><div className="h-16 bg-gray-50 animate-pulse rounded-xl" /><div className="h-16 bg-gray-50 animate-pulse rounded-xl" /></div>
                             ) : shippingRates.length > 0 ? (
                                 <div className="space-y-3">
-                                    {shippingRates.map((rate) => {
+                                    {hasSplitShipping && (
+                                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-2">
+                                            <div className="font-bold text-amber-800 text-sm mb-2">Split Shipping</div>
+                                            <p className="text-xs text-amber-700 mb-3">Your order contains both standard and bulk items. Please choose shipping for each group separately.</p>
+
+                                            {/* Standard items section */}
+                                            <div className="mb-3">
+                                                <div className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Standard Items ({standardItems.length})</div>
+                                                <div className="text-xs text-gray-500 mb-2">{standardItems.map(i => i.name).join(', ')}</div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Standard shipping options (or all options if no split) */}
+                                    {shippingRates
+                                        .filter(rate => !hasSplitShipping || rate.carrier !== 'InterEuropa')
+                                        .map((rate) => {
                                         const isPickup = rate.carrier === 'Personal Pick-up'
                                         const isIE = rate.carrier === 'InterEuropa'
-                                        const effectiveRate = rate.carrier === 'DPD' && boxCount > 1
-                                            ? calculateDPDShippingCost(parcels, allDpdRates)
+                                        const stdParcels = hasSplitShipping
+                                            ? calculateTigoParcels(standardItems as any)
+                                            : parcels
+                                        const stdBoxCount = hasSplitShipping ? stdParcels.length : boxCount
+                                        const effectiveRate = rate.carrier === 'DPD' && stdBoxCount > 1
+                                            ? calculateDPDShippingCost(stdParcels, allDpdRates)
                                             : rate.rate_eur
                                         return (
                                             <label key={rate.id} className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${selectedShippingId === rate.id ? (isIE ? 'border-blue-500 bg-blue-50' : 'border-amber-500 bg-amber-50') : 'border-gray-200 hover:border-amber-300'}`}>
@@ -1075,9 +1114,9 @@ export default function CheckoutPage() {
                                                     <div>
                                                         <div className="font-bold text-gray-900">
                                                             {isPickup ? t('personalPickup') : isIE ? 'InterEuropa Pallet' : `${rate.carrier} ${t('standard')}`}
-                                                            {rate.carrier === 'DPD' && boxCount > 1 && (
+                                                            {rate.carrier === 'DPD' && stdBoxCount > 1 && (
                                                                 <span className="ml-2 text-xs font-normal text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded">
-                                                                    ({boxCount} {t('boxes')})
+                                                                    ({stdBoxCount} {t('boxes')})
                                                                 </span>
                                                             )}
                                                         </div>
@@ -1094,6 +1133,36 @@ export default function CheckoutPage() {
                                             </label>
                                         )
                                     })}
+
+                                    {/* Bulk items shipping section */}
+                                    {hasSplitShipping && (
+                                        <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                                            <div className="text-xs font-bold text-orange-800 uppercase tracking-wider mb-1">Bulk / Pallet Items ({bulkItems.length})</div>
+                                            <div className="text-xs text-orange-600 mb-3">{bulkItems.map(i => `${i.name} (${i.quantity}x)`).join(', ')}</div>
+                                            <div className="space-y-2">
+                                                <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all ${bulkShippingMethod === 'intereuropa' ? 'border-orange-500 bg-orange-100' : 'border-gray-200 hover:border-orange-300 bg-white'}`}>
+                                                    <div className="flex items-center gap-3">
+                                                        <input type="radio" name="bulk_shipping" value="intereuropa" checked={bulkShippingMethod === 'intereuropa'} onChange={() => setBulkShippingMethod('intereuropa')} className="text-orange-600" />
+                                                        <div>
+                                                            <div className="font-bold text-gray-900 text-sm">InterEuropa Pallet</div>
+                                                            <div className="text-xs text-gray-500">Price confirmed after order</div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                {formData.shipping_country === 'SI' && (
+                                                    <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all ${bulkShippingMethod === 'pickup' ? 'border-orange-500 bg-orange-100' : 'border-gray-200 hover:border-orange-300 bg-white'}`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <input type="radio" name="bulk_shipping" value="pickup" checked={bulkShippingMethod === 'pickup'} onChange={() => setBulkShippingMethod('pickup')} className="text-orange-600" />
+                                                            <div>
+                                                                <div className="font-bold text-gray-900 text-sm">{t('personalPickup')}</div>
+                                                                <div className="text-xs text-gray-500">{t('pickupReady')}</div>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">{t('noShippingMethods')}</div>

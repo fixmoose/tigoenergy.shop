@@ -140,6 +140,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           autoReminderEnabled={(order as any).auto_reminder_enabled !== false}
           warehouseActions={(order as any).warehouse_actions || []}
           warehouseSendLog={(order as any).warehouse_send_log || []}
+          orderItems={(items ?? []).map(i => ({ id: i.id, shipping_carrier: i.shipping_carrier, product_name: i.product_name, quantity: i.quantity }))}
         />
       </div>
 
@@ -183,6 +184,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             vatAmount={order.vat_amount || 0}
             total={order.total || 0}
             invoiceIssued={!!order.invoice_url}
+            orderShippingCarrier={order.shipping_carrier}
           />
         </div>
 

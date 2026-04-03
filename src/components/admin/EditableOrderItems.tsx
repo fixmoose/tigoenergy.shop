@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { adminUpdateOrderItem, adminRemoveOrderItem, adminAddOrderItem, adminUpdateShippingCost } from '@/app/actions/order-modify'
-import { searchProductsAction } from '@/app/actions/products'
+import { searchProductsAction, getOrderedQuantities } from '@/app/actions/products'
 import type { OrderItem } from '@/types/database'
 
 function formatCurrency(amount: number | null | undefined) {
@@ -16,6 +16,13 @@ function formatWeight(kg: number | null | undefined) {
     return new Intl.NumberFormat('de-DE', { maximumFractionDigits: 3 }).format(kg) + ' kg'
 }
 
+const CARRIER_OPTIONS = [
+    { value: '', label: 'Order default' },
+    { value: 'Personal Pick-up', label: 'Personal Pick-up' },
+    { value: 'DPD', label: 'DPD' },
+    { value: 'InterEuropa', label: 'InterEuropa' },
+]
+
 interface EditableOrderItemsProps {
     orderId: string
     items: OrderItem[]
@@ -25,9 +32,10 @@ interface EditableOrderItemsProps {
     vatAmount: number
     total: number
     invoiceIssued: boolean
+    orderShippingCarrier?: string | null
 }
 
-export default function EditableOrderItems({ orderId, items, subtotal, shippingCost, vatRate, vatAmount, total, invoiceIssued }: EditableOrderItemsProps) {
+export default function EditableOrderItems({ orderId, items, subtotal, shippingCost, vatRate, vatAmount, total, invoiceIssued, orderShippingCarrier }: EditableOrderItemsProps) {
     const router = useRouter()
     const [editingItem, setEditingItem] = useState<string | null>(null)
     const [editQty, setEditQty] = useState('')
@@ -42,6 +50,36 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
     const [editingShipping, setEditingShipping] = useState(false)
     const [editShippingCost, setEditShippingCost] = useState('')
+    const [itemCarriers, setItemCarriers] = useState<Record<string, string>>(() => {
+        const map: Record<string, string> = {}
+        for (const item of items) map[item.id] = item.shipping_carrier || ''
+        return map
+    })
+    const [savingCarriers, setSavingCarriers] = useState(false)
+    const [orderedQty, setOrderedQty] = useState<Record<string, number>>({})
+
+    useEffect(() => {
+        getOrderedQuantities().then(res => {
+            if (res.success && res.data) setOrderedQty(res.data)
+        })
+    }, [])
+
+    const hasCarrierChanges = items.some(item => (itemCarriers[item.id] || '') !== (item.shipping_carrier || ''))
+
+    const saveItemCarriers = async () => {
+        setSavingCarriers(true)
+        try {
+            const res = await fetch(`/api/admin/orders/${orderId}/item-carriers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ carriers: itemCarriers }),
+            })
+            if (res.ok) router.refresh()
+            else alert('Failed to save carriers')
+        } finally {
+            setSavingCarriers(false)
+        }
+    }
 
     const startEdit = (item: OrderItem) => {
         setEditingItem(item.id)
@@ -141,14 +179,25 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <div className="px-6 py-4 border-b bg-slate-50 flex items-center justify-between">
                 <h2 className="font-semibold text-slate-800">Items</h2>
-                {!invoiceIssued && (
-                    <button
-                        onClick={() => setShowAddProduct(!showAddProduct)}
-                        className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                    >
-                        {showAddProduct ? 'Cancel' : '+ Add Product'}
-                    </button>
-                )}
+                <div className="flex items-center gap-3">
+                    {!invoiceIssued && hasCarrierChanges && (
+                        <button
+                            onClick={saveItemCarriers}
+                            disabled={savingCarriers}
+                            className="text-xs font-bold text-amber-600 hover:text-amber-800 px-3 py-1 bg-amber-50 rounded-lg border border-amber-200 disabled:opacity-50"
+                        >
+                            {savingCarriers ? 'Saving...' : 'Save Carrier Assignments'}
+                        </button>
+                    )}
+                    {!invoiceIssued && (
+                        <button
+                            onClick={() => setShowAddProduct(!showAddProduct)}
+                            className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                        >
+                            {showAddProduct ? 'Cancel' : '+ Add Product'}
+                        </button>
+                    )}
+                </div>
             </div>
 
             {showAddProduct && (
@@ -178,7 +227,16 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-sm font-medium text-slate-800">{formatCurrency(p.b2b_price_eur || p.price_eur)}</div>
-                                                <div className="text-xs text-slate-400">Stock: {p.stock_quantity ?? '?'}</div>
+                                                {(() => {
+                                                    const total = p.stock_quantity ?? 0
+                                                    const ordered = orderedQty[p.id] || 0
+                                                    const available = total - ordered
+                                                    return (
+                                                        <div className="text-xs text-slate-400">
+                                                            {total} stk{ordered > 0 && <> / <span className="text-orange-500">{ordered} ord</span> / <span className={available < 5 ? 'text-red-500 font-bold' : 'text-green-600'}>{available} avl</span></>}
+                                                        </div>
+                                                    )
+                                                })()}
                                             </div>
                                         </button>
                                     ))}
@@ -242,6 +300,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                         <th className="text-right px-4 py-3">Qty</th>
                         <th className="text-right px-4 py-3">Unit Price</th>
                         <th className="text-right px-4 py-3">Total</th>
+                        <th className="text-center px-4 py-3">Ship via</th>
                         <th className="text-center px-4 py-3">Compliance</th>
                         {!invoiceIssued && <th className="text-center px-2 py-3 w-20">Edit</th>}
                     </tr>
@@ -292,6 +351,23 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                     ? formatCurrency((parseInt(editQty) || 0) * (parseFloat(editPrice) || 0))
                                     : formatCurrency(item.total_price)
                                 }
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                                {!invoiceIssued ? (
+                                    <select
+                                        value={itemCarriers[item.id] || ''}
+                                        onChange={e => setItemCarriers(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                        className="text-xs border border-slate-200 rounded px-1.5 py-1 bg-white text-slate-700 max-w-[110px]"
+                                    >
+                                        {CARRIER_OPTIONS.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <span className="text-xs text-slate-500">
+                                        {item.shipping_carrier || (orderShippingCarrier || '-')}
+                                    </span>
+                                )}
                             </td>
                             <td className="px-4 py-4">
                                 <div className="flex flex-col items-center gap-1">
@@ -366,14 +442,14 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                 <tfoot className="bg-slate-50 border-t">
                     <tr>
                         <td className="px-6 py-3 text-slate-500">Subtotal</td>
-                        <td colSpan={invoiceIssued ? 3 : 4} className="text-right px-4 py-3 font-medium text-slate-800">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 font-medium text-slate-800">
                             {formatCurrency(subtotal)}
                         </td>
                         <td></td>
                     </tr>
                     <tr>
                         <td className="px-6 py-3 text-slate-500">Shipping</td>
-                        <td colSpan={invoiceIssued ? 3 : 4} className="text-right px-4 py-3 text-slate-600">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 text-slate-600">
                             {editingShipping ? (
                                 <div className="flex items-center justify-end gap-2">
                                     <span className="text-slate-400 text-sm">&euro;</span>
@@ -423,14 +499,14 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                     </tr>
                     <tr>
                         <td className="px-6 py-3 text-slate-500">VAT ({vatRate}%)</td>
-                        <td colSpan={invoiceIssued ? 3 : 4} className="text-right px-4 py-3 text-slate-600">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 text-slate-600">
                             {formatCurrency(vatAmount)}
                         </td>
                         <td></td>
                     </tr>
                     <tr className="font-bold text-lg">
                         <td className="px-6 py-4 text-slate-800">Total</td>
-                        <td colSpan={invoiceIssued ? 3 : 4} className="text-right px-4 py-4 text-slate-800">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-4 text-slate-800">
                             {formatCurrency(total)}
                         </td>
                         <td></td>

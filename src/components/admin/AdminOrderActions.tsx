@@ -31,6 +31,7 @@ interface AdminOrderActionsProps {
     autoReminderEnabled?: boolean
     warehouseActions?: { action: string; by_email?: string; by_name?: string; at: string; file_url?: string }[]
     warehouseSendLog?: { email: string; name: string; sentAt: string }[]
+    orderItems?: { id: string; shipping_carrier?: string | null; product_name?: string; quantity?: number }[]
 }
 
 type FlowStep = 'received' | 'confirm' | 'payment' | 'packing' | 'shipping' | 'delivered' | 'invoice' | 'done'
@@ -97,7 +98,39 @@ function StepCard({ step, currentStep, children, title, subtitle, icon, color }:
     )
 }
 
-export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, overdueReminderSentAt, autoReminderEnabled = true, warehouseActions = [], warehouseSendLog = [] }: AdminOrderActionsProps) {
+function InvoiceGate({ orderItems, warehouseActions, status, loading, onIssue }: {
+    orderItems: { id: string; shipping_carrier?: string | null }[]
+    warehouseActions: { action: string }[]
+    status: string | null
+    loading: boolean
+    onIssue: () => void
+}) {
+    const itemCarriers = new Set(orderItems.map(i => i.shipping_carrier).filter(Boolean))
+    const isSplitShipping = itemCarriers.size > 1
+    const completedCarriers = new Set<string>()
+    for (const wa of warehouseActions) {
+        if (wa.action === 'marked_picked_up') completedCarriers.add('Personal Pick-up')
+        if (wa.action === 'marked_dpd_picked_up') completedCarriers.add('DPD')
+    }
+    const orderComplete = status === 'shipped' || status === 'delivered'
+    const allCarriersComplete = orderComplete || !isSplitShipping || [...itemCarriers].every(c => completedCarriers.has(c!))
+
+    return (
+        <>
+            {isSplitShipping && !allCarriersComplete && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
+                    Split shipping: not all carrier groups completed yet. Complete all shipments before issuing invoice.
+                </div>
+            )}
+            <button onClick={onIssue} disabled={loading || (isSplitShipping && !allCarriersComplete)}
+                className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700 transition disabled:opacity-50">
+                {loading ? 'Wait...' : 'Issue Official Invoice'}
+            </button>
+        </>
+    )
+}
+
+export default function AdminOrderActions({ orderId, status, paymentStatus, createdAt, confirmedAt, packingSlipUrl, shippingLabelUrl, invoiceUrl, trackingNumber, trackingUrl, shippingCarrier, customerEmail, sendCount = 0, orderTotal = 0, amountPaid = 0, modificationUnlocked = false, paymentTerms, paymentDueDate, overdueReminderSentAt, autoReminderEnabled = true, warehouseActions = [], warehouseSendLog = [], orderItems = [] }: AdminOrderActionsProps) {
     const [loading, setLoading] = useState(false)
     const [uploadingDoc, setUploadingDoc] = useState<'invoice' | 'packing_slip' | 'delivery_note' | null>(null)
     const [currentTime, setCurrentTime] = useState(new Date())
@@ -674,30 +707,81 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
 
                 {/* Step 4: Packing */}
                 <StepCard step="packing" currentStep={currentStep} title="Packing" subtitle="Generate packing slip & prepare items" icon="4" color="blue">
-                    <button
-                        onClick={async () => {
-                            // Open the PDF in a new tab
-                            window.open(`/api/orders/${orderId}/packing-slip`, '_blank')
-                            // Save packing slip URL to DB so the workflow can advance
-                            setLoading(true)
-                            try {
-                                const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
-                                const { error: updateErr } = await supabase
-                                    .from('orders')
-                                    .update({ packing_slip_url: packingUrl })
-                                    .eq('id', orderId)
-                                if (updateErr) console.error('Failed to save packing slip URL:', updateErr)
-                                router.refresh()
-                            } catch (err) {
-                                console.error('Error saving packing slip URL:', err)
-                            } finally {
-                                setLoading(false)
+                    {(() => {
+                        // Detect split shipping — items with different per-item carriers
+                        const carrierGroups = new Map<string, number>()
+                        for (const item of orderItems) {
+                            const carrier = item.shipping_carrier || shippingCarrier || 'Unknown'
+                            carrierGroups.set(carrier, (carrierGroups.get(carrier) || 0) + (item.quantity || 0))
+                        }
+                        const isSplit = carrierGroups.size > 1
+
+                        if (isSplit) {
+                            // Show per-carrier packing slip buttons
+                            const carrierParam: Record<string, string> = {
+                                'Personal Pick-up': 'pickup',
+                                'DPD': 'dpd',
+                                'InterEuropa': 'intereuropa',
                             }
-                        }}
-                        disabled={loading}
-                        className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50">
-                        {loading ? 'Processing...' : 'Generate Packing Slip'}
-                    </button>
+                            return (
+                                <div className="space-y-2">
+                                    <div className="text-xs text-slate-500 mb-1">Split shipping detected — generate per-carrier packing slips:</div>
+                                    {Array.from(carrierGroups.entries()).map(([carrier, qty]) => (
+                                        <button
+                                            key={carrier}
+                                            onClick={async () => {
+                                                const param = carrierParam[carrier] || carrier.toLowerCase()
+                                                window.open(`/api/orders/${orderId}/packing-slip?carrier=${param}`, '_blank')
+                                                setLoading(true)
+                                                try {
+                                                    const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
+                                                    await supabase.from('orders').update({ packing_slip_url: packingUrl }).eq('id', orderId)
+                                                    router.refresh()
+                                                } catch (err) {
+                                                    console.error('Error saving packing slip URL:', err)
+                                                } finally { setLoading(false) }
+                                            }}
+                                            disabled={loading}
+                                            className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                        >
+                                            <span>{carrier}</span>
+                                            <span className="bg-blue-500 px-1.5 py-0.5 rounded text-[10px]">{qty} pcs</span>
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
+                                        className="w-full py-1.5 text-blue-600 border border-blue-200 rounded-lg text-xs font-medium hover:bg-blue-50 transition"
+                                    >
+                                        Download All Items (Combined)
+                                    </button>
+                                </div>
+                            )
+                        }
+
+                        // Single carrier — original behavior
+                        return (
+                            <button
+                                onClick={async () => {
+                                    window.open(`/api/orders/${orderId}/packing-slip`, '_blank')
+                                    setLoading(true)
+                                    try {
+                                        const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
+                                        const { error: updateErr } = await supabase
+                                            .from('orders')
+                                            .update({ packing_slip_url: packingUrl })
+                                            .eq('id', orderId)
+                                        if (updateErr) console.error('Failed to save packing slip URL:', updateErr)
+                                        router.refresh()
+                                    } catch (err) {
+                                        console.error('Error saving packing slip URL:', err)
+                                    } finally { setLoading(false) }
+                                }}
+                                disabled={loading}
+                                className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50">
+                                {loading ? 'Processing...' : 'Generate Packing Slip'}
+                            </button>
+                        )
+                    })()}
                 </StepCard>
 
                 {/* Step 5: Shipping */}
@@ -926,10 +1010,13 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <StepCard step="invoice" currentStep={currentStep} title="Invoice & Compliance" subtitle="Issue invoice, trigger OEEE / Intrastat" icon="7" color="purple">
                     <div className="space-y-2">
                         {!invoiceUrl ? (
-                            <button onClick={handleIssueInvoice} disabled={loading}
-                                className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700 transition disabled:opacity-50">
-                                {loading ? 'Wait...' : 'Issue Official Invoice'}
-                            </button>
+                            <InvoiceGate
+                                orderItems={orderItems}
+                                warehouseActions={warehouseActions}
+                                status={status}
+                                loading={loading}
+                                onIssue={handleIssueInvoice}
+                            />
                         ) : (
                             <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800 font-medium">
                                 &#10003; Invoice issued

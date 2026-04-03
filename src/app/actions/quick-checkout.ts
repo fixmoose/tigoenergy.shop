@@ -46,6 +46,14 @@ export async function placeQuickOrder(
 
         if (!user) return { success: false, error: 'Not authenticated. Please sign in.' }
 
+        // Check for bulk items that need split shipping — redirect to full checkout
+        for (const item of items) {
+            const itemParcels = calculateTigoParcels([{ name: item.name, sku: item.sku, quantity: item.quantity, weight_kg: item.weight_kg || 0 }])
+            if (itemParcels.length > 10) {
+                return { success: false, error: 'Your order contains bulk items that require special shipping. Please use the full checkout.' }
+            }
+        }
+
         // Get customer details
         const { data: customer } = await supabase
             .from('customers')

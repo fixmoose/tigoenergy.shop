@@ -281,8 +281,22 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
 
         if (orderError) throw new Error(orderError.message)
 
-        // 6. Insert Items
-        const itemsWithOrderId = orderItemsData.map(i => ({ ...i, order_id: order.id }))
+        // 6. Insert Items — with per-item shipping carrier for split shipping
+        const bulkShippingMethod = rawData.bulk_shipping_method as string | undefined
+        const bulkItemSkusRaw = rawData.bulk_item_skus as string | undefined
+        const bulkItemSkus = bulkItemSkusRaw ? new Set(JSON.parse(bulkItemSkusRaw) as string[]) : null
+
+        const itemsWithOrderId = orderItemsData.map(i => {
+            let itemCarrier: string | null = null
+            if (bulkItemSkus && bulkShippingMethod) {
+                if (bulkItemSkus.has(i.sku)) {
+                    itemCarrier = bulkShippingMethod === 'intereuropa' ? 'InterEuropa' : 'Personal Pick-up'
+                } else {
+                    itemCarrier = shippingCarrier
+                }
+            }
+            return { ...i, order_id: order.id, shipping_carrier: itemCarrier }
+        })
         const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
 
         if (itemsError) throw new Error(itemsError.message)

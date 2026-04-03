@@ -151,7 +151,36 @@ export async function GET(
         const customerName = `${order.billing_address?.first_name || order.shipping_address?.first_name || ''} ${order.billing_address?.last_name || order.shipping_address?.last_name || ''}`.trim() || order.customer_email
 
         // Calculate parcels/boxes using DPD packing logic
-        const orderItems = order.order_items || []
+        let orderItems = order.order_items || []
+
+        // Fallback: fill in missing weight_kg from products table (for older orders)
+        const itemsMissingWeight = orderItems.filter((item: any) => item.weight_kg == null && item.product_id)
+        if (itemsMissingWeight.length > 0) {
+            const missingIds = itemsMissingWeight.map((i: any) => i.product_id)
+            const { data: prods } = await supabase.from('products').select('id, weight_kg').in('id', missingIds)
+            const weightMap = new Map((prods || []).map((p: any) => [p.id, p.weight_kg]))
+            for (const item of orderItems) {
+                if (item.weight_kg == null && item.product_id && weightMap.has(item.product_id)) {
+                    item.weight_kg = weightMap.get(item.product_id)
+                }
+            }
+        }
+
+        // Optional carrier filter for split shipping packing slips
+        const carrierFilter = req.nextUrl.searchParams.get('carrier')
+        if (carrierFilter) {
+            const carrierMap: Record<string, string> = {
+                'pickup': 'Personal Pick-up',
+                'dpd': 'DPD',
+                'intereuropa': 'InterEuropa',
+            }
+            const targetCarrier = carrierMap[carrierFilter.toLowerCase()] || carrierFilter
+            orderItems = orderItems.filter((item: any) => {
+                const itemCarrier = item.shipping_carrier || order.shipping_carrier
+                return itemCarrier === targetCarrier
+            })
+        }
+
         const parcels = calculateTigoParcels(orderItems.map((item: any) => ({
             name: item.product_name || item.sku || '',
             sku: item.sku || '',
@@ -221,68 +250,60 @@ export async function GET(
             `</div>${shippingBanner}<div style="background:#f9fafb`
         )
 
-        // 6. Inject signature block — "Podpis prevzemnika" for all dobavnicas
-        {
-            const sigLabels: Record<string, { title: string; name: string; date: string; sign: string; note: string }> = {
-                sl: { title: 'Podpis prevzemnika', name: 'Ime in priimek', date: 'Datum', sign: 'Podpis', note: 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.' },
-                hr: { title: 'Potpis primatelja', name: 'Ime i prezime', date: 'Datum', sign: 'Potpis', note: 'Potpisom potvrđujem da sam preuzeo/la gore navedenu robu u ispravnom stanju.' },
-                de: { title: 'Unterschrift des Empfängers', name: 'Vollständiger Name', date: 'Datum', sign: 'Unterschrift', note: 'Mit meiner Unterschrift bestätige ich, dass ich die oben genannten Waren in einwandfreiem Zustand erhalten habe.' },
-                it: { title: 'Firma del destinatario', name: 'Nome completo', date: 'Data', sign: 'Firma', note: 'Con la firma confermo di aver ricevuto la merce sopra indicata in buone condizioni.' },
-                cs: { title: 'Podpis příjemce', name: 'Celé jméno', date: 'Datum', sign: 'Podpis', note: 'Podpisem potvrzuji, že jsem převzal/a výše uvedené zboží v bezvadném stavu.' },
-                sk: { title: 'Podpis príjemcu', name: 'Celé meno', date: 'Dátum', sign: 'Podpis', note: 'Podpisom potvrdzujem, že som prevzal/a vyššie uvedený tovar v bezchybnom stave.' },
-                sv: { title: 'Mottagarens signatur', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
-            }
-            const sig = sigLabels[lang] || { title: 'Recipient Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
-            const signatureBlock = `
-<div style="margin:24px 36px 0;padding:16px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:12px;">${sig.title}</div>
-  <div style="font-size:9px;color:#6b7280;margin-bottom:16px;">${sig.note}</div>
-  <table style="width:100%;border-collapse:collapse;">
-    <tr>
-      <td style="width:50%;padding-right:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.name}</div>
-        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
-      </td>
-      <td style="width:25%;padding-right:16px;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.date}</div>
-        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
-      </td>
-      <td style="width:25%;">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:4px;">${sig.sign}</div>
-        <div style="border-bottom:1px solid #1a2b3c;height:28px;"></div>
-      </td>
-    </tr>
-  </table>
-</div>`
-            // Insert before the footer div (which has border-top and text-align:center)
-            const footerPattern = /<div style="padding:10px 36px;border-top/
-            if (footerPattern.test(htmlContent)) {
-                htmlContent = htmlContent.replace(footerPattern, signatureBlock + '\n<div style="padding:10px 36px;border-top')
-            } else {
-                // Fallback: append before the last closing </div>
-                htmlContent = htmlContent.replace(/(<\/div>\s*)$/, signatureBlock + '$1')
-            }
+        // 6. Build signature block + legal clauses — inject together before footer to avoid page overflow
+        const sigLabels: Record<string, { title: string; name: string; date: string; sign: string; note: string }> = {
+            sl: { title: 'Podpis prevzemnika', name: 'Ime in priimek', date: 'Datum', sign: 'Podpis', note: 'S podpisom potrjujem, da sem prevzel/a zgoraj navedeno blago v brezhibnem stanju.' },
+            hr: { title: 'Potpis primatelja', name: 'Ime i prezime', date: 'Datum', sign: 'Potpis', note: 'Potpisom potvrđujem da sam preuzeo/la gore navedenu robu u ispravnom stanju.' },
+            de: { title: 'Unterschrift des Empfängers', name: 'Vollständiger Name', date: 'Datum', sign: 'Unterschrift', note: 'Mit meiner Unterschrift bestätige ich, dass ich die oben genannten Waren in einwandfreiem Zustand erhalten habe.' },
+            it: { title: 'Firma del destinatario', name: 'Nome completo', date: 'Data', sign: 'Firma', note: 'Con la firma confermo di aver ricevuto la merce sopra indicata in buone condizioni.' },
+            cs: { title: 'Podpis příjemce', name: 'Celé jméno', date: 'Datum', sign: 'Podpis', note: 'Podpisem potvrzuji, že jsem převzal/a výše uvedené zboží v bezvadném stavu.' },
+            sk: { title: 'Podpis príjemcu', name: 'Celé meno', date: 'Dátum', sign: 'Podpis', note: 'Podpisom potvrdzujem, že som prevzal/a vyššie uvedený tovar v bezchybnom stave.' },
+            sv: { title: 'Mottagarens signatur', name: 'Fullständigt namn', date: 'Datum', sign: 'Signatur', note: 'Genom min signatur bekräftar jag att jag har mottagit ovanstående varor i gott skick.' },
         }
+        const sig = sigLabels[lang] || { title: 'Recipient Signature', name: 'Full Name', date: 'Date', sign: 'Signature', note: 'By signing, I confirm that I have received the above goods in good condition.' }
 
-        // 7. Inject legal clauses
         const isB2BOrder = !!(order.company_name || order.vat_id)
         const clauses = getLegalClauses(lang)
         const enClauses = getLegalClauses('en')
         const isEnglish = lang === 'en'
         const emailLink = '<a href="mailto:support@tigoenergy.shop" style="color:#16a34a;">support@tigoenergy.shop</a>'
-        const legalClause = `
-<div style="margin:0 36px 16px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:10px;color:#374151;line-height:1.6;">
-  <strong style="display:block;margin-bottom:4px;font-size:10.5px;">${clauses.packingTitle}${!isEnglish ? ` / ${enClauses.packingTitle}` : ''}</strong>
+
+        // Combined block: signature + legal — wrapped in no-break to keep on same page
+        const bottomBlock = `
+<div class="no-break">
+<div style="margin:10px 36px 0;padding:10px;border:2px solid #1a2b3c;border-radius:8px;background:#ffffff;">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#1a2b3c;margin-bottom:6px;">${sig.title}</div>
+  <div style="font-size:8px;color:#6b7280;margin-bottom:8px;">${sig.note}</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="width:50%;padding-right:16px;">
+        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:2px;">${sig.name}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:20px;"></div>
+      </td>
+      <td style="width:25%;padding-right:16px;">
+        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:2px;">${sig.date}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:20px;"></div>
+      </td>
+      <td style="width:25%;">
+        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:2px;">${sig.sign}</div>
+        <div style="border-bottom:1px solid #1a2b3c;height:20px;"></div>
+      </td>
+    </tr>
+  </table>
+</div>
+<div style="margin:6px 36px 8px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:9px;color:#374151;line-height:1.5;">
+  <strong style="display:block;margin-bottom:2px;font-size:9.5px;">${clauses.packingTitle}${!isEnglish ? ` / ${enClauses.packingTitle}` : ''}</strong>
   ${clauses.packingBody.replace('support@tigoenergy.shop', emailLink)}
-  ${!isEnglish ? `<br><br><em style="color:#6b7280;">${enClauses.packingBody.replace('support@tigoenergy.shop', emailLink)}</em>` : ''}
-  ${isB2BOrder ? `<br><br><strong>${clauses.packingB2BAddition}</strong>${!isEnglish ? `<br><em style="color:#6b7280;">${enClauses.packingB2BAddition}</em>` : ''}` : ''}
+  ${!isEnglish ? `<br><em style="color:#6b7280;">${enClauses.packingBody.replace('support@tigoenergy.shop', emailLink)}</em>` : ''}
+  ${isB2BOrder ? `<br><strong>${clauses.packingB2BAddition}</strong>${!isEnglish ? `<br><em style="color:#6b7280;">${enClauses.packingB2BAddition}</em>` : ''}` : ''}
+</div>
 </div>`
-        // Insert before footer
-        const footerPattern2 = /<div style="padding:10px 36px;border-top/
-        if (footerPattern2.test(htmlContent)) {
-            htmlContent = htmlContent.replace(footerPattern2, legalClause + '\n<div style="padding:10px 36px;border-top')
+        // Insert combined block before footer
+        const footerPattern = /<div style="padding:10px 36px;border-top/
+        if (footerPattern.test(htmlContent)) {
+            htmlContent = htmlContent.replace(footerPattern, bottomBlock + '\n<div style="padding:10px 36px;border-top')
         } else {
-            htmlContent = htmlContent.replace(/(<\/div>\s*)$/, legalClause + '$1')
+            htmlContent = htmlContent.replace(/(<\/div>\s*)$/, bottomBlock + '$1')
         }
 
         // 8. Generate PDF

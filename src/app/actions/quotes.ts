@@ -429,16 +429,34 @@ export async function acceptQuoteAction(token: string, delivery: {
 
         if (orderError) throw orderError
 
+        // Fetch product details for weight_kg and compliance fields
+        const productIds = items.map(i => i.product_id).filter(Boolean)
+        const { data: products } = productIds.length > 0
+            ? await supabase.from('products').select('id, weight_kg, cn_code, applies_trod_fee, trod_category_code, applies_packaging_fee, packaging_weight_kg, packaging_type, packaging_data').in('id', productIds)
+            : { data: [] }
+        const productMap = new Map((products || []).map(p => [p.id, p]))
+
         // Create order items
-        const orderItems = items.map(i => ({
-            order_id: orderData.id,
-            product_id: i.product_id,
-            sku: i.sku,
-            product_name: i.product_name,
-            quantity: i.quantity,
-            unit_price: i.unit_price,
-            total_price: i.total_price,
-        }))
+        const orderItems = items.map(i => {
+            const prod = i.product_id ? productMap.get(i.product_id) : null
+            return {
+                order_id: orderData.id,
+                product_id: i.product_id,
+                sku: i.sku,
+                product_name: i.product_name,
+                quantity: i.quantity,
+                unit_price: i.unit_price,
+                total_price: i.total_price,
+                weight_kg: prod?.weight_kg ?? null,
+                cn_code: prod?.cn_code ?? null,
+                applies_trod_fee: prod?.applies_trod_fee ?? false,
+                trod_category_code: prod?.trod_category_code ?? null,
+                applies_packaging_fee: prod?.applies_packaging_fee ?? false,
+                packaging_weight_kg: prod?.packaging_weight_kg ?? null,
+                packaging_type: prod?.packaging_type ?? null,
+                packaging_data: prod?.packaging_data ?? null,
+            }
+        })
 
         await supabase.from('order_items').insert(orderItems)
 

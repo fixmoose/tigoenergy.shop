@@ -7,6 +7,7 @@ import RichTextEditor from './RichTextEditor'
 import Link from 'next/link'
 import { getB2BCustomerPrices, setB2BCustomerPrice, deleteB2BCustomerPrice } from '@/app/actions/pricing'
 import { getB2BCustomers } from '@/app/actions/customers'
+import { getOrderedQuantities } from '@/app/actions/products'
 
 export default function ProductForm({ initial, onSaved }: { initial?: Partial<Product>; onSaved?: (p: Product) => void }) {
   const [product, setProduct] = useState<Partial<Product>>(initial ?? {})
@@ -22,6 +23,7 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
   const [allProducts, setAllProducts] = useState<Array<Pick<Product, 'id' | 'name_en' | 'sku' | 'images' | 'stock_quantity'>>>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [categories, setCategories] = useState<{ id: string, name: string, parent_id: string | null }[]>([])
+  const [productOrderedQty, setProductOrderedQty] = useState(0)
   const [loading, setLoading] = useState(true)
 
   // B2B Custom Pricing State
@@ -132,6 +134,15 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
     fetchProducts()
   }, [])
 
+  useEffect(() => {
+    if (product.id) {
+      getOrderedQuantities().then(res => {
+        if (res.success && res.data && product.id) {
+          setProductOrderedQty(res.data[product.id] || 0)
+        }
+      })
+    }
+  }, [product.id])
 
   function setField<K extends keyof Product>(k: K, v: any) {
     setProduct((p) => ({ ...(p ?? {}), [k]: v }))
@@ -358,9 +369,23 @@ export default function ProductForm({ initial, onSaved }: { initial?: Partial<Pr
         {/* Card 4: Stock */}
         <div className="bg-white p-5 rounded-xl border shadow-sm space-y-4">
           <h3 className="font-semibold text-gray-800 border-b pb-2 text-sm uppercase tracking-wide">Stock</h3>
-          <div className="text-center py-2 bg-gray-50 rounded border border-dashed">
+          <div className="text-center py-3 bg-gray-50 rounded border border-dashed space-y-1">
             <div className="text-3xl font-bold">{product.stock_quantity ?? 0}</div>
-            <div className="text-[10px] text-gray-400">Available</div>
+            <div className="text-[10px] text-gray-400">Total in Stock</div>
+            {productOrderedQty > 0 && (
+              <div className="flex justify-center gap-3 pt-1 border-t border-dashed">
+                <div>
+                  <div className="text-sm font-bold text-orange-600">{productOrderedQty}</div>
+                  <div className="text-[9px] text-orange-400">Ordered</div>
+                </div>
+                <div>
+                  <div className={`text-sm font-bold ${(product.stock_quantity ?? 0) - productOrderedQty < (product.low_stock_threshold || 5) ? 'text-red-600' : 'text-green-600'}`}>
+                    {(product.stock_quantity ?? 0) - productOrderedQty}
+                  </div>
+                  <div className="text-[9px] text-gray-400">Available</div>
+                </div>
+              </div>
+            )}
           </div>
           <select value={product.stock_status ?? 'in_stock'} onChange={(e) => setField('stock_status', e.target.value)} className="border rounded w-full px-2 py-2 text-sm">
             <option value="in_stock">In Stock</option>

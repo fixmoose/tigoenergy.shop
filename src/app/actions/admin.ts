@@ -1193,16 +1193,33 @@ export async function adminCreateOrderWithCustomerAction(payload: {
 
         if (orderError) throw orderError;
 
-        // 4. Create Order Items
-        const itemsWithOrderId = order.items.map(i => ({
-            order_id: orderData.id,
-            product_id: i.product_id,
-            sku: i.sku,
-            product_name: i.product_name,
-            quantity: i.quantity,
-            unit_price: i.unit_price,
-            total_price: i.unit_price * i.quantity
-        }));
+        // 4. Create Order Items — enrich with product weight + compliance data
+        const adminProductIds = order.items.map(i => i.product_id).filter(Boolean)
+        const { data: adminProducts } = adminProductIds.length > 0
+            ? await supabase.from('products').select('id, weight_kg, cn_code, applies_trod_fee, trod_category_code, applies_packaging_fee, packaging_weight_kg, packaging_type, packaging_data').in('id', adminProductIds)
+            : { data: [] }
+        const adminProductMap = new Map((adminProducts || []).map(p => [p.id, p]))
+
+        const itemsWithOrderId = order.items.map(i => {
+            const prod = i.product_id ? adminProductMap.get(i.product_id) : null
+            return {
+                order_id: orderData.id,
+                product_id: i.product_id,
+                sku: i.sku,
+                product_name: i.product_name,
+                quantity: i.quantity,
+                unit_price: i.unit_price,
+                total_price: i.unit_price * i.quantity,
+                weight_kg: prod?.weight_kg ?? null,
+                cn_code: prod?.cn_code ?? null,
+                applies_trod_fee: prod?.applies_trod_fee ?? false,
+                trod_category_code: prod?.trod_category_code ?? null,
+                applies_packaging_fee: prod?.applies_packaging_fee ?? false,
+                packaging_weight_kg: prod?.packaging_weight_kg ?? null,
+                packaging_type: prod?.packaging_type ?? null,
+                packaging_data: prod?.packaging_data ?? null,
+            }
+        });
 
         const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId);
         if (itemsError) throw itemsError;

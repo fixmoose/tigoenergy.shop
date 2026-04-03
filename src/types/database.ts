@@ -172,6 +172,9 @@ export interface OrderItem {
   packaging_type?: 'cardboard' | 'plastic' | 'foam' | 'metal' | 'glass' | 'wood' | 'none' | 'mixed' | null
   packaging_data?: Record<string, number> | null
 
+  // Per-item shipping carrier for split shipping (null = use order-level carrier)
+  shipping_carrier?: string | null
+
   // Pricing Breakdown
   b2c_unit_price?: number | null
   discount_amount?: number | null
