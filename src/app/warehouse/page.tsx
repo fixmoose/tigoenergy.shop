@@ -389,7 +389,7 @@ export default function WarehousePortal() {
                                         </span>
                                         <span className="text-orange-400 font-mono font-bold">{order.order_number}</span>
                                         <span className="text-slate-300 truncate flex-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</span>
-                                        <span className="text-slate-500">EUR {order.total?.toFixed(2)}</span>
+                                        <span className="text-slate-500">{order.order_items?.length || 0} items</span>
                                         {completedAt && (
                                             <span className="text-amber-500/70">
                                                 {new Date(completedAt).toLocaleDateString('sl-SI')} {new Date(completedAt).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
@@ -478,7 +478,6 @@ function OrderCard({
                             {new Date(order.created_at).toLocaleDateString('sl-SI')}
                         </span>
                     </div>
-                    <span className="text-white font-bold text-sm">EUR {order.total?.toFixed(2)}</span>
                 </div>
                 <p className="text-white text-sm mt-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</p>
                 {type === 'dpd' && addr && (
