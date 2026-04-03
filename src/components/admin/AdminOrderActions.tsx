@@ -717,10 +717,13 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 <StepCard step="packing" currentStep={currentStep} title="Packing" subtitle="Generate packing slip & prepare items" icon="4" color="blue">
                     {(() => {
                         // Detect split shipping — items with different per-item carriers
-                        const carrierGroups = new Map<string, number>()
+                        const carrierGroups = new Map<string, { qty: number; items: string[] }>()
                         for (const item of orderItems) {
                             const carrier = item.shipping_carrier || shippingCarrier || 'Unknown'
-                            carrierGroups.set(carrier, (carrierGroups.get(carrier) || 0) + (item.quantity || 0))
+                            const group = carrierGroups.get(carrier) || { qty: 0, items: [] }
+                            group.qty += (item.quantity || 0)
+                            group.items.push(item.product_name || 'Item')
+                            carrierGroups.set(carrier, group)
                         }
                         const isSplit = carrierGroups.size > 1
 
@@ -742,30 +745,32 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                             return (
                                 <div className="space-y-2">
                                     <div className="text-xs text-slate-500 mb-1">Split shipping — {totalParts} dobavnice needed:</div>
-                                    {carrierEntries.map(([carrier, qty], idx) => {
+                                    {carrierEntries.map(([carrier, group], idx) => {
                                         const part = idx + 1
                                         const param = carrierParam[carrier] || carrier.toLowerCase()
                                         const colors = carrierColors[carrier] || { bg: 'bg-slate-600', hover: 'hover:bg-slate-700', badge: 'bg-slate-500' }
                                         return (
-                                            <button
-                                                key={carrier}
-                                                onClick={async () => {
-                                                    window.open(`/api/orders/${orderId}/packing-slip?carrier=${param}&part=${part}&totalParts=${totalParts}`, '_blank')
-                                                    setLoading(true)
-                                                    try {
-                                                        const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
-                                                        await supabase.from('orders').update({ packing_slip_url: packingUrl }).eq('id', orderId)
-                                                        router.refresh()
-                                                    } catch (err) {
-                                                        console.error('Error saving packing slip URL:', err)
-                                                    } finally { setLoading(false) }
-                                                }}
-                                                disabled={loading}
-                                                className={`w-full py-2 ${colors.bg} text-white rounded-lg text-xs font-bold ${colors.hover} transition disabled:opacity-50 flex items-center justify-center gap-2`}
-                                            >
-                                                <span>Dobavnica {part}/{totalParts} — {carrier}</span>
-                                                <span className={`${colors.badge} px-1.5 py-0.5 rounded text-[10px]`}>{qty} pcs</span>
-                                            </button>
+                                            <div key={carrier} className="space-y-1">
+                                                <button
+                                                    onClick={async () => {
+                                                        window.open(`/api/orders/${orderId}/packing-slip?carrier=${param}&part=${part}&totalParts=${totalParts}`, '_blank')
+                                                        setLoading(true)
+                                                        try {
+                                                            const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
+                                                            await supabase.from('orders').update({ packing_slip_url: packingUrl }).eq('id', orderId)
+                                                            router.refresh()
+                                                        } catch (err) {
+                                                            console.error('Error saving packing slip URL:', err)
+                                                        } finally { setLoading(false) }
+                                                    }}
+                                                    disabled={loading}
+                                                    className={`w-full py-2 ${colors.bg} text-white rounded-lg text-xs font-bold ${colors.hover} transition disabled:opacity-50 flex items-center justify-center gap-2`}
+                                                >
+                                                    <span>Dobavnica {part}/{totalParts} — {carrier}</span>
+                                                    <span className={`${colors.badge} px-1.5 py-0.5 rounded text-[10px]`}>{group.qty} pcs</span>
+                                                </button>
+                                                <div className="text-[10px] text-slate-400 pl-2">{group.items.join(', ')}</div>
+                                            </div>
                                         )
                                     })}
                                     <button
@@ -779,7 +784,15 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                         }
 
                         // Single carrier — original behavior
+                        const singleCarrier = Array.from(carrierGroups.keys())[0] || shippingCarrier || 'Unknown'
                         return (
+                            <>
+                            {orderItems.length > 0 && (
+                                <div className="text-[10px] text-slate-400 mb-2 space-y-0.5">
+                                    <div>Detected: {carrierGroups.size} group(s) → &quot;{singleCarrier}&quot; | Order carrier: &quot;{shippingCarrier || '(none)'}&quot;</div>
+                                    <div>Items: {orderItems.map(i => `${(i.product_name || '?').substring(0, 15)}=[${i.shipping_carrier ?? 'null'}]`).join(', ')}</div>
+                                </div>
+                            )}
                             <button
                                 onClick={async () => {
                                     window.open(`/api/orders/${orderId}/packing-slip`, '_blank')
@@ -800,6 +813,7 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                                 className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50">
                                 {loading ? 'Processing...' : 'Generate Packing Slip'}
                             </button>
+                            </>
                         )
                     })()}
                 </StepCard>
