@@ -13,8 +13,8 @@ export async function PUT(req: NextRequest) {
     const expenseId = formData.get('expenseId') as string
     const path = formData.get('path') as string
 
-    if (!file || !expenseId || !path) {
-        return NextResponse.json({ error: 'Missing file, expenseId, or path' }, { status: 400 })
+    if (!file || !path) {
+        return NextResponse.json({ error: 'Missing file or path' }, { status: 400 })
     }
 
     const supabase = await createAdminClient()
@@ -29,14 +29,16 @@ export async function PUT(req: NextRequest) {
 
     const receiptUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(path)}`
 
-    // Update expense with receipt URL
-    const { error: updateError } = await supabase
-        .from('expenses')
-        .update({ receipt_url: receiptUrl, updated_at: new Date().toISOString() })
-        .eq('id', expenseId)
+    // Update expense with receipt URL if a real expenseId was provided
+    if (expenseId && expenseId !== 'temp') {
+        const { error: updateError } = await supabase
+            .from('expenses')
+            .update({ receipt_url: receiptUrl, updated_at: new Date().toISOString() })
+            .eq('id', expenseId)
 
-    if (updateError) {
-        return NextResponse.json({ error: updateError.message }, { status: 500 })
+        if (updateError) {
+            return NextResponse.json({ error: updateError.message }, { status: 500 })
+        }
     }
 
     return NextResponse.json({ success: true, receipt_url: receiptUrl })

@@ -26,8 +26,10 @@ export default function AccountingReportPage() {
     const [expensesSummary, setExpensesSummary] = useState<any>(null)
     const [showExpenseForm, setShowExpenseForm] = useState(false)
     const [editingExpense, setEditingExpense] = useState<any>(null)
-    const [expenseForm, setExpenseForm] = useState({ date: '', description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
+    const [expenseForm, setExpenseForm] = useState({ date: '', description: '', category: 'Shipping & Logistics', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
     const [uploadingReceipt, setUploadingReceipt] = useState<string | null>(null)
+    const [dropHover, setDropHover] = useState(false)
+    const [processingDrop, setProcessingDrop] = useState(false)
 
     useEffect(() => {
         setIsMounted(true)
@@ -65,14 +67,23 @@ export default function AccountingReportPage() {
         setLoading(true)
         try {
             if (reportType === 'expenses') {
-                const res = await fetch(`/api/admin/expenses?year=${year}&month=${month}`)
-                const data = await res.json()
-                if (data.success) {
-                    setOrders(data.data.expenses || [])
-                    setExpensesSummary(data.data.summary)
-                    setMarginSummary(null)
-                    setDdvSummary(null)
+                const defaultSummary = { totalAmount: 0, totalVat: 0, totalNet: 0, count: 0, byCategory: [] }
+                try {
+                    const res = await fetch(`/api/admin/expenses?year=${year}&month=${month}`)
+                    const data = await res.json()
+                    if (data.success) {
+                        setOrders(data.data.expenses || [])
+                        setExpensesSummary(data.data.summary || defaultSummary)
+                    } else {
+                        setOrders([])
+                        setExpensesSummary(defaultSummary)
+                    }
+                } catch {
+                    setOrders([])
+                    setExpensesSummary(defaultSummary)
                 }
+                setMarginSummary(null)
+                setDdvSummary(null)
             } else {
                 const res = await fetch(`/api/admin/reporting/accounting?year=${year}&month=${month}&type=${reportType}`)
                 const data = await res.json()
@@ -105,7 +116,7 @@ export default function AccountingReportPage() {
         }
     }
 
-    const EXPENSE_CATEGORIES = ['Shipping', 'Warehouse', 'Office', 'Software', 'Marketing', 'Compliance & Fees', 'Insurance', 'Utilities', 'Professional Services', 'Other']
+    const EXPENSE_CATEGORIES = ['Fuel', 'Phone & Internet', 'Office Supplies', 'Software & Subscriptions', 'Shipping & Logistics', 'Warehouse & Rent', 'Marketing & Advertising', 'Insurance', 'Professional Services', 'Bank & Financial', 'Travel & Transport', 'Meals & Entertainment', 'Equipment & Tools', 'Compliance & Fees', 'Utilities', 'Other']
 
     const handleSaveExpense = async () => {
         if (!expenseForm.date || !expenseForm.description || !expenseForm.amount_eur) {
@@ -120,7 +131,7 @@ export default function AccountingReportPage() {
             if (data.success) {
                 setShowExpenseForm(false)
                 setEditingExpense(null)
-                setExpenseForm({ date: '', description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
+                setExpenseForm({ date: '', description: '', category: 'Shipping & Logistics', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
                 fetchData()
             } else {
                 alert('Error: ' + data.error)
@@ -181,6 +192,61 @@ export default function AccountingReportPage() {
         e.preventDefault()
         const file = e.dataTransfer.files?.[0]
         if (file) handleReceiptUpload(expenseId, file)
+    }
+
+    // Main drop zone: upload file → create expense with receipt → open edit form
+    const handleMainDrop = async (e: React.DragEvent) => {
+        e.preventDefault()
+        setDropHover(false)
+        const file = e.dataTransfer.files?.[0]
+        if (!file) return
+        await handleNewReceiptUpload(file)
+    }
+
+    const handleNewReceiptUpload = async (file: File) => {
+        setProcessingDrop(true)
+        try {
+            const ext = file.name.split('.').pop() || 'pdf'
+            const ts = Date.now()
+            const storagePath = `expenses/receipt_${ts}.${ext}`
+
+            // 1. Upload to storage
+            const uploadForm = new FormData()
+            uploadForm.append('file', file)
+            uploadForm.append('expenseId', 'temp')
+            uploadForm.append('path', storagePath)
+            const uploadRes = await fetch('/api/admin/expenses/upload', { method: 'PUT', body: uploadForm })
+            const uploadData = await uploadRes.json()
+
+            // 2. Create expense record with receipt attached
+            const receiptUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(storagePath)}`
+            const expenseData = {
+                date: new Date().toISOString().split('T')[0],
+                description: file.name.replace(/\.[^.]+$/, ''),
+                category: 'Other',
+                amount_eur: 0,
+                vat_amount: 0,
+                receipt_url: receiptUrl,
+            }
+            const createRes = await fetch('/api/admin/expenses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(expenseData),
+            })
+            const createData = await createRes.json()
+
+            if (createData.success && createData.data) {
+                // Open edit form pre-filled so user can enter details
+                handleEditExpense({ ...createData.data, receipt_url: receiptUrl })
+                fetchData()
+            } else {
+                alert('Failed to create expense: ' + (createData.error || 'Unknown error'))
+            }
+        } catch (err: any) {
+            alert('Upload failed: ' + err.message)
+        } finally {
+            setProcessingDrop(false)
+        }
     }
 
     useEffect(() => {
@@ -252,7 +318,7 @@ export default function AccountingReportPage() {
                     >
                         <option value="orders">Orders</option>
                         <option value="invoices">Invoices</option>
-                        <option value="expenses">Expenses</option>
+                        {/* Expenses moved to dedicated /admin/accounting section */}
                         <option value="ddv">DDV (VAT)</option>
                         <option value="margin">Margin Report</option>
                         <option value="returns">Returns (RMAs)</option>
@@ -293,27 +359,62 @@ export default function AccountingReportPage() {
             </div>
 
             {/* Summary Cards */}
-            {reportType === 'expenses' && expensesSummary ? (
+            {reportType === 'expenses' ? (
                 <div className="space-y-6">
+                    {/* DROP ZONE — main receipt upload */}
+                    <div
+                        onDragOver={e => { e.preventDefault(); setDropHover(true) }}
+                        onDragLeave={() => setDropHover(false)}
+                        onDrop={handleMainDrop}
+                        onClick={() => {
+                            if (processingDrop) return
+                            const input = document.createElement('input')
+                            input.type = 'file'
+                            input.accept = 'image/*,.pdf'
+                            input.onchange = (e: any) => { const f = e.target.files?.[0]; if (f) handleNewReceiptUpload(f) }
+                            input.click()
+                        }}
+                        className={`relative rounded-2xl border-2 border-dashed p-10 text-center cursor-pointer transition-all ${
+                            processingDrop
+                                ? 'border-blue-400 bg-blue-50'
+                                : dropHover
+                                    ? 'border-blue-500 bg-blue-50 scale-[1.01]'
+                                    : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
+                        }`}
+                    >
+                        {processingDrop ? (
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                <div className="text-sm font-bold text-blue-600">Uploading receipt...</div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="text-4xl mb-3 opacity-40">&#128206;</div>
+                                <div className="text-lg font-bold text-slate-700">Drop receipt here</div>
+                                <div className="text-sm text-slate-400 mt-1">PDF, JPG, PNG — or click to browse</div>
+                            </>
+                        )}
+                    </div>
+
                     {/* Summary row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm">
                             <div className="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">Total Expenses</div>
-                            <div className="text-3xl font-black text-red-600">{formatCurrency(expensesSummary.totalAmount)}</div>
-                            <div className="text-[10px] text-slate-400 mt-1">{expensesSummary.count} receipts/invoices this month</div>
+                            <div className="text-3xl font-black text-red-600">{formatCurrency(expensesSummary?.totalAmount || 0)}</div>
+                            <div className="text-[10px] text-slate-400 mt-1">{expensesSummary?.count || 0} receipts this month</div>
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Net (excl. VAT)</div>
-                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(expensesSummary.totalNet)}</div>
+                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(expensesSummary?.totalNet || 0)}</div>
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Input VAT (deductible)</div>
-                            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(expensesSummary.totalVat)}</div>
+                            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(expensesSummary?.totalVat || 0)}</div>
                         </div>
                     </div>
 
-                    {/* Category breakdown — horizontal pills */}
-                    {expensesSummary.byCategory && expensesSummary.byCategory.length > 0 && (
+                    {/* Category breakdown */}
+                    {expensesSummary?.byCategory && expensesSummary.byCategory.length > 0 && (
                         <div className="flex flex-wrap gap-2">
                             {expensesSummary.byCategory.map((c: any) => (
                                 <div key={c.category} className="bg-white border border-slate-200 rounded-xl px-4 py-2 flex items-center gap-3 shadow-sm">
@@ -325,23 +426,20 @@ export default function AccountingReportPage() {
                         </div>
                     )}
 
-                    {/* Search + Add */}
+                    {/* Search + manual add */}
                     <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
-                        <div className="relative w-full md:w-96">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Search</span>
-                            <input
-                                type="text"
-                                placeholder=""
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-16 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
-                            />
-                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search expenses..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full md:w-96 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
                         <button
-                            onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
-                            className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-700 transition shadow-sm whitespace-nowrap"
+                            onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping & Logistics', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
+                            className="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition shadow-sm whitespace-nowrap"
                         >
-                            + Add Expense
+                            + Add manually
                         </button>
                     </div>
 
@@ -349,11 +447,15 @@ export default function AccountingReportPage() {
                     {loading ? (
                         <div className="text-center py-12 text-slate-400">Loading expenses...</div>
                     ) : filteredOrders.length === 0 ? (
-                        <div className="text-center py-12 text-slate-400 italic">No expenses for this period.</div>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                            <div className="text-3xl opacity-30 mb-3">&#128203;</div>
+                            <div className="text-slate-500 font-medium">No expenses for {months[month - 1].l} {year}</div>
+                            <div className="text-sm text-slate-400 mt-1">Drop a receipt above or add one manually</div>
+                        </div>
                     ) : (
                         <div className="space-y-3">
                             {filteredOrders.map((expense: any) => (
-                                <div key={expense.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-slate-300 transition">
+                                <div key={expense.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-slate-300 transition group">
                                     <div className="flex items-start gap-4 p-5">
                                         {/* Left: date badge */}
                                         <div className="flex-shrink-0 w-14 text-center">
@@ -367,7 +469,7 @@ export default function AccountingReportPage() {
 
                                         {/* Middle: details */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
+                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                 <span className="text-sm font-bold text-slate-800">{expense.description}</span>
                                                 <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{expense.category}</span>
                                             </div>
@@ -376,53 +478,39 @@ export default function AccountingReportPage() {
                                                 {expense.invoice_number && <span className="font-mono text-slate-400">#{expense.invoice_number}</span>}
                                                 {expense.notes && <span className="italic text-slate-400 truncate max-w-[200px]">{expense.notes}</span>}
                                             </div>
+                                            {/* Receipt link */}
+                                            <div className="flex items-center gap-3 mt-2">
+                                                {expense.receipt_url ? (
+                                                    <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
+                                                        className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1 rounded-lg transition inline-flex items-center gap-1">
+                                                        &#128196; View Receipt
+                                                    </a>
+                                                ) : (
+                                                    <label className={`text-xs font-bold px-3 py-1 rounded-lg cursor-pointer transition inline-flex items-center gap-1 ${
+                                                        uploadingReceipt === expense.id
+                                                            ? 'text-slate-400 bg-slate-100'
+                                                            : 'text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100'
+                                                    }`}>
+                                                        &#128206; {uploadingReceipt === expense.id ? 'Uploading...' : 'Attach receipt'}
+                                                        <input type="file" className="hidden" accept="image/*,.pdf" disabled={uploadingReceipt === expense.id}
+                                                            onChange={e => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(expense.id, f); e.target.value = '' }} />
+                                                    </label>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Right: amount + actions */}
                                         <div className="flex-shrink-0 text-right">
                                             <div className="text-lg font-black text-red-600">{formatCurrency(Number(expense.amount_eur))}</div>
                                             {Number(expense.vat_amount) > 0 && (
-                                                <div className="text-[10px] text-emerald-600 font-medium">VAT: {formatCurrency(Number(expense.vat_amount))}</div>
+                                                <div className="text-xs text-emerald-600 font-medium">VAT: {formatCurrency(Number(expense.vat_amount))}</div>
                                             )}
-                                            <div className="flex items-center justify-end gap-2 mt-2">
-                                                {expense.receipt_url ? (
-                                                    <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
-                                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded transition">
-                                                        View Receipt
-                                                    </a>
-                                                ) : (
-                                                    <label className={`text-[10px] font-bold px-2 py-1 rounded cursor-pointer transition ${
-                                                        uploadingReceipt === expense.id
-                                                            ? 'text-slate-400 bg-slate-100'
-                                                            : 'text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100'
-                                                    }`}>
-                                                        {uploadingReceipt === expense.id ? 'Uploading...' : 'Attach'}
-                                                        <input type="file" className="hidden" disabled={uploadingReceipt === expense.id}
-                                                            onChange={e => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(expense.id, f); e.target.value = '' }} />
-                                                    </label>
-                                                )}
-                                                <button onClick={() => handleEditExpense(expense)} className="text-[10px] font-bold text-blue-500 hover:text-blue-700 transition">Edit</button>
-                                                <button onClick={() => handleDeleteExpense(expense.id)} className="text-[10px] font-bold text-red-400 hover:text-red-600 transition">Del</button>
+                                            <div className="flex items-center justify-end gap-2 mt-3 opacity-0 group-hover:opacity-100 transition">
+                                                <button onClick={() => handleEditExpense(expense)} className="text-xs font-bold text-blue-500 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded transition">Edit</button>
+                                                <button onClick={() => handleDeleteExpense(expense.id)} className="text-xs font-bold text-red-400 hover:text-red-600 bg-red-50 px-2 py-1 rounded transition">Delete</button>
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Drop zone for receipt — only if no receipt attached */}
-                                    {!expense.receipt_url && (
-                                        <div
-                                            onDragOver={e => e.preventDefault()}
-                                            onDrop={handleReceiptDrop(expense.id)}
-                                            className="border-t border-dashed border-slate-200 px-5 py-2 text-center text-[10px] text-slate-400 hover:bg-slate-50 transition cursor-pointer"
-                                            onClick={() => {
-                                                const input = document.createElement('input')
-                                                input.type = 'file'
-                                                input.onchange = (e: any) => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(expense.id, f) }
-                                                input.click()
-                                            }}
-                                        >
-                                            {uploadingReceipt === expense.id ? 'Uploading receipt...' : 'Drop receipt here or click to attach'}
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
@@ -574,7 +662,7 @@ export default function AccountingReportPage() {
                     <div className="flex items-center gap-3">
                         {reportType === 'expenses' && (
                             <button
-                                onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
+                                onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping & Logistics', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
                                 className="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition"
                             >
                                 + Add Expense

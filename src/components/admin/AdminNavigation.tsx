@@ -13,6 +13,7 @@ const navItems = [
     { name: 'Pricing', href: '/admin/pricing' },
     { name: 'Marketing', href: '/admin/marketing' },
     { name: 'Suppliers', href: '/admin/suppliers' },
+    { name: 'Accounting', href: '/admin/accounting' },
     { name: 'Reporting', href: '/admin/reporting' },
     { name: 'Settings', href: '/admin/settings' },
 ]
