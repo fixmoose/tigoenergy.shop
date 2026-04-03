@@ -1169,18 +1169,56 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 </div>
             </div>
 
-            {/* Warehouse Documents — packing slip, label, send buttons */}
+            {/* Warehouse Documents — packing slip(s), label, send buttons */}
             {(packingSlipUrl || shippingLabelUrl) && (
                 <div className="mt-3 border-t pt-3">
                     <div className="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-2">Warehouse</div>
                     <div className="flex flex-wrap gap-2">
-                        {packingSlipUrl && (
-                            <a href={packingSlipUrl} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                Packing Slip
-                            </a>
-                        )}
+                        {packingSlipUrl && (() => {
+                            // Detect split shipping for per-carrier packing slips
+                            const carrierGroups = new Map<string, string[]>()
+                            for (const item of orderItems) {
+                                const carrier = item.shipping_carrier || shippingCarrier || 'Unknown'
+                                if (!carrierGroups.has(carrier)) carrierGroups.set(carrier, [])
+                                carrierGroups.get(carrier)!.push(item.product_name || 'Item')
+                            }
+                            const isSplit = carrierGroups.size > 1
+                            if (!isSplit) {
+                                return (
+                                    <a href={packingSlipUrl} target="_blank" rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        Packing Slip
+                                    </a>
+                                )
+                            }
+                            const carrierParam: Record<string, string> = { 'Personal Pick-up': 'pickup', 'DPD': 'dpd', 'InterEuropa': 'intereuropa' }
+                            const carrierColors: Record<string, string> = { 'Personal Pick-up': 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100', 'DPD': 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100', 'InterEuropa': 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' }
+                            const entries = Array.from(carrierGroups.entries())
+                            const totalParts = entries.length
+                            return (
+                                <>
+                                    {entries.map(([carrier, items], idx) => {
+                                        const part = idx + 1
+                                        const param = carrierParam[carrier] || carrier.toLowerCase()
+                                        const colors = carrierColors[carrier] || 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                                        return (
+                                            <a key={carrier} href={`/api/orders/${orderId}/packing-slip?carrier=${param}&part=${part}&totalParts=${totalParts}`} target="_blank" rel="noopener noreferrer"
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-[10px] font-bold transition ${colors}`}
+                                                title={items.join(', ')}>
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                Dobavnica {part}/{totalParts} — {carrier}
+                                            </a>
+                                        )
+                                    })}
+                                    <a href={`/api/orders/${orderId}/packing-slip`} target="_blank" rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-lg text-[10px] font-bold hover:bg-slate-100 transition">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        All (combined)
+                                    </a>
+                                </>
+                            )
+                        })()}
                         {shippingLabelUrl && (
                             <a href={shippingLabelUrl} target="_blank" rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold hover:bg-red-100 transition">
