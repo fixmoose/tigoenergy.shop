@@ -27,6 +27,7 @@ export default function AccountingReportPage() {
     const [showExpenseForm, setShowExpenseForm] = useState(false)
     const [editingExpense, setEditingExpense] = useState<any>(null)
     const [expenseForm, setExpenseForm] = useState({ date: '', description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
+    const [uploadingReceipt, setUploadingReceipt] = useState<string | null>(null)
 
     useEffect(() => {
         setIsMounted(true)
@@ -156,6 +157,32 @@ export default function AccountingReportPage() {
         setShowExpenseForm(true)
     }
 
+    const handleReceiptUpload = async (expenseId: string, file: File) => {
+        setUploadingReceipt(expenseId)
+        try {
+            const ext = file.name.split('.').pop() || 'pdf'
+            const filePath = `expenses/receipt_${expenseId}_${Date.now()}.${ext}`
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('expenseId', expenseId)
+            formData.append('path', filePath)
+            const res = await fetch('/api/admin/expenses/upload', { method: 'PUT', body: formData })
+            const data = await res.json()
+            if (!data.success) throw new Error(data.error || 'Upload failed')
+            fetchData()
+        } catch (err: any) {
+            alert('Failed to upload receipt: ' + err.message)
+        } finally {
+            setUploadingReceipt(null)
+        }
+    }
+
+    const handleReceiptDrop = (expenseId: string) => (e: React.DragEvent) => {
+        e.preventDefault()
+        const file = e.dataTransfer.files?.[0]
+        if (file) handleReceiptUpload(expenseId, file)
+    }
+
     useEffect(() => {
         fetchData()
     }, [year, month, reportType])
@@ -267,50 +294,137 @@ export default function AccountingReportPage() {
 
             {/* Summary Cards */}
             {reportType === 'expenses' && expensesSummary ? (
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-6">
+                    {/* Summary row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm">
                             <div className="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">Total Expenses</div>
                             <div className="text-3xl font-black text-red-600">{formatCurrency(expensesSummary.totalAmount)}</div>
-                            <div className="text-[10px] text-slate-400 mt-1">{expensesSummary.count} entries</div>
+                            <div className="text-[10px] text-slate-400 mt-1">{expensesSummary.count} receipts/invoices this month</div>
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Net (excl. VAT)</div>
                             <div className="text-2xl font-bold text-slate-800">{formatCurrency(expensesSummary.totalNet)}</div>
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">VAT (Input Tax)</div>
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Input VAT (deductible)</div>
                             <div className="text-2xl font-bold text-emerald-600">{formatCurrency(expensesSummary.totalVat)}</div>
-                            <div className="text-[10px] text-emerald-500 mt-1">Deductible input VAT</div>
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Categories</div>
-                            <div className="text-2xl font-bold text-slate-800">{(expensesSummary.byCategory || []).length}</div>
                         </div>
                     </div>
+
+                    {/* Category breakdown — horizontal pills */}
                     {expensesSummary.byCategory && expensesSummary.byCategory.length > 0 && (
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Breakdown by Category</div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                {expensesSummary.byCategory.map((c: any) => (
-                                    <div key={c.category} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-sm font-bold text-slate-700">{c.category}</span>
-                                            <span className="text-[10px] text-slate-400">{c.count} items</span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 text-center">
-                                            <div>
-                                                <div className="text-[10px] text-slate-400">Total</div>
-                                                <div className="text-sm font-bold text-red-600">{formatCurrency(c.total)}</div>
+                        <div className="flex flex-wrap gap-2">
+                            {expensesSummary.byCategory.map((c: any) => (
+                                <div key={c.category} className="bg-white border border-slate-200 rounded-xl px-4 py-2 flex items-center gap-3 shadow-sm">
+                                    <span className="text-sm font-bold text-slate-700">{c.category}</span>
+                                    <span className="text-sm font-black text-red-600">{formatCurrency(c.total)}</span>
+                                    <span className="text-[10px] text-slate-400">{c.count}x</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Search + Add */}
+                    <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+                        <div className="relative w-full md:w-96">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Search</span>
+                            <input
+                                type="text"
+                                placeholder=""
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-16 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            />
+                        </div>
+                        <button
+                            onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
+                            className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-700 transition shadow-sm whitespace-nowrap"
+                        >
+                            + Add Expense
+                        </button>
+                    </div>
+
+                    {/* Expense cards */}
+                    {loading ? (
+                        <div className="text-center py-12 text-slate-400">Loading expenses...</div>
+                    ) : filteredOrders.length === 0 ? (
+                        <div className="text-center py-12 text-slate-400 italic">No expenses for this period.</div>
+                    ) : (
+                        <div className="space-y-3">
+                            {filteredOrders.map((expense: any) => (
+                                <div key={expense.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-slate-300 transition">
+                                    <div className="flex items-start gap-4 p-5">
+                                        {/* Left: date badge */}
+                                        <div className="flex-shrink-0 w-14 text-center">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase">
+                                                {new Date(expense.date).toLocaleDateString('en', { month: 'short' })}
                                             </div>
-                                            <div>
-                                                <div className="text-[10px] text-slate-400">VAT</div>
-                                                <div className="text-sm font-bold text-emerald-600">{formatCurrency(c.vat)}</div>
+                                            <div className="text-2xl font-black text-slate-700 leading-tight">
+                                                {new Date(expense.date).getDate()}
+                                            </div>
+                                        </div>
+
+                                        {/* Middle: details */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-sm font-bold text-slate-800">{expense.description}</span>
+                                                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">{expense.category}</span>
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                                {expense.supplier && <span>{expense.supplier}</span>}
+                                                {expense.invoice_number && <span className="font-mono text-slate-400">#{expense.invoice_number}</span>}
+                                                {expense.notes && <span className="italic text-slate-400 truncate max-w-[200px]">{expense.notes}</span>}
+                                            </div>
+                                        </div>
+
+                                        {/* Right: amount + actions */}
+                                        <div className="flex-shrink-0 text-right">
+                                            <div className="text-lg font-black text-red-600">{formatCurrency(Number(expense.amount_eur))}</div>
+                                            {Number(expense.vat_amount) > 0 && (
+                                                <div className="text-[10px] text-emerald-600 font-medium">VAT: {formatCurrency(Number(expense.vat_amount))}</div>
+                                            )}
+                                            <div className="flex items-center justify-end gap-2 mt-2">
+                                                {expense.receipt_url ? (
+                                                    <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
+                                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded transition">
+                                                        View Receipt
+                                                    </a>
+                                                ) : (
+                                                    <label className={`text-[10px] font-bold px-2 py-1 rounded cursor-pointer transition ${
+                                                        uploadingReceipt === expense.id
+                                                            ? 'text-slate-400 bg-slate-100'
+                                                            : 'text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100'
+                                                    }`}>
+                                                        {uploadingReceipt === expense.id ? 'Uploading...' : 'Attach'}
+                                                        <input type="file" className="hidden" disabled={uploadingReceipt === expense.id}
+                                                            onChange={e => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(expense.id, f); e.target.value = '' }} />
+                                                    </label>
+                                                )}
+                                                <button onClick={() => handleEditExpense(expense)} className="text-[10px] font-bold text-blue-500 hover:text-blue-700 transition">Edit</button>
+                                                <button onClick={() => handleDeleteExpense(expense.id)} className="text-[10px] font-bold text-red-400 hover:text-red-600 transition">Del</button>
                                             </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+
+                                    {/* Drop zone for receipt — only if no receipt attached */}
+                                    {!expense.receipt_url && (
+                                        <div
+                                            onDragOver={e => e.preventDefault()}
+                                            onDrop={handleReceiptDrop(expense.id)}
+                                            className="border-t border-dashed border-slate-200 px-5 py-2 text-center text-[10px] text-slate-400 hover:bg-slate-50 transition cursor-pointer"
+                                            onClick={() => {
+                                                const input = document.createElement('input')
+                                                input.type = 'file'
+                                                input.onchange = (e: any) => { const f = e.target.files?.[0]; if (f) handleReceiptUpload(expense.id, f) }
+                                                input.click()
+                                            }}
+                                        >
+                                            {uploadingReceipt === expense.id ? 'Uploading receipt...' : 'Drop receipt here or click to attach'}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -444,8 +558,8 @@ export default function AccountingReportPage() {
                 </div>
             )}
 
-            {/* Search and Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Search and Table — not shown for expenses (they have their own card view) */}
+            {reportType !== 'expenses' && <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-50/50">
                     <div className="relative w-full md:w-96">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
@@ -865,7 +979,7 @@ export default function AccountingReportPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div>}
 
             {/* Expense Form Modal */}
             {showExpenseForm && (
