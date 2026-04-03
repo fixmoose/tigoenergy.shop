@@ -784,15 +784,8 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                         }
 
                         // Single carrier — original behavior
-                        const singleCarrier = Array.from(carrierGroups.keys())[0] || shippingCarrier || 'Unknown'
                         return (
                             <>
-                            {orderItems.length > 0 && (
-                                <div className="text-[10px] text-slate-400 mb-2 space-y-0.5">
-                                    <div>Detected: {carrierGroups.size} group(s) → &quot;{singleCarrier}&quot; | Order carrier: &quot;{shippingCarrier || '(none)'}&quot;</div>
-                                    <div>Items: {orderItems.map(i => `${(i.product_name || '?').substring(0, 15)}=[${i.shipping_carrier ?? 'null'}]`).join(', ')}</div>
-                                </div>
-                            )}
                             <button
                                 onClick={async () => {
                                     window.open(`/api/orders/${orderId}/packing-slip`, '_blank')
