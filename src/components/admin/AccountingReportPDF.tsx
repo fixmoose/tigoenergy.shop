@@ -75,12 +75,11 @@ const styles = StyleSheet.create({
     tableCol: {
         padding: 5,
     },
-    colOrder: { width: '15%' },
-    colDate: { width: '12%' },
-    colCustomer: { width: '35%' },
-    colStatus: { width: '13%' },
-    colAmount: { width: '15%', textAlign: 'right' },
-    colInvoice: { width: '10%', textAlign: 'center' },
+    colOrder: { width: '18%' },
+    colCustomer: { width: '30%' },
+    colStatus: { width: '14%' },
+    colAmount: { width: '16%', textAlign: 'right' },
+    colInvoice: { width: '22%' },
 
     headerText: {
         fontSize: 8,
@@ -151,17 +150,19 @@ export const AccountingReportPDF = ({ orders, summary, period }: AccountingRepor
                 {/* Table */}
                 <View style={styles.table}>
                     <View style={[styles.tableRow, styles.tableHeader]}>
-                        <View style={[styles.tableCol, styles.colOrder]}><Text style={styles.headerText}>Order #</Text></View>
-                        <View style={[styles.tableCol, styles.colDate]}><Text style={styles.headerText}>Date</Text></View>
+                        <View style={[styles.tableCol, styles.colOrder]}><Text style={styles.headerText}>Order / Date</Text></View>
                         <View style={[styles.tableCol, styles.colCustomer]}><Text style={styles.headerText}>Customer / Company</Text></View>
                         <View style={[styles.tableCol, styles.colStatus]}><Text style={styles.headerText}>Status</Text></View>
                         <View style={[styles.tableCol, styles.colAmount]}><Text style={styles.headerText}>Amount</Text></View>
+                        <View style={[styles.tableCol, styles.colInvoice]}><Text style={styles.headerText}>Invoice</Text></View>
                     </View>
 
                     {orders.map((order, i) => (
                         <View key={i} style={styles.tableRow}>
-                            <View style={[styles.tableCol, styles.colOrder]}><Text>{order.order_number}</Text></View>
-                            <View style={[styles.tableCol, styles.colDate]}><Text>{new Date(order.created_at).toLocaleDateString()}</Text></View>
+                            <View style={[styles.tableCol, styles.colOrder]}>
+                                <Text>{order.order_number}</Text>
+                                <Text style={{ fontSize: 7, color: '#94a3b8' }}>{new Date(order.created_at).toLocaleDateString()}</Text>
+                            </View>
                             <View style={[styles.tableCol, styles.colCustomer]}>
                                 <Text style={{ fontWeight: 'bold' }}>{order.company_name || 'Individual'}</Text>
                                 <Text style={{ fontSize: 7, color: '#64748b' }}>{order.customer_email}</Text>
@@ -175,6 +176,12 @@ export const AccountingReportPDF = ({ orders, summary, period }: AccountingRepor
                             <View style={[styles.tableCol, styles.colAmount]}>
                                 <Text>{formatCurrency(order.total)}</Text>
                                 <Text style={{ fontSize: 6, color: '#94a3b8' }}>VAT: {order.vat_rate}%</Text>
+                            </View>
+                            <View style={[styles.tableCol, styles.colInvoice]}>
+                                <Text style={{ fontSize: 8 }}>{order.invoice_number || '—'}</Text>
+                                {order.invoice_created_at && (
+                                    <Text style={{ fontSize: 6, color: '#94a3b8' }}>{new Date(order.invoice_created_at).toLocaleDateString()}</Text>
+                                )}
                             </View>
                         </View>
                     ))}

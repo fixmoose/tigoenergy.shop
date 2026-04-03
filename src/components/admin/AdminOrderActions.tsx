@@ -111,15 +111,23 @@ function InvoiceGate({ orderItems, warehouseActions, status, loading, onIssue }:
     for (const wa of warehouseActions) {
         if (wa.action === 'marked_picked_up') completedCarriers.add('Personal Pick-up')
         if (wa.action === 'marked_dpd_picked_up') completedCarriers.add('DPD')
+        if (wa.action === 'marked_intereuropa_shipped') completedCarriers.add('InterEuropa')
     }
     const orderComplete = status === 'shipped' || status === 'delivered'
     const allCarriersComplete = orderComplete || !isSplitShipping || [...itemCarriers].every(c => completedCarriers.has(c!))
 
     return (
         <>
-            {isSplitShipping && !allCarriersComplete && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
-                    Split shipping: not all carrier groups completed yet. Complete all shipments before issuing invoice.
+            {isSplitShipping && (
+                <div className={`rounded-lg px-3 py-2 text-xs space-y-1 ${allCarriersComplete ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-amber-50 border border-amber-200 text-amber-700'}`}>
+                    <div className="font-bold">{allCarriersComplete ? 'All shipments completed' : 'Waiting for all shipments to complete:'}</div>
+                    {[...itemCarriers].map(c => (
+                        <div key={c} className="flex items-center gap-2">
+                            <span>{completedCarriers.has(c!) ? '\u2705' : '\u23F3'}</span>
+                            <span>{c}</span>
+                            <span className="text-[10px] opacity-70">{completedCarriers.has(c!) ? 'done' : 'pending'}</span>
+                        </div>
+                    ))}
                 </div>
             )}
             <button onClick={onIssue} disabled={loading || (isSplitShipping && !allCarriersComplete)}
@@ -717,40 +725,52 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                         const isSplit = carrierGroups.size > 1
 
                         if (isSplit) {
-                            // Show per-carrier packing slip buttons
+                            // Show per-carrier packing slip buttons with part numbering
                             const carrierParam: Record<string, string> = {
                                 'Personal Pick-up': 'pickup',
                                 'DPD': 'dpd',
                                 'InterEuropa': 'intereuropa',
                             }
+                            const carrierColors: Record<string, { bg: string; hover: string; badge: string }> = {
+                                'Personal Pick-up': { bg: 'bg-green-600', hover: 'hover:bg-green-700', badge: 'bg-green-500' },
+                                'DPD': { bg: 'bg-blue-600', hover: 'hover:bg-blue-700', badge: 'bg-blue-500' },
+                                'InterEuropa': { bg: 'bg-amber-600', hover: 'hover:bg-amber-700', badge: 'bg-amber-500' },
+                            }
+                            const carrierEntries = Array.from(carrierGroups.entries())
+                            const totalParts = carrierEntries.length
+
                             return (
                                 <div className="space-y-2">
-                                    <div className="text-xs text-slate-500 mb-1">Split shipping detected — generate per-carrier packing slips:</div>
-                                    {Array.from(carrierGroups.entries()).map(([carrier, qty]) => (
-                                        <button
-                                            key={carrier}
-                                            onClick={async () => {
-                                                const param = carrierParam[carrier] || carrier.toLowerCase()
-                                                window.open(`/api/orders/${orderId}/packing-slip?carrier=${param}`, '_blank')
-                                                setLoading(true)
-                                                try {
-                                                    const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
-                                                    await supabase.from('orders').update({ packing_slip_url: packingUrl }).eq('id', orderId)
-                                                    router.refresh()
-                                                } catch (err) {
-                                                    console.error('Error saving packing slip URL:', err)
-                                                } finally { setLoading(false) }
-                                            }}
-                                            disabled={loading}
-                                            className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                                        >
-                                            <span>{carrier}</span>
-                                            <span className="bg-blue-500 px-1.5 py-0.5 rounded text-[10px]">{qty} pcs</span>
-                                        </button>
-                                    ))}
+                                    <div className="text-xs text-slate-500 mb-1">Split shipping — {totalParts} dobavnice needed:</div>
+                                    {carrierEntries.map(([carrier, qty], idx) => {
+                                        const part = idx + 1
+                                        const param = carrierParam[carrier] || carrier.toLowerCase()
+                                        const colors = carrierColors[carrier] || { bg: 'bg-slate-600', hover: 'hover:bg-slate-700', badge: 'bg-slate-500' }
+                                        return (
+                                            <button
+                                                key={carrier}
+                                                onClick={async () => {
+                                                    window.open(`/api/orders/${orderId}/packing-slip?carrier=${param}&part=${part}&totalParts=${totalParts}`, '_blank')
+                                                    setLoading(true)
+                                                    try {
+                                                        const packingUrl = `${window.location.origin}/api/orders/${orderId}/packing-slip`
+                                                        await supabase.from('orders').update({ packing_slip_url: packingUrl }).eq('id', orderId)
+                                                        router.refresh()
+                                                    } catch (err) {
+                                                        console.error('Error saving packing slip URL:', err)
+                                                    } finally { setLoading(false) }
+                                                }}
+                                                disabled={loading}
+                                                className={`w-full py-2 ${colors.bg} text-white rounded-lg text-xs font-bold ${colors.hover} transition disabled:opacity-50 flex items-center justify-center gap-2`}
+                                            >
+                                                <span>Dobavnica {part}/{totalParts} — {carrier}</span>
+                                                <span className={`${colors.badge} px-1.5 py-0.5 rounded text-[10px]`}>{qty} pcs</span>
+                                            </button>
+                                        )
+                                    })}
                                     <button
                                         onClick={() => window.open(`/api/orders/${orderId}/packing-slip`, '_blank')}
-                                        className="w-full py-1.5 text-blue-600 border border-blue-200 rounded-lg text-xs font-medium hover:bg-blue-50 transition"
+                                        className="w-full py-1.5 text-slate-500 border border-slate-200 rounded-lg text-xs font-medium hover:bg-slate-50 transition"
                                     >
                                         Download All Items (Combined)
                                     </button>

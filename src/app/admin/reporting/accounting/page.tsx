@@ -23,6 +23,10 @@ export default function AccountingReportPage() {
     const [reportType, setReportType] = useState('orders')
     const [marginSummary, setMarginSummary] = useState<any>(null)
     const [ddvSummary, setDdvSummary] = useState<any>(null)
+    const [expensesSummary, setExpensesSummary] = useState<any>(null)
+    const [showExpenseForm, setShowExpenseForm] = useState(false)
+    const [editingExpense, setEditingExpense] = useState<any>(null)
+    const [expenseForm, setExpenseForm] = useState({ date: '', description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
 
     useEffect(() => {
         setIsMounted(true)
@@ -59,33 +63,97 @@ export default function AccountingReportPage() {
     const fetchData = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/admin/reporting/accounting?year=${year}&month=${month}&type=${reportType}`)
-            const data = await res.json()
-            if (data.success) {
-                if (reportType === 'margin') {
-                    setOrders(data.data.orders || [])
-                    setMarginSummary(data.data.summary)
-                    setDdvSummary(null)
-                } else if (reportType === 'ddv') {
-                    setOrders(data.data.orders || [])
-                    setDdvSummary(data.data.summary)
-                    setMarginSummary(null)
-                } else if (reportType === 'orders' || reportType === 'invoices') {
-                    setOrders(data.data.orders)
-                    setSummary(data.data.summary)
-                    setMarginSummary(null)
-                    setDdvSummary(null)
-                } else {
-                    setOrders(data.data.records || [])
+            if (reportType === 'expenses') {
+                const res = await fetch(`/api/admin/expenses?year=${year}&month=${month}`)
+                const data = await res.json()
+                if (data.success) {
+                    setOrders(data.data.expenses || [])
+                    setExpensesSummary(data.data.summary)
                     setMarginSummary(null)
                     setDdvSummary(null)
                 }
+            } else {
+                const res = await fetch(`/api/admin/reporting/accounting?year=${year}&month=${month}&type=${reportType}`)
+                const data = await res.json()
+                if (data.success) {
+                    if (reportType === 'margin') {
+                        setOrders(data.data.orders || [])
+                        setMarginSummary(data.data.summary)
+                        setDdvSummary(null)
+                    } else if (reportType === 'ddv') {
+                        setOrders(data.data.orders || [])
+                        setDdvSummary(data.data.summary)
+                        setMarginSummary(null)
+                    } else if (reportType === 'orders' || reportType === 'invoices') {
+                        setOrders(data.data.orders)
+                        setSummary(data.data.summary)
+                        setMarginSummary(null)
+                        setDdvSummary(null)
+                    } else {
+                        setOrders(data.data.records || [])
+                        setMarginSummary(null)
+                        setDdvSummary(null)
+                    }
+                }
+                setExpensesSummary(null)
             }
         } catch (error) {
             console.error('Failed to fetch accounting data:', error)
         } finally {
             setLoading(false)
         }
+    }
+
+    const EXPENSE_CATEGORIES = ['Shipping', 'Warehouse', 'Office', 'Software', 'Marketing', 'Compliance & Fees', 'Insurance', 'Utilities', 'Professional Services', 'Other']
+
+    const handleSaveExpense = async () => {
+        if (!expenseForm.date || !expenseForm.description || !expenseForm.amount_eur) {
+            alert('Please fill in date, description, and amount.')
+            return
+        }
+        try {
+            const method = editingExpense ? 'PUT' : 'POST'
+            const body = editingExpense ? { id: editingExpense.id, ...expenseForm, amount_eur: Number(expenseForm.amount_eur), vat_amount: Number(expenseForm.vat_amount) || 0 } : { ...expenseForm, amount_eur: Number(expenseForm.amount_eur), vat_amount: Number(expenseForm.vat_amount) || 0 }
+            const res = await fetch('/api/admin/expenses', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            const data = await res.json()
+            if (data.success) {
+                setShowExpenseForm(false)
+                setEditingExpense(null)
+                setExpenseForm({ date: '', description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' })
+                fetchData()
+            } else {
+                alert('Error: ' + data.error)
+            }
+        } catch (err: any) {
+            alert('Failed to save expense: ' + err.message)
+        }
+    }
+
+    const handleDeleteExpense = async (id: string) => {
+        if (!confirm('Delete this expense?')) return
+        try {
+            const res = await fetch(`/api/admin/expenses?id=${id}`, { method: 'DELETE' })
+            const data = await res.json()
+            if (data.success) fetchData()
+            else alert('Error: ' + data.error)
+        } catch (err: any) {
+            alert('Failed to delete: ' + err.message)
+        }
+    }
+
+    const handleEditExpense = (expense: any) => {
+        setEditingExpense(expense)
+        setExpenseForm({
+            date: expense.date,
+            description: expense.description,
+            category: expense.category,
+            amount_eur: String(expense.amount_eur),
+            vat_amount: String(expense.vat_amount || ''),
+            supplier: expense.supplier || '',
+            invoice_number: expense.invoice_number || '',
+            notes: expense.notes || '',
+        })
+        setShowExpenseForm(true)
     }
 
     useEffect(() => {
@@ -95,6 +163,16 @@ export default function AccountingReportPage() {
     const filteredOrders = useMemo(() => {
         if (!searchQuery) return orders
         const q = searchQuery.toLowerCase()
+        if (reportType === 'expenses') {
+            return orders.filter(o =>
+                o.description?.toLowerCase().includes(q) ||
+                o.supplier?.toLowerCase().includes(q) ||
+                o.category?.toLowerCase().includes(q) ||
+                o.invoice_number?.toLowerCase().includes(q) ||
+                o.notes?.toLowerCase().includes(q) ||
+                o.amount_eur?.toString().includes(q)
+            )
+        }
         return orders.filter(o =>
             o.order_number?.toLowerCase().includes(q) ||
             o.customer_email?.toLowerCase().includes(q) ||
@@ -102,7 +180,7 @@ export default function AccountingReportPage() {
             o.invoice_number?.toLowerCase().includes(q) ||
             o.total?.toString().includes(q)
         )
-    }, [orders, searchQuery])
+    }, [orders, searchQuery, reportType])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -147,6 +225,7 @@ export default function AccountingReportPage() {
                     >
                         <option value="orders">Orders</option>
                         <option value="invoices">Invoices</option>
+                        <option value="expenses">Expenses</option>
                         <option value="ddv">DDV (VAT)</option>
                         <option value="margin">Margin Report</option>
                         <option value="returns">Returns (RMAs)</option>
@@ -187,7 +266,55 @@ export default function AccountingReportPage() {
             </div>
 
             {/* Summary Cards */}
-            {reportType === 'ddv' && ddvSummary ? (
+            {reportType === 'expenses' && expensesSummary ? (
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">Total Expenses</div>
+                            <div className="text-3xl font-black text-red-600">{formatCurrency(expensesSummary.totalAmount)}</div>
+                            <div className="text-[10px] text-slate-400 mt-1">{expensesSummary.count} entries</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Net (excl. VAT)</div>
+                            <div className="text-2xl font-bold text-slate-800">{formatCurrency(expensesSummary.totalNet)}</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">VAT (Input Tax)</div>
+                            <div className="text-2xl font-bold text-emerald-600">{formatCurrency(expensesSummary.totalVat)}</div>
+                            <div className="text-[10px] text-emerald-500 mt-1">Deductible input VAT</div>
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Categories</div>
+                            <div className="text-2xl font-bold text-slate-800">{(expensesSummary.byCategory || []).length}</div>
+                        </div>
+                    </div>
+                    {expensesSummary.byCategory && expensesSummary.byCategory.length > 0 && (
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                            <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Breakdown by Category</div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                {expensesSummary.byCategory.map((c: any) => (
+                                    <div key={c.category} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-bold text-slate-700">{c.category}</span>
+                                            <span className="text-[10px] text-slate-400">{c.count} items</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-center">
+                                            <div>
+                                                <div className="text-[10px] text-slate-400">Total</div>
+                                                <div className="text-sm font-bold text-red-600">{formatCurrency(c.total)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-slate-400">VAT</div>
+                                                <div className="text-sm font-bold text-emerald-600">{formatCurrency(c.vat)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ) : reportType === 'ddv' && ddvSummary ? (
                 <div className="space-y-4">
                     {/* DDV Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -330,8 +457,18 @@ export default function AccountingReportPage() {
                             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
                     </div>
-                    <div className="text-xs text-slate-500 font-medium">
-                        Showing {filteredOrders.length} records
+                    <div className="flex items-center gap-3">
+                        {reportType === 'expenses' && (
+                            <button
+                                onClick={() => { setEditingExpense(null); setExpenseForm({ date: new Date().toISOString().split('T')[0], description: '', category: 'Shipping', amount_eur: '', vat_amount: '', supplier: '', invoice_number: '', notes: '' }); setShowExpenseForm(true) }}
+                                className="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-700 transition"
+                            >
+                                + Add Expense
+                            </button>
+                        )}
+                        <div className="text-xs text-slate-500 font-medium">
+                            Showing {filteredOrders.length} records
+                        </div>
                     </div>
                 </div>
 
@@ -404,6 +541,16 @@ export default function AccountingReportPage() {
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Margin</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">%</th>
                                         <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Invoice</th>
+                                    </>
+                                )}
+                                {reportType === 'expenses' && (
+                                    <>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Supplier</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
+                                        <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">VAT</th>
                                     </>
                                 )}
                                 {reportType === 'stock' && (
@@ -650,6 +797,29 @@ export default function AccountingReportPage() {
                                             </>
                                         )}
 
+                                        {reportType === 'expenses' && (
+                                            <>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-medium text-slate-800">{new Date(record.date).toLocaleDateString()}</div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="text-sm font-semibold text-slate-800">{record.description}</div>
+                                                    {record.invoice_number && <div className="text-[10px] text-slate-400 font-mono mt-0.5">{record.invoice_number}</div>}
+                                                    {record.notes && <div className="text-[10px] text-slate-400 italic mt-0.5">{record.notes}</div>}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded font-medium">{record.category}</span>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-slate-600">{record.supplier || '—'}</td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="font-bold text-red-600">{formatCurrency(Number(record.amount_eur))}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="text-sm text-emerald-600 font-medium">{formatCurrency(Number(record.vat_amount) || 0)}</div>
+                                                </td>
+                                            </>
+                                        )}
+
                                         {reportType === 'stock' && (
                                             <>
                                                 <td className="px-6 py-4">
@@ -670,17 +840,24 @@ export default function AccountingReportPage() {
                                         )}
 
                                         <td className="px-6 py-4 text-right">
-                                            <a
-                                                href={
-                                                    reportType === 'customers' ? `/admin/customers/${record.id}` :
-                                                        reportType === 'carts' ? (record.user_id ? `/admin/customers/${record.user_id}` : '#') :
-                                                            `/admin/orders/${record.id || record.order_id}`
-                                                }
-                                                className={`text-slate-400 hover:text-slate-600 transition ${reportType === 'carts' && !record.user_id ? 'opacity-20 cursor-not-allowed' : ''}`}
-                                                title="View Details"
-                                            >
-                                                <span>➡️</span>
-                                            </a>
+                                            {reportType === 'expenses' ? (
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button onClick={() => handleEditExpense(record)} className="text-blue-500 hover:text-blue-700 text-xs font-bold transition">Edit</button>
+                                                    <button onClick={() => handleDeleteExpense(record.id)} className="text-red-400 hover:text-red-600 text-xs font-bold transition">Del</button>
+                                                </div>
+                                            ) : (
+                                                <a
+                                                    href={
+                                                        reportType === 'customers' ? `/admin/customers/${record.id}` :
+                                                            reportType === 'carts' ? (record.user_id ? `/admin/customers/${record.user_id}` : '#') :
+                                                                `/admin/orders/${record.id || record.order_id}`
+                                                    }
+                                                    className={`text-slate-400 hover:text-slate-600 transition ${reportType === 'carts' && !record.user_id ? 'opacity-20 cursor-not-allowed' : ''}`}
+                                                    title="View Details"
+                                                >
+                                                    <span>➡️</span>
+                                                </a>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -689,6 +866,66 @@ export default function AccountingReportPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Expense Form Modal */}
+            {showExpenseForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8">
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-800">{editingExpense ? 'Edit Expense' : 'Add Expense'}</h3>
+                                <p className="text-sm text-slate-500">Track a business expense.</p>
+                            </div>
+                            <button onClick={() => { setShowExpenseForm(false); setEditingExpense(null) }} className="text-slate-400 hover:text-slate-600 text-2xl font-bold">x</button>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date *</label>
+                                    <input type="date" value={expenseForm.date} onChange={e => setExpenseForm(f => ({ ...f, date: e.target.value }))} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Category *</label>
+                                    <select value={expenseForm.category} onChange={e => setExpenseForm(f => ({ ...f, category: e.target.value }))} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                        {EXPENSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Description *</label>
+                                <input type="text" value={expenseForm.description} onChange={e => setExpenseForm(f => ({ ...f, description: e.target.value }))} placeholder="e.g. DPD shipping March 2026" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Amount (EUR) *</label>
+                                    <input type="number" step="0.01" value={expenseForm.amount_eur} onChange={e => setExpenseForm(f => ({ ...f, amount_eur: e.target.value }))} placeholder="0.00" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">VAT Amount (EUR)</label>
+                                    <input type="number" step="0.01" value={expenseForm.vat_amount} onChange={e => setExpenseForm(f => ({ ...f, vat_amount: e.target.value }))} placeholder="0.00" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Supplier</label>
+                                    <input type="text" value={expenseForm.supplier} onChange={e => setExpenseForm(f => ({ ...f, supplier: e.target.value }))} placeholder="e.g. DPD d.o.o." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Invoice #</label>
+                                    <input type="text" value={expenseForm.invoice_number} onChange={e => setExpenseForm(f => ({ ...f, invoice_number: e.target.value }))} placeholder="Supplier invoice ref" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Notes</label>
+                                <textarea value={expenseForm.notes} onChange={e => setExpenseForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Optional notes..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                            </div>
+                            <button onClick={handleSaveExpense} className="w-full bg-red-600 text-white py-3 rounded-2xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-100">
+                                {editingExpense ? 'Update Expense' : 'Add Expense'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Share Modal */}
             {shareModalOpen && (

@@ -168,6 +168,9 @@ export async function GET(
 
         // Optional carrier filter for split shipping packing slips
         const carrierFilter = req.nextUrl.searchParams.get('carrier')
+        const partNumber = req.nextUrl.searchParams.get('part')     // e.g. "1"
+        const totalParts = req.nextUrl.searchParams.get('totalParts') // e.g. "2"
+        let carrierLabel = ''
         if (carrierFilter) {
             const carrierMap: Record<string, string> = {
                 'pickup': 'Personal Pick-up',
@@ -175,6 +178,7 @@ export async function GET(
                 'intereuropa': 'InterEuropa',
             }
             const targetCarrier = carrierMap[carrierFilter.toLowerCase()] || carrierFilter
+            carrierLabel = targetCarrier
             orderItems = orderItems.filter((item: any) => {
                 const itemCarrier = item.shipping_carrier || order.shipping_carrier
                 return itemCarrier === targetCarrier
@@ -189,8 +193,11 @@ export async function GET(
         })))
         const totalWeight = orderItems.reduce((sum: number, item: any) => sum + (parseFloat(item.weight_kg || 0) * item.quantity), 0)
 
+        // Part numbering for split shipping: "ORD-2026-0042 (1/2)"
+        const partSuffix = partNumber && totalParts ? ` (${partNumber}/${totalParts})` : ''
+
         const documentData: DocumentData = {
-            order_number: order.order_number,
+            order_number: order.order_number + partSuffix,
             order_date: new Date(order.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
             customer_name: customerName,
             customer_email: order.customer_email,
@@ -224,11 +231,31 @@ export async function GET(
         const pickupLabel = pl?.pickupBanner || 'SELF-PICKUP'
         const deliveryLabel = pl?.deliveryBanner || 'DELIVERY / DPD'
         const customerLabel = pl?.customerLabel || 'Customer'
-        const bannerColor = isPickup ? '#16a34a' : '#2563eb'
-        const bannerBg = isPickup ? '#f0fdf4' : '#eff6ff'
-        const bannerBorder = isPickup ? '#22c55e' : '#3b82f6'
-        const bannerText = isPickup ? pickupLabel : deliveryLabel
-        const enFallback = isPickup ? 'SELF-PICKUP' : 'DELIVERY'
+
+        // Determine effective carrier for this packing slip (split shipping may override)
+        const effectivePickup = carrierLabel ? carrierLabel === 'Personal Pick-up' : isPickup
+        const effectiveCarrierName = carrierLabel || order.shipping_carrier || 'Standard'
+
+        // Carrier-specific banner colors and labels
+        let bannerColor = effectivePickup ? '#16a34a' : '#2563eb'
+        let bannerBg = effectivePickup ? '#f0fdf4' : '#eff6ff'
+        let bannerBorder = effectivePickup ? '#22c55e' : '#3b82f6'
+        let bannerText = effectivePickup ? pickupLabel : deliveryLabel
+        let enFallback = effectivePickup ? 'SELF-PICKUP' : 'DELIVERY'
+
+        // InterEuropa gets distinct amber styling
+        if (carrierLabel === 'InterEuropa') {
+            bannerColor = '#d97706'
+            bannerBg = '#fffbeb'
+            bannerBorder = '#f59e0b'
+            bannerText = 'INTEREUROPA — PALLET'
+            enFallback = 'INTEREUROPA'
+        }
+
+        // Add part number to banner if split shipping
+        if (partNumber && totalParts) {
+            bannerText += ` (${partNumber}/${totalParts})`
+        }
 
         const shippingBanner = `<div style="background:${bannerBg};border-bottom:3px solid ${bannerBorder};padding:10px 36px;">
   <table style="width:100%;border-collapse:collapse;"><tr>
@@ -313,7 +340,7 @@ export async function GET(
         return new NextResponse(Buffer.from(pdfBuffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=${({ sl: 'Dobavnica', hr: 'Otpremnica', de: 'Lieferschein', it: 'BollaConsegna', cs: 'DodaciList', sk: 'DodaciList', sv: 'Foljesedel' } as Record<string, string>)[lang] || 'PackingSlip'}_${order.order_number}.pdf`,
+                'Content-Disposition': `attachment; filename=${({ sl: 'Dobavnica', hr: 'Otpremnica', de: 'Lieferschein', it: 'BollaConsegna', cs: 'DodaciList', sk: 'DodaciList', sv: 'Foljesedel' } as Record<string, string>)[lang] || 'PackingSlip'}_${order.order_number}${partNumber ? `_${partNumber}-${totalParts}` : ''}.pdf`,
                 'Cache-Control': 'no-cache'
             },
         })
