@@ -821,6 +821,56 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
                 {/* Step 5: Shipping */}
                 <StepCard step="shipping" currentStep={currentStep} title={isPickup ? 'Pickup' : 'Shipping'} subtitle={isPickup ? 'Skip shipping or convert to delivery' : 'DPD, own delivery, or manual'} icon="5" color="red">
                     <div className="space-y-2">
+                        {/* InterEuropa section — shown when any items have InterEuropa carrier */}
+                        {(() => {
+                            const ieItems = orderItems.filter(i => i.shipping_carrier === 'InterEuropa')
+                            const ieCompleted = warehouseActions.some(a => a.action === 'marked_intereuropa_shipped')
+                            if (ieItems.length === 0) return null
+                            return (
+                                <div className={`rounded-lg border p-3 space-y-2 ${ieCompleted ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-300'}`}>
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">INTEREUROPA</span>
+                                        <span className="text-xs text-slate-600 font-medium">Pallet shipping</span>
+                                        {ieCompleted && <span className="ml-auto text-emerald-600 text-xs font-bold">Delivered</span>}
+                                    </div>
+                                    <div className="text-[10px] text-slate-500">
+                                        {ieItems.map(i => `${i.product_name} x${i.quantity}`).join(', ')}
+                                    </div>
+                                    {!ieCompleted && (
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm('Mark InterEuropa items as shipped/delivered?')) return
+                                                setLoading(true)
+                                                try {
+                                                    const { data: order } = await supabase
+                                                        .from('orders')
+                                                        .select('warehouse_actions')
+                                                        .eq('id', orderId)
+                                                        .single()
+                                                    const actions = Array.isArray(order?.warehouse_actions) ? order.warehouse_actions : []
+                                                    actions.push({
+                                                        action: 'marked_intereuropa_shipped',
+                                                        by_email: 'admin',
+                                                        by_name: 'Admin',
+                                                        at: new Date().toISOString(),
+                                                    })
+                                                    await supabase
+                                                        .from('orders')
+                                                        .update({ warehouse_actions: actions })
+                                                        .eq('id', orderId)
+                                                    router.refresh()
+                                                } catch { alert('Failed') } finally { setLoading(false) }
+                                            }}
+                                            disabled={loading}
+                                            className="w-full py-2 bg-amber-600 text-white rounded-lg font-bold text-xs hover:bg-amber-700 transition disabled:opacity-50"
+                                        >
+                                            {loading ? 'Processing...' : 'Mark InterEuropa Delivered'}
+                                        </button>
+                                    )}
+                                </div>
+                            )
+                        })()}
+
                         {isPickup ? (
                             <>
                                 <button onClick={async () => {

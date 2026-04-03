@@ -33,6 +33,11 @@ interface WarehouseOrder {
     pickup_payment_proof_required: boolean
     created_at: string
     order_items: OrderItem[]
+    // Split shipping virtual fields
+    _split_carrier?: string
+    _split_part?: number
+    _split_total?: number
+    _split_carrier_param?: string
 }
 
 export default function WarehousePortal() {
@@ -450,11 +455,25 @@ function OrderCard({
                 </div>
             )}
 
+            {/* Split shipping badge */}
+            {order._split_part && order._split_total && (
+                <div className="bg-purple-900/60 border-b border-purple-700/50 px-4 py-1.5 flex items-center gap-2">
+                    <span className="text-purple-200 text-[10px] font-bold uppercase tracking-wider">Deljeno naročilo</span>
+                    <span className="bg-purple-700 text-purple-100 text-[10px] font-bold px-2 py-0.5 rounded">
+                        {order._split_part}/{order._split_total}
+                    </span>
+                    <span className="text-purple-300 text-[10px]">{order._split_carrier}</span>
+                </div>
+            )}
+
             {/* Header */}
             <div className="px-4 py-3 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
                     <div>
-                        <span className="text-orange-400 font-mono font-bold text-sm">{order.order_number}</span>
+                        <span className="text-orange-400 font-mono font-bold text-sm">
+                            {order.order_number}
+                            {order._split_part ? ` (${order._split_part}/${order._split_total})` : ''}
+                        </span>
                         <span className="text-slate-500 text-xs ml-2">
                             {new Date(order.created_at).toLocaleDateString('sl-SI')}
                         </span>
@@ -483,7 +502,10 @@ function OrderCard({
             <div className="px-4 py-3 space-y-2.5">
                 {/* Download packing slip */}
                 {(() => {
-                    const slipUrl = order.packing_slip_url || `/api/orders/${order.id}/packing-slip`
+                    let slipUrl = `/api/orders/${order.id}/packing-slip`
+                    if (order._split_carrier_param && order._split_part && order._split_total) {
+                        slipUrl += `?carrier=${order._split_carrier_param}&part=${order._split_part}&totalParts=${order._split_total}`
+                    }
                     return (
                     <a
                         href={`${slipUrl}${slipUrl.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
