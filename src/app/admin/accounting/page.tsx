@@ -439,13 +439,14 @@ export default function AccountingPage() {
                                 <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
                                     className="block h-40 bg-slate-100 relative overflow-hidden border-b border-slate-100 hover:opacity-90 transition">
                                     {expense.receipt_url.includes('.pdf') || expense.notes?.includes('.pdf') ? (
-                                        <div className="w-full h-full relative bg-white">
-                                            <iframe
-                                                src={`${expense.receipt_url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                                                className="absolute top-0 left-0 border-0 pointer-events-none"
-                                                style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
-                                                title="PDF preview"
-                                            />
+                                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50">
+                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" className="mb-2 opacity-60">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                <polyline points="14 2 14 8 20 8" />
+                                                <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><line x1="10" y1="9" x2="8" y2="9" />
+                                            </svg>
+                                            <div className="text-[10px] font-bold text-slate-400">{expense.invoice_number || 'PDF'}</div>
+                                            <div className="text-[9px] text-blue-500 mt-0.5 font-semibold">Odpri</div>
                                         </div>
                                     ) : (
                                         /* eslint-disable-next-line @next/next/no-img-element */
