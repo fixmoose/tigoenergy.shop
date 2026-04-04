@@ -172,8 +172,8 @@ export default function AccountingPage() {
 
     // --- Receipt upload (new expense from drop) ---
 
-    const uploadNewReceipt = async (file: File) => {
-        setUploading(true)
+    const uploadNewReceipt = async (file: File, skipLoadingState = false) => {
+        if (!skipLoadingState) setUploading(true)
         try {
             const ext = file.name.split('.').pop() || 'pdf'
             const storagePath = `expenses/receipt_${Date.now()}.${ext}`
@@ -208,6 +208,18 @@ export default function AccountingPage() {
             }
         } catch (err: any) {
             alert('Upload failed: ' + err.message)
+        } finally {
+            if (!skipLoadingState) setUploading(false)
+        }
+    }
+
+    const uploadMultipleReceipts = async (files: File[]) => {
+        setUploading(true)
+        try {
+            for (const file of files) {
+                await uploadNewReceipt(file, true)
+            }
+            fetchExpenses()
         } finally {
             setUploading(false)
         }
@@ -258,13 +270,14 @@ export default function AccountingPage() {
             <div
                 onDragOver={e => { e.preventDefault(); setDropHover(true) }}
                 onDragLeave={() => setDropHover(false)}
-                onDrop={e => { e.preventDefault(); setDropHover(false); const f = e.dataTransfer.files?.[0]; if (f) uploadNewReceipt(f) }}
+                onDrop={e => { e.preventDefault(); setDropHover(false); const files = Array.from(e.dataTransfer.files || []); if (files.length) uploadMultipleReceipts(files) }}
                 onClick={() => {
                     if (uploading) return
                     const input = document.createElement('input')
                     input.type = 'file'
                     input.accept = 'image/*,.pdf'
-                    input.onchange = (e: any) => { const f = e.target.files?.[0]; if (f) uploadNewReceipt(f) }
+                    input.multiple = true
+                    input.onchange = (e: any) => { const files = Array.from(e.target.files || []) as File[]; if (files.length) uploadMultipleReceipts(files) }
                     input.click()
                 }}
                 className={`rounded-2xl border-2 border-dashed p-12 text-center cursor-pointer transition-all ${
