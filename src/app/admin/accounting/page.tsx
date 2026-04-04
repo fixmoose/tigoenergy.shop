@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 
 const CATEGORIES = [
     'Gorivo',
@@ -51,6 +51,51 @@ const formatDate = (d: string) => {
 
 const isUnprocessed = (e: Expense) => e.description === 'Unprocessed' && Number(e.amount_eur) === 0
 
+function PdfThumb({ url, label }: { url: string; label?: string }) {
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const [loaded, setLoaded] = useState(false)
+
+    useEffect(() => {
+        let cancelled = false
+        const render = async () => {
+            try {
+                // @ts-expect-error - loading from CDN
+                const pdfjsLib = window.pdfjsLib
+                if (!pdfjsLib) return
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs'
+                const pdf = await pdfjsLib.getDocument(url).promise
+                const page = await pdf.getPage(1)
+                const canvas = canvasRef.current
+                if (!canvas || cancelled) return
+                const vp = page.getViewport({ scale: 1 })
+                const scale = Math.min(canvas.width / vp.width, canvas.height / vp.height)
+                const viewport = page.getViewport({ scale })
+                canvas.width = viewport.width
+                canvas.height = viewport.height
+                await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise
+                if (!cancelled) setLoaded(true)
+            } catch { /* ignore */ }
+        }
+        render()
+        return () => { cancelled = true }
+    }, [url])
+
+    return (
+        <>
+            <canvas ref={canvasRef} className={`w-full h-full object-contain ${loaded ? '' : 'hidden'}`} width={300} height={400} />
+            {!loaded && (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" className="mb-1.5 opacity-50 animate-pulse">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    <div className="text-[10px] font-bold text-slate-400">{label || 'PDF'}</div>
+                </div>
+            )}
+        </>
+    )
+}
+
 export default function AccountingPage() {
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
@@ -96,6 +141,20 @@ export default function AccountingPage() {
     }, [year, month])
 
     useEffect(() => { fetchExpenses() }, [fetchExpenses])
+
+    // Load pdf.js from CDN once
+    useEffect(() => {
+        // @ts-expect-error - loading from CDN
+        if (window.pdfjsLib) return
+        const script = document.createElement('script')
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs'
+        script.type = 'module'
+        // Use classic script for global availability
+        const s2 = document.createElement('script')
+        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js'
+        s2.onload = () => { /* pdfjsLib now on window */ }
+        document.head.appendChild(s2)
+    }, [])
 
     const filtered = useMemo(() => {
         if (!search) return expenses
@@ -439,15 +498,7 @@ export default function AccountingPage() {
                                 <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
                                     className="block h-40 bg-slate-100 relative overflow-hidden border-b border-slate-100 hover:opacity-90 transition">
                                     {expense.receipt_url.includes('.pdf') || expense.notes?.includes('.pdf') ? (
-                                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50">
-                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" className="mb-2 opacity-60">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                                <polyline points="14 2 14 8 20 8" />
-                                                <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><line x1="10" y1="9" x2="8" y2="9" />
-                                            </svg>
-                                            <div className="text-[10px] font-bold text-slate-400">{expense.invoice_number || 'PDF'}</div>
-                                            <div className="text-[9px] text-blue-500 mt-0.5 font-semibold">Odpri</div>
-                                        </div>
+                                        <PdfThumb url={expense.receipt_url} label={expense.invoice_number || 'PDF'} />
                                     ) : (
                                         /* eslint-disable-next-line @next/next/no-img-element */
                                         <img src={expense.receipt_url} alt="Račun" className="w-full h-full object-cover" />
