@@ -439,10 +439,13 @@ export default function AccountingPage() {
                                 <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
                                     className="block h-40 bg-slate-100 relative overflow-hidden border-b border-slate-100 hover:opacity-90 transition">
                                     {expense.receipt_url.includes('.pdf') || expense.notes?.includes('.pdf') ? (
-                                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
-                                            <div className="text-4xl mb-1 opacity-40">&#128196;</div>
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase">PDF dokument</div>
-                                            <div className="text-[9px] text-blue-500 mt-1 font-semibold">Klikni za ogled</div>
+                                        <div className="w-full h-full relative bg-white">
+                                            <iframe
+                                                src={`${expense.receipt_url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                                                className="absolute top-0 left-0 border-0 pointer-events-none"
+                                                style={{ width: '200%', height: '200%', transform: 'scale(0.5)', transformOrigin: 'top left' }}
+                                                title="PDF preview"
+                                            />
                                         </div>
                                     ) : (
                                         /* eslint-disable-next-line @next/next/no-img-element */
