@@ -619,10 +619,12 @@ export default function AccountingReportPage() {
                         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
                             <span className="text-amber-500 text-lg">💰</span>
                             <div>
-                                <div className="text-sm font-bold text-amber-800">Warehouse Margin Share</div>
+                                <div className="text-sm font-bold text-amber-800">Warehouse Margin Share (25%)</div>
                                 <div className="text-xs text-amber-700 mt-1">
-                                    Invoiced margin: <strong>{formatCurrency(marginSummary.invoiced.margin)}</strong> —
-                                    Transport costs are NOT included in this calculation (only item sell price minus item purchase cost).
+                                    Invoiced margin: <strong>{formatCurrency(marginSummary.invoiced.margin)}</strong> ×  25% = <strong>{formatCurrency(marginSummary.invoiced.margin * 0.25)}</strong>
+                                </div>
+                                <div className="text-[10px] text-amber-600 mt-1">
+                                    Transport costs are NOT included (only item sell price minus item purchase cost).
                                 </div>
                             </div>
                         </div>
