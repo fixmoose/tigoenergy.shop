@@ -416,7 +416,7 @@ export default function AccountingPage() {
                 </button>
             </div>
 
-            {/* Expense list */}
+            {/* Expense cards */}
             {loading ? (
                 <div className="text-center py-16 text-slate-400">Nalagam...</div>
             ) : filtered.length === 0 ? (
@@ -426,74 +426,97 @@ export default function AccountingPage() {
                     <div className="text-sm text-slate-400 mt-1">Spustite račun zgoraj ali dodajte ročno</div>
                 </div>
             ) : (
-                <div className="space-y-2">
-                    {filtered.map(expense => (
-                        <div key={expense.id} className={`rounded-xl border transition group ${
-                            isUnprocessed(expense) ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-200 hover:border-slate-300'
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(expense => (
+                        <div key={expense.id} className={`rounded-2xl border transition group overflow-hidden flex flex-col ${
+                            isUnprocessed(expense) ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
                         }`}>
-                            <div className="flex items-center gap-4 px-4 py-3">
-                                {/* Date */}
-                                <div className="w-14 text-center flex-shrink-0">
-                                    <div className="text-[9px] font-bold text-slate-400 uppercase">{monthsSI[new Date(expense.date).getMonth()]}</div>
-                                    <div className="text-xl font-black text-slate-700 leading-tight">{new Date(expense.date).getDate()}</div>
-                                    <div className="text-[9px] text-slate-400">{new Date(expense.date).getFullYear()}</div>
-                                </div>
-
-                                {/* Info */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        {isUnprocessed(expense) ? (
-                                            <span className="text-[10px] font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded animate-pulse">Neobdelano</span>
-                                        ) : (
-                                            <>
-                                                <span className="font-semibold text-sm text-slate-800 truncate">{expense.description}</span>
-                                                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Obdelano</span>
-                                                <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{expense.category}</span>
-                                            </>
-                                        )}
+                            {/* Receipt thumbnail / preview */}
+                            {expense.receipt_url ? (
+                                <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
+                                    className="block h-40 bg-slate-100 relative overflow-hidden border-b border-slate-100 hover:opacity-90 transition">
+                                    {expense.receipt_url.includes('.pdf') || expense.notes?.includes('.pdf') ? (
+                                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
+                                            <div className="text-4xl mb-1 opacity-40">&#128196;</div>
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase">PDF dokument</div>
+                                            <div className="text-[9px] text-blue-500 mt-1 font-semibold">Klikni za ogled</div>
+                                        </div>
+                                    ) : (
+                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                        <img src={expense.receipt_url} alt="Račun" className="w-full h-full object-cover" />
+                                    )}
+                                </a>
+                            ) : (
+                                <label className={`block h-28 flex flex-col items-center justify-center cursor-pointer border-b transition ${
+                                    isUnprocessed(expense) ? 'border-orange-100 bg-orange-50' : 'border-slate-100 bg-slate-50 hover:bg-slate-100'
+                                }`}>
+                                    <div className="text-3xl opacity-20 mb-1">&#128206;</div>
+                                    <div className="text-[10px] font-bold text-slate-400">
+                                        {uploadingReceipt === expense.id ? 'Nalagam...' : '+ Priloži račun'}
                                     </div>
-                                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
-                                        {isUnprocessed(expense) && expense.notes && (
-                                            <span className="text-orange-500">{expense.notes}</span>
-                                        )}
-                                        {expense.supplier && <span>{expense.supplier}</span>}
-                                        {expense.invoice_number && <span className="font-mono">#{expense.invoice_number}</span>}
-                                        {expense.receipt_url ? (
-                                            <a href={expense.receipt_url} target="_blank" rel="noopener noreferrer"
-                                                className="text-blue-600 font-bold hover:underline">
-                                                Odpri dokument
-                                            </a>
-                                        ) : (
-                                            <label className={`font-bold cursor-pointer ${uploadingReceipt === expense.id ? 'text-slate-400' : 'text-orange-500 hover:text-orange-700'}`}>
-                                                {uploadingReceipt === expense.id ? 'Nalagam...' : '+ Priloži račun'}
-                                                <input type="file" className="hidden" accept="image/*,.pdf"
-                                                    disabled={uploadingReceipt === expense.id}
-                                                    onChange={e => { const f = e.target.files?.[0]; if (f) attachReceipt(expense.id, f); e.target.value = '' }} />
-                                            </label>
-                                        )}
-                                    </div>
-                                </div>
+                                    <input type="file" className="hidden" accept="image/*,.pdf"
+                                        disabled={uploadingReceipt === expense.id}
+                                        onChange={e => { const f = e.target.files?.[0]; if (f) attachReceipt(expense.id, f); e.target.value = '' }} />
+                                </label>
+                            )}
 
-                                {/* Amount */}
-                                <div className="text-right flex-shrink-0">
+                            {/* Card body */}
+                            <div className="p-4 flex-1 flex flex-col">
+                                {/* Status + Category badges */}
+                                <div className="flex items-center gap-1.5 flex-wrap mb-2">
                                     {isUnprocessed(expense) ? (
-                                        <div className="text-sm font-bold text-orange-500">—</div>
+                                        <span className="text-[10px] font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded animate-pulse">Neobdelano</span>
                                     ) : (
                                         <>
-                                            <div className="text-base font-black text-red-600">{formatEur(Number(expense.amount_eur))}</div>
-                                            {Number(expense.vat_amount) > 0 && (
-                                                <div className="text-[10px] text-emerald-600 font-semibold">DDV {formatEur(Number(expense.vat_amount))}</div>
-                                            )}
-                                            <div className="text-[10px] text-slate-400">Neto {formatEur(Number(expense.amount_eur) - Number(expense.vat_amount || 0))}</div>
+                                            <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Obdelano</span>
+                                            <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{expense.category}</span>
                                         </>
                                     )}
+                                    <span className="text-[10px] text-slate-400 ml-auto">{formatDate(expense.date)}</span>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition flex-shrink-0">
-                                    <button onClick={() => openEdit(expense)} className="text-xs text-blue-500 hover:text-blue-700 font-bold px-2 py-1 rounded hover:bg-blue-50">Uredi</button>
-                                    <button onClick={() => deleteExpense(expense.id)} className="text-xs text-red-400 hover:text-red-600 font-bold px-2 py-1 rounded hover:bg-red-50">Briši</button>
+                                {/* Description */}
+                                {isUnprocessed(expense) ? (
+                                    <div className="text-xs text-orange-500 mb-2">{expense.notes || 'Čaka na obdelavo'}</div>
+                                ) : (
+                                    <div className="font-semibold text-sm text-slate-800 mb-1 leading-snug">{expense.description}</div>
+                                )}
+
+                                {/* Supplier + Invoice */}
+                                {!isUnprocessed(expense) && (
+                                    <div className="text-xs text-slate-400 mb-3 space-y-0.5">
+                                        {expense.supplier && <div>{expense.supplier}</div>}
+                                        {expense.invoice_number && <div className="font-mono">#{expense.invoice_number}</div>}
+                                    </div>
+                                )}
+
+                                {/* Amount block — pushed to bottom */}
+                                <div className="mt-auto">
+                                    {isUnprocessed(expense) ? (
+                                        <div className="text-sm font-bold text-orange-400">—</div>
+                                    ) : (
+                                        <div className="flex items-end justify-between">
+                                            <div>
+                                                <div className="text-[10px] text-slate-400">Neto</div>
+                                                <div className="text-sm font-bold text-slate-600">{formatEur(Number(expense.amount_eur) - Number(expense.vat_amount || 0))}</div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-[10px] text-slate-400">DDV</div>
+                                                <div className="text-sm font-semibold text-emerald-600">{formatEur(Number(expense.vat_amount || 0))}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] text-slate-400">Skupaj</div>
+                                                <div className="text-lg font-black text-red-600">{formatEur(Number(expense.amount_eur))}</div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
+                            </div>
+
+                            {/* Actions footer */}
+                            <div className="flex border-t border-slate-100 divide-x divide-slate-100 opacity-0 group-hover:opacity-100 transition">
+                                <button onClick={() => openEdit(expense)} className="flex-1 text-xs text-blue-500 hover:text-blue-700 hover:bg-blue-50 font-bold py-2 transition">Uredi</button>
+                                <button onClick={() => deleteExpense(expense.id)} className="flex-1 text-xs text-red-400 hover:text-red-600 hover:bg-red-50 font-bold py-2 transition">Briši</button>
                             </div>
                         </div>
                     ))}
