@@ -257,7 +257,9 @@ export default function AccountingPage() {
     // --- PDF Export ---
     const downloadPDF = () => {
         const periodLabel = month === 0 ? `${year}` : `${monthsFullSI[month - 1]} ${year}`
-        const processed = filtered.filter(e => !isUnprocessed(e))
+        const processed = [...filtered]
+            .filter(e => !isUnprocessed(e))
+            .sort((a, b) => a.category.localeCompare(b.category) || new Date(a.date).getTime() - new Date(b.date).getTime())
 
         const rows = processed.map(e => {
             const net = Number(e.amount_eur) - Number(e.vat_amount || 0)
@@ -283,7 +285,7 @@ export default function AccountingPage() {
         </style></head><body>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
             <div><h1 style="margin:0;font-size:20px">Pregled stroškov</h1><p style="margin:4px 0 0;color:#64748b;font-size:13px">${periodLabel} &mdash; ${processed.length} zapisov</p></div>
-            <div style="text-align:right;font-size:11px;color:#64748b">Tigo Energy d.o.o.<br>Generirano: ${formatDate(new Date().toISOString())}</div>
+            <div style="text-align:right;font-size:11px;color:#64748b">Initra Energija d.o.o.<br>Generirano: ${formatDate(new Date().toISOString())}</div>
         </div>
         <table>
             <thead><tr>
