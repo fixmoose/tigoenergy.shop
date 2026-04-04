@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import * as pdfjsLib from 'pdfjs-dist'
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
 
 const CATEGORIES = [
     'Gorivo',
@@ -59,22 +62,20 @@ function PdfThumb({ url, label }: { url: string; label?: string }) {
         let cancelled = false
         const render = async () => {
             try {
-                // @ts-expect-error - loading from CDN
-                const pdfjsLib = window.pdfjsLib
-                if (!pdfjsLib) return
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs'
                 const pdf = await pdfjsLib.getDocument(url).promise
                 const page = await pdf.getPage(1)
                 const canvas = canvasRef.current
                 if (!canvas || cancelled) return
                 const vp = page.getViewport({ scale: 1 })
-                const scale = Math.min(canvas.width / vp.width, canvas.height / vp.height)
+                const scale = Math.min(300 / vp.width, 400 / vp.height)
                 const viewport = page.getViewport({ scale })
                 canvas.width = viewport.width
                 canvas.height = viewport.height
                 await page.render({ canvasContext: canvas.getContext('2d')!, viewport }).promise
                 if (!cancelled) setLoaded(true)
-            } catch { /* ignore */ }
+            } catch (err) {
+                console.error('PDF thumb error:', err)
+            }
         }
         render()
         return () => { cancelled = true }
@@ -82,7 +83,7 @@ function PdfThumb({ url, label }: { url: string; label?: string }) {
 
     return (
         <>
-            <canvas ref={canvasRef} className={`w-full h-full object-contain ${loaded ? '' : 'hidden'}`} width={300} height={400} />
+            <canvas ref={canvasRef} className={`w-full h-full object-contain bg-white ${loaded ? '' : 'hidden'}`} />
             {!loaded && (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" className="mb-1.5 opacity-50 animate-pulse">
@@ -141,20 +142,6 @@ export default function AccountingPage() {
     }, [year, month])
 
     useEffect(() => { fetchExpenses() }, [fetchExpenses])
-
-    // Load pdf.js from CDN once
-    useEffect(() => {
-        // @ts-expect-error - loading from CDN
-        if (window.pdfjsLib) return
-        const script = document.createElement('script')
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs'
-        script.type = 'module'
-        // Use classic script for global availability
-        const s2 = document.createElement('script')
-        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js'
-        s2.onload = () => { /* pdfjsLib now on window */ }
-        document.head.appendChild(s2)
-    }, [])
 
     const filtered = useMemo(() => {
         if (!search) return expenses
