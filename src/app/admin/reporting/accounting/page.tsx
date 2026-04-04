@@ -69,7 +69,7 @@ export default function AccountingReportPage() {
             if (reportType === 'expenses') {
                 const defaultSummary = { totalAmount: 0, totalVat: 0, totalNet: 0, count: 0, byCategory: [] }
                 try {
-                    const res = await fetch(`/api/admin/expenses?year=${year}&month=${month}`)
+                    const res = await fetch(`/api/admin/expenses?year=${year}${month ? `&month=${month}` : ''}`)
                     const data = await res.json()
                     if (data.success) {
                         setOrders(data.data.expenses || [])
@@ -85,7 +85,7 @@ export default function AccountingReportPage() {
                 setMarginSummary(null)
                 setDdvSummary(null)
             } else {
-                const res = await fetch(`/api/admin/reporting/accounting?year=${year}&month=${month}&type=${reportType}`)
+                const res = await fetch(`/api/admin/reporting/accounting?year=${year}${month ? `&month=${month}` : ''}&type=${reportType}`)
                 const data = await res.json()
                 if (data.success) {
                     if (reportType === 'margin') {
@@ -281,11 +281,13 @@ export default function AccountingReportPage() {
 
 
     const months = [
+        { v: 0, l: 'All Months' },
         { v: 1, l: 'January' }, { v: 2, l: 'February' }, { v: 3, l: 'March' },
         { v: 4, l: 'April' }, { v: 5, l: 'May' }, { v: 6, l: 'June' },
         { v: 7, l: 'July' }, { v: 8, l: 'August' }, { v: 9, l: 'September' },
         { v: 10, l: 'October' }, { v: 11, l: 'November' }, { v: 12, l: 'December' }
     ]
+    const periodLabel = month === 0 ? `${year}` : `${months.find(m => m.v === month)?.l} ${year}`
 
     return (
         <div className="space-y-6">
@@ -340,7 +342,7 @@ export default function AccountingReportPage() {
                                 <AccountingReportPDF
                                     orders={filteredOrders}
                                     summary={summary}
-                                    period={`${months[month - 1].l} ${year}`}
+                                    period={`${periodLabel}`}
                                 />
                             }
                             fileName={`accounting_report_${year}_${month}.pdf`}
@@ -449,7 +451,7 @@ export default function AccountingReportPage() {
                     ) : filteredOrders.length === 0 ? (
                         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
                             <div className="text-3xl opacity-30 mb-3">&#128203;</div>
-                            <div className="text-slate-500 font-medium">No expenses for {months[month - 1].l} {year}</div>
+                            <div className="text-slate-500 font-medium">No expenses for {periodLabel}</div>
                             <div className="text-sm text-slate-400 mt-1">Drop a receipt above or add one manually</div>
                         </div>
                     ) : (
@@ -629,7 +631,7 @@ export default function AccountingReportPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="text-sm font-medium text-slate-500 mb-1">Total Sales ({months[month - 1].l} {year})</div>
+                        <div className="text-sm font-medium text-slate-500 mb-1">Total Sales ({periodLabel})</div>
                         <div className="text-3xl font-bold text-slate-800">{formatCurrency(summary.totalRevenue)}</div>
                         <div className="text-xs text-slate-400 mt-2">Inc. VAT where applicable</div>
                     </div>

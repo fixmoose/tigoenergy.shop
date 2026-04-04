@@ -211,15 +211,15 @@ export default function ReportingDashboard() {
           </div>
         </div>
 
-        {/* ACCOUNTING - Fixed */}
+        {/* STATISTICS */}
         <div className="p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow flex flex-col">
           <Link href="/admin/reporting/accounting" className="flex-1">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-2xl">🧾</span>
+              <span className="text-2xl">📊</span>
               <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded font-medium">Financial</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Accounting</h3>
-            <p className="text-sm text-slate-500">Invoices, revenue reports, and financial exports.</p>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Statistics</h3>
+            <p className="text-sm text-slate-500">Orders, invoices, margins, VAT, and financial exports.</p>
             {!loading && (
               <div className="mt-4 pt-4 border-t border-slate-100">
                 <div className="flex justify-between text-sm">

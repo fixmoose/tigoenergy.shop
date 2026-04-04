@@ -71,7 +71,7 @@ export default function AccountingPage() {
         setLoading(true)
         const defaultSummary: Summary = { totalAmount: 0, totalVat: 0, totalNet: 0, count: 0, byCategory: [] }
         try {
-            const res = await fetch(`/api/admin/expenses?year=${year}&month=${month}`)
+            const res = await fetch(`/api/admin/expenses?year=${year}${month ? `&month=${month}` : ''}`)
             const data = await res.json()
             if (data.success) {
                 setExpenses(data.data.expenses || [])
@@ -244,6 +244,7 @@ export default function AccountingPage() {
                 <div className="flex items-center gap-2">
                     <select value={month} onChange={e => setMonth(Number(e.target.value))}
                         className="border rounded-lg px-3 py-2 text-sm bg-white">
+                        <option value={0}>All Months</option>
                         {monthsFull.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                     </select>
                     <select value={year} onChange={e => setYear(Number(e.target.value))}
@@ -334,7 +335,7 @@ export default function AccountingPage() {
             ) : filtered.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
                     <div className="text-4xl opacity-20 mb-2">&#128203;</div>
-                    <div className="text-slate-500">No expenses for {monthsFull[month - 1]} {year}</div>
+                    <div className="text-slate-500">No expenses for {month === 0 ? year : `${monthsFull[month - 1]} ${year}`}</div>
                     <div className="text-sm text-slate-400 mt-1">Drop a receipt above or add one manually</div>
                 </div>
             ) : (
