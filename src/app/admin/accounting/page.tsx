@@ -269,6 +269,7 @@ export default function AccountingPage() {
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px">${e.description}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px">${e.category}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px">${e.supplier || '-'}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;font-family:monospace">${e.invoice_number || '-'}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;text-align:right">${formatEur(net)}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;text-align:right">${formatEur(Number(e.vat_amount || 0))}</td>
                     <td style="padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;text-align:right;font-weight:bold">${formatEur(Number(e.amount_eur))}</td>
@@ -289,12 +290,12 @@ export default function AccountingPage() {
         </div>
         <table>
             <thead><tr>
-                <th>Datum</th><th>Opis</th><th>Kategorija</th><th>Dobavitelj</th>
+                <th>Datum</th><th>Opis</th><th>Kategorija</th><th>Dobavitelj</th><th>Št. računa</th>
                 <th style="text-align:right">Neto</th><th style="text-align:right">DDV</th><th style="text-align:right">Skupaj</th>
             </tr></thead>
             <tbody>${rows}</tbody>
             <tfoot><tr style="font-weight:bold;background:#f8fafc">
-                <td colspan="4" style="padding:8px 10px;border-top:2px solid #cbd5e1;font-size:12px">SKUPAJ</td>
+                <td colspan="5" style="padding:8px 10px;border-top:2px solid #cbd5e1;font-size:12px">SKUPAJ</td>
                 <td style="padding:8px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:12px">${formatEur(totalNet)}</td>
                 <td style="padding:8px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:12px">${formatEur(totalVat)}</td>
                 <td style="padding:8px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:12px">${formatEur(totalAmount)}</td>
