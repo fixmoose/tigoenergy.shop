@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { date, description, category, amount_eur, vat_amount, supplier, invoice_number, notes } = body
+    const { date, description, category, amount_eur, vat_amount, supplier, invoice_number, notes, receipt_url } = body
 
     if (!date || !description || !category || amount_eur == null) {
         return NextResponse.json({ error: 'Missing required fields: date, description, category, amount_eur' }, { status: 400 })
@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
             supplier: supplier || null,
             invoice_number: invoice_number || null,
             notes: notes || null,
+            receipt_url: receipt_url || null,
         })
         .select()
         .single()
