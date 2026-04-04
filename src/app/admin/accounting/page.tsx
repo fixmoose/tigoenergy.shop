@@ -185,23 +185,23 @@ export default function AccountingPage() {
             fd.append('path', storagePath)
             await fetch('/api/admin/expenses/upload', { method: 'PUT', body: fd })
 
-            // Create expense with receipt
+            // Create unprocessed expense with receipt — no form needed
             const receiptUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(storagePath)}`
             const res = await fetch('/api/admin/expenses', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date: new Date().toISOString().split('T')[0],
-                    description: file.name.replace(/\.[^.]+$/, ''),
+                    description: 'Unprocessed',
                     category: 'Other',
                     amount_eur: 0,
                     vat_amount: 0,
                     receipt_url: receiptUrl,
+                    notes: `Original file: ${file.name}`,
                 }),
             })
             const data = await res.json()
-            if (data.success && data.data) {
-                openEdit(data.data)
+            if (data.success) {
                 fetchExpenses()
             } else {
                 alert('Failed: ' + (data.error || 'Unknown'))
@@ -353,7 +353,11 @@ export default function AccountingPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <span className="font-semibold text-sm text-slate-800 truncate">{expense.description}</span>
-                                        <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{expense.category}</span>
+                                        {expense.description === 'Unprocessed' && Number(expense.amount_eur) === 0 ? (
+                                            <span className="text-[10px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded animate-pulse">Unprocessed</span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{expense.category}</span>
+                                        )}
                                     </div>
                                     <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
                                         {expense.supplier && <span>{expense.supplier}</span>}
