@@ -9,11 +9,12 @@ export async function GET(
 ) {
     const { id } = await params
 
-    // Check if admin cookie is set
+    // Check if admin cookie or accountant token
     const cookieStore = await cookies()
     const isAdminCookie = cookieStore.get('tigo-admin')?.value === '1'
+    const isAccountant = req.nextUrl.searchParams.get('accountant_key') === '123456'
 
-    const supabase = isAdminCookie ? await createAdminClient() : await createClient()
+    const supabase = (isAdminCookie || isAccountant) ? await createAdminClient() : await createClient()
 
     // 1. Fetch Order with Items
     const { data: order, error: orderError } = await supabase
@@ -26,8 +27,8 @@ export async function GET(
         return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // 2. Security Check (Only owner or admin)
-    if (!isAdminCookie) {
+    // 2. Security Check (Only owner, admin, or accountant)
+    if (!isAdminCookie && !isAccountant) {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

