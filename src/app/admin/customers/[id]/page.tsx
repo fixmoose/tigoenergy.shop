@@ -43,6 +43,17 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
     .eq('customer_id', id)
     .order('created_at', { ascending: false })
 
+  // Fetch manual invoices matching this customer's VAT ID
+  let manualInvoices: any[] = []
+  if (customer?.vat_id) {
+    const { data: mi } = await supabase
+      .from('manual_invoices')
+      .select('id,invoice_number,invoice_date,customer_name,company_name,net_amount,vat_amount,total,currency,pdf_url,paid,paid_at')
+      .eq('vat_id', customer.vat_id)
+      .order('invoice_date', { ascending: false })
+    manualInvoices = mi || []
+  }
+
   // Fetch Pricing Data
   const allSchemas = await getPricingSchemas()
   const currentSchemas = await getCustomerSchemas(id)
@@ -188,6 +199,81 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                 )}
               </div>
             </section>
+
+            {/* Manual / Imported Invoices */}
+            {manualInvoices.length > 0 && (
+              <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                  <div>
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Imported Invoices</h3>
+                    <p className="text-sm font-bold text-gray-900 mt-0.5">Invoices from Initra (external software)</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {manualInvoices.filter(i => !i.paid).length > 0 && (
+                      <span className="bg-red-50 px-3 py-1 rounded-full text-[10px] font-black text-red-600 border border-red-100 uppercase tracking-widest">
+                        {manualInvoices.filter(i => !i.paid).length} Unpaid
+                      </span>
+                    )}
+                    <span className="bg-white px-3 py-1 rounded-full text-[10px] font-black text-amber-600 border border-amber-100 uppercase tracking-widest">
+                      {manualInvoices.length} Invoices
+                    </span>
+                  </div>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {manualInvoices.map((inv: any) => (
+                    <div key={inv.id} className="p-6 hover:bg-gray-50/50 transition-colors">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-black text-gray-900">
+                              {inv.invoice_number}
+                            </span>
+                            <span className={`text-[10px] px-3 py-1 rounded-lg border font-black uppercase tracking-widest ${
+                              inv.paid
+                                ? 'bg-amber-50 text-amber-700 border-amber-100'
+                                : 'bg-red-50 text-red-700 border-red-100'
+                            }`}>
+                              {inv.paid ? 'Paid' : 'Unpaid'}
+                            </span>
+                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            {new Date(inv.invoice_date).toLocaleDateString('en-GB')}
+                            {inv.paid && inv.paid_at && ` • Paid ${new Date(inv.paid_at).toLocaleDateString('en-GB')}`}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Total</p>
+                            <p className={`text-lg font-black ${inv.paid ? 'text-gray-900' : 'text-red-700'}`}>
+                              {inv.currency || 'EUR'} {Number(inv.total).toFixed(2)}
+                            </p>
+                          </div>
+                          {inv.pdf_url && (
+                            <a
+                              href={inv.pdf_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition shadow-sm"
+                              title="Download PDF"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {manualInvoices.filter(i => !i.paid).length > 0 && (
+                  <div className="px-8 py-4 bg-red-50/50 border-t border-red-100 flex justify-between items-center">
+                    <span className="text-xs font-black text-red-600 uppercase tracking-widest">Total Unpaid</span>
+                    <span className="text-lg font-black text-red-700">
+                      EUR {manualInvoices.filter(i => !i.paid).reduce((s: number, i: any) => s + Number(i.total), 0).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* Quotes Section */}
             {quotes && quotes.length > 0 && (
