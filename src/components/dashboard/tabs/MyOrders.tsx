@@ -21,9 +21,23 @@ const QUOTE_STATUS_STYLES: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-500',
 }
 
+interface UnpaidInvoice {
+    id: string
+    invoice_number: string
+    invoice_date: string
+    customer_name: string | null
+    company_name: string | null
+    total: number
+    vat_amount: number
+    currency: string
+    pdf_url: string | null
+    paid: boolean
+}
+
 export default function MyOrders({ user, customer }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
+    const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const t = useTranslations('dashboard')
@@ -48,6 +62,13 @@ export default function MyOrders({ user, customer }: Props) {
             if (ordersRes.data) setOrders(ordersRes.data)
             if (quotesRes.data) setQuotes(quotesRes.data)
             setLoading(false)
+
+            // Fetch unpaid manual invoices for this customer
+            try {
+                const res = await fetch('/api/customer/unpaid-invoices')
+                const data = await res.json()
+                if (data.success) setUnpaidInvoices(data.data || [])
+            } catch { /* ignore */ }
         }
         fetchData()
     }, [user.id])
@@ -149,6 +170,61 @@ export default function MyOrders({ user, customer }: Props) {
                                 >
                                     {t('viewQuote')}
                                 </a>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* Unpaid Invoices from Initra */}
+        {!loading && unpaidInvoices.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden mb-6">
+                <div className="p-6 border-b border-red-100 bg-red-50/50 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-red-100 text-red-700 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-lg text-gray-900">Unpaid Invoices</h3>
+                        <p className="text-sm text-red-600 font-medium">
+                            {unpaidInvoices.length} invoice{unpaidInvoices.length !== 1 ? 's' : ''} outstanding &mdash; {unpaidInvoices[0]?.currency || 'EUR'} {unpaidInvoices.reduce((s, i) => s + i.total, 0).toFixed(2)}
+                        </p>
+                    </div>
+                </div>
+                <div className="divide-y divide-red-50">
+                    {unpaidInvoices.map(inv => (
+                        <div key={inv.id} className="p-6 hover:bg-red-50/30 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-red-100 p-3 rounded-xl">
+                                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1 flex-wrap">
+                                        <span className="font-bold text-lg text-gray-900">Invoice #{inv.invoice_number}</span>
+                                        <span className="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider bg-red-100 text-red-700">
+                                            Unpaid
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium">
+                                        {new Date(inv.invoice_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-none pt-4 md:pt-0">
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">Amount Due</p>
+                                    <p className="text-lg font-bold text-red-700">{inv.currency || 'EUR'} {inv.total.toFixed(2)}</p>
+                                </div>
+                                {inv.pdf_url && (
+                                    <a
+                                        href={inv.pdf_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
+                                    >
+                                        Download PDF
+                                    </a>
+                                )}
                             </div>
                         </div>
                     ))}
