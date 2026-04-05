@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Order } from '@/types/database'
@@ -10,10 +10,33 @@ function formatCurrency(amount: number) {
     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
 }
 
+interface ManualInvoice {
+    id: string
+    invoice_number: string
+    invoice_date: string
+    customer_name: string | null
+    company_name: string | null
+    vat_id: string | null
+    net_amount: number
+    vat_amount: number
+    total: number
+    currency: string
+    pdf_url: string | null
+    notes: string | null
+    created_at: string
+}
+
 export default function InvoicesPage() {
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+    const [manualInvoices, setManualInvoices] = useState<ManualInvoice[]>([])
+    const [uploading, setUploading] = useState(false)
+    const [uploadStatus, setUploadStatus] = useState<string[]>([])
+    const [dragOver, setDragOver] = useState(false)
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editForm, setEditForm] = useState<Partial<ManualInvoice>>({})
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const supabase = createClient()
 
     async function fetchOrders() {
@@ -29,8 +52,78 @@ export default function InvoicesPage() {
         setLoading(false)
     }
 
+    async function fetchManualInvoices() {
+        const res = await fetch('/api/admin/manual-invoices')
+        const data = await res.json()
+        if (data.success) setManualInvoices(data.data || [])
+    }
+
+    const uploadFiles = useCallback(async (files: FileList | File[]) => {
+        const pdfs = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf'))
+        if (pdfs.length === 0) return
+
+        setUploading(true)
+        setUploadStatus([])
+        const statuses: string[] = []
+
+        for (const file of pdfs) {
+            statuses.push(`Uploading ${file.name}...`)
+            setUploadStatus([...statuses])
+            const form = new FormData()
+            form.append('file', file)
+            try {
+                const res = await fetch('/api/admin/manual-invoices', { method: 'POST', body: form })
+                const data = await res.json()
+                if (data.success) {
+                    statuses[statuses.length - 1] = `${file.name} — ${data.data.invoice_number || 'imported'}`
+                } else {
+                    statuses[statuses.length - 1] = `${file.name} — Error: ${data.error}`
+                }
+            } catch {
+                statuses[statuses.length - 1] = `${file.name} — Upload failed`
+            }
+            setUploadStatus([...statuses])
+        }
+
+        setUploading(false)
+        fetchManualInvoices()
+        setTimeout(() => setUploadStatus([]), 5000)
+    }, [])
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault()
+        setDragOver(false)
+        if (e.dataTransfer.files.length > 0) uploadFiles(e.dataTransfer.files)
+    }, [uploadFiles])
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault()
+        setDragOver(true)
+    }, [])
+
+    const handleDragLeave = useCallback(() => setDragOver(false), [])
+
+    const startEdit = (inv: ManualInvoice) => {
+        setEditingId(inv.id)
+        setEditForm({ invoice_number: inv.invoice_number, invoice_date: inv.invoice_date, customer_name: inv.customer_name || '', company_name: inv.company_name || '', vat_id: inv.vat_id || '', net_amount: inv.net_amount, vat_amount: inv.vat_amount, total: inv.total })
+    }
+
+    const saveEdit = async () => {
+        if (!editingId) return
+        await fetch('/api/admin/manual-invoices', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...editForm }) })
+        setEditingId(null)
+        fetchManualInvoices()
+    }
+
+    const deleteInvoice = async (id: string) => {
+        if (!confirm('Delete this imported invoice?')) return
+        await fetch('/api/admin/manual-invoices', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+        fetchManualInvoices()
+    }
+
     useEffect(() => {
         fetchOrders()
+        fetchManualInvoices()
     }, [])
 
     return (
@@ -107,6 +200,111 @@ export default function InvoicesPage() {
                         + Create One-Off Invoice
                     </button>
                 </div>
+            </div>
+
+            {/* Import External Invoices — Drag & Drop */}
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold text-slate-800">Import External Invoices</h2>
+                <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition ${dragOver ? 'border-blue-500 bg-blue-50' : 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'}`}
+                >
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf"
+                        multiple
+                        className="hidden"
+                        onChange={e => e.target.files && uploadFiles(e.target.files)}
+                    />
+                    <div className="text-3xl mb-2">{uploading ? '...' : '📄'}</div>
+                    <p className="text-sm font-bold text-slate-600">
+                        {uploading ? 'Processing...' : 'Drop PDF invoices here or click to select'}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">Data will be extracted automatically. You can edit after import.</p>
+                </div>
+
+                {uploadStatus.length > 0 && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1">
+                        {uploadStatus.map((s, i) => (
+                            <div key={i} className="text-xs text-slate-600">{s}</div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Imported Invoices Table */}
+                {manualInvoices.length > 0 && (
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-500 uppercase">Imported Invoices ({manualInvoices.length})</span>
+                        </div>
+                        <table className="w-full text-sm">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Invoice #</th>
+                                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Date</th>
+                                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Customer</th>
+                                    <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Net</th>
+                                    <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">VAT</th>
+                                    <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Total</th>
+                                    <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase w-32">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {manualInvoices.map(inv => (
+                                    <tr key={inv.id} className="hover:bg-slate-50/50 transition">
+                                        {editingId === inv.id ? (
+                                            <>
+                                                <td className="px-4 py-2"><input className="w-full border rounded px-2 py-1 text-xs font-mono" value={editForm.invoice_number || ''} onChange={e => setEditForm(f => ({ ...f, invoice_number: e.target.value }))} /></td>
+                                                <td className="px-4 py-2"><input type="date" className="border rounded px-2 py-1 text-xs" value={editForm.invoice_date || ''} onChange={e => setEditForm(f => ({ ...f, invoice_date: e.target.value }))} /></td>
+                                                <td className="px-4 py-2">
+                                                    <input className="w-full border rounded px-2 py-1 text-xs mb-1" placeholder="Company" value={editForm.company_name || ''} onChange={e => setEditForm(f => ({ ...f, company_name: e.target.value }))} />
+                                                    <input className="w-full border rounded px-2 py-1 text-xs" placeholder="Name" value={editForm.customer_name || ''} onChange={e => setEditForm(f => ({ ...f, customer_name: e.target.value }))} />
+                                                </td>
+                                                <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.net_amount || 0} onChange={e => setEditForm(f => ({ ...f, net_amount: Number(e.target.value) }))} /></td>
+                                                <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.vat_amount || 0} onChange={e => setEditForm(f => ({ ...f, vat_amount: Number(e.target.value) }))} /></td>
+                                                <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.total || 0} onChange={e => setEditForm(f => ({ ...f, total: Number(e.target.value) }))} /></td>
+                                                <td className="px-4 py-2 text-right space-x-1">
+                                                    <button onClick={saveEdit} className="text-xs font-bold text-green-600 hover:text-green-800">Save</button>
+                                                    <button onClick={() => setEditingId(null)} className="text-xs font-bold text-slate-400 hover:text-slate-600">Cancel</button>
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td className="px-4 py-3 font-mono font-bold text-slate-800">{inv.invoice_number}</td>
+                                                <td className="px-4 py-3 text-slate-600">{new Date(inv.invoice_date).toLocaleDateString('en-GB')}</td>
+                                                <td className="px-4 py-3">
+                                                    <div className="font-medium text-slate-800">{inv.company_name || inv.customer_name || '-'}</div>
+                                                    {inv.vat_id && <div className="text-[10px] text-slate-400">{inv.vat_id}</div>}
+                                                </td>
+                                                <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(inv.net_amount)}</td>
+                                                <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(inv.vat_amount)}</td>
+                                                <td className="px-4 py-3 text-right font-bold text-slate-800">{formatCurrency(inv.total)}</td>
+                                                <td className="px-4 py-3 text-right space-x-2">
+                                                    {inv.pdf_url && <a href={inv.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-500 hover:text-blue-700">PDF</a>}
+                                                    <button onClick={() => startEdit(inv)} className="text-xs font-bold text-slate-500 hover:text-slate-700">Edit</button>
+                                                    <button onClick={() => deleteInvoice(inv.id)} className="text-xs font-bold text-red-400 hover:text-red-600">Del</button>
+                                                </td>
+                                            </>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr className="bg-slate-50 font-bold border-t border-slate-200">
+                                    <td colSpan={3} className="px-4 py-3 text-slate-600 text-xs">TOTAL</td>
+                                    <td className="px-4 py-3 text-right text-slate-600 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.net_amount, 0))}</td>
+                                    <td className="px-4 py-3 text-right text-slate-600 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.vat_amount, 0))}</td>
+                                    <td className="px-4 py-3 text-right text-slate-800 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.total, 0))}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {isCreateModalOpen && (

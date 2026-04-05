@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getIntrastatReport, saveIntrastatReport, generateIntrastatCSV } from '@/lib/db/compliance'
+import { getIntrastatReport, saveIntrastatReport, generateIntrastatCSV, generateIntrastatXML } from '@/lib/db/compliance'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,6 +24,17 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'text/csv',
           'Content-Disposition': `attachment; filename="intrastat-${monthName}-${year}.csv"`,
+        },
+      })
+    }
+
+    if (format === 'xml') {
+      const xml = await generateIntrastatXML(year, month)
+      const monthPad = month.toString().padStart(2, '0')
+      return new NextResponse(xml, {
+        headers: {
+          'Content-Type': 'application/xml',
+          'Content-Disposition': `attachment; filename="INSTAT_${year}${monthPad}.xml"`,
         },
       })
     }

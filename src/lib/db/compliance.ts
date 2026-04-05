@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import type {
   OSSReportRow,
   OSSSummary,
@@ -361,6 +361,220 @@ export function generateIntrastatCSV(report: IntrastatReportData): string {
   )
 
   return [headers.join(','), ...rows].join('\n')
+}
+
+// Country name → ISO 2-letter code mapping for country_of_origin normalization
+const COUNTRY_NAME_TO_ISO: Record<string, string> = {
+  'Thailand': 'TH', 'China': 'CN', 'Netherlands': 'NL', 'Germany': 'DE',
+  'United States': 'US', 'USA': 'US', 'Taiwan': 'TW', 'Japan': 'JP',
+  'South Korea': 'KR', 'Korea': 'KR', 'India': 'IN', 'Vietnam': 'VN',
+  'Malaysia': 'MY', 'Indonesia': 'ID', 'Italy': 'IT', 'France': 'FR',
+  'Spain': 'ES', 'Czech Republic': 'CZ', 'Czechia': 'CZ', 'Poland': 'PL',
+  'Austria': 'AT', 'Belgium': 'BE', 'Croatia': 'HR', 'Slovenia': 'SI',
+  'Hungary': 'HU', 'Romania': 'RO', 'Bulgaria': 'BG', 'Slovakia': 'SK',
+  'Portugal': 'PT', 'Sweden': 'SE', 'Denmark': 'DK', 'Finland': 'FI',
+  'Ireland': 'IE', 'Greece': 'GR', 'Estonia': 'EE', 'Latvia': 'LV',
+  'Lithuania': 'LT', 'Luxembourg': 'LU', 'Malta': 'MT', 'Cyprus': 'CY',
+}
+
+function normalizeCountryCode(code: string | null | undefined): string {
+  if (!code) return 'US'
+  if (code.length === 2) return code.toUpperCase()
+  return COUNTRY_NAME_TO_ISO[code] || code.substring(0, 2).toUpperCase()
+}
+
+// EU member states (excluding SI for dispatch filtering)
+const EU_COUNTRIES = new Set([
+  'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU',
+  'IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','ES','SE'
+])
+
+/**
+ * Generate INSTAT XML for Slovenian Intrastat reporting to SURS.
+ * Each order to an EU country becomes a Declaration with Items.
+ */
+export async function generateIntrastatXML(year: number, month: number): Promise<string> {
+  const supabase = await createAdminClient()
+
+  const periodStart = `${year}-${month.toString().padStart(2, '0')}-01`
+  const nextMonth = month < 12 ? month + 1 : 1
+  const nextYear = month < 12 ? year : year + 1
+  const periodEnd = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`
+  const referencePeriod = `${year}${month.toString().padStart(2, '0')}`
+
+  // Fetch all invoiced orders dispatched to EU countries in this period
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select('id,order_number,invoice_number,delivery_country,vat_id,subtotal,total,vat_amount,shipped_at,invoice_created_at')
+    .not('invoice_number', 'is', null)
+    .not('delivery_country', 'is', null)
+    .neq('delivery_country', 'SI')
+    .gte('invoice_created_at', periodStart)
+    .lt('invoice_created_at', periodEnd)
+    .order('invoice_created_at', { ascending: true })
+
+  if (error) throw new Error(`Failed to fetch orders: ${error.message}`)
+
+  // Filter to EU-only destinations
+  const euOrders = (orders || []).filter(o => EU_COUNTRIES.has(o.delivery_country))
+  if (euOrders.length === 0) {
+    // Return minimal valid XML with no declarations
+    return generateEmptyInstatXML(referencePeriod)
+  }
+
+  // Fetch order items for all EU orders
+  const orderIds = euOrders.map(o => o.id)
+  const { data: allItems } = await supabase
+    .from('order_items')
+    .select('order_id,product_name,sku,quantity,unit_price,total_price,weight_kg,cn_code,product_id')
+    .in('order_id', orderIds)
+
+  // Fetch products for country_of_origin
+  const productIds = [...new Set((allItems || []).map(i => i.product_id).filter(Boolean))]
+  let productMap: Record<string, { country_of_origin: string; cn_code: string; weight_kg: number }> = {}
+  if (productIds.length > 0) {
+    const { data: products } = await supabase
+      .from('products')
+      .select('id,country_of_origin,cn_code,weight_kg')
+      .in('id', productIds)
+    for (const p of products || []) {
+      productMap[p.id] = p
+    }
+  }
+
+  // Group items by order
+  const itemsByOrder: Record<string, NonNullable<typeof allItems>> = {}
+  for (const item of allItems || []) {
+    if (!itemsByOrder[item.order_id]) itemsByOrder[item.order_id] = []
+    itemsByOrder[item.order_id]!.push(item)
+  }
+
+  // Build XML
+  const now = new Date()
+  const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`
+  const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`
+  const PSI = 'SI62518313'
+  const PSI_DIGITS = '62518313'
+  const YY = year.toString().slice(-2)
+
+  const lines: string[] = []
+  lines.push('<?xml version="1.0" encoding="UTF-8"?>')
+  lines.push('<INSTAT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://intrastat-surs.gov.si/xml/schema/INSTAT62-SI.xsd">')
+  lines.push('    <Envelope>')
+  lines.push(`        <envelopeId>${Math.floor(Math.random()*9000+1000)}_${dateStr.replace(/-/g,'')}_${timeStr.replace(/:/g,'')}</envelopeId>`)
+  lines.push('        <DateTime>')
+  lines.push(`            <date>${dateStr}</date>`)
+  lines.push(`            <time>${timeStr}</time>`)
+  lines.push('        </DateTime>')
+  lines.push('        <Party partyType="PSI" partyRole="sender">')
+  lines.push(`            <partyId>${PSI}    000</partyId>`)
+  lines.push('            <partyName>INITRA ENERGIJA, PRODAJA IN STORITVE, D.O.O.</partyName>')
+  lines.push('        </Party>')
+  lines.push('        <Party partyType="CC" partyRole="receiver">')
+  lines.push('            <partyId>SI47730811    000</partyId>')
+  lines.push('            <partyName>Carinski urad Nova Gorica</partyName>')
+  lines.push('        </Party>')
+
+  let declSeq = 1
+  for (let oi = 0; oi < euOrders.length; oi++) {
+    const order = euOrders[oi]
+    const items = itemsByOrder[order.id] || []
+    if (items.length === 0) continue
+
+    const isLast = oi === euOrders.length - 1
+    const hasPartner = !!order.vat_id
+    // flowCode=1 for dispatches (goods leaving SI)
+    const declType = 'RACN'
+    const declId = `${PSI_DIGITS}${YY}${declType}${declSeq.toString().padStart(5, '0')}`
+
+    lines.push('        <Declaration>')
+    lines.push(`            <declarationId>${declId}</declarationId>`)
+    lines.push(`            <referencePeriod>${referencePeriod}</referencePeriod>`)
+    lines.push(`            <PSIId>${PSI_DIGITS}000</PSIId>`)
+    lines.push('            <Function>')
+    lines.push('                <functionCode>I</functionCode>')
+    lines.push('            </Function>')
+    lines.push('            <flowCode>1</flowCode>')
+    lines.push('            <currencyCode>EUR</currencyCode>')
+    lines.push(`            <firstLast>${isLast ? '1' : '0'}</firstLast>`)
+
+    for (let ii = 0; ii < items.length; ii++) {
+      const item = items[ii]
+      const product = item.product_id ? productMap[item.product_id] : null
+      const cnCode = (item.cn_code || product?.cn_code || '00000000').replace(/\D/g, '').padEnd(8, '0')
+      const originCountry = normalizeCountryCode(product?.country_of_origin)
+      const weightPerUnit = item.weight_kg || product?.weight_kg || 0
+      const netMass = Number((weightPerUnit * item.quantity).toFixed(2))
+      // invoicedAmount = net value (subtotal for this line, excluding VAT)
+      const invoicedAmount = Number(item.total_price || 0)
+
+      lines.push('            <Item>')
+      lines.push(`                <itemNumber>${ii + 1}</itemNumber>`)
+      lines.push('                <CN8>')
+      lines.push(`                    <CN8Code>${cnCode}</CN8Code>`)
+      lines.push('                </CN8>')
+      lines.push(`                <goodsDescription>${escapeXml(item.product_name)}</goodsDescription>`)
+      lines.push(`                <MSConsDestCode>${order.delivery_country}</MSConsDestCode>`)
+      lines.push(`                <countryOfOriginCode>${originCountry}</countryOfOriginCode>`)
+      lines.push(`                <netMass>${netMass}</netMass>`)
+      lines.push(`                <quantityInSU>${item.quantity}</quantityInSU>`)
+      lines.push(`                <invoicedAmount>${invoicedAmount}</invoicedAmount>`)
+      lines.push(`                <statisticalValue>${invoicedAmount}</statisticalValue>`)
+      if (hasPartner) {
+        lines.push(`                <partnerId>${escapeXml(order.vat_id)}</partnerId>`)
+      }
+      lines.push('                <NatureOfTransaction>')
+      lines.push('                    <natureOfTransactionACode>1</natureOfTransactionACode>')
+      lines.push('                    <natureOfTransactionBCode>1</natureOfTransactionBCode>')
+      lines.push('                </NatureOfTransaction>')
+      lines.push('                <modeOfTransportCode>3</modeOfTransportCode>')
+      lines.push('                <DeliveryTerms>')
+      lines.push('                    <TODCode>DDP</TODCode>')
+      lines.push('                    <locationCode>2</locationCode>')
+      lines.push('                </DeliveryTerms>')
+      lines.push('                <numberOfConsignments>1</numberOfConsignments>')
+      lines.push('            </Item>')
+    }
+
+    lines.push(`            <totalNumberLines>${items.length}</totalNumberLines>`)
+    lines.push('        </Declaration>')
+    declSeq++
+  }
+
+  lines.push(`        <numberOfDeclarations>${declSeq - 1}</numberOfDeclarations>`)
+  lines.push('    </Envelope>')
+  lines.push('</INSTAT>')
+
+  return lines.join('\n')
+}
+
+function generateEmptyInstatXML(referencePeriod: string): string {
+  const now = new Date()
+  const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`
+  const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<INSTAT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://intrastat-surs.gov.si/xml/schema/INSTAT62-SI.xsd">
+    <Envelope>
+        <envelopeId>${Math.floor(Math.random()*9000+1000)}_${dateStr.replace(/-/g,'')}_${timeStr.replace(/:/g,'')}</envelopeId>
+        <DateTime>
+            <date>${dateStr}</date>
+            <time>${timeStr}</time>
+        </DateTime>
+        <Party partyType="PSI" partyRole="sender">
+            <partyId>SI62518313    000</partyId>
+            <partyName>INITRA ENERGIJA, PRODAJA IN STORITVE, D.O.O.</partyName>
+        </Party>
+        <Party partyType="CC" partyRole="receiver">
+            <partyId>SI47730811    000</partyId>
+            <partyName>Carinski urad Nova Gorica</partyName>
+        </Party>
+        <numberOfDeclarations>0</numberOfDeclarations>
+    </Envelope>
+</INSTAT>`
+}
+
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
 }
 
 export function generateETRODCSV(report: ETRODReportData): string {

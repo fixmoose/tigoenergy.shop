@@ -28,6 +28,7 @@ interface Invoice {
     company_name: string | null
     status: string
     currency: string
+    source?: 'shop' | 'import'
 }
 
 interface Summary {
@@ -251,10 +252,17 @@ export default function RacunovodstvoPage() {
                                             <td className="px-4 py-3 text-right text-slate-600">{formatEur(Number(inv.vat_amount || 0))}</td>
                                             <td className="px-4 py-3 text-right font-bold text-slate-800">{formatEur(Number(inv.total))}</td>
                                             <td className="px-4 py-3 text-center">
-                                                <a href={invoiceDownloadUrl(inv.id)} target="_blank" rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:text-blue-700 font-bold text-xs">
-                                                    PDF
-                                                </a>
+                                                {inv.source === 'import' && inv.invoice_url ? (
+                                                    <a href={storageUrl(inv.invoice_url)} target="_blank" rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:text-blue-700 font-bold text-xs">
+                                                        PDF
+                                                    </a>
+                                                ) : (
+                                                    <a href={invoiceDownloadUrl(inv.id)} target="_blank" rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:text-blue-700 font-bold text-xs">
+                                                        PDF
+                                                    </a>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

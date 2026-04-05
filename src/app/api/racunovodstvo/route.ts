@@ -50,8 +50,37 @@ export async function GET(req: NextRequest) {
     const invoices = (rawInvoices || []).map(inv => {
         const addr = inv.shipping_address as Record<string, string> | null
         const customerName = addr ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim() : inv.customer_email
-        return { ...inv, customer_name: customerName, shipping_address: undefined }
+        return { ...inv, customer_name: customerName, shipping_address: undefined, source: 'shop' as const }
     })
+
+    // Fetch manual (imported) invoices for the same period
+    const { data: manualInvoices } = await supabase
+        .from('manual_invoices')
+        .select('id,invoice_number,invoice_date,customer_name,company_name,vat_id,net_amount,vat_amount,total,currency,pdf_url')
+        .gte('invoice_date', start)
+        .lt('invoice_date', end)
+        .order('invoice_date', { ascending: true })
+
+    // Merge manual invoices into the invoices list
+    const manualMapped = (manualInvoices || []).map(m => ({
+        id: m.id,
+        order_number: '',
+        invoice_number: m.invoice_number,
+        invoice_url: m.pdf_url,
+        invoice_created_at: m.invoice_date,
+        total: Number(m.total),
+        vat_amount: Number(m.vat_amount),
+        customer_email: '',
+        company_name: m.company_name,
+        customer_name: m.customer_name || m.company_name || '',
+        status: 'imported',
+        currency: m.currency,
+        source: 'import' as const,
+    }))
+
+    const allInvoices = [...invoices, ...manualMapped].sort((a, b) =>
+        new Date(a.invoice_created_at).getTime() - new Date(b.invoice_created_at).getTime()
+    )
 
     // Expense totals
     let expenseNet = 0, expenseVat = 0
@@ -60,9 +89,9 @@ export async function GET(req: NextRequest) {
         expenseVat += Number(e.vat_amount) || 0
     }
 
-    // Invoice totals
+    // Invoice totals (includes both shop + imported)
     let invoiceTotal = 0, invoiceVat = 0
-    for (const inv of invoices || []) {
+    for (const inv of allInvoices) {
         invoiceTotal += Number(inv.total) || 0
         invoiceVat += Number(inv.vat_amount) || 0
     }
@@ -71,13 +100,13 @@ export async function GET(req: NextRequest) {
         success: true,
         data: {
             expenses: expenses || [],
-            invoices: invoices || [],
+            invoices: allInvoices,
             summary: {
                 expenseCount: (expenses || []).length,
                 expenseNet,
                 expenseVat,
                 expenseTotal: expenseNet + expenseVat,
-                invoiceCount: (invoices || []).length,
+                invoiceCount: allInvoices.length,
                 invoiceTotal,
                 invoiceVat,
                 invoiceNet: invoiceTotal - invoiceVat,

@@ -122,6 +122,13 @@ export default function IntrastatPage() {
           >
             Download CSV
           </button>
+          <button
+            onClick={() => window.open(`/api/admin/reporting/intrastat?year=${year}&month=${month}&format=xml`, '_blank')}
+            disabled={!report || report.rows.length === 0}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Download INSTAT XML
+          </button>
         </div>
       </div>
 
