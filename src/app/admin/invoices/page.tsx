@@ -23,6 +23,8 @@ interface ManualInvoice {
     currency: string
     pdf_url: string | null
     notes: string | null
+    paid: boolean
+    paid_at: string | null
     created_at: string
 }
 
@@ -112,6 +114,16 @@ export default function InvoicesPage() {
         if (!editingId) return
         await fetch('/api/admin/manual-invoices', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...editForm }) })
         setEditingId(null)
+        fetchManualInvoices()
+    }
+
+    const togglePaid = async (inv: ManualInvoice) => {
+        const newPaid = !inv.paid
+        await fetch('/api/admin/manual-invoices', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: inv.id, paid: newPaid, paid_at: newPaid ? new Date().toISOString() : null })
+        })
         fetchManualInvoices()
     }
 
@@ -250,6 +262,7 @@ export default function InvoicesPage() {
                                     <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Net</th>
                                     <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">VAT</th>
                                     <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Total</th>
+                                    <th className="text-center px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">Status</th>
                                     <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-500 uppercase w-32">Actions</th>
                                 </tr>
                             </thead>
@@ -267,6 +280,7 @@ export default function InvoicesPage() {
                                                 <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.net_amount || 0} onChange={e => setEditForm(f => ({ ...f, net_amount: Number(e.target.value) }))} /></td>
                                                 <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.vat_amount || 0} onChange={e => setEditForm(f => ({ ...f, vat_amount: Number(e.target.value) }))} /></td>
                                                 <td className="px-4 py-2"><input type="number" step="0.01" className="w-20 border rounded px-2 py-1 text-xs text-right" value={editForm.total || 0} onChange={e => setEditForm(f => ({ ...f, total: Number(e.target.value) }))} /></td>
+                                                <td></td>
                                                 <td className="px-4 py-2 text-right space-x-1">
                                                     <button onClick={saveEdit} className="text-xs font-bold text-green-600 hover:text-green-800">Save</button>
                                                     <button onClick={() => setEditingId(null)} className="text-xs font-bold text-slate-400 hover:text-slate-600">Cancel</button>
@@ -283,6 +297,15 @@ export default function InvoicesPage() {
                                                 <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(inv.net_amount)}</td>
                                                 <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(inv.vat_amount)}</td>
                                                 <td className="px-4 py-3 text-right font-bold text-slate-800">{formatCurrency(inv.total)}</td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <button
+                                                        onClick={() => togglePaid(inv)}
+                                                        className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase cursor-pointer transition ${inv.paid ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                                                        title={inv.paid && inv.paid_at ? `Paid on ${new Date(inv.paid_at).toLocaleDateString('en-GB')}` : 'Click to mark as paid'}
+                                                    >
+                                                        {inv.paid ? 'Paid' : 'Unpaid'}
+                                                    </button>
+                                                </td>
                                                 <td className="px-4 py-3 text-right space-x-2">
                                                     {inv.pdf_url && <a href={inv.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-500 hover:text-blue-700">PDF</a>}
                                                     <button onClick={() => startEdit(inv)} className="text-xs font-bold text-slate-500 hover:text-slate-700">Edit</button>
@@ -299,6 +322,11 @@ export default function InvoicesPage() {
                                     <td className="px-4 py-3 text-right text-slate-600 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.net_amount, 0))}</td>
                                     <td className="px-4 py-3 text-right text-slate-600 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.vat_amount, 0))}</td>
                                     <td className="px-4 py-3 text-right text-slate-800 text-xs">{formatCurrency(manualInvoices.reduce((s, i) => s + i.total, 0))}</td>
+                                    <td className="px-4 py-3 text-center text-[10px] text-slate-500">
+                                        {manualInvoices.filter(i => !i.paid).length > 0 && (
+                                            <span className="text-red-600 font-bold">{formatCurrency(manualInvoices.filter(i => !i.paid).reduce((s, i) => s + i.total, 0))} unpaid</span>
+                                        )}
+                                    </td>
                                     <td></td>
                                 </tr>
                             </tfoot>
