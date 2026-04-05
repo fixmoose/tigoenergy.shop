@@ -36,13 +36,15 @@ export async function GET(req: NextRequest) {
         .order('date', { ascending: true })
 
     // Fetch issued invoices (orders with invoice_number)
-    const { data: invoices } = await supabase
+    const { data: invoices, error: invError } = await supabase
         .from('orders')
         .select('id,order_number,invoice_number,invoice_url,invoice_created_at,total,vat_amount,customer_name,customer_email,company_name,status,currency')
         .not('invoice_number', 'is', null)
         .gte('invoice_created_at', start)
         .lt('invoice_created_at', end)
         .order('invoice_created_at', { ascending: true })
+
+    if (invError) console.error('Invoice query error:', invError)
 
     // Expense totals
     let expenseNet = 0, expenseVat = 0
@@ -60,6 +62,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
         success: true,
+        debug: { start, end, invError: invError?.message || null, invoiceCount: invoices?.length ?? -1 },
         data: {
             expenses: expenses || [],
             invoices: invoices || [],
