@@ -36,15 +36,22 @@ export async function GET(req: NextRequest) {
         .order('date', { ascending: true })
 
     // Fetch issued invoices (orders with invoice_number)
-    const { data: invoices, error: invError } = await supabase
+    const { data: rawInvoices, error: invError } = await supabase
         .from('orders')
-        .select('id,order_number,invoice_number,invoice_url,invoice_created_at,total,vat_amount,customer_name,customer_email,company_name,status,currency')
+        .select('id,order_number,invoice_number,invoice_url,invoice_created_at,total,vat_amount,customer_email,company_name,status,currency,shipping_address')
         .not('invoice_number', 'is', null)
         .gte('invoice_created_at', start)
         .lt('invoice_created_at', end)
         .order('invoice_created_at', { ascending: true })
 
     if (invError) console.error('Invoice query error:', invError)
+
+    // Extract customer_name from shipping_address
+    const invoices = (rawInvoices || []).map(inv => {
+        const addr = inv.shipping_address as Record<string, string> | null
+        const customerName = addr ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim() : inv.customer_email
+        return { ...inv, customer_name: customerName, shipping_address: undefined }
+    })
 
     // Expense totals
     let expenseNet = 0, expenseVat = 0
@@ -62,7 +69,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
         success: true,
-        debug: { start, end, invError: invError?.message || null, invoiceCount: invoices?.length ?? -1 },
         data: {
             expenses: expenses || [],
             invoices: invoices || [],
