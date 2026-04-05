@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
-// @ts-expect-error no types for pdf-parse
-import pdfParse from 'pdf-parse'
 
 async function requireAdmin() {
     const cookieStore = await cookies()
@@ -189,6 +187,9 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer())
     let extracted: ReturnType<typeof extractInvoiceData>
     try {
+        // Dynamic import to avoid pdf-parse loading its test file at module init
+        // @ts-expect-error no types for pdf-parse
+        const pdfParse = (await import('pdf-parse')).default
         const parsed = await pdfParse(buffer)
         extracted = extractInvoiceData(parsed.text)
     } catch {
