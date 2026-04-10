@@ -207,15 +207,13 @@ export default function WarehousePortal() {
         }
     }
 
-    const markComplete = async (orderId: string, type: 'pickup' | 'dpd') => {
-        const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
-        if (!confirm(`Označiti naročilo kot ${label}? Naročilo bo odstranjeno s seznama.`)) return
+    const markComplete = async (orderId: string, type: 'pickup' | 'dpd', comment?: string) => {
         setActionLoading(prev => ({ ...prev, [orderId + '_complete']: true }))
         try {
             await fetch(`/api/warehouse/orders/${orderId}/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, type }),
+                body: JSON.stringify({ email, type, comment: comment || undefined }),
             })
             await fetchOrders()
         } finally {
@@ -429,8 +427,9 @@ function OrderCard({
     getUploadedDobavnica: (order: WarehouseOrder) => WarehouseAction | undefined
     onToggleAction: (id: string, actionType: string, currentlyChecked: boolean) => void
     onUpload: (id: string, file: File) => void
-    onComplete: (id: string, type: 'pickup' | 'dpd') => void
+    onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string) => void
 }) {
+    const [comment, setComment] = useState('')
     const isPrepared = hasAction(order, 'marked_prepared')
     const isPaymentVerified = hasAction(order, 'payment_verified')
     const dobavnica = getUploadedDobavnica(order)
@@ -601,13 +600,22 @@ function OrderCard({
                     </label>
                 )}
 
+                {/* Comment for admin */}
+                <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Komentar za admina (neobvezno)"
+                    rows={2}
+                    className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500/50 resize-none"
+                />
+
                 {/* Zaključi naročilo button */}
                 <button
                     disabled={!canFinalize || actionLoading[order.id + '_complete']}
                     onClick={() => {
                         const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
                         if (confirm(`Zaključi naročilo #${order.order_number} kot ${label}?\n\nTo dejanje ni mogoče razveljaviti.`)) {
-                            onComplete(order.id, type)
+                            onComplete(order.id, type, comment.trim() || undefined)
                         }
                     }}
                     className={`w-full py-3 rounded-lg font-bold text-sm transition ${

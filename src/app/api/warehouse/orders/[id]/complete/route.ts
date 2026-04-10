@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, notifyAdmins } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id: orderId } = await params
-    const { email, type } = await req.json()
+    const { email, type, comment } = await req.json()
     if (!email || !type) return NextResponse.json({ error: 'Missing email or type' }, { status: 400 })
 
     const supabase = await createAdminClient()
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         by_email: driver.email,
         by_name: driver.name,
         at: new Date().toISOString(),
+        ...(comment ? { comment } : {}),
     })
 
     // Pickup = customer already has it → delivered. DPD = shipped (in transit).
@@ -219,6 +220,38 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             }
         } catch (emailErr) {
             console.error('Failed to send order completion email (non-fatal):', emailErr)
+        }
+    }
+
+    // Notify admin if warehouse left a comment
+    if (comment) {
+        try {
+            const addr = order.shipping_address
+            const customerName = addr ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim() : order.customer_email
+            const typeLabel = type === 'pickup' ? 'Lastni prevzem' : 'DPD Dostava'
+
+            await notifyAdmins({
+                subject: `Komentar na naročilo #${order.order_number} od ${driver.name}`,
+                html: `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f9fafb;">
+<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+  <div style="background:#f59e0b;padding:20px 28px;color:#fff;">
+    <h1 style="font-size:18px;font-weight:600;margin:0;">Komentar skladišča</h1>
+    <p style="margin:4px 0 0;font-size:13px;opacity:0.9;">#${order.order_number} — ${typeLabel}</p>
+  </div>
+  <div style="padding:24px 28px;">
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;margin-bottom:16px;">
+      <p style="margin:0;font-size:14px;color:#92400e;white-space:pre-wrap;">${comment.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+    </div>
+    <table style="font-size:13px;color:#6b7280;line-height:1.8;">
+      <tr><td style="font-weight:600;padding-right:12px;">Stranka:</td><td>${customerName || '-'}</td></tr>
+      <tr><td style="font-weight:600;padding-right:12px;">Skladiščnik:</td><td>${driver.name} (${driver.email})</td></tr>
+      <tr><td style="font-weight:600;padding-right:12px;">Tip:</td><td>${typeLabel}</td></tr>
+    </table>
+  </div>
+</div></body></html>`,
+            })
+        } catch (e) {
+            console.error('Failed to send admin comment notification (non-fatal):', e)
         }
     }
 
