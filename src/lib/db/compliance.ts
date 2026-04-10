@@ -490,7 +490,7 @@ export async function generateIntrastatXML(year: number, month: number): Promise
     lines.push('        <Declaration>')
     lines.push(`            <declarationId>${declId}</declarationId>`)
     lines.push(`            <referencePeriod>${referencePeriod}</referencePeriod>`)
-    lines.push(`            <PSIId>${PSI_DIGITS}000</PSIId>`)
+    lines.push(`            <PSIId>${PSI}000</PSIId>`)
     lines.push('            <Function>')
     lines.push('                <functionCode>I</functionCode>')
     lines.push('            </Function>')
