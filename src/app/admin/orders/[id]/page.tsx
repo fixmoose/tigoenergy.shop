@@ -5,6 +5,7 @@ import type { Order, OrderItem } from '@/types/database'
 import AdminOrderActions from '@/components/admin/AdminOrderActions'
 import OrderWorkflowTracker from '@/components/admin/OrderWorkflowTracker'
 import WarehouseActionsLog from '@/components/admin/WarehouseActionsLog'
+import OrderAttachments from '@/components/admin/OrderAttachments'
 import OrderEmailHistory from '@/components/admin/OrderEmailHistory'
 import EditableShippingAddress from '@/components/admin/EditableShippingAddress'
 import EditableShippingMethod from '@/components/admin/EditableShippingMethod'
@@ -115,6 +116,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       {(order as any).warehouse_actions?.length > 0 && (
         <WarehouseActionsLog actions={(order as any).warehouse_actions} orderId={order.id} />
       )}
+
+      <OrderAttachments orderId={order.id} warehouseActions={(order as any).warehouse_actions || []} />
 
       <div className="mb-6">
         <AdminOrderActions

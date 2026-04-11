@@ -9,6 +9,7 @@ interface WarehouseAction {
     by_name: string
     at: string
     note?: string
+    comment?: string
     file_url?: string
 }
 
@@ -18,6 +19,7 @@ const ACTION_LABELS: Record<string, { label: string; icon: string }> = {
     marked_picked_up: { label: 'Marked as picked up by customer', icon: '🤝' },
     marked_dpd_picked_up: { label: 'Marked as picked up by DPD', icon: '🚚' },
     payment_verified: { label: 'Payment proof verified', icon: '💳' },
+    admin_attachment: { label: 'File attached', icon: '📎' },
 }
 
 export default function WarehouseActionsLog({ actions, orderId }: { actions: WarehouseAction[]; orderId: string }) {
@@ -76,6 +78,9 @@ export default function WarehouseActionsLog({ actions, orderId }: { actions: War
                                         className="text-blue-600 text-xs hover:underline ml-2">
                                         View file
                                     </a>
+                                )}
+                                {(action.comment || action.note) && (
+                                    <p className="text-orange-700 text-xs mt-0.5 italic">&ldquo;{action.comment || action.note}&rdquo;</p>
                                 )}
                                 <div className="text-orange-600/70 text-xs">
                                     {action.by_name || action.by_email} · {time.toLocaleDateString('sl-SI')} {time.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
