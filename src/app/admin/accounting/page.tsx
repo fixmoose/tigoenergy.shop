@@ -233,12 +233,23 @@ export default function AccountingPage() {
             const ext = file.name.split('.').pop() || 'pdf'
             const storagePath = `expenses/receipt_${Date.now()}.${ext}`
 
-            // Upload file
-            const fd = new FormData()
-            fd.append('file', file)
-            fd.append('expenseId', 'temp')
-            fd.append('path', storagePath)
-            await fetch('/api/admin/expenses/upload', { method: 'PUT', body: fd })
+            // For large files (>4MB), upload directly to Supabase Storage
+            // to bypass Vercel's 4.5MB serverless body limit
+            if (file.size > 4 * 1024 * 1024) {
+                const { createClient } = await import('@/lib/supabase/client')
+                const supabase = createClient()
+                const { error: directUploadError } = await supabase.storage
+                    .from('invoices')
+                    .upload(storagePath, file, { upsert: true })
+                if (directUploadError) throw new Error(directUploadError.message)
+            } else {
+                // Upload via API route for smaller files
+                const fd = new FormData()
+                fd.append('file', file)
+                fd.append('expenseId', 'temp')
+                fd.append('path', storagePath)
+                await fetch('/api/admin/expenses/upload', { method: 'PUT', body: fd })
+            }
 
             // Create unprocessed expense with receipt — no form needed
             const receiptUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(storagePath)}`
