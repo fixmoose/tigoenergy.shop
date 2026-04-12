@@ -45,12 +45,15 @@ interface ArchiveInvoice extends UnpaidInvoice {
     notes: string | null
 }
 
+import type { SavedCart } from '@/types/database'
+
 export default function MyOrders({ user, customer, adminViewCustomerId }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
     const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([])
     const [archiveInvoices, setArchiveInvoices] = useState<ArchiveInvoice[]>([])
     const [archiveOpen, setArchiveOpen] = useState(false)
+    const [mirrorSavedCarts, setMirrorSavedCarts] = useState<SavedCart[] | null>(null)
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const t = useTranslations('dashboard')
@@ -68,6 +71,7 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
                         setQuotes(data.data.quotes || [])
                         setUnpaidInvoices(data.data.unpaidInvoices || [])
                         setArchiveInvoices(data.data.archiveInvoices || [])
+                        setMirrorSavedCarts(data.data.savedCarts || [])
                     }
                 } catch { /* ignore */ }
                 setLoading(false)
@@ -499,7 +503,10 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
             </div>
         )}
 
-        <SavedCartsList />
+        <SavedCartsList
+            injectedCarts={adminViewCustomerId ? mirrorSavedCarts : null}
+            readOnly={!!adminViewCustomerId}
+        />
         </>
     )
 }

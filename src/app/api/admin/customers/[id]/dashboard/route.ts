@@ -33,7 +33,7 @@ export async function GET(
     return NextResponse.json({ error: 'Customer not found' }, { status: 404 })
   }
 
-  const [ordersRes, quotesRes, unpaidRes, archiveRes] = await Promise.all([
+  const [ordersRes, quotesRes, unpaidRes, archiveRes, savedCartsRes] = await Promise.all([
     admin
       .from('orders')
       .select('*')
@@ -60,6 +60,11 @@ export async function GET(
           .eq('vat_id', customer.vat_id)
           .order('invoice_date', { ascending: false })
       : Promise.resolve({ data: [] as any[] }),
+    admin
+      .from('saved_carts')
+      .select('*, items:saved_cart_items(*)')
+      .eq('user_id', customerId)
+      .order('created_at', { ascending: false }),
   ])
 
   return NextResponse.json({
@@ -70,6 +75,7 @@ export async function GET(
       quotes: quotesRes.data || [],
       unpaidInvoices: unpaidRes.data || [],
       archiveInvoices: archiveRes.data || [],
+      savedCarts: savedCartsRes.data || [],
     },
   })
 }

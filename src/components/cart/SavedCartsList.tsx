@@ -6,13 +6,29 @@ import { getSavedCarts, deleteSavedCart, loadSavedCart, mergeSavedCart } from '@
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function SavedCartsList() {
-    const [savedCarts, setSavedCarts] = useState<SavedCart[]>([])
-    const [loading, setLoading] = useState(true)
+interface Props {
+    // Admin "view as customer" mirror passes the target customer's saved
+    // carts in directly so this component doesn't fall back to its own
+    // auth.getUser() — which would return the admin user and show the
+    // admin's own carts against every customer mirror. Also disables the
+    // load/merge/delete buttons in this mode since those are customer-side
+    // actions that should not run under admin impersonation.
+    injectedCarts?: SavedCart[] | null
+    readOnly?: boolean
+}
+
+export default function SavedCartsList({ injectedCarts, readOnly = false }: Props = {}) {
+    const [savedCarts, setSavedCarts] = useState<SavedCart[]>(injectedCarts || [])
+    const [loading, setLoading] = useState(injectedCarts == null)
     const [actionLoading, setActionLoading] = useState<string | null>(null)
     const router = useRouter()
 
     useEffect(() => {
+        if (injectedCarts != null) {
+            setSavedCarts(injectedCarts)
+            setLoading(false)
+            return
+        }
         const fetchCarts = async () => {
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
@@ -25,7 +41,7 @@ export default function SavedCartsList() {
             setLoading(false)
         }
         fetchCarts()
-    }, [])
+    }, [injectedCarts])
 
     const handleLoad = async (cart: SavedCart) => {
         if (!confirm(`Load "${cart.name}"? This will replace your current cart.`)) return
@@ -97,29 +113,31 @@ export default function SavedCartsList() {
                             </div>
                         </div>
 
-                        <div className="flex gap-2 mt-3">
-                            <button
-                                onClick={() => handleLoad(cart)}
-                                disabled={!!actionLoading}
-                                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
-                            >
-                                {actionLoading === cart.id ? 'Loading...' : 'Load Cart'}
-                            </button>
-                            <button
-                                onClick={() => handleMerge(cart)}
-                                disabled={!!actionLoading}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
-                            >
-                                {actionLoading === cart.id ? 'Merging...' : 'Add to Cart'}
-                            </button>
-                            <button
-                                onClick={() => handleDelete(cart)}
-                                disabled={!!actionLoading}
-                                className="px-3 bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 text-gray-600 text-xs font-bold rounded transition-colors disabled:opacity-50"
-                            >
-                                Delete
-                            </button>
-                        </div>
+                        {!readOnly && (
+                            <div className="flex gap-2 mt-3">
+                                <button
+                                    onClick={() => handleLoad(cart)}
+                                    disabled={!!actionLoading}
+                                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
+                                >
+                                    {actionLoading === cart.id ? 'Loading...' : 'Load Cart'}
+                                </button>
+                                <button
+                                    onClick={() => handleMerge(cart)}
+                                    disabled={!!actionLoading}
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 rounded transition-colors disabled:opacity-50"
+                                >
+                                    {actionLoading === cart.id ? 'Merging...' : 'Add to Cart'}
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(cart)}
+                                    disabled={!!actionLoading}
+                                    className="px-3 bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 text-gray-600 text-xs font-bold rounded transition-colors disabled:opacity-50"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
