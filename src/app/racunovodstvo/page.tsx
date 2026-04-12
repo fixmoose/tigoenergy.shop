@@ -426,6 +426,12 @@ export default function RacunovodstvoPage() {
                         </label>
                     </p>
                     <p className="text-xs text-slate-400 mt-1">Računi, potrdila, dokumenti — PDF, slike, Excel</p>
+                    {uploadStatus.some(s => s.startsWith('✓')) && (
+                        <div className="mt-4 max-w-md mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-left">
+                            <p className="text-sm text-amber-800 font-medium">Admin bo pregledal datoteko in jo uvrstil v pravilno tabelo.</p>
+                            <p className="text-xs text-amber-700 mt-1">Ponavadi 24h, do največ 72h. Glejte sproti, ker ne boste dobili sporočila, ko bo datoteka zaključena z uvrščanjem.</p>
+                        </div>
+                    )}
                     {uploadStatus.length > 0 && (
                         <div className="mt-4 text-left max-w-md mx-auto space-y-1">
                             {uploadStatus.map((s, i) => (
