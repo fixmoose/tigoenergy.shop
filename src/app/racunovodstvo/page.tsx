@@ -64,6 +64,8 @@ export default function RacunovodstvoPage() {
     const [summary, setSummary] = useState<Summary | null>(null)
     const [loading, setLoading] = useState(false)
     const [tab, setTab] = useState<'expenses' | 'invoices'>('expenses')
+    const [uploadDragOver, setUploadDragOver] = useState(false)
+    const [uploadStatus, setUploadStatus] = useState<string[]>([])
 
     // Check URL param or sessionStorage on mount
     useEffect(() => {
@@ -348,6 +350,92 @@ export default function RacunovodstvoPage() {
                         </div>
                     )
                 )}
+
+                {/* Document Upload Zone */}
+                <div
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition ${
+                        uploadDragOver
+                            ? 'border-blue-400 bg-blue-50'
+                            : 'border-slate-300 bg-white hover:border-slate-400'
+                    }`}
+                    onDragOver={e => { e.preventDefault(); setUploadDragOver(true) }}
+                    onDragLeave={() => setUploadDragOver(false)}
+                    onDrop={async e => {
+                        e.preventDefault()
+                        setUploadDragOver(false)
+                        const files = Array.from(e.dataTransfer.files)
+                        if (files.length === 0) return
+                        const statuses: string[] = []
+                        for (const file of files) {
+                            statuses.push(`Nalagam ${file.name}…`)
+                            setUploadStatus([...statuses])
+                            const fd = new FormData()
+                            fd.append('file', file)
+                            try {
+                                const res = await fetch(`/api/racunovodstvo/upload?key=${key}`, { method: 'POST', body: fd })
+                                const data = await res.json()
+                                statuses[statuses.length - 1] = data.success
+                                    ? `✓ ${file.name} — naloženo`
+                                    : `✗ ${file.name} — ${data.error || 'napaka'}`
+                            } catch {
+                                statuses[statuses.length - 1] = `✗ ${file.name} — napaka`
+                            }
+                            setUploadStatus([...statuses])
+                        }
+                        setTimeout(() => setUploadStatus([]), 8000)
+                    }}
+                >
+                    <input
+                        type="file"
+                        id="accountant-upload"
+                        multiple
+                        className="hidden"
+                        onChange={async e => {
+                            const files = Array.from(e.target.files || [])
+                            if (files.length === 0) return
+                            const statuses: string[] = []
+                            for (const file of files) {
+                                statuses.push(`Nalagam ${file.name}…`)
+                                setUploadStatus([...statuses])
+                                const fd = new FormData()
+                                fd.append('file', file)
+                                try {
+                                    const res = await fetch(`/api/racunovodstvo/upload?key=${key}`, { method: 'POST', body: fd })
+                                    const data = await res.json()
+                                    statuses[statuses.length - 1] = data.success
+                                        ? `✓ ${file.name} — naloženo`
+                                        : `✗ ${file.name} — ${data.error || 'napaka'}`
+                                } catch {
+                                    statuses[statuses.length - 1] = `✗ ${file.name} — napaka`
+                                }
+                                setUploadStatus([...statuses])
+                            }
+                            e.target.value = ''
+                            setTimeout(() => setUploadStatus([]), 8000)
+                        }}
+                    />
+                    <div className="text-slate-500 mb-2">
+                        <svg className="w-10 h-10 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                    </div>
+                    <p className="text-sm font-medium text-slate-700">
+                        Povlecite dokumente sem ali{' '}
+                        <label htmlFor="accountant-upload" className="text-blue-600 hover:underline cursor-pointer font-bold">
+                            izberite datoteke
+                        </label>
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">Računi, potrdila, dokumenti — PDF, slike, Excel</p>
+                    {uploadStatus.length > 0 && (
+                        <div className="mt-4 text-left max-w-md mx-auto space-y-1">
+                            {uploadStatus.map((s, i) => (
+                                <div key={i} className={`text-xs ${s.startsWith('✓') ? 'text-green-600' : s.startsWith('✗') ? 'text-red-600' : 'text-slate-500'}`}>
+                                    {s}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 <div className="text-center text-xs text-slate-400 py-4">
                     Initra Energija d.o.o. &bull; Podsmreka 59A, 1356 Dobrova &bull; SI62518313

@@ -253,6 +253,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         } catch (e) {
             console.error('Failed to send admin comment notification (non-fatal):', e)
         }
+
+        // Also persist as an in-app notification so it shows in the admin bell
+        try {
+            await supabase.from('admin_notifications').insert({
+                type: 'warehouse_comment',
+                title: `Warehouse comment on #${order.order_number}`,
+                message: comment,
+                source: 'warehouse',
+                source_name: driver.name,
+                metadata: { order_id: orderId, order_number: order.order_number },
+            })
+        } catch { /* non-fatal */ }
     }
 
     return NextResponse.json({ success: true, invoiceIssued })

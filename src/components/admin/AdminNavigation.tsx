@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import NotificationBell from './NotificationBell'
 
 const navItems = [
     { name: 'Products', href: '/admin/products' },
@@ -38,6 +39,7 @@ export default function AdminNavigation() {
                     </Link>
                 )
             })}
+            <NotificationBell />
             <a
                 href="/api/auth/signout"
                 className="text-sm text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-50 ml-2"
