@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Order } from '@/types/database'
 import AdminManualOrderCreator from '@/components/admin/AdminManualOrderCreator'
+import { resolveInvoicePdfUrl } from '@/lib/utils/invoice-pdf-url'
 
 function formatCurrency(amount: number) {
     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount)
@@ -307,7 +308,7 @@ export default function InvoicesPage() {
                                                     </button>
                                                 </td>
                                                 <td className="px-4 py-3 text-right space-x-2">
-                                                    {inv.pdf_url && <a href={inv.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-500 hover:text-blue-700">PDF</a>}
+                                                    {resolveInvoicePdfUrl(inv.pdf_url) && <a href={resolveInvoicePdfUrl(inv.pdf_url)!} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-blue-500 hover:text-blue-700">PDF</a>}
                                                     <button onClick={() => startEdit(inv)} className="text-xs font-bold text-slate-500 hover:text-slate-700">Edit</button>
                                                     <button onClick={() => deleteInvoice(inv.id)} className="text-xs font-bold text-red-400 hover:text-red-600">Del</button>
                                                 </td>

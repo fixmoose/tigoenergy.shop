@@ -10,6 +10,7 @@ import CustomerDashboardMirror from '@/components/admin/CustomerDashboardMirror'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
 import DeleteCustomerButton from '@/components/admin/DeleteCustomerButton'
+import { resolveInvoicePdfUrl } from '@/lib/utils/invoice-pdf-url'
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -251,9 +252,9 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                               {inv.currency || 'EUR'} {Number(inv.total).toFixed(2)}
                             </p>
                           </div>
-                          {inv.pdf_url && (
+                          {resolveInvoicePdfUrl(inv.pdf_url) && (
                             <a
-                              href={inv.pdf_url}
+                              href={resolveInvoicePdfUrl(inv.pdf_url)!}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition shadow-sm"

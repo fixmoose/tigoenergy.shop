@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import type { SupplierInvoice } from '@/types/database'
 import SupplierInvoiceFormModal from '@/components/admin/SupplierInvoiceFormModal'
+import { resolveInvoicePdfUrl } from '@/lib/utils/invoice-pdf-url'
 
 function formatCurrency(amount: number, currency = 'EUR') {
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency }).format(amount)
@@ -290,9 +291,9 @@ export default function SupplierInvoicesPage() {
                     </button>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {r.pdf_url ? (
+                    {resolveInvoicePdfUrl(r.pdf_url) ? (
                       <a
-                        href={r.pdf_url.startsWith('/api/') ? r.pdf_url : `/api/storage?bucket=invoices&path=${encodeURIComponent(r.pdf_url)}`}
+                        href={resolveInvoicePdfUrl(r.pdf_url)!}
                         target="_blank"
                         rel="noreferrer"
                         className="text-blue-600 hover:underline text-xs"

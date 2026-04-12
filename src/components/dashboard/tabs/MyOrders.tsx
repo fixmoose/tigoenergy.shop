@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Customer, Order, Quote } from '@/types/database'
 import SavedCartsList from '@/components/cart/SavedCartsList'
 import { useTranslations } from 'next-intl'
+import { resolveInvoicePdfUrl } from '@/lib/utils/invoice-pdf-url'
 
 interface Props {
     user: User
@@ -42,17 +43,6 @@ interface ArchiveInvoice extends UnpaidInvoice {
     net_amount: number
     paid_at: string | null
     notes: string | null
-}
-
-// manual_invoices.pdf_url is stored in two shapes depending on when the row
-// was created: raw bucket path ("expenses/receipt_X.pdf") for historical
-// batch imports, or a full /api/storage URL for newer uploads. Normalise
-// both so the anchor resolves to a working download regardless of shape.
-function resolveInvoicePdfUrl(url: string | null | undefined): string | null {
-    if (!url) return null
-    if (url.startsWith('/api/')) return url
-    if (url.startsWith('http')) return url
-    return `/api/storage?bucket=invoices&path=${encodeURIComponent(url)}`
 }
 
 export default function MyOrders({ user, customer, adminViewCustomerId }: Props) {
