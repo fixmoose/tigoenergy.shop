@@ -286,26 +286,41 @@ export default function IntrastatPage() {
                   ))}
                 </tbody>
                 <tfoot className="bg-slate-50 border-t border-slate-200">
-                  <tr className="font-semibold">
-                    <td className="px-4 py-3" colSpan={3}>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
-                        Odprema
-                      </span>
-                    </td>
-                    <td className="text-right px-4 py-3 text-blue-700">{formatCurrency(report.summary.dispatch_value_eur)}</td>
-                    <td className="text-right px-4 py-3 text-blue-700">{formatWeight(report.summary.dispatch_weight_kg)}</td>
-                    <td className="text-right px-4 py-3 text-blue-700">{report.summary.dispatch_count}</td>
-                  </tr>
-                  <tr className="font-semibold">
-                    <td className="px-4 py-3" colSpan={3}>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
-                        Prejem
-                      </span>
-                    </td>
-                    <td className="text-right px-4 py-3 text-emerald-700">{formatCurrency(report.summary.arrival_value_eur)}</td>
-                    <td className="text-right px-4 py-3 text-emerald-700">{formatWeight(report.summary.arrival_weight_kg)}</td>
-                    <td className="text-right px-4 py-3 text-emerald-700">{report.summary.arrival_count}</td>
-                  </tr>
+                  {(() => {
+                    // Sum quantities (supplementary_units) per flow for the
+                    // footer. The summary .dispatch_count / .arrival_count
+                    // fields are declaration-line counts, not item counts.
+                    const dispatchUnits = report.rows
+                      .filter(r => r.flow_type === 'dispatch')
+                      .reduce((s, r) => s + (r.supplementary_units || 0), 0)
+                    const arrivalUnits = report.rows
+                      .filter(r => r.flow_type === 'arrival')
+                      .reduce((s, r) => s + (r.supplementary_units || 0), 0)
+                    return (
+                      <>
+                        <tr className="font-semibold">
+                          <td className="px-4 py-3" colSpan={3}>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
+                              Odprema
+                            </span>
+                          </td>
+                          <td className="text-right px-4 py-3 text-blue-700">{formatCurrency(report.summary.dispatch_value_eur)}</td>
+                          <td className="text-right px-4 py-3 text-blue-700">{formatWeight(report.summary.dispatch_weight_kg)}</td>
+                          <td className="text-right px-4 py-3 text-blue-700">{dispatchUnits}</td>
+                        </tr>
+                        <tr className="font-semibold">
+                          <td className="px-4 py-3" colSpan={3}>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                              Prejem
+                            </span>
+                          </td>
+                          <td className="text-right px-4 py-3 text-emerald-700">{formatCurrency(report.summary.arrival_value_eur)}</td>
+                          <td className="text-right px-4 py-3 text-emerald-700">{formatWeight(report.summary.arrival_weight_kg)}</td>
+                          <td className="text-right px-4 py-3 text-emerald-700">{arrivalUnits}</td>
+                        </tr>
+                      </>
+                    )
+                  })()}
                 </tfoot>
               </table>
             )}

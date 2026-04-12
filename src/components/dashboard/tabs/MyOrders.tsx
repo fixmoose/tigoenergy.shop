@@ -44,6 +44,17 @@ interface ArchiveInvoice extends UnpaidInvoice {
     notes: string | null
 }
 
+// manual_invoices.pdf_url is stored in two shapes depending on when the row
+// was created: raw bucket path ("expenses/receipt_X.pdf") for historical
+// batch imports, or a full /api/storage URL for newer uploads. Normalise
+// both so the anchor resolves to a working download regardless of shape.
+function resolveInvoicePdfUrl(url: string | null | undefined): string | null {
+    if (!url) return null
+    if (url.startsWith('/api/')) return url
+    if (url.startsWith('http')) return url
+    return `/api/storage?bucket=invoices&path=${encodeURIComponent(url)}`
+}
+
 export default function MyOrders({ user, customer, adminViewCustomerId }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
@@ -251,9 +262,9 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
                                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">Amount Due</p>
                                     <p className="text-lg font-bold text-red-700">{inv.currency || 'EUR'} {inv.total.toFixed(2)}</p>
                                 </div>
-                                {inv.pdf_url && (
+                                {resolveInvoicePdfUrl(inv.pdf_url) && (
                                     <a
-                                        href={inv.pdf_url}
+                                        href={resolveInvoicePdfUrl(inv.pdf_url)!}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-all shadow-sm hover:shadow-md"
@@ -480,9 +491,9 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
                                         <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total</p>
                                         <p className="text-sm font-bold text-gray-900">{inv.currency || 'EUR'} {inv.total.toFixed(2)}</p>
                                     </div>
-                                    {inv.pdf_url && (
+                                    {resolveInvoicePdfUrl(inv.pdf_url) && (
                                         <a
-                                            href={inv.pdf_url}
+                                            href={resolveInvoicePdfUrl(inv.pdf_url)!}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-xs font-semibold text-gray-700 hover:text-gray-900 underline"
