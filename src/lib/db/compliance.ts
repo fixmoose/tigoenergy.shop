@@ -475,6 +475,10 @@ type GoodsReceiptItem = {
   country_of_origin?: string
 }
 
+// CN codes where SURS does not require supplementary quantity (quantityInSU).
+// When the code is in this set the XML omits the <quantityInSU> element entirely.
+const CN_NO_SUPPLEMENTARY_UNITS = new Set(['90308900'])
+
 type IntrastatDeclaration = {
   flowCode: 1 | 2
   declType: 'PRBL' | 'RACN'
@@ -485,7 +489,7 @@ type IntrastatDeclaration = {
     cnCode: string
     countryOfOrigin: string
     netMass: number
-    quantity: number
+    quantity: number        // 0 when CN code has no supplementary unit
     invoicedAmount: number
   }>
 }
@@ -566,7 +570,7 @@ async function buildIntrastatDeclarations(
           cnCode,
           countryOfOrigin: originCountry,
           netMass,
-          quantity: item.quantity,
+          quantity: CN_NO_SUPPLEMENTARY_UNITS.has(cnCode) ? 0 : item.quantity,
           invoicedAmount,
         })
       }
@@ -627,16 +631,15 @@ async function buildIntrastatDeclarations(
         cnCode,
         countryOfOrigin: origin,
         netMass,
-        quantity: qty,
+        quantity: CN_NO_SUPPLEMENTARY_UNITS.has(cnCode) ? 0 : qty,
         invoicedAmount,
       })
     }
 
     if (declItems.length === 0) continue
 
-    // Partner country derived from VAT prefix (e.g. 'HR62345613352' → 'HR')
     const partnerCountry = (mi.vat_id || '').slice(0, 2).toUpperCase()
-    if (!EU_COUNTRIES.has(partnerCountry)) continue  // region set but VAT missing/malformed
+    if (!EU_COUNTRIES.has(partnerCountry)) continue
 
     decls.push({
       flowCode: 2,
@@ -692,12 +695,12 @@ async function buildIntrastatDeclarations(
         cnCode,
         countryOfOrigin: origin,
         netMass,
-        quantity: qty,
+        quantity: CN_NO_SUPPLEMENTARY_UNITS.has(cnCode) ? 0 : qty,
         invoicedAmount,
       })
     }
 
-    if (declItems.length === 0) continue  // receipt had only services
+    if (declItems.length === 0) continue
     decls.push({
       flowCode: 1,
       declType: 'PRBL',
@@ -778,7 +781,9 @@ export async function generateIntrastatXML(year: number, month: number): Promise
       lines.push(`                <MSConsDestCode>${decl.partnerCountry}</MSConsDestCode>`)
       lines.push(`                <countryOfOriginCode>${item.countryOfOrigin}</countryOfOriginCode>`)
       lines.push(`                <netMass>${item.netMass}</netMass>`)
-      lines.push(`                <quantityInSU>${item.quantity}</quantityInSU>`)
+      if (item.quantity > 0) {
+        lines.push(`                <quantityInSU>${item.quantity}</quantityInSU>`)
+      }
       lines.push(`                <invoicedAmount>${item.invoicedAmount}</invoicedAmount>`)
       lines.push(`                <statisticalValue>${item.invoicedAmount}</statisticalValue>`)
       if (decl.partnerVat) {

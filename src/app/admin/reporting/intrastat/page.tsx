@@ -281,7 +281,7 @@ export default function IntrastatPage() {
                       </td>
                       <td className="text-right px-4 py-3 text-slate-800">{formatCurrency(row.statistical_value_eur)}</td>
                       <td className="text-right px-4 py-3 text-slate-600">{formatWeight(row.net_mass_kg)}</td>
-                      <td className="text-right px-4 py-3 text-slate-600">{row.supplementary_units}</td>
+                      <td className="text-right px-4 py-3 text-slate-600">{row.supplementary_units || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
