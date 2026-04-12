@@ -750,23 +750,29 @@ export async function generateIntrastatXML(year: number, month: number): Promise
   lines.push('            <partyName>Carinski urad Nova Gorica</partyName>')
   lines.push('        </Party>')
 
-  // YTD running counter: the evidenčna številka (declaration ID) is a global
-  // sequence per type across the whole year, not per month. Each invoice gets
-  // its own number (the old Initra system did not aggregate). We start from
-  // a base offset that accounts for declarations already submitted to SURS
-  // from the legacy system, then count this system's own declarations from
-  // the cutover month forward.
-  const LEGACY_HANDOVER: Record<number, { base: { PRBL: number; RACN: number }; startMonth: number }> = {
-    2026: { base: { PRBL: 3, RACN: 7 }, startMonth: 3 },
-  }
-  const legacy = LEGACY_HANDOVER[year]
-  const seqByType: Record<'PRBL' | 'RACN', number> = legacy
-    ? { ...legacy.base }
-    : { PRBL: 0, RACN: 0 }
-  const countFromMonth = legacy?.startMonth || 1
-  for (let m = countFromMonth; m < month; m++) {
-    const priorDecls = await buildIntrastatDeclarations(year, m)
-    for (const d of priorDecls) seqByType[d.declType]++
+  // Lifetime running counter: the evidenčna številka is a global sequence
+  // per declaration type that never resets — not per month, not per year.
+  // The NNNNN part of the declarationId increments across the company's
+  // entire Intrastat reporting history.
+  //
+  // Base offsets = last numbers used by the old Initra system before this
+  // generator took over (March 2026). From the cutover month forward, this
+  // generator counts its own declarations and continues the sequence.
+  const LIFETIME_BASE = { PRBL: 25, RACN: 149 }
+  const CUTOVER = { year: 2026, month: 3 }
+
+  const seqByType: Record<'PRBL' | 'RACN', number> = { ...LIFETIME_BASE }
+
+  // Walk every month from cutover to just before the target period and
+  // count declarations so the target month's IDs pick up where the prior
+  // month left off.
+  for (let y = CUTOVER.year; y <= year; y++) {
+    const mStart = y === CUTOVER.year ? CUTOVER.month : 1
+    const mEnd = y === year ? month : 13
+    for (let m = mStart; m < mEnd; m++) {
+      const priorDecls = await buildIntrastatDeclarations(y, m)
+      for (const d of priorDecls) seqByType[d.declType]++
+    }
   }
 
   for (let di = 0; di < decls.length; di++) {
