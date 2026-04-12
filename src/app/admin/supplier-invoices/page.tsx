@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import Link from 'next/link'
 import type { SupplierInvoice } from '@/types/database'
 import SupplierInvoiceFormModal from '@/components/admin/SupplierInvoiceFormModal'
 
@@ -123,13 +124,21 @@ export default function SupplierInvoicesPage() {
           <h1 className="text-2xl font-bold text-slate-800">Supplier Invoices (prejeti računi)</h1>
           <p className="text-slate-500 mt-1">Received invoices from suppliers — accounts payable + source for PRBL / Intrastat arrivals.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setModalInvoice(null)}
-          className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium"
-        >
-          + New Supplier Invoice
-        </button>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/goods-receipts/new"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+          >
+            + New Goods Receipt
+          </Link>
+          <button
+            type="button"
+            onClick={() => setModalInvoice(null)}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium"
+          >
+            + New Supplier Invoice
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
