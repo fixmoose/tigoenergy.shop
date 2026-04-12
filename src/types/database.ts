@@ -467,3 +467,76 @@ export interface CustomerCustomPricing {
   updated_at?: string | null
   product?: Product // For joins
 }
+
+// Received invoice from a supplier (accounts payable).
+// Parallel to ManualInvoice (issued) — this is the received side.
+export interface SupplierInvoice {
+  id: string
+
+  supplier_name: string
+  supplier_vat_id?: string | null
+  supplier_country?: string | null
+
+  invoice_number: string
+  invoice_date: string
+  due_date?: string | null
+
+  currency: string
+  exchange_rate?: number | null
+  net_amount: number
+  vat_amount: number
+  total: number
+
+  net_amount_eur: number
+  vat_amount_eur: number
+  total_eur: number
+
+  category: 'goods' | 'service'
+  region?: 'EU' | 'SI' | 'outside_EU' | null
+
+  pdf_url?: string | null
+  expense_id?: string | null
+
+  paid?: boolean
+  paid_at?: string | null
+
+  notes?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+}
+
+// Goods receipt (prevzem blaga / PRBL) — physical arrival of goods into a warehouse.
+// Triggers Intrastat reporting by receipt_date and adjusts stock levels.
+export interface GoodsReceiptItem {
+  code?: string
+  name?: string
+  qty: number
+  unit?: string
+  price: number
+  cn_code?: string
+  weight_kg?: number
+  country_of_origin?: string
+}
+
+export interface GoodsReceipt {
+  id: string
+  document_number: string
+  receipt_date: string
+
+  supplier_name: string
+  supplier_country?: string | null
+  supplier_invoice_number?: string | null
+  supplier_invoice_date?: string | null
+  supplier_invoice_id?: string | null  // FK to supplier_invoices
+
+  warehouse?: string | null
+  items: GoodsReceiptItem[] | string  // JSONB — may arrive as string from PostgREST
+  net_amount: number
+  vat_amount: number
+  total_payable: number
+
+  pdf_url?: string | null
+  notes?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+}

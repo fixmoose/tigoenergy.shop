@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import ProductForm from '@/components/admin/ProductForm'
+import CreateGoodsReceiptButton from '@/components/admin/CreateGoodsReceiptButton'
 import { createClient } from '@/lib/supabase/client'
 import type { Product } from '@/types/database'
 import { useParams, useRouter } from 'next/navigation'
@@ -140,6 +141,15 @@ export default function EditProductPage() {
         {/* Right: Actions Portal */}
         <div id="product-header-actions" className="flex justify-end gap-2"></div>
       </div>
+
+      {product && (
+        <CreateGoodsReceiptButton
+          productId={product.id}
+          productName={product.name_en}
+          productSku={product.sku}
+          onCreated={() => window.location.reload()}
+        />
+      )}
 
       <ProductForm initial={product ?? undefined} onSaved={(p: any) => { window.location.href = `/admin/products/${p.id}` }} />
     </div>

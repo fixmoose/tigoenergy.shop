@@ -389,9 +389,57 @@ const EU_COUNTRIES = new Set([
   'IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','ES','SE'
 ])
 
+// Fallback CN8 / weight / origin per internal product code for goods_receipts items
+// that do not store these fields inline. Used when aggregating arrivals for Intrastat.
+// 'SKIP' cn_code marks service lines (transport, install) that are never in Intrastat.
+const GR_PRODUCT_MAP: Record<string, { cn_code: string; weight_kg: number; country_of_origin: string }> = {
+  '119700263': { cn_code: '90308900', weight_kg: 0.56, country_of_origin: 'CN' }, // Tigo TS4-A-O
+  '119700909': { cn_code: '90308900', weight_kg: 0.59, country_of_origin: 'CN' }, // Tigo TS4-A-2F MC4
+  '119700891': { cn_code: '90308900', weight_kg: 0.59, country_of_origin: 'CN' }, // Tigo TS4-A-2F EVO2
+  '119700898': { cn_code: '90308900', weight_kg: 0.56, country_of_origin: 'TH' }, // Tigo TS4-A-O EVO2
+  '119700901': { cn_code: '90308900', weight_kg: 0.65, country_of_origin: 'TH' }, // Tigo TS4-X-O
+  '119700264': { cn_code: '90308900', weight_kg: 0.56, country_of_origin: 'CN' }, // Tigo TS4-A-F
+  '119700265': { cn_code: '84719000', weight_kg: 0.43, country_of_origin: 'CN' }, // Tigo CCA Kit
+  '119700268': { cn_code: '84719000', weight_kg: 0.21, country_of_origin: 'CN' }, // Tigo TAP
+  '119700892': { cn_code: '85414300', weight_kg: 21.1, country_of_origin: 'VN' }, // Trina TSM-450NEG9R.28
+  '119700924': { cn_code: '85414300', weight_kg: 32.2, country_of_origin: 'VN' }, // DAS-DH132NE-615
+  '119700925': { cn_code: '85044060', weight_kg: 15.0, country_of_origin: 'CN' }, // SolaX Battery Parallel BOX
+  '119700535': { cn_code: '76109090', weight_kg: 25.0, country_of_origin: 'DE' }, // Renusol mounting
+  '119700931': { cn_code: '85414300', weight_kg: 28.5, country_of_origin: 'VN' }, // DAH 580W
+  // Services — never in Intrastat
+  '119700279': { cn_code: 'SKIP', weight_kg: 0, country_of_origin: '' },            // Prevoz - AP
+  '119700582': { cn_code: 'SKIP', weight_kg: 0, country_of_origin: '' },            // Prevoz - AP
+}
+
+type GoodsReceiptItem = {
+  code?: string
+  name?: string
+  qty?: number
+  unit?: string
+  price?: number
+  cn_code?: string
+  weight_kg?: number
+  country_of_origin?: string
+}
+
+type IntrastatDeclaration = {
+  flowCode: 1 | 2
+  declType: 'PRBL' | 'RACN'
+  partnerCountry: string  // MSConsDestCode — destination (dispatches) or dispatching country (arrivals)
+  partnerVat?: string     // partnerId — only for dispatches
+  items: Array<{
+    description: string
+    cnCode: string
+    countryOfOrigin: string
+    netMass: number
+    quantity: number
+    invoicedAmount: number
+  }>
+}
+
 /**
  * Generate INSTAT XML for Slovenian Intrastat reporting to SURS.
- * Each order to an EU country becomes a Declaration with Items.
+ * Emits both dispatches (flowCode=2, from orders) and arrivals (flowCode=1, from goods_receipts).
  */
 export async function generateIntrastatXML(year: number, month: number): Promise<string> {
   const supabase = await createAdminClient()
@@ -402,8 +450,13 @@ export async function generateIntrastatXML(year: number, month: number): Promise
   const periodEnd = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`
   const referencePeriod = `${year}${month.toString().padStart(2, '0')}`
 
-  // Fetch all invoiced orders dispatched to EU countries in this period
-  const { data: orders, error } = await supabase
+  const decls: IntrastatDeclaration[] = []
+
+  // ==========================================================================
+  // Dispatches (odprema, flowCode=2, RACN) — from orders table
+  // Source: issued invoices to EU customers (delivery_country != SI, in EU set)
+  // ==========================================================================
+  const { data: orders, error: ordersErr } = await supabase
     .from('orders')
     .select('id,order_number,invoice_number,delivery_country,vat_id,subtotal,total,vat_amount,shipped_at,invoice_created_at')
     .not('invoice_number', 'is', null)
@@ -413,43 +466,131 @@ export async function generateIntrastatXML(year: number, month: number): Promise
     .lt('invoice_created_at', periodEnd)
     .order('invoice_created_at', { ascending: true })
 
-  if (error) throw new Error(`Failed to fetch orders: ${error.message}`)
+  if (ordersErr) throw new Error(`Failed to fetch orders: ${ordersErr.message}`)
 
-  // Filter to EU-only destinations
-  const euOrders = (orders || []).filter(o => EU_COUNTRIES.has(o.delivery_country))
-  if (euOrders.length === 0) {
-    // Return minimal valid XML with no declarations
-    return generateEmptyInstatXML(referencePeriod)
-  }
+  const euOrders = (orders || []).filter(o => o.delivery_country && EU_COUNTRIES.has(o.delivery_country))
 
-  // Fetch order items for all EU orders
-  const orderIds = euOrders.map(o => o.id)
-  const { data: allItems } = await supabase
-    .from('order_items')
-    .select('order_id,product_name,sku,quantity,unit_price,total_price,weight_kg,cn_code,product_id')
-    .in('order_id', orderIds)
+  if (euOrders.length > 0) {
+    const orderIds = euOrders.map(o => o.id)
+    const { data: allItems } = await supabase
+      .from('order_items')
+      .select('order_id,product_name,sku,quantity,unit_price,total_price,weight_kg,cn_code,product_id')
+      .in('order_id', orderIds)
 
-  // Fetch products for country_of_origin
-  const productIds = [...new Set((allItems || []).map(i => i.product_id).filter(Boolean))]
-  let productMap: Record<string, { country_of_origin: string; cn_code: string; weight_kg: number }> = {}
-  if (productIds.length > 0) {
-    const { data: products } = await supabase
-      .from('products')
-      .select('id,country_of_origin,cn_code,weight_kg')
-      .in('id', productIds)
-    for (const p of products || []) {
-      productMap[p.id] = p
+    const productIds = [...new Set((allItems || []).map(i => i.product_id).filter(Boolean))]
+    let productMap: Record<string, { country_of_origin: string; cn_code: string; weight_kg: number }> = {}
+    if (productIds.length > 0) {
+      const { data: products } = await supabase
+        .from('products')
+        .select('id,country_of_origin,cn_code,weight_kg')
+        .in('id', productIds)
+      for (const p of products || []) productMap[p.id] = p
+    }
+
+    const itemsByOrder: Record<string, NonNullable<typeof allItems>> = {}
+    for (const item of allItems || []) {
+      if (!itemsByOrder[item.order_id]) itemsByOrder[item.order_id] = []
+      itemsByOrder[item.order_id]!.push(item)
+    }
+
+    for (const order of euOrders) {
+      const orderItems = itemsByOrder[order.id] || []
+      if (orderItems.length === 0) continue
+
+      const declItems: IntrastatDeclaration['items'] = []
+      for (const item of orderItems) {
+        const product = item.product_id ? productMap[item.product_id] : null
+        const cnCode = (item.cn_code || product?.cn_code || '00000000').replace(/\D/g, '').padEnd(8, '0')
+        const originCountry = normalizeCountryCode(product?.country_of_origin)
+        const weightPerUnit = item.weight_kg || product?.weight_kg || 0
+        const netMass = Number((weightPerUnit * item.quantity).toFixed(2))
+        const invoicedAmount = Number(item.total_price || 0)
+        declItems.push({
+          description: item.product_name,
+          cnCode,
+          countryOfOrigin: originCountry,
+          netMass,
+          quantity: item.quantity,
+          invoicedAmount,
+        })
+      }
+
+      decls.push({
+        flowCode: 2,
+        declType: 'RACN',
+        partnerCountry: order.delivery_country!,
+        partnerVat: order.vat_id || undefined,
+        items: declItems,
+      })
     }
   }
 
-  // Group items by order
-  const itemsByOrder: Record<string, NonNullable<typeof allItems>> = {}
-  for (const item of allItems || []) {
-    if (!itemsByOrder[item.order_id]) itemsByOrder[item.order_id] = []
-    itemsByOrder[item.order_id]!.push(item)
+  // ==========================================================================
+  // Arrivals (prejem, flowCode=1, PRBL) — from goods_receipts table
+  // Source: received goods from EU suppliers (supplier_country != SI, in EU set)
+  // Services are skipped (items missing cn_code or weight, or cn_code='SKIP').
+  // ==========================================================================
+  const { data: receipts, error: receiptsErr } = await supabase
+    .from('goods_receipts')
+    .select('document_number,receipt_date,supplier_name,supplier_country,supplier_invoice_number,items,net_amount')
+    .gte('receipt_date', periodStart)
+    .lt('receipt_date', periodEnd)
+    .not('supplier_country', 'is', null)
+    .order('receipt_date', { ascending: true })
+
+  if (receiptsErr) throw new Error(`Failed to fetch goods_receipts: ${receiptsErr.message}`)
+
+  const euReceipts = (receipts || []).filter(r => r.supplier_country && EU_COUNTRIES.has(r.supplier_country))
+
+  for (const receipt of euReceipts) {
+    const rawItems: GoodsReceiptItem[] = typeof receipt.items === 'string'
+      ? JSON.parse(receipt.items)
+      : (receipt.items || [])
+
+    const declItems: IntrastatDeclaration['items'] = []
+    for (const item of rawItems) {
+      const fallback = item.code ? GR_PRODUCT_MAP[item.code] : null
+      const rawCn = (item.cn_code || fallback?.cn_code || '').toString()
+      if (rawCn === 'SKIP' || !rawCn) continue  // service or unknown → skip
+      const cnCode = rawCn.replace(/\D/g, '').padEnd(8, '0')
+      if (cnCode === '00000000') continue
+
+      const weightPerUnit = Number(item.weight_kg ?? fallback?.weight_kg ?? 0)
+      if (weightPerUnit === 0) continue  // no weight → treat as non-goods / service
+
+      const origin = normalizeCountryCode(item.country_of_origin || fallback?.country_of_origin)
+      const qty = Number(item.qty || 0)
+      const price = Number(item.price || 0)
+      if (qty === 0) continue
+      const netMass = Number((weightPerUnit * qty).toFixed(2))
+      const invoicedAmount = Number((qty * price).toFixed(2))
+
+      declItems.push({
+        description: item.name || item.code || 'Goods',
+        cnCode,
+        countryOfOrigin: origin,
+        netMass,
+        quantity: qty,
+        invoicedAmount,
+      })
+    }
+
+    if (declItems.length === 0) continue  // receipt had only services
+    decls.push({
+      flowCode: 1,
+      declType: 'PRBL',
+      partnerCountry: receipt.supplier_country!,
+      items: declItems,
+    })
   }
 
-  // Build XML
+  // ==========================================================================
+  // Emit XML envelope
+  // ==========================================================================
+  if (decls.length === 0) {
+    return generateEmptyInstatXML(referencePeriod)
+  }
+
   const now = new Date()
   const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`
   const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`
@@ -475,17 +616,14 @@ export async function generateIntrastatXML(year: number, month: number): Promise
   lines.push('            <partyName>Carinski urad Nova Gorica</partyName>')
   lines.push('        </Party>')
 
-  let declSeq = 1
-  for (let oi = 0; oi < euOrders.length; oi++) {
-    const order = euOrders[oi]
-    const items = itemsByOrder[order.id] || []
-    if (items.length === 0) continue
+  // Per-type sequence counters so declarationIds stay meaningful (PRBL00001, RACN00001, ...)
+  const seqByType: Record<'PRBL' | 'RACN', number> = { PRBL: 0, RACN: 0 }
 
-    const isLast = oi === euOrders.length - 1
-    const hasPartner = !!order.vat_id
-    // flowCode=1 for dispatches (goods leaving SI)
-    const declType = 'RACN'
-    const declId = `${PSI_DIGITS}${YY}${declType}${declSeq.toString().padStart(5, '0')}`
+  for (let di = 0; di < decls.length; di++) {
+    const decl = decls[di]
+    const isLast = di === decls.length - 1
+    seqByType[decl.declType] += 1
+    const declId = `${PSI_DIGITS}${YY}${decl.declType}${seqByType[decl.declType].toString().padStart(5, '0')}`
 
     lines.push('        <Declaration>')
     lines.push(`            <declarationId>${declId}</declarationId>`)
@@ -494,34 +632,26 @@ export async function generateIntrastatXML(year: number, month: number): Promise
     lines.push('            <Function>')
     lines.push('                <functionCode>I</functionCode>')
     lines.push('            </Function>')
-    lines.push('            <flowCode>1</flowCode>')
+    lines.push(`            <flowCode>${decl.flowCode}</flowCode>`)
     lines.push('            <currencyCode>EUR</currencyCode>')
     lines.push(`            <firstLast>${isLast ? '1' : '0'}</firstLast>`)
 
-    for (let ii = 0; ii < items.length; ii++) {
-      const item = items[ii]
-      const product = item.product_id ? productMap[item.product_id] : null
-      const cnCode = (item.cn_code || product?.cn_code || '00000000').replace(/\D/g, '').padEnd(8, '0')
-      const originCountry = normalizeCountryCode(product?.country_of_origin)
-      const weightPerUnit = item.weight_kg || product?.weight_kg || 0
-      const netMass = Number((weightPerUnit * item.quantity).toFixed(2))
-      // invoicedAmount = net value (subtotal for this line, excluding VAT)
-      const invoicedAmount = Number(item.total_price || 0)
-
+    for (let ii = 0; ii < decl.items.length; ii++) {
+      const item = decl.items[ii]
       lines.push('            <Item>')
       lines.push(`                <itemNumber>${ii + 1}</itemNumber>`)
       lines.push('                <CN8>')
-      lines.push(`                    <CN8Code>${cnCode}</CN8Code>`)
+      lines.push(`                    <CN8Code>${item.cnCode}</CN8Code>`)
       lines.push('                </CN8>')
-      lines.push(`                <goodsDescription>${escapeXml(item.product_name)}</goodsDescription>`)
-      lines.push(`                <MSConsDestCode>${order.delivery_country}</MSConsDestCode>`)
-      lines.push(`                <countryOfOriginCode>${originCountry}</countryOfOriginCode>`)
-      lines.push(`                <netMass>${netMass}</netMass>`)
+      lines.push(`                <goodsDescription>${escapeXml(item.description)}</goodsDescription>`)
+      lines.push(`                <MSConsDestCode>${decl.partnerCountry}</MSConsDestCode>`)
+      lines.push(`                <countryOfOriginCode>${item.countryOfOrigin}</countryOfOriginCode>`)
+      lines.push(`                <netMass>${item.netMass}</netMass>`)
       lines.push(`                <quantityInSU>${item.quantity}</quantityInSU>`)
-      lines.push(`                <invoicedAmount>${invoicedAmount}</invoicedAmount>`)
-      lines.push(`                <statisticalValue>${invoicedAmount}</statisticalValue>`)
-      if (hasPartner) {
-        lines.push(`                <partnerId>${escapeXml(order.vat_id)}</partnerId>`)
+      lines.push(`                <invoicedAmount>${item.invoicedAmount}</invoicedAmount>`)
+      lines.push(`                <statisticalValue>${item.invoicedAmount}</statisticalValue>`)
+      if (decl.partnerVat) {
+        lines.push(`                <partnerId>${escapeXml(decl.partnerVat)}</partnerId>`)
       }
       lines.push('                <NatureOfTransaction>')
       lines.push('                    <natureOfTransactionACode>1</natureOfTransactionACode>')
@@ -536,12 +666,11 @@ export async function generateIntrastatXML(year: number, month: number): Promise
       lines.push('            </Item>')
     }
 
-    lines.push(`            <totalNumberLines>${items.length}</totalNumberLines>`)
+    lines.push(`            <totalNumberLines>${decl.items.length}</totalNumberLines>`)
     lines.push('        </Declaration>')
-    declSeq++
   }
 
-  lines.push(`        <numberOfDeclarations>${declSeq - 1}</numberOfDeclarations>`)
+  lines.push(`        <numberOfDeclarations>${decls.length}</numberOfDeclarations>`)
   lines.push('    </Envelope>')
   lines.push('</INSTAT>')
 
