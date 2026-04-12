@@ -251,11 +251,23 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-none pt-4 md:pt-0">
+                            <div className="flex items-center justify-between md:justify-end gap-3 border-t md:border-none pt-4 md:pt-0">
                                 <div className="text-right">
                                     <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-0.5">Amount Due</p>
                                     <p className="text-lg font-bold text-red-700">{inv.currency || 'EUR'} {inv.total.toFixed(2)}</p>
                                 </div>
+                                {/* Pay Now — opens a pre-filled Wise transfer page for this one
+                                    invoice. Amount, currency, and description (invoice #) are
+                                    baked into the URL so the customer just confirms the payer
+                                    details and submits. */}
+                                <a
+                                    href={`https://wise.com/pay/business/initraenergijadoo?amount=${inv.total.toFixed(2)}&currency=${inv.currency || 'EUR'}&description=${encodeURIComponent(inv.invoice_number)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                                >
+                                    {t('payNow') || 'Pay Now'}
+                                </a>
                                 {resolveInvoicePdfUrl(inv.pdf_url) && (
                                     <a
                                         href={resolveInvoicePdfUrl(inv.pdf_url)!}
