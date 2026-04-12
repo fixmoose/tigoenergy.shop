@@ -183,26 +183,31 @@ export default function IntrastatPage() {
 
       {report && (
         <>
-          {/* Summary Cards */}
+          {/* Summary Cards — dispatch + arrival split out */}
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-              <p className="text-sm text-slate-500">Monthly Value</p>
-              <p className="text-2xl font-bold text-slate-800">{formatCurrency(report.summary.monthly_value_eur)}</p>
+              <p className="text-sm text-slate-500">Odprema (dispatch)</p>
+              <p className="text-2xl font-bold text-blue-700">{formatCurrency(report.summary.dispatch_value_eur)}</p>
+              <p className="text-xs text-slate-400 mt-1">{formatWeight(report.summary.dispatch_weight_kg)} · {report.summary.dispatch_count} lines</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-              <p className="text-sm text-slate-500">Monthly Weight</p>
-              <p className="text-2xl font-bold text-slate-800">{formatWeight(report.summary.monthly_weight_kg)}</p>
+              <p className="text-sm text-slate-500">Prejem (arrival)</p>
+              <p className="text-2xl font-bold text-emerald-700">{formatCurrency(report.summary.arrival_value_eur)}</p>
+              <p className="text-xs text-slate-400 mt-1">{formatWeight(report.summary.arrival_weight_kg)} · {report.summary.arrival_count} lines</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-              <p className="text-sm text-slate-500">YTD Dispatches</p>
-              <p className={`text-2xl font-bold ${getThresholdColor(
+              <p className="text-sm text-slate-500">YTD Totals</p>
+              <p className={`text-lg font-bold ${getThresholdColor(
                 (report.summary.ytd_dispatches_eur / report.summary.threshold_eur) * 100,
                 report.summary.threshold_exceeded
               )}`}>
-                {formatCurrency(report.summary.ytd_dispatches_eur)}
+                ↑ {formatCurrency(report.summary.ytd_dispatches_eur)}
+              </p>
+              <p className="text-lg font-bold text-emerald-700">
+                ↓ {formatCurrency(report.summary.ytd_arrivals_eur)}
               </p>
               <p className="text-xs text-slate-400 mt-1">
-                Threshold: {formatCurrency(report.summary.threshold_eur)}
+                Thresholds: 270k dispatch · 240k arrival
               </p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
@@ -229,32 +234,46 @@ export default function IntrastatPage() {
             </div>
           )}
 
-          {/* Report Table */}
+          {/* Report Table — dispatches + arrivals, grouped by flow */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <h3 className="font-semibold text-slate-800">Dispatches by CN Code & Country</h3>
-              <p className="text-sm text-slate-500">{report.summary.monthly_shipments} shipments in {months[month - 1].label} {year}</p>
+              <h3 className="font-semibold text-slate-800">Declarations by CN Code & Country</h3>
+              <p className="text-sm text-slate-500">
+                {report.rows.length} row{report.rows.length !== 1 ? 's' : ''} in {months[month - 1].label} {year}
+                {' · '}
+                {report.summary.dispatch_count} odprema, {report.summary.arrival_count} prejem
+              </p>
             </div>
             {report.rows.length === 0 ? (
               <div className="p-8 text-center text-slate-400">
-                No EU dispatches recorded for this period
+                No Intrastat activity recorded for this period
               </div>
             ) : (
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Flow</th>
                     <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">CN Code</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Destination</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Partner country</th>
                     <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Value (EUR)</th>
                     <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Mass (kg)</th>
                     <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Units</th>
-                    <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Transaction</th>
-                    <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Transport</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {report.rows.map((row, idx) => (
-                    <tr key={`${row.cn_code}-${row.destination_country}-${idx}`} className="hover:bg-slate-50">
+                    <tr key={`${row.flow_type}-${row.cn_code}-${row.destination_country}-${idx}`} className="hover:bg-slate-50">
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            row.flow_type === 'dispatch'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-emerald-100 text-emerald-700'
+                          }`}
+                        >
+                          {row.flow_type === 'dispatch' ? 'Odprema' : 'Prejem'}
+                        </span>
+                      </td>
                       <td className="px-4 py-3 font-mono text-sm text-slate-800">{row.cn_code}</td>
                       <td className="px-4 py-3">
                         <span className="font-medium text-slate-800">{row.destination_country}</span>
@@ -263,18 +282,15 @@ export default function IntrastatPage() {
                       <td className="text-right px-4 py-3 text-slate-800">{formatCurrency(row.statistical_value_eur)}</td>
                       <td className="text-right px-4 py-3 text-slate-600">{formatWeight(row.net_mass_kg)}</td>
                       <td className="text-right px-4 py-3 text-slate-600">{row.supplementary_units}</td>
-                      <td className="text-center px-4 py-3 text-slate-500">{row.nature_of_transaction}</td>
-                      <td className="text-center px-4 py-3 text-slate-500">{row.mode_of_transport}</td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot className="bg-slate-50 border-t border-slate-200">
                   <tr className="font-semibold">
-                    <td className="px-4 py-3 text-slate-800" colSpan={2}>Total</td>
+                    <td className="px-4 py-3 text-slate-800" colSpan={3}>Total</td>
                     <td className="text-right px-4 py-3 text-slate-800">{formatCurrency(report.summary.monthly_value_eur)}</td>
                     <td className="text-right px-4 py-3 text-slate-800">{formatWeight(report.summary.monthly_weight_kg)}</td>
                     <td className="text-right px-4 py-3 text-slate-800">{report.summary.monthly_shipments}</td>
-                    <td colSpan={2}></td>
                   </tr>
                 </tfoot>
               </table>

@@ -10,6 +10,10 @@ import { useTranslations } from 'next-intl'
 interface Props {
     user: User
     customer: Customer
+    // When set, this component renders the dashboard of that customer as seen
+    // by admins from /admin/customers/[id]. All data fetches are routed to
+    // /api/admin/customers/[id]/dashboard instead of the self-auth routes.
+    adminViewCustomerId?: string
 }
 
 const QUOTE_STATUS_STYLES: Record<string, string> = {
@@ -40,7 +44,7 @@ interface ArchiveInvoice extends UnpaidInvoice {
     notes: string | null
 }
 
-export default function MyOrders({ user, customer }: Props) {
+export default function MyOrders({ user, customer, adminViewCustomerId }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
     const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([])
@@ -52,6 +56,24 @@ export default function MyOrders({ user, customer }: Props) {
 
     useEffect(() => {
         const fetchData = async () => {
+            if (adminViewCustomerId) {
+                // Admin mirror mode: fetch the whole payload for the target
+                // customer through a single admin-scoped endpoint.
+                try {
+                    const res = await fetch(`/api/admin/customers/${adminViewCustomerId}/dashboard`)
+                    const data = await res.json()
+                    if (data.success) {
+                        setOrders(data.data.orders || [])
+                        setQuotes(data.data.quotes || [])
+                        setUnpaidInvoices(data.data.unpaidInvoices || [])
+                        setArchiveInvoices(data.data.archiveInvoices || [])
+                    }
+                } catch { /* ignore */ }
+                setLoading(false)
+                return
+            }
+
+            // Self-serve mode: customer viewing their own dashboard.
             const supabase = createClient()
             const [ordersRes, quotesRes] = await Promise.all([
                 supabase
@@ -71,8 +93,6 @@ export default function MyOrders({ user, customer }: Props) {
             if (quotesRes.data) setQuotes(quotesRes.data)
             setLoading(false)
 
-            // Fetch unpaid manual invoices for this customer (top red widget)
-            // and the full archive (paid + unpaid history, bottom section).
             try {
                 const [unpaidRes, archiveRes] = await Promise.all([
                     fetch('/api/customer/unpaid-invoices'),
@@ -87,7 +107,7 @@ export default function MyOrders({ user, customer }: Props) {
             } catch { /* ignore */ }
         }
         fetchData()
-    }, [user.id])
+    }, [user.id, adminViewCustomerId])
 
     const filtered = search.trim()
         ? orders.filter(o =>

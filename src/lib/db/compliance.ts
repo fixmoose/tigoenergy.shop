@@ -67,47 +67,100 @@ export async function getOSSReport(year: number, quarter: number): Promise<OSSRe
 // Intrastat Reporting
 // ============================================================================
 
+// Country-name lookup for IntrastatReportRow.country_name (kept minimal —
+// expand when new destinations/origins appear)
+const COUNTRY_NAMES: Record<string, string> = {
+  AT: 'Austria', BE: 'Belgium', BG: 'Bulgaria', HR: 'Croatia', CY: 'Cyprus',
+  CZ: 'Czech Republic', DK: 'Denmark', EE: 'Estonia', FI: 'Finland',
+  FR: 'France', DE: 'Germany', GR: 'Greece', HU: 'Hungary', IE: 'Ireland',
+  IT: 'Italy', LV: 'Latvia', LT: 'Lithuania', LU: 'Luxembourg', MT: 'Malta',
+  NL: 'Netherlands', PL: 'Poland', PT: 'Portugal', RO: 'Romania',
+  SK: 'Slovakia', ES: 'Spain', SE: 'Sweden',
+}
+
 export async function getIntrastatReport(year: number, month: number): Promise<IntrastatReportData> {
-  const supabase = await createClient()
+  // Read from the same source the XML generator uses so UI and XML never drift.
+  const decls = await buildIntrastatDeclarations(year, month)
 
-  // Call the PostgreSQL function for detailed report
-  const { data: rows, error: rowsError } = await supabase.rpc('generate_intrastat_report', {
-    p_year: year,
-    p_month: month,
+  // Aggregate by (flow_type, country, cn_code) into display rows.
+  // Each declaration contributes its items to the grouping.
+  const grouped = new Map<string, IntrastatReportRow>()
+  for (const decl of decls) {
+    const flow_type: 'dispatch' | 'arrival' = decl.flowCode === 2 ? 'dispatch' : 'arrival'
+    for (const item of decl.items) {
+      const key = `${flow_type}|${decl.partnerCountry}|${item.cnCode}`
+      const existing = grouped.get(key)
+      if (existing) {
+        existing.statistical_value_eur += item.invoicedAmount
+        existing.net_mass_kg += item.netMass
+        existing.supplementary_units += item.quantity
+        existing.order_count += 1
+      } else {
+        grouped.set(key, {
+          flow_type,
+          cn_code: item.cnCode,
+          destination_country: decl.partnerCountry,
+          country_name: COUNTRY_NAMES[decl.partnerCountry] || decl.partnerCountry,
+          statistical_value_eur: item.invoicedAmount,
+          net_mass_kg: item.netMass,
+          supplementary_units: item.quantity,
+          nature_of_transaction: '11',
+          mode_of_transport: '3',
+          order_count: 1,
+        })
+      }
+    }
+  }
+
+  const rows = Array.from(grouped.values()).sort((a, b) => {
+    if (a.flow_type !== b.flow_type) return a.flow_type === 'dispatch' ? -1 : 1
+    if (a.destination_country !== b.destination_country) return a.destination_country.localeCompare(b.destination_country)
+    return a.cn_code.localeCompare(b.cn_code)
   })
 
-  if (rowsError) {
-    console.error('Error fetching Intrastat report:', rowsError)
-    throw new Error(`Failed to generate Intrastat report: ${rowsError.message}`)
+  // Flow-split summary
+  const dispatchRows = rows.filter(r => r.flow_type === 'dispatch')
+  const arrivalRows = rows.filter(r => r.flow_type === 'arrival')
+  const sumVal = (list: IntrastatReportRow[]) => list.reduce((s, r) => s + r.statistical_value_eur, 0)
+  const sumMass = (list: IntrastatReportRow[]) => list.reduce((s, r) => s + r.net_mass_kg, 0)
+  const sumCount = (list: IntrastatReportRow[]) => list.reduce((s, r) => s + r.order_count, 0)
+
+  // YTD totals across all declarations up to the current period
+  let ytdDispatchValue = 0
+  let ytdArrivalValue = 0
+  for (let m = 1; m <= month; m++) {
+    const monthDecls = m === month ? decls : await buildIntrastatDeclarations(year, m)
+    for (const d of monthDecls) {
+      const val = d.items.reduce((s, it) => s + it.invoicedAmount, 0)
+      if (d.flowCode === 2) ytdDispatchValue += val
+      else ytdArrivalValue += val
+    }
   }
 
-  // Call the summary function
-  const { data: summaryData, error: summaryError } = await supabase.rpc('get_intrastat_summary', {
-    p_year: year,
-    p_month: month,
-  })
-
-  if (summaryError) {
-    console.error('Error fetching Intrastat summary:', summaryError)
-    throw new Error(`Failed to get Intrastat summary: ${summaryError.message}`)
+  const thresholdEur = 270000
+  const summary: IntrastatSummary = {
+    monthly_value_eur: sumVal(rows),
+    monthly_weight_kg: sumMass(rows),
+    monthly_shipments: sumCount(rows),
+    dispatch_value_eur: sumVal(dispatchRows),
+    dispatch_weight_kg: sumMass(dispatchRows),
+    dispatch_count: sumCount(dispatchRows),
+    arrival_value_eur: sumVal(arrivalRows),
+    arrival_weight_kg: sumMass(arrivalRows),
+    arrival_count: sumCount(arrivalRows),
+    ytd_dispatches_eur: ytdDispatchValue,
+    ytd_arrivals_eur: ytdArrivalValue,
+    threshold_eur: thresholdEur,
+    threshold_exceeded: ytdDispatchValue > thresholdEur || ytdArrivalValue > 240000,
+    // 15th of following month, standard SURS deadline
+    submission_deadline: (() => {
+      const nextMonth = month < 12 ? month + 1 : 1
+      const nextYear = month < 12 ? year : year + 1
+      return `${nextYear}-${nextMonth.toString().padStart(2, '0')}-15`
+    })(),
   }
 
-  const summary = summaryData?.[0] || {
-    monthly_value_eur: 0,
-    monthly_weight_kg: 0,
-    monthly_shipments: 0,
-    ytd_dispatches_eur: 0,
-    threshold_eur: 270000,
-    threshold_exceeded: false,
-    submission_deadline: null,
-  }
-
-  return {
-    year,
-    month,
-    rows: (rows || []) as IntrastatReportRow[],
-    summary: summary as IntrastatSummary,
-  }
+  return { year, month, rows, summary }
 }
 
 export async function saveIntrastatReport(year: number, month: number): Promise<number> {
@@ -438,17 +491,20 @@ type IntrastatDeclaration = {
 }
 
 /**
- * Generate INSTAT XML for Slovenian Intrastat reporting to SURS.
- * Emits both dispatches (flowCode=2, from orders) and arrivals (flowCode=1, from goods_receipts).
+ * Build the list of Intrastat declarations for a reporting period from all
+ * three sources (orders, manual_invoices, goods_receipts). Used by both the
+ * XML generator and the admin UI so they never drift apart.
  */
-export async function generateIntrastatXML(year: number, month: number): Promise<string> {
+async function buildIntrastatDeclarations(
+  year: number,
+  month: number
+): Promise<IntrastatDeclaration[]> {
   const supabase = await createAdminClient()
 
   const periodStart = `${year}-${month.toString().padStart(2, '0')}-01`
   const nextMonth = month < 12 ? month + 1 : 1
   const nextYear = month < 12 ? year : year + 1
   const periodEnd = `${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`
-  const referencePeriod = `${year}${month.toString().padStart(2, '0')}`
 
   const decls: IntrastatDeclaration[] = []
 
@@ -650,9 +706,18 @@ export async function generateIntrastatXML(year: number, month: number): Promise
     })
   }
 
-  // ==========================================================================
-  // Emit XML envelope
-  // ==========================================================================
+  return decls
+}
+
+/**
+ * Generate INSTAT XML for Slovenian Intrastat reporting to SURS.
+ * Emits both dispatches (flowCode=2, RACN) and arrivals (flowCode=1, PRBL)
+ * from the same buildIntrastatDeclarations helper the admin UI reads.
+ */
+export async function generateIntrastatXML(year: number, month: number): Promise<string> {
+  const referencePeriod = `${year}${month.toString().padStart(2, '0')}`
+  const decls = await buildIntrastatDeclarations(year, month)
+
   if (decls.length === 0) {
     return generateEmptyInstatXML(referencePeriod)
   }

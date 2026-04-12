@@ -6,6 +6,7 @@ import CustomerPricingAssignment from '@/components/admin/CustomerPricingAssignm
 import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
 import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
 import AdminAddressEditor from '@/components/admin/AdminAddressEditor'
+import CustomerDashboardMirror from '@/components/admin/CustomerDashboardMirror'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
 import DeleteCustomerButton from '@/components/admin/DeleteCustomerButton'
@@ -97,6 +98,8 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             </Link>
           </div>
         </header>
+
+        <CustomerDashboardMirror customer={customer as Customer} />
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">

@@ -41,8 +41,9 @@ export interface OSSReportData {
 // ============================================================================
 
 export interface IntrastatReportRow {
+  flow_type: 'dispatch' | 'arrival'
   cn_code: string
-  destination_country: string
+  destination_country: string  // destination (dispatch) or dispatching country (arrival)
   country_name: string
   statistical_value_eur: number
   net_mass_kg: number
@@ -56,7 +57,14 @@ export interface IntrastatSummary {
   monthly_value_eur: number
   monthly_weight_kg: number
   monthly_shipments: number
+  dispatch_value_eur: number
+  dispatch_weight_kg: number
+  dispatch_count: number
+  arrival_value_eur: number
+  arrival_weight_kg: number
+  arrival_count: number
   ytd_dispatches_eur: number
+  ytd_arrivals_eur: number
   threshold_eur: number
   threshold_exceeded: boolean
   submission_deadline: string
