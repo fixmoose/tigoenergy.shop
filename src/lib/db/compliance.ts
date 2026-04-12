@@ -750,8 +750,24 @@ export async function generateIntrastatXML(year: number, month: number): Promise
   lines.push('            <partyName>Carinski urad Nova Gorica</partyName>')
   lines.push('        </Party>')
 
-  // Per-type sequence counters so declarationIds stay meaningful (PRBL00001, RACN00001, ...)
-  const seqByType: Record<'PRBL' | 'RACN', number> = { PRBL: 0, RACN: 0 }
+  // YTD running counter: the evidenčna številka (declaration ID) is a global
+  // sequence per type across the whole year, not per month. Each invoice gets
+  // its own number (the old Initra system did not aggregate). We start from
+  // a base offset that accounts for declarations already submitted to SURS
+  // from the legacy system, then count this system's own declarations from
+  // the cutover month forward.
+  const LEGACY_HANDOVER: Record<number, { base: { PRBL: number; RACN: number }; startMonth: number }> = {
+    2026: { base: { PRBL: 3, RACN: 7 }, startMonth: 3 },
+  }
+  const legacy = LEGACY_HANDOVER[year]
+  const seqByType: Record<'PRBL' | 'RACN', number> = legacy
+    ? { ...legacy.base }
+    : { PRBL: 0, RACN: 0 }
+  const countFromMonth = legacy?.startMonth || 1
+  for (let m = countFromMonth; m < month; m++) {
+    const priorDecls = await buildIntrastatDeclarations(year, m)
+    for (const d of priorDecls) seqByType[d.declType]++
+  }
 
   for (let di = 0; di < decls.length; di++) {
     const decl = decls[di]
