@@ -48,6 +48,7 @@ export default function SupplierInvoiceFormModal({ initial, onClose, onSaved }: 
         }
       : { ...EMPTY }
   )
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -76,31 +77,52 @@ export default function SupplierInvoiceFormModal({ initial, onClose, onSaved }: 
       return setError('Exchange rate is required for non-EUR invoices')
     }
 
-    const payload: any = {
+    const payload: Record<string, any> = {
       supplier_name: form.supplier_name.trim(),
-      supplier_vat_id: form.supplier_vat_id.trim() || null,
-      supplier_country: form.supplier_country.trim().toUpperCase() || null,
+      supplier_vat_id: form.supplier_vat_id.trim() || '',
+      supplier_country: form.supplier_country.trim().toUpperCase() || '',
       invoice_number: form.invoice_number.trim(),
       invoice_date: form.invoice_date,
-      due_date: form.due_date || null,
+      due_date: form.due_date || '',
       currency: form.currency,
-      exchange_rate: form.currency === 'EUR' ? null : parseFloat(form.exchange_rate),
-      net_amount: parseFloat(form.net_amount) || 0,
-      vat_amount: parseFloat(form.vat_amount) || 0,
-      total: parseFloat(form.total) || 0,
+      exchange_rate: form.currency === 'EUR' ? '' : String(parseFloat(form.exchange_rate) || 0),
+      net_amount: String(parseFloat(form.net_amount) || 0),
+      vat_amount: String(parseFloat(form.vat_amount) || 0),
+      total: String(parseFloat(form.total) || 0),
       category: form.category,
-      pdf_url: form.pdf_url.trim() || null,
-      notes: form.notes.trim() || null,
+      pdf_url: form.pdf_url.trim() || '',
+      notes: form.notes.trim() || '',
     }
     if (isEdit) payload.id = initial!.id
 
     setSubmitting(true)
     try {
-      const res = await fetch('/api/admin/supplier-invoices', {
-        method: isEdit ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      let res: Response
+      if (!isEdit && pdfFile) {
+        // Create with PDF upload → multipart/form-data in one round-trip.
+        const fd = new FormData()
+        for (const [k, v] of Object.entries(payload)) {
+          if (v !== '' && v != null) fd.append(k, String(v))
+        }
+        fd.append('file', pdfFile)
+        res = await fetch('/api/admin/supplier-invoices', { method: 'POST', body: fd })
+      } else {
+        // JSON path: edit, or create without file.
+        // Convert '' → null for the JSON payload so the server handles blanks.
+        const json: Record<string, any> = {}
+        for (const [k, v] of Object.entries(payload)) {
+          json[k] = v === '' ? null : v
+        }
+        // Numerics need to be real numbers in JSON, not strings.
+        for (const k of ['net_amount', 'vat_amount', 'total', 'exchange_rate']) {
+          if (json[k] != null) json[k] = parseFloat(json[k])
+        }
+        res = await fetch('/api/admin/supplier-invoices', {
+          method: isEdit ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(json),
+        })
+      }
       const data = await res.json()
       if (!data.success) {
         setError(data.error || 'Save failed')
@@ -272,13 +294,24 @@ export default function SupplierInvoiceFormModal({ initial, onClose, onSaved }: 
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">PDF URL (optional)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                PDF {isEdit ? 'URL' : '(upload or paste URL)'}
+              </label>
+              {!isEdit && (
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={e => setPdfFile(e.target.files?.[0] || null)}
+                  className="w-full text-sm mb-2"
+                />
+              )}
               <input
                 type="text"
                 value={form.pdf_url}
                 onChange={e => set('pdf_url', e.target.value)}
-                placeholder="/api/storage?bucket=…"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                placeholder={pdfFile ? pdfFile.name : '/api/storage?bucket=…'}
+                disabled={!!pdfFile}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm disabled:bg-slate-100"
               />
             </div>
           </div>

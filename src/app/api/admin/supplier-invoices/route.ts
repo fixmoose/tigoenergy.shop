@@ -44,14 +44,53 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ success: true, data })
 }
 
-// POST: create a supplier invoice
+// POST: create a supplier invoice. Accepts either JSON or multipart/form-data.
+// With multipart, the optional 'file' field is uploaded to Supabase storage
+// and its URL is stored as pdf_url — one round-trip from the admin form.
 export async function POST(req: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await req.json().catch(() => null)
-  if (!body) return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  const contentType = req.headers.get('content-type') || ''
+  let body: any = null
+  let uploadedPdfUrl: string | null = null
+
+  if (contentType.startsWith('multipart/form-data')) {
+    const form = await req.formData()
+    body = {}
+    for (const [key, value] of form.entries()) {
+      if (key === 'file') continue
+      if (typeof value === 'string') body[key] = value
+    }
+    // Coerce numerics
+    for (const key of ['net_amount', 'vat_amount', 'total', 'exchange_rate']) {
+      if (body[key] != null && body[key] !== '') body[key] = parseFloat(body[key])
+    }
+
+    const file = form.get('file') as File | null
+    if (file && file.size > 0) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        return NextResponse.json({ error: 'Only PDF files are accepted' }, { status: 400 })
+      }
+      const supabase = await createAdminClient()
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const storagePath = `supplier-invoices/${Date.now()}_${safeName}`
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const { error: uploadError } = await supabase.storage
+        .from('invoices')
+        .upload(storagePath, buffer, { contentType: 'application/pdf' })
+      if (uploadError) {
+        return NextResponse.json({ error: `Failed to upload PDF: ${uploadError.message}` }, { status: 500 })
+      }
+      uploadedPdfUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(storagePath)}`
+    }
+  } else {
+    body = await req.json().catch(() => null)
+  }
+
+  if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
+  if (uploadedPdfUrl) body.pdf_url = uploadedPdfUrl
 
   const {
     supplier_name,

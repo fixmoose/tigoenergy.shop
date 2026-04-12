@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
+import { regionFor } from '@/lib/invoice-classification'
 
 async function requireAdmin() {
     const cookieStore = await cookies()
@@ -8,6 +9,15 @@ async function requireAdmin() {
         return false
     }
     return true
+}
+
+// Derive the counterparty region from a VAT ID prefix.
+// A manual_invoices row is "issued to EU" if its vat_id starts with an EU
+// country code (other than SI). Used at ingestion to route the row through
+// the classifyInvoice rule matrix.
+function regionFromVatId(vatId: string | null | undefined): 'EU' | 'SI' | 'outside_EU' {
+    if (!vatId || vatId.length < 2) return 'SI'  // domestic default for blank/personal invoices
+    return regionFor(vatId.slice(0, 2).toUpperCase())
 }
 
 /**
@@ -218,12 +228,16 @@ export async function POST(req: NextRequest) {
 
     const pdfUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(storagePath)}`
 
-    // Insert into DB
+    // Insert into DB. Region is derived from the extracted VAT ID prefix so
+    // the row is routed per the classifyInvoice rule matrix at ingestion.
+    const region = regionFromVatId(extracted.vat_id)
     const { data: invoice, error: insertError } = await supabase
         .from('manual_invoices')
         .insert({
             ...extracted,
             pdf_url: pdfUrl,
+            region,
+            category: 'goods',
         })
         .select()
         .single()
@@ -245,6 +259,11 @@ export async function PATCH(req: NextRequest) {
     const { id, ...updates } = body
 
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+    // Recompute region if vat_id changed so the classification stays in sync.
+    if (updates.vat_id !== undefined) {
+        updates.region = regionFromVatId(updates.vat_id)
+    }
 
     const supabase = await createAdminClient()
     const { error } = await supabase

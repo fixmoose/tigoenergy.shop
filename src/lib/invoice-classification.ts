@@ -59,7 +59,10 @@ export function classifyInvoice({ direction, counterpartyCountry, category = 'go
     // Income is always recorded
     targets.push('income')
     if (region === 'SI') {
-      targets.push('ddv', 'weee')
+      targets.push('ddv')
+      // WEEE (eTROD) applies to electronic equipment placed on the Slovenian
+      // market — goods only, B2C and B2B alike. Services are exempt.
+      if (category === 'goods') targets.push('weee')
     } else if (region === 'EU' && category === 'goods') {
       targets.push('intrastat_dispatch')
     }

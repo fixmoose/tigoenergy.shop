@@ -526,6 +526,72 @@ export async function generateIntrastatXML(year: number, month: number): Promise
   }
 
   // ==========================================================================
+  // Dispatches (odprema, flowCode=2, RACN) — from manual_invoices table
+  // Source: historical / paper invoices imported via /api/admin/manual-invoices
+  // with region='EU' and a populated items[] JSON. Rows without items are
+  // skipped (they represent SI-domestic or not-yet-itemized historical data).
+  // ==========================================================================
+  const { data: manualInvoices, error: miErr } = await supabase
+    .from('manual_invoices')
+    .select('id,invoice_number,invoice_date,company_name,vat_id,net_amount,total,items,region,category')
+    .eq('region', 'EU')
+    .eq('category', 'goods')
+    .gte('invoice_date', periodStart)
+    .lt('invoice_date', periodEnd)
+    .order('invoice_date', { ascending: true })
+
+  if (miErr) throw new Error(`Failed to fetch manual_invoices: ${miErr.message}`)
+
+  for (const mi of manualInvoices || []) {
+    const rawItems: GoodsReceiptItem[] = typeof mi.items === 'string'
+      ? JSON.parse(mi.items)
+      : (mi.items || [])
+    if (!rawItems || rawItems.length === 0) continue  // not yet itemized — skip
+
+    const declItems: IntrastatDeclaration['items'] = []
+    for (const item of rawItems) {
+      const fallback = item.code ? GR_PRODUCT_MAP[item.code] : null
+      const rawCn = (item.cn_code || fallback?.cn_code || '').toString()
+      if (rawCn === 'SKIP' || !rawCn) continue
+      const cnCode = rawCn.replace(/\D/g, '').padEnd(8, '0')
+      if (cnCode === '00000000') continue
+
+      const weightPerUnit = Number(item.weight_kg ?? fallback?.weight_kg ?? 0)
+      if (weightPerUnit === 0) continue
+
+      const origin = normalizeCountryCode(item.country_of_origin || fallback?.country_of_origin)
+      const qty = Number(item.qty || 0)
+      const price = Number(item.price || 0)
+      if (qty === 0) continue
+      const netMass = Number((weightPerUnit * qty).toFixed(2))
+      const invoicedAmount = Number((qty * price).toFixed(2))
+
+      declItems.push({
+        description: item.name || item.code || 'Goods',
+        cnCode,
+        countryOfOrigin: origin,
+        netMass,
+        quantity: qty,
+        invoicedAmount,
+      })
+    }
+
+    if (declItems.length === 0) continue
+
+    // Partner country derived from VAT prefix (e.g. 'HR62345613352' → 'HR')
+    const partnerCountry = (mi.vat_id || '').slice(0, 2).toUpperCase()
+    if (!EU_COUNTRIES.has(partnerCountry)) continue  // region set but VAT missing/malformed
+
+    decls.push({
+      flowCode: 2,
+      declType: 'RACN',
+      partnerCountry,
+      partnerVat: mi.vat_id || undefined,
+      items: declItems,
+    })
+  }
+
+  // ==========================================================================
   // Arrivals (prejem, flowCode=1, PRBL) — from goods_receipts table
   // Source: received goods from EU suppliers (supplier_country != SI, in EU set)
   // Services are skipped (items missing cn_code or weight, or cn_code='SKIP').
