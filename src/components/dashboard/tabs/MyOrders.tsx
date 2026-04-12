@@ -34,10 +34,18 @@ interface UnpaidInvoice {
     paid: boolean
 }
 
+interface ArchiveInvoice extends UnpaidInvoice {
+    net_amount: number
+    paid_at: string | null
+    notes: string | null
+}
+
 export default function MyOrders({ user, customer }: Props) {
     const [orders, setOrders] = useState<Order[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
     const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([])
+    const [archiveInvoices, setArchiveInvoices] = useState<ArchiveInvoice[]>([])
+    const [archiveOpen, setArchiveOpen] = useState(false)
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const t = useTranslations('dashboard')
@@ -63,11 +71,19 @@ export default function MyOrders({ user, customer }: Props) {
             if (quotesRes.data) setQuotes(quotesRes.data)
             setLoading(false)
 
-            // Fetch unpaid manual invoices for this customer
+            // Fetch unpaid manual invoices for this customer (top red widget)
+            // and the full archive (paid + unpaid history, bottom section).
             try {
-                const res = await fetch('/api/customer/unpaid-invoices')
-                const data = await res.json()
-                if (data.success) setUnpaidInvoices(data.data || [])
+                const [unpaidRes, archiveRes] = await Promise.all([
+                    fetch('/api/customer/unpaid-invoices'),
+                    fetch('/api/customer/invoices'),
+                ])
+                const [unpaidJson, archiveJson] = await Promise.all([
+                    unpaidRes.json(),
+                    archiveRes.json(),
+                ])
+                if (unpaidJson.success) setUnpaidInvoices(unpaidJson.data || [])
+                if (archiveJson.success) setArchiveInvoices(archiveJson.data || [])
             } catch { /* ignore */ }
         }
         fetchData()
@@ -385,6 +401,83 @@ export default function MyOrders({ user, customer }: Props) {
                 </div>
             )}
         </div>
+
+        {/* Invoice Archive — full history of invoices issued to this customer,
+            matched by VAT ID. Collapsed by default; surfaces both paid and
+            unpaid rows so the customer can audit past activity. */}
+        {!loading && archiveInvoices.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mt-6">
+                <button
+                    type="button"
+                    onClick={() => setArchiveOpen(v => !v)}
+                    className="w-full p-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3 hover:bg-gray-100/60 transition text-left"
+                >
+                    <div className="w-8 h-8 bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                        </svg>
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-bold text-lg text-gray-900">Invoice Archive</h3>
+                        <p className="text-sm text-gray-500">
+                            {archiveInvoices.length} invoice{archiveInvoices.length !== 1 ? 's' : ''} on file · total {archiveInvoices[0]?.currency || 'EUR'} {archiveInvoices.reduce((s, i) => s + i.total, 0).toFixed(2)}
+                        </p>
+                    </div>
+                    <svg
+                        className={`w-5 h-5 text-gray-400 transition-transform ${archiveOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {archiveOpen && (
+                    <div className="divide-y divide-gray-100">
+                        {archiveInvoices.map(inv => (
+                            <div key={inv.id} className="px-6 py-4 hover:bg-gray-50/40 transition flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-2.5 rounded-lg ${inv.paid ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-semibold text-gray-900">Invoice #{inv.invoice_number}</span>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${inv.paid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                {inv.paid ? 'Paid' : 'Unpaid'}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-0.5">
+                                            {new Date(inv.invoice_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {inv.paid && inv.paid_at && (
+                                                <span className="text-green-600"> · paid {new Date(inv.paid_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total</p>
+                                        <p className="text-sm font-bold text-gray-900">{inv.currency || 'EUR'} {inv.total.toFixed(2)}</p>
+                                    </div>
+                                    {inv.pdf_url && (
+                                        <a
+                                            href={inv.pdf_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs font-semibold text-gray-700 hover:text-gray-900 underline"
+                                        >
+                                            PDF
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        )}
+
         <SavedCartsList />
         </>
     )
