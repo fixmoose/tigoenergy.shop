@@ -227,14 +227,10 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         it: 'Importo residuo', cs: 'Zbývá k úhradě', sk: 'Zostáva na úhradu', sv: 'Återstående belopp',
     }
 
-    // ── Payment summary block: inserted right after the Grand Total row,
-    // before the bank section. Shows payment details + Plačano + Ostane
-    // za plačilo so the payment status is immediately visible after the
-    // total, not buried at the bottom of the page.
-    const bankMarker = 'Podatki za nakazilo'
-    const bankIdx = htmlContent.indexOf(bankMarker)
-
-    // Build the combined payment + summary HTML
+    // ── Payment summary block: replaces the <!-- PAYMENT_SUMMARY -->
+    // marker in the invoice template (between TOTALS_SECTION and
+    // BANK_SECTION) so the payment status is immediately visible right
+    // after Grand Total — not buried at the bottom of the page.
     let paymentHtml = ''
 
     if (effectivePayments.length > 0) {
@@ -281,22 +277,18 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     </table>
 </div>`
 
-    // Insert after Grand Total, before bank details
-    if (bankIdx > 0) {
-        // Find the start of the bank section's parent div
-        const bankDivStart = htmlContent.lastIndexOf('<div', bankIdx)
-        if (bankDivStart > 0) {
-            htmlContent = htmlContent.slice(0, bankDivStart) + paymentHtml + htmlContent.slice(bankDivStart)
-        }
+    // Replace the template marker with the payment block
+    if (htmlContent.includes('<!-- PAYMENT_SUMMARY -->')) {
+        htmlContent = htmlContent.replace('<!-- PAYMENT_SUMMARY -->', paymentHtml)
     } else {
-        // Fallback: append before </body> if bank section not found
+        // Fallback for templates without the marker
         htmlContent = htmlContent.replace('</body>', paymentHtml + '</body>')
     }
 
     // Hide bank transfer section when fully paid (no need for payment instructions)
-    if (remainingAmount <= 0.01 && bankIdx > 0) {
+    if (remainingAmount <= 0.01) {
         htmlContent = htmlContent.replace(
-            /(<div[^>]*>[\s\S]*?Podatki za nakazilo[\s\S]*?<\/div>\s*<\/div>)/,
+            /(<div[^>]*>[\s\S]*?Podatki za nakazilo[\s\S]*?<\/table>\s*<\/div>)/,
             '<!-- bank section hidden: fully paid -->'
         )
     }
