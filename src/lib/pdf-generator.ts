@@ -29,6 +29,11 @@ export async function generatePdfFromHtml(html: string) {
                     .no-break { page-break-inside: avoid; }
                     table { page-break-inside: auto; }
                     tr { page-break-inside: avoid; page-break-after: auto; }
+                    /* Prevent any section div from being split across pages */
+                    div[style*="border-radius"] { page-break-inside: avoid; }
+                    div[style*="margin:0 36px"] { page-break-inside: avoid; }
+                    tfoot { page-break-inside: avoid; }
+                    thead { display: table-header-group; }
                 </style>
             </head>
             <body>

@@ -516,7 +516,7 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
         )}
 
         <SavedCartsList
-            injectedCarts={adminViewCustomerId ? mirrorSavedCarts : null}
+            injectedCarts={adminViewCustomerId ? (mirrorSavedCarts ?? []) : null}
             readOnly={!!adminViewCustomerId}
         />
         </>

@@ -223,13 +223,23 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         it: 'Pagato', cs: 'Zaplaceno', sk: 'Zaplatené', sv: 'Betalt',
     }
     const dueLabel: Record<string, string> = {
-        sl: 'Znesek za plačilo', hr: 'Iznos za plaćanje', de: 'Zahlungsbetrag', en: 'Amount due',
-        it: 'Importo dovuto', cs: 'Částka k úhradě', sk: 'Suma na úhradu', sv: 'Belopp att betala',
+        sl: 'Ostane za plačilo', hr: 'Ostaje za plaćanje', de: 'Offener Betrag', en: 'Balance due',
+        it: 'Importo residuo', cs: 'Zbývá k úhradě', sk: 'Zostáva na úhradu', sv: 'Återstående belopp',
     }
+
+    // ── Payment summary block: inserted right after the Grand Total row,
+    // before the bank section. Shows payment details + Plačano + Ostane
+    // za plačilo so the payment status is immediately visible after the
+    // total, not buried at the bottom of the page.
+    const bankMarker = 'Podatki za nakazilo'
+    const bankIdx = htmlContent.indexOf(bankMarker)
+
+    // Build the combined payment + summary HTML
+    let paymentHtml = ''
 
     if (effectivePayments.length > 0) {
         const paymentRows = effectivePayments.map((p: any) =>
-            `<tr>
+            `<tr style="page-break-inside:avoid;">
                 <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${new Date(p.payment_date).toLocaleDateString(dateLocale)}</td>
                 <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.payment_method || labels.bankTransfer}</td>
                 <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.reference || '-'}</td>
@@ -237,8 +247,8 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
             </tr>`
         ).join('')
 
-        const paymentTable = `
-<div style="margin-top:24px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+        paymentHtml += `
+<div style="margin:0 36px 12px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;page-break-inside:avoid;">
     <div style="background:#f0fdf4;padding:10px 14px;border-bottom:1px solid #e5e7eb;">
         <strong style="font-size:12px;color:#15803d;">${labels.paymentsReceived}</strong>
     </div>
@@ -252,27 +262,13 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
             </tr>
         </thead>
         <tbody>${paymentRows}</tbody>
-        <tfoot>
-            <tr style="background:#f0fdf4;">
-                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">${labels.totalPaid}</td>
-                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€${totalPaidAmount.toFixed(2)}</td>
-            </tr>
-            ${remainingAmount > 0.01 ? `<tr style="background:#fef3c7;">
-                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;">${labels.balanceDue}</td>
-                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#92400e;text-align:right;">€${remainingAmount.toFixed(2)}</td>
-            </tr>` : `<tr style="background:#f0fdf4;">
-                <td colspan="3" style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;">${labels.balanceDue}</td>
-                <td style="padding:8px 10px;font-size:11px;font-weight:700;color:#15803d;text-align:right;">€0.00</td>
-            </tr>`}
-        </tfoot>
     </table>
 </div>`
-        htmlContent = htmlContent.replace('</body>', paymentTable + '</body>')
     }
 
-    // Paid/Due summary block — always shown, prominent
-    const paidSummaryHtml = `
-<div style="margin-top:20px;border:2px solid ${remainingAmount <= 0.01 ? '#22c55e' : '#e5e7eb'};border-radius:8px;overflow:hidden;">
+    // Paid / Balance Due summary — always shown, prominent
+    paymentHtml += `
+<div style="margin:0 36px 16px;border:2px solid ${remainingAmount <= 0.01 ? '#22c55e' : '#e5e7eb'};border-radius:8px;overflow:hidden;page-break-inside:avoid;">
     <table style="width:100%;border-collapse:collapse;">
         <tr style="background:#f9fafb;">
             <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#374151;">${paidLabel[lang] || paidLabel.en}</td>
@@ -284,7 +280,26 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         </tr>
     </table>
 </div>`
-    htmlContent = htmlContent.replace('</body>', paidSummaryHtml + '</body>')
+
+    // Insert after Grand Total, before bank details
+    if (bankIdx > 0) {
+        // Find the start of the bank section's parent div
+        const bankDivStart = htmlContent.lastIndexOf('<div', bankIdx)
+        if (bankDivStart > 0) {
+            htmlContent = htmlContent.slice(0, bankDivStart) + paymentHtml + htmlContent.slice(bankDivStart)
+        }
+    } else {
+        // Fallback: append before </body> if bank section not found
+        htmlContent = htmlContent.replace('</body>', paymentHtml + '</body>')
+    }
+
+    // Hide bank transfer section when fully paid (no need for payment instructions)
+    if (remainingAmount <= 0.01 && bankIdx > 0) {
+        htmlContent = htmlContent.replace(
+            /(<div[^>]*>[\s\S]*?Podatki za nakazilo[\s\S]*?<\/div>\s*<\/div>)/,
+            '<!-- bank section hidden: fully paid -->'
+        )
+    }
 
     // Prominent payment due notice (only for Net30 orders with outstanding balance)
     if (isNet30 && remainingAmount > 0.01) {
