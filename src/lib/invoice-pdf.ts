@@ -263,10 +263,25 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     // Hide bank transfer section when fully paid
     if (remainingAmount <= 0.01) {
         htmlContent = htmlContent.replace(
-            /<div[^>]*background:#f9fafb[^>]*>[\s\S]*?(?:Bank Transfer|Podatki za nakazilo)[\s\S]*?<\/table>\s*<\/div>\s*<\/div>/,
+            /<!-- BANK_START -->[\s\S]*?<!-- BANK_END -->/,
             '<!-- bank section hidden: fully paid -->'
         )
     }
+
+    // Tighten vertical spacing globally so ≤5-item invoices fit one A4 page.
+    // The DB templates use generous 48px/40px/32px paddings designed for
+    // multi-page documents; for compact invoices we scale them down.
+    htmlContent = htmlContent
+        .replace(/padding:40px 48px/g, 'padding:28px 36px')
+        .replace(/padding:32px 48px/g, 'padding:24px 36px')
+        .replace(/margin:0 48px 32px/g, 'margin:0 36px 16px')
+        .replace(/padding:0 48px 32px/g, 'padding:0 36px 16px')
+        .replace(/padding:14px 48px/g, 'padding:10px 36px')
+        .replace(/padding:16px 48px/g, 'padding:10px 36px')
+        .replace(/margin:0 48px/g, 'margin:0 36px')
+        .replace(/margin:24px 0 0/g, 'margin:12px 0 0')
+        .replace(/margin-top:32px/g, 'margin-top:16px')
+        .replace(/margin-bottom:20px/g, 'margin-bottom:12px')
 
     // Prominent payment due notice (only for Net30 orders with outstanding balance)
     if (isNet30 && remainingAmount > 0.01) {
