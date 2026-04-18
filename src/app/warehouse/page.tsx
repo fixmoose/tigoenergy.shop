@@ -53,6 +53,10 @@ export default function WarehousePortal() {
     const [completedOffset, setCompletedOffset] = useState(0)
     const [loadingMore, setLoadingMore] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [msgText, setMsgText] = useState('')
+    const [msgFile, setMsgFile] = useState<File | null>(null)
+    const [msgSending, setMsgSending] = useState(false)
+    const [msgStatus, setMsgStatus] = useState<string | null>(null)
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
     const COMPLETED_PAGE_SIZE = 20
 
@@ -410,6 +414,81 @@ export default function WarehousePortal() {
                     </div>
                 </div>
             )}
+
+            {/* ── Message to Admin ── */}
+            <div className="px-4 pb-6 max-w-7xl mx-auto">
+                <div className="border-t border-slate-700 pt-4 mt-2">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                        <h2 className="text-white font-bold text-sm uppercase tracking-wide">
+                            Sporočilo za admina
+                        </h2>
+                    </div>
+                    <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 space-y-3">
+                        <textarea
+                            value={msgText}
+                            onChange={e => setMsgText(e.target.value)}
+                            placeholder="Napiši sporočilo adminu..."
+                            rows={3}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                        />
+                        <div className="flex items-center gap-3">
+                            <label className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 cursor-pointer transition">
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    onChange={e => setMsgFile(e.target.files?.[0] || null)}
+                                />
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                                {msgFile ? (
+                                    <span className="text-orange-400 font-medium truncate max-w-[200px]">{msgFile.name}</span>
+                                ) : (
+                                    'Priloži dokument'
+                                )}
+                            </label>
+                            <div className="flex-1" />
+                            <button
+                                onClick={async () => {
+                                    if (!msgText.trim() && !msgFile) return
+                                    setMsgSending(true)
+                                    setMsgStatus(null)
+                                    try {
+                                        const fd = new FormData()
+                                        fd.append('email', email)
+                                        if (msgText.trim()) fd.append('message', msgText.trim())
+                                        if (msgFile) fd.append('file', msgFile)
+                                        const res = await fetch('/api/warehouse/message', { method: 'POST', body: fd })
+                                        const data = await res.json()
+                                        if (data.success) {
+                                            setMsgText('')
+                                            setMsgFile(null)
+                                            setMsgStatus('✓ Poslano')
+                                            setTimeout(() => setMsgStatus(null), 5000)
+                                        } else {
+                                            setMsgStatus('✗ Napaka: ' + (data.error || ''))
+                                        }
+                                    } catch {
+                                        setMsgStatus('✗ Napaka pri pošiljanju')
+                                    } finally {
+                                        setMsgSending(false)
+                                    }
+                                }}
+                                disabled={msgSending || (!msgText.trim() && !msgFile)}
+                                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-lg transition disabled:opacity-50"
+                            >
+                                {msgSending ? 'Pošiljam...' : 'Pošlji'}
+                            </button>
+                        </div>
+                        {msgStatus && (
+                            <p className={`text-xs font-medium ${msgStatus.startsWith('✓') ? 'text-green-400' : 'text-red-400'}`}>
+                                {msgStatus}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
