@@ -118,6 +118,12 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     const deliveryNoteNumber = order.order_number.replace('ORD', 'DOB')
     const deliveredAt = order.delivered_at ? new Date(order.delivered_at).toLocaleDateString(dateLocale) : '-'
 
+    // European number format: 1.234,56
+    const fmtAmount = (n: number | string) => {
+        const num = typeof n === 'string' ? parseFloat(n) || 0 : n
+        return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num)
+    }
+
     const documentData: DocumentData = {
         order_number: order.order_number,
         order_date: new Date(order.created_at).toLocaleDateString(dateLocale),
@@ -132,10 +138,10 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
             : order.shipping_carrier
                 ? `<strong>${order.shipping_carrier}</strong><br>${formatAddress(shipping)}`
                 : formatAddress(shipping),
-        subtotal_net: `${order.currency || '€'} ${parseFloat(order.subtotal || 0).toFixed(2)}`,
-        vat_total: `${order.currency || '€'} ${parseFloat(order.vat_amount || 0).toFixed(2)}`,
-        shipping_cost: `${order.currency || '€'} ${parseFloat(order.shipping_cost || 0).toFixed(2)}`,
-        total_amount: `${order.currency || '€'} ${parseFloat(order.total || 0).toFixed(2)}`,
+        subtotal_net: `${order.currency || '€'} ${fmtAmount(order.subtotal || 0)}`,
+        vat_total: `${order.currency || '€'} ${fmtAmount(order.vat_amount || 0)}`,
+        shipping_cost: `${order.currency || '€'} ${fmtAmount(order.shipping_cost || 0)}`,
+        total_amount: `${order.currency || '€'} ${fmtAmount(order.total || 0)}`,
         payment_method: formatPaymentMethod(order.payment_method, lang, labels, order),
         items_table: generateItemsTableHtml(order.order_items, order.currency || '€', false, {
             no: labels.no, description: labels.description, sku: labels.sku,
@@ -227,69 +233,35 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         it: 'Importo residuo', cs: 'Zbývá k úhradě', sk: 'Zostáva na úhradu', sv: 'Återstående belopp',
     }
 
-    // ── Payment summary block: replaces the <!-- PAYMENT_SUMMARY -->
-    // marker in the invoice template (between TOTALS_SECTION and
-    // BANK_SECTION) so the payment status is immediately visible right
-    // after Grand Total — not buried at the bottom of the page.
-    let paymentHtml = ''
+    // ── Payment summary: 2 compact lines right after Grand Total,
+    // matching the totals table style. No cards, no borders — just
+    // continuation rows for "Plačano" and "Ostane za plačilo".
+    const fmtEur = (n: number) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+    const paidDateStr = effectivePayments.length > 0
+        ? ` (${new Date(effectivePayments[0].payment_date).toLocaleDateString(dateLocale)}${effectivePayments[0].payment_method ? ', ' + effectivePayments[0].payment_method : ''})`
+        : ''
 
-    if (effectivePayments.length > 0) {
-        const paymentRows = effectivePayments.map((p: any) =>
-            `<tr style="page-break-inside:avoid;">
-                <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${new Date(p.payment_date).toLocaleDateString(dateLocale)}</td>
-                <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.payment_method || labels.bankTransfer}</td>
-                <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;">${p.reference || '-'}</td>
-                <td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-size:11px;text-align:right;font-weight:600;">€${parseFloat(p.amount).toFixed(2)}</td>
-            </tr>`
-        ).join('')
-
-        paymentHtml += `
-<div style="margin:0 36px 12px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;page-break-inside:avoid;">
-    <div style="background:#f0fdf4;padding:10px 14px;border-bottom:1px solid #e5e7eb;">
-        <strong style="font-size:12px;color:#15803d;">${labels.paymentsReceived}</strong>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-        <thead>
-            <tr style="background:#f9fafb;">
-                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">${labels.date}</th>
-                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">${labels.method}</th>
-                <th style="text-align:left;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">${labels.reference}</th>
-                <th style="text-align:right;padding:6px 10px;font-size:10px;color:#6b7280;text-transform:uppercase;">${labels.amount}</th>
-            </tr>
-        </thead>
-        <tbody>${paymentRows}</tbody>
-    </table>
-</div>`
-    }
-
-    // Paid / Balance Due summary — always shown, prominent
-    paymentHtml += `
-<div style="margin:0 36px 16px;border:2px solid ${remainingAmount <= 0.01 ? '#22c55e' : '#e5e7eb'};border-radius:8px;overflow:hidden;page-break-inside:avoid;">
-    <table style="width:100%;border-collapse:collapse;">
-        <tr style="background:#f9fafb;">
-            <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#374151;">${paidLabel[lang] || paidLabel.en}</td>
-            <td style="padding:10px 14px;font-size:12px;font-weight:700;color:#15803d;text-align:right;">€${totalPaidAmount.toFixed(2)}</td>
-        </tr>
-        <tr style="background:${remainingAmount <= 0.01 ? '#f0fdf4' : '#fffbeb'};">
-            <td style="padding:10px 14px;font-size:14px;font-weight:900;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};">${dueLabel[lang] || dueLabel.en}</td>
-            <td style="padding:10px 14px;font-size:14px;font-weight:900;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};text-align:right;">€${remainingAmount.toFixed(2)}</td>
-        </tr>
-    </table>
+    const paymentHtml = `
+<div style="padding:0 36px 16px;">
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="width:55%;"></td>
+    <td style="width:45%;">
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr><td style="padding:4px 0;color:#15803d;">${paidLabel[lang] || paidLabel.en}${paidDateStr}</td><td style="padding:4px 0;text-align:right;font-weight:600;color:#15803d;">€${fmtEur(totalPaidAmount)}</td></tr>
+        <tr><td style="padding:4px 0;font-weight:700;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};">${dueLabel[lang] || dueLabel.en}</td><td style="padding:4px 0;text-align:right;font-weight:700;color:${remainingAmount <= 0.01 ? '#15803d' : '#92400e'};">€${fmtEur(remainingAmount)}</td></tr>
+      </table>
+    </td>
+  </tr></table>
 </div>`
 
-    // Replace the template marker with the payment block
     if (htmlContent.includes('<!-- PAYMENT_SUMMARY -->')) {
         htmlContent = htmlContent.replace('<!-- PAYMENT_SUMMARY -->', paymentHtml)
     } else {
-        // Fallback for templates without the marker
         htmlContent = htmlContent.replace('</body>', paymentHtml + '</body>')
     }
 
-    // Hide bank transfer section when fully paid (no need for payment instructions)
+    // Hide bank transfer section when fully paid
     if (remainingAmount <= 0.01) {
-        // Match the bank section by its background style + "Bank Transfer" or
-        // "Podatki za nakazilo" label (DB templates use the English version,
-        // the code default uses the Slovenian one)
         htmlContent = htmlContent.replace(
             /<div[^>]*background:#f9fafb[^>]*>[\s\S]*?(?:Bank Transfer|Podatki za nakazilo)[\s\S]*?<\/table>\s*<\/div>\s*<\/div>/,
             '<!-- bank section hidden: fully paid -->'
@@ -301,7 +273,8 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         const invoiceBase = order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()
         const dueDate = new Date(invoiceBase.getTime() + dueDays * 24 * 60 * 60 * 1000)
         const dueDateStr = dueDate.toLocaleDateString(dateLocale)
-        const dueStr = `€${remainingAmount.toFixed(2)}`
+        const fmtEurDue = (n: number) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+        const dueStr = `€${fmtEurDue(remainingAmount)}`
 
         const dueLabelMap: Record<string, string> = {
             sl: `Znesek za plačilo ${dueStr} najkasneje do ${dueDateStr}.`,
