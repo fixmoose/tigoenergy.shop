@@ -180,7 +180,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
             <div className="px-6 py-4 border-b bg-slate-50 flex items-center justify-between">
                 <h2 className="font-semibold text-slate-800">Items</h2>
                 <div className="flex items-center gap-3">
-                    {hasCarrierChanges && (
+                    {!invoiceIssued && hasCarrierChanges && (
                         <button
                             onClick={saveItemCarriers}
                             disabled={savingCarriers}
@@ -302,7 +302,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                         <th className="text-right px-4 py-3">Total</th>
                         <th className="text-center px-4 py-3">Ship via</th>
                         <th className="text-center px-4 py-3">Compliance</th>
-                        <th className="text-center px-2 py-3 w-20">Edit</th>
+                        {!invoiceIssued && <th className="text-center px-2 py-3 w-20">Edit</th>}
                     </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -353,15 +353,21 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                 }
                             </td>
                             <td className="px-4 py-4 text-center">
-                                <select
-                                    value={itemCarriers[item.id] || ''}
-                                    onChange={e => setItemCarriers(prev => ({ ...prev, [item.id]: e.target.value }))}
-                                    className="text-xs border border-slate-200 rounded px-1.5 py-1 bg-white text-slate-700 max-w-[110px]"
-                                >
-                                    {CARRIER_OPTIONS.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
+                                {!invoiceIssued ? (
+                                    <select
+                                        value={itemCarriers[item.id] || ''}
+                                        onChange={e => setItemCarriers(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                        className="text-xs border border-slate-200 rounded px-1.5 py-1 bg-white text-slate-700 max-w-[110px]"
+                                    >
+                                        {CARRIER_OPTIONS.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <span className="text-xs text-slate-500">
+                                        {item.shipping_carrier || (orderShippingCarrier || '-')}
+                                    </span>
+                                )}
                             </td>
                             <td className="px-4 py-4">
                                 <div className="flex flex-col items-center gap-1">
@@ -388,7 +394,8 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                     )}
                                 </div>
                             </td>
-                            <td className="px-2 py-4 text-center">
+                            {!invoiceIssued && (
+                                <td className="px-2 py-4 text-center">
                                     {editingItem === item.id ? (
                                         <div className="flex items-center justify-center gap-1">
                                             <button
@@ -410,7 +417,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                             <button
                                                 onClick={() => startEdit(item)}
                                                 className="text-blue-500 hover:text-blue-700"
-                                                title="Edit quantity / price"
+                                                title="Edit"
                                             >
                                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -428,20 +435,21 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                         </div>
                                     )}
                                 </td>
+                            )}
                         </tr>
                     ))}
                 </tbody>
                 <tfoot className="bg-slate-50 border-t">
                     <tr>
                         <td className="px-6 py-3 text-slate-500">Subtotal</td>
-                        <td colSpan={5} className="text-right px-4 py-3 font-medium text-slate-800">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 font-medium text-slate-800">
                             {formatCurrency(subtotal)}
                         </td>
                         <td></td>
                     </tr>
                     <tr>
                         <td className="px-6 py-3 text-slate-500">Shipping</td>
-                        <td colSpan={5} className="text-right px-4 py-3 text-slate-600">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 text-slate-600">
                             {editingShipping ? (
                                 <div className="flex items-center justify-end gap-2">
                                     <span className="text-slate-400 text-sm">&euro;</span>
@@ -473,15 +481,17 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                             ) : (
                                 <div className="flex items-center justify-end gap-2">
                                     {formatCurrency(shippingCost)}
-                                    <button
-                                        onClick={() => { setEditShippingCost(String(shippingCost)); setEditingShipping(true) }}
-                                        className="text-blue-500 hover:text-blue-700"
-                                        title="Edit shipping cost"
-                                    >
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </button>
+                                    {!invoiceIssued && (
+                                        <button
+                                            onClick={() => { setEditShippingCost(String(shippingCost)); setEditingShipping(true) }}
+                                            className="text-blue-500 hover:text-blue-700"
+                                            title="Edit shipping cost"
+                                        >
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </td>
@@ -489,14 +499,14 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                     </tr>
                     <tr>
                         <td className="px-6 py-3 text-slate-500">VAT ({vatRate}%)</td>
-                        <td colSpan={5} className="text-right px-4 py-3 text-slate-600">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-3 text-slate-600">
                             {formatCurrency(vatAmount)}
                         </td>
                         <td></td>
                     </tr>
                     <tr className="font-bold text-lg">
                         <td className="px-6 py-4 text-slate-800">Total</td>
-                        <td colSpan={5} className="text-right px-4 py-4 text-slate-800">
+                        <td colSpan={invoiceIssued ? 4 : 5} className="text-right px-4 py-4 text-slate-800">
                             {formatCurrency(total)}
                         </td>
                         <td></td>
