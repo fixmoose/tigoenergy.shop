@@ -287,8 +287,11 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
 
     // Hide bank transfer section when fully paid (no need for payment instructions)
     if (remainingAmount <= 0.01) {
+        // Match the bank section by its background style + "Bank Transfer" or
+        // "Podatki za nakazilo" label (DB templates use the English version,
+        // the code default uses the Slovenian one)
         htmlContent = htmlContent.replace(
-            /(<div[^>]*>[\s\S]*?Podatki za nakazilo[\s\S]*?<\/table>\s*<\/div>)/,
+            /<div[^>]*background:#f9fafb[^>]*>[\s\S]*?(?:Bank Transfer|Podatki za nakazilo)[\s\S]*?<\/table>\s*<\/div>\s*<\/div>/,
             '<!-- bank section hidden: fully paid -->'
         )
     }
