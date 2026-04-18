@@ -236,7 +236,7 @@ export async function sendPaymentReminderAction(orderId: string) {
         .single()
 
     if (error || !order) throw new Error('Order not found')
-    if (order.payment_status === 'paid' || order.payment_status === 'net30') throw new Error('Order already paid')
+    if (order.payment_status === 'paid') throw new Error('Order already paid')
 
     const { data: orderItems } = await supabase
         .from('order_items')
