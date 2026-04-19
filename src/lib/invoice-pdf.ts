@@ -64,11 +64,14 @@ function getLabels(lang: string) {
 
 /** Map raw payment_method DB values to localized display labels */
 function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>, order?: any): string {
-    // Net customers — show "Net XX" prominently
+    // Net customers — show "Net XX" prominently. Net terms are counted from
+    // the invoice issue date, NOT the order creation date (if the invoice is
+    // issued later, due_date - created_at inflates the days artificially).
     if (order?.payment_terms === 'net30') {
         let days = 30
-        if (order.payment_due_date && order.created_at) {
-            days = Math.round((new Date(order.payment_due_date).getTime() - new Date(order.created_at).getTime()) / (24 * 60 * 60 * 1000))
+        const invoiceDate = order.invoice_created_at || order.created_at
+        if (order.payment_due_date && invoiceDate) {
+            days = Math.round((new Date(order.payment_due_date).getTime() - new Date(invoiceDate).getTime()) / (24 * 60 * 60 * 1000))
             if (days < 1) days = 30
         }
         return `Net ${days}`
@@ -96,8 +99,10 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     const isNet30 = order.payment_terms === 'net30'
     let dueDays = 0
     if (isNet30) {
-        if (order.payment_due_date && order.created_at) {
-            dueDays = Math.round((new Date(order.payment_due_date).getTime() - new Date(order.created_at).getTime()) / (24 * 60 * 60 * 1000))
+        // Net terms are counted from invoice issue date, not order creation
+        const invoiceDate = order.invoice_created_at || order.created_at
+        if (order.payment_due_date && invoiceDate) {
+            dueDays = Math.round((new Date(order.payment_due_date).getTime() - new Date(invoiceDate).getTime()) / (24 * 60 * 60 * 1000))
             if (dueDays < 1) dueDays = 30
         } else {
             dueDays = 30
