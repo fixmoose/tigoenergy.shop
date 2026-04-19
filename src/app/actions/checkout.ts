@@ -186,7 +186,8 @@ export async function placeOrder(prevState: CheckoutState, formData: FormData): 
         const isSlovenianB2B = isActuallyB2B && shippingCountry === 'SI'
         const vatExemptB2B = isActuallyB2B && !isSlovenianB2B
         const vatAmount = vatExemptB2B ? 0 : (subtotal + shippingCost) * vatRate
-        const grandTotal = subtotal + shippingCost + vatAmount
+        const cardProcessingFee = parseFloat(rawData.card_processing_fee as string) || 0
+        const grandTotal = subtotal + shippingCost + vatAmount + cardProcessingFee
 
         // 5. Create Order
         const orderPayload = {

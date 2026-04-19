@@ -63,9 +63,12 @@ interface PaymentPrefs {
     preferred?: string
 }
 
+const CARD_FEE_PERCENT = 2 // card processing fee passed to customer
+
 const PAYMENT_METHODS = [
-    { id: 'wise', labelKey: 'paymentWiseLabel', descKey: 'paymentWiseDesc', icon: '⚡', enabled: true },
-    { id: 'invoice', labelKey: 'paymentInvoiceLabel', descKey: 'paymentInvoiceDesc', icon: '🏦', enabled: true },
+    { id: 'wise', labelKey: 'paymentWiseLabel', descKey: 'paymentWiseDesc', icon: '🏦', enabled: true },
+    { id: 'wise_card', labelKey: 'paymentCardLabel', descKey: 'paymentCardDesc', icon: '💳', enabled: true },
+    { id: 'invoice', labelKey: 'paymentInvoiceLabel', descKey: 'paymentInvoiceDesc', icon: '📄', enabled: true },
 ]
 
 export default function CheckoutPage() {
@@ -86,6 +89,7 @@ export default function CheckoutPage() {
     const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
     const [preferredPayment, setPreferredPayment] = useState<string>('wise')
+    const [selectedPayment, setSelectedPayment] = useState<string>('wise')
     const [invalidFields, setInvalidFields] = useState<string[]>([])
     const [hasOverStock, setHasOverStock] = useState(false)
 
@@ -735,6 +739,7 @@ export default function CheckoutPage() {
             if (selectedShippingId) data.append('shipping_id', selectedShippingId)
             if (modifyingOrder) data.append('original_order_id', modifyingOrder.orderId)
             if (pickupPaymentAcknowledged) data.append('pickup_payment_proof_required', 'true')
+            if (cardFee > 0) data.append('card_processing_fee', String(cardFee))
             if (hasSplitShipping && bulkShippingMethod) {
                 data.append('bulk_shipping_method', bulkShippingMethod)
                 data.append('bulk_item_skus', JSON.stringify(bulkItems.map(i => i.sku)))
@@ -787,7 +792,9 @@ export default function CheckoutPage() {
     const isExportOrder = formData.shipping_country && !EU_COUNTRY_CODES.includes(formData.shipping_country)
 
     const finalVatAmount = appliesVat ? (subtotal + currentShippingCost) * vatRate : 0
-    const finalTotal = subtotal + currentShippingCost + finalVatAmount
+    const baseTotal = subtotal + currentShippingCost + finalVatAmount
+    const cardFee = selectedPayment === 'wise_card' ? Number((baseTotal * CARD_FEE_PERCENT / 100).toFixed(2)) : 0
+    const finalTotal = baseTotal + cardFee
 
     if (!loading && items.length === 0) {
         return (
@@ -1261,7 +1268,7 @@ export default function CheckoutPage() {
                             <div className="space-y-3">
                                 {sortedPaymentMethods.map((method) => (
                                     <label key={method.id} className={`flex items-center gap-3 p-4 border rounded-xl transition-all ${method.enabled ? 'cursor-pointer hover:border-amber-300 hover:bg-amber-50/30' : 'opacity-50 cursor-not-allowed bg-gray-50'} ${method.id === preferredPayment && method.enabled ? 'border-amber-500 bg-amber-50/50' : 'border-gray-200'}`}>
-                                        <input type="radio" name="payment_method" value={method.id} defaultChecked={method.id === preferredPayment} disabled={!method.enabled} className="text-amber-600" />
+                                        <input type="radio" name="payment_method" value={method.id} checked={method.id === selectedPayment} onChange={() => setSelectedPayment(method.id)} disabled={!method.enabled} className="text-amber-600" />
                                         <div className="flex-1">
                                             <div className="font-bold text-gray-900">{t(method.labelKey)} {method.id === preferredPayment && <span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{t('preferred')}</span>}</div>
                                             <div className="text-xs text-gray-500">{t(method.descKey)}</div>
@@ -1311,6 +1318,12 @@ export default function CheckoutPage() {
                                 )}
                                 {appliesVat && (
                                     <div className="flex justify-between text-gray-600"><span>{t('vat', { rate: (vatRate * 100).toFixed(0) })}</span><span>{formatPriceNet(finalVatAmount)}</span></div>
+                                )}
+                                {cardFee > 0 && (
+                                    <div className="flex justify-between text-amber-700">
+                                        <span>{t('cardFee', { pct: CARD_FEE_PERCENT })}</span>
+                                        <span>{formatPriceNet(cardFee)}</span>
+                                    </div>
                                 )}
                                 <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2"><span>{t('total')}</span><span>{formatPriceNet(finalTotal)}</span></div>
                                 <div className="bg-gray-50 border rounded-lg p-3 mt-3 text-[11px] text-gray-500 space-y-2">
