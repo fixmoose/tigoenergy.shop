@@ -64,17 +64,10 @@ function getLabels(lang: string) {
 
 /** Map raw payment_method DB values to localized display labels */
 function formatPaymentMethod(raw: string | null | undefined, lang: string, labels: ReturnType<typeof getLabels>, order?: any): string {
-    // Net customers — show "Net XX" prominently. Net terms are counted from
-    // the invoice issue date, NOT the order creation date (if the invoice is
-    // issued later, due_date - created_at inflates the days artificially).
+    // Net customers — "Net 30" is the term label, not a derived number.
+    // Always show "Net 30" when payment_terms === 'net30'.
     if (order?.payment_terms === 'net30') {
-        let days = 30
-        const invoiceDate = order.invoice_created_at || order.created_at
-        if (order.payment_due_date && invoiceDate) {
-            days = Math.round((new Date(order.payment_due_date).getTime() - new Date(invoiceDate).getTime()) / (24 * 60 * 60 * 1000))
-            if (days < 1) days = 30
-        }
-        return `Net ${days}`
+        return 'Net 30'
     }
     const v = (raw || '').toLowerCase()
     if (v === 'wise' || v === 'iban' || v === 'invoice') return labels.bankTransfer
@@ -97,17 +90,10 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
     const labels = getLabels(lang)
     const dateLocale = ({ sl: 'sl-SI', de: 'de-DE', hr: 'hr-HR', it: 'it-IT', cs: 'cs-CZ', sk: 'sk-SK', sv: 'sv-SE' } as Record<string, string>)[lang] || 'en-GB'
     const isNet30 = order.payment_terms === 'net30'
-    let dueDays = 0
-    if (isNet30) {
-        // Net terms are counted from invoice issue date, not order creation
-        const invoiceDate = order.invoice_created_at || order.created_at
-        if (order.payment_due_date && invoiceDate) {
-            dueDays = Math.round((new Date(order.payment_due_date).getTime() - new Date(invoiceDate).getTime()) / (24 * 60 * 60 * 1000))
-            if (dueDays < 1) dueDays = 30
-        } else {
-            dueDays = 30
-        }
-    }
+    // Net 30 is the term name — always 30 days from invoice date. Due date
+    // is computed as invoice_created_at + 30 days (or payment_due_date from
+    // the DB if the admin has set a custom one).
+    const dueDays = isNet30 ? 30 : 0
 
     const template = await getPinnedTemplate('invoice', lang)
     if (!template) throw new Error('Invoice template not found')
@@ -156,7 +142,9 @@ export async function generateInvoicePdf(order: any, supabase: any): Promise<Uin
         invoice_number: order.invoice_number || `ETRG-INV-${order.order_number}`,
         invoice_date: order.invoice_created_at ? new Date(order.invoice_created_at).toLocaleDateString(dateLocale) : new Date().toLocaleDateString(dateLocale),
         due_date: isNet30
-            ? new Date((order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()).getTime() + dueDays * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale)
+            ? (order.payment_due_date
+                ? new Date(order.payment_due_date).toLocaleDateString(dateLocale)
+                : new Date((order.invoice_created_at ? new Date(order.invoice_created_at) : new Date()).getTime() + dueDays * 24 * 60 * 60 * 1000).toLocaleDateString(dateLocale))
             : (({ sl: 'Predplačilo', de: 'Vorauszahlung', hr: 'Predplaćanje', it: 'Prepagato', cs: 'Předplaceno', sk: 'Predplatené', sv: 'Förskottsbetalning' } as Record<string, string>)[lang] || 'Prepaid'),
         dispatch_date: order.shipped_at
             ? new Date(order.shipped_at).toLocaleDateString(dateLocale)
