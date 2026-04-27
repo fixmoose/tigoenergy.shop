@@ -27,6 +27,8 @@ interface WarehouseOrder {
     shipping_method: string
     packing_slip_url: string | null
     shipping_label_url: string | null
+    invoice_url: string | null
+    invoice_number: string | null
     total: number
     currency: string
     warehouse_actions: WarehouseAction[] | null
@@ -57,6 +59,7 @@ export default function WarehousePortal() {
     const [msgFile, setMsgFile] = useState<File | null>(null)
     const [msgSending, setMsgSending] = useState(false)
     const [msgStatus, setMsgStatus] = useState<string | null>(null)
+    const [expandedCompletedId, setExpandedCompletedId] = useState<string | null>(null)
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
     const COMPLETED_PAGE_SIZE = 20
 
@@ -381,23 +384,83 @@ export default function WarehousePortal() {
                                 const isPickup = order.shipping_carrier === 'Personal Pick-up'
                                 const actions = order.warehouse_actions || []
                                 const completedAt = actions.find(a => a.action === 'marked_picked_up' || a.action === 'marked_dpd_picked_up')?.at
+                                const isExpanded = expandedCompletedId === order.id
+                                const dobavnicaActions = actions.filter(a => a.action === 'uploaded_dobavnica' && a.file_url)
+                                // Build downloadable document list. Storage URLs need
+                                // ?warehouse_email= for the API to authorise the download.
+                                const withAuth = (url: string) => `${url}${url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`
+                                const docs: { label: string; url: string }[] = []
+                                if (order.invoice_url) docs.push({ label: order.invoice_number ? `Račun ${order.invoice_number}` : 'Račun', url: withAuth(order.invoice_url) })
+                                if (order.packing_slip_url) docs.push({ label: 'Dobavnica (sistem)', url: withAuth(order.packing_slip_url) })
+                                if (order.shipping_label_url) docs.push({ label: 'Etiketa DPD', url: withAuth(order.shipping_label_url) })
+                                dobavnicaActions.forEach((a, i) => {
+                                    docs.push({ label: dobavnicaActions.length > 1 ? `Podpisana dobavnica ${i + 1}` : 'Podpisana dobavnica', url: withAuth(a.file_url!) })
+                                })
 
                                 return (
-                                    <div key={order.id} className="flex items-center gap-3 px-3 py-2 bg-slate-800/40 rounded-lg border border-slate-700/30 text-xs">
-                                        <span className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
-                                            isPickup ? 'bg-blue-900/40 text-blue-400' : 'bg-red-900/40 text-red-400'
-                                        }`}>
-                                            {isPickup ? 'PREVZEM' : 'DPD'}
-                                        </span>
-                                        <span className="text-orange-400 font-mono font-bold">{order.order_number}</span>
-                                        <span className="text-slate-300 truncate flex-1">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</span>
-                                        <span className="text-slate-500">{order.order_items?.length || 0} items</span>
-                                        {completedAt && (
-                                            <span className="text-amber-500/70">
-                                                {new Date(completedAt).toLocaleDateString('sl-SI')} {new Date(completedAt).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
+                                    <div key={order.id} className="bg-slate-800/40 rounded-lg border border-slate-700/30">
+                                        <button
+                                            type="button"
+                                            onClick={() => setExpandedCompletedId(isExpanded ? null : order.id)}
+                                            className="w-full flex items-center gap-3 px-3 py-2 text-xs hover:bg-slate-800/60 transition rounded-lg"
+                                        >
+                                            <svg className={`w-3 h-3 text-slate-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                            <span className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
+                                                isPickup ? 'bg-blue-900/40 text-blue-400' : 'bg-red-900/40 text-red-400'
+                                            }`}>
+                                                {isPickup ? 'PREVZEM' : 'DPD'}
                                             </span>
+                                            <span className="text-orange-400 font-mono font-bold">{order.order_number}</span>
+                                            <span className="text-slate-300 truncate flex-1 text-left">{customerName}{order.company_name ? ` (${order.company_name})` : ''}</span>
+                                            <span className="text-slate-500">{order.order_items?.length || 0} items</span>
+                                            {docs.length > 0 && (
+                                                <span className="text-slate-400 bg-slate-700/50 px-1.5 py-0.5 rounded text-[10px]">📎 {docs.length}</span>
+                                            )}
+                                            {completedAt && (
+                                                <span className="text-amber-500/70">
+                                                    {new Date(completedAt).toLocaleDateString('sl-SI')} {new Date(completedAt).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            )}
+                                            <span className="text-amber-500">✓</span>
+                                        </button>
+                                        {isExpanded && (
+                                            <div className="px-4 pb-3 pt-1 border-t border-slate-700/30 space-y-2">
+                                                {docs.length === 0 ? (
+                                                    <p className="text-slate-500 text-xs italic">Ni priloženih dokumentov.</p>
+                                                ) : (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                                                        {docs.map((doc, i) => (
+                                                            <a
+                                                                key={i}
+                                                                href={doc.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 px-3 py-2 bg-slate-700/40 hover:bg-slate-700/70 border border-slate-600/30 rounded text-xs text-slate-200 transition"
+                                                            >
+                                                                <svg className="w-4 h-4 text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                                <span className="truncate">{doc.label}</span>
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                {/* Show order item summary */}
+                                                {order.order_items && order.order_items.length > 0 && (
+                                                    <div className="text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-700/30">
+                                                        {order.order_items.map(it => (
+                                                            <div key={it.id} className="flex gap-2">
+                                                                <span className="text-slate-500">{it.quantity}×</span>
+                                                                <span className="font-mono text-slate-500 text-[10px]">{it.sku}</span>
+                                                                <span className="truncate">{it.product_name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
-                                        <span className="text-amber-500">✓</span>
                                     </div>
                                 )
                             })}

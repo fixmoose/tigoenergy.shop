@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const driver = await validateWarehouseEmail(supabase, email)
     if (!driver) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const selectFields = 'id, order_number, customer_email, company_name, shipping_address, shipping_carrier, shipping_method, packing_slip_url, shipping_label_url, total, currency, warehouse_actions, pickup_payment_proof_required, created_at, status, order_items(id, product_name, quantity, sku, shipping_carrier)'
+    const selectFields = 'id, order_number, customer_email, company_name, shipping_address, shipping_carrier, shipping_method, packing_slip_url, shipping_label_url, invoice_url, invoice_number, total, currency, warehouse_actions, pickup_payment_proof_required, created_at, status, order_items(id, product_name, quantity, sku, shipping_carrier)'
 
     // Active orders (processing)
     const { data: orders, error } = await supabase
