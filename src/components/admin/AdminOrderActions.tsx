@@ -249,7 +249,11 @@ export default function AdminOrderActions({ orderId, status, paymentStatus, crea
             if (!res.ok) throw new Error(data.error || 'Failed to process shipping')
             // Deduct stock — goods leaving warehouse
             await adjustStockForOrderAction(orderId)
-            alert(`${carrier} shipment processed. Email sent to customer.`)
+            if (data.prepared) {
+                alert(`${carrier} label generated. Order is now in /warehouse for printing + handoff. Customer will be notified once warehouse completes the order.`)
+            } else {
+                alert(`${carrier} shipment processed. Email sent to customer.`)
+            }
             router.refresh()
         } catch (err: any) {
             console.error('Error shipping:', err)

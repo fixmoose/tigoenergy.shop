@@ -103,7 +103,30 @@ export async function POST(
             }
         }
 
-        // 5. Update Order Status
+        // 5. Update Order. DPD orders MUST go through warehouse to be marked
+        // shipped — admin "Generate label" only prepares the shipment so
+        // warehouse can print and hand to courier. Status stays 'processing'
+        // until the warehouse completes via /warehouse/orders/[id]/complete.
+        // For non-DPD carriers, keep the legacy "ship now" behavior.
+        const isWarehouseHandled = carrier === 'DPD'
+
+        if (isWarehouseHandled) {
+            // Save the carrier + tracking but leave status as-is.
+            const { error: updateError } = await supabase
+                .from('orders')
+                .update({
+                    shipping_carrier: carrier,
+                    tracking_number: trackingNumber,
+                    tracking_url: trackingUrl,
+                })
+                .eq('id', id)
+            if (updateError) throw updateError
+            // No customer email yet — warehouse complete sends the "shipped"
+            // notification once the parcel actually leaves.
+            return NextResponse.json({ ok: true, prepared: true })
+        }
+
+        // Legacy path (GLS, etc.): admin marks order shipped immediately.
         const { error: updateError } = await supabase
             .from('orders')
             .update({
@@ -117,7 +140,6 @@ export async function POST(
 
         if (updateError) throw updateError
 
-        // 5. Build and Send Email
         const { subject, html } = buildShippingUpdateEmail({
             orderNumber: order.order_number,
             customerName: `${order.shipping_address?.first_name || ''} ${order.shipping_address?.last_name || ''}`.trim() || 'Customer',

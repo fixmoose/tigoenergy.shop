@@ -7,6 +7,7 @@ import CustomerDetailsEditor from '@/components/admin/CustomerDetailsEditor'
 import CustomerOrderActions from '@/components/admin/CustomerOrderActions'
 import AdminAddressEditor from '@/components/admin/AdminAddressEditor'
 import CustomerDashboardMirror from '@/components/admin/CustomerDashboardMirror'
+import MarkInvoicePaidButton from '@/components/admin/MarkInvoicePaidButton'
 import { getPricingSchemas, getCustomerSchemas } from '@/app/actions/pricing'
 import { adminVerifyB2BCustomerAction } from '@/app/actions/admin'
 import DeleteCustomerButton from '@/components/admin/DeleteCustomerButton'
@@ -252,6 +253,14 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
                               {inv.currency || 'EUR'} {Number(inv.total).toFixed(2)}
                             </p>
                           </div>
+                          {!inv.paid && (
+                            <MarkInvoicePaidButton
+                              invoiceId={inv.id}
+                              invoiceNumber={inv.invoice_number}
+                              total={Number(inv.total)}
+                              currency={inv.currency || 'EUR'}
+                            />
+                          )}
                           {resolveInvoicePdfUrl(inv.pdf_url) && (
                             <a
                               href={resolveInvoicePdfUrl(inv.pdf_url)!}

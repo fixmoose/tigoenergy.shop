@@ -256,7 +256,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { id, ...updates } = body
+    const { id, notes_append, ...updates } = body
 
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
@@ -266,6 +266,19 @@ export async function PATCH(req: NextRequest) {
     }
 
     const supabase = await createAdminClient()
+
+    // notes_append appends to the existing notes field instead of replacing
+    // it — used by Mark-Paid to keep an audit log of payments.
+    if (notes_append) {
+        const { data: existing } = await supabase
+            .from('manual_invoices')
+            .select('notes')
+            .eq('id', id)
+            .single()
+        const prefix = existing?.notes ? `${existing.notes}\n` : ''
+        updates.notes = `${prefix}${notes_append}`
+    }
+
     const { error } = await supabase
         .from('manual_invoices')
         .update({ ...updates, updated_at: new Date().toISOString() })
