@@ -168,11 +168,32 @@ export async function GET(
 
         // Optional carrier filter for split shipping packing slips
         const carrierFilter = req.nextUrl.searchParams.get('carrier')
-        const partNumber = req.nextUrl.searchParams.get('part')     // e.g. "1"
-        const totalParts = req.nextUrl.searchParams.get('totalParts') // e.g. "2"
+        let partNumber = req.nextUrl.searchParams.get('part')     // e.g. "1"
+        let totalParts = req.nextUrl.searchParams.get('totalParts') // e.g. "2"
         // Exclude specific order_items by id — used for partial deliveries
         // where part of the order has already been picked up. Comma-separated.
         const excludeIds = req.nextUrl.searchParams.get('exclude')
+        // ?delivery=<order_deliveries.id> — render the slip from a stored
+        // delivery row: respects its items+qty, fills in part/totalParts
+        // from the delivery's part_number/total_parts.
+        const deliveryId = req.nextUrl.searchParams.get('delivery')
+        let deliveryOverrideItems: Array<{ order_item_id: string; qty: number; product_name?: string; sku?: string }> | null = null
+        let deliveryCarrier: string | null = null
+        if (deliveryId) {
+            const { data: delivery } = await supabase
+                .from('order_deliveries')
+                .select('items, part_number, total_parts, carrier')
+                .eq('id', deliveryId)
+                .eq('order_id', id)
+                .single()
+            if (delivery) {
+                const dItems = typeof delivery.items === 'string' ? JSON.parse(delivery.items) : (delivery.items || [])
+                deliveryOverrideItems = dItems
+                deliveryCarrier = delivery.carrier
+                if (!partNumber) partNumber = String(delivery.part_number)
+                if (!totalParts) totalParts = String(delivery.total_parts)
+            }
+        }
         let carrierLabel = ''
         if (carrierFilter) {
             const carrierMap: Record<string, string> = {
@@ -190,6 +211,17 @@ export async function GET(
         if (excludeIds) {
             const excluded = new Set(excludeIds.split(',').map(s => s.trim()))
             orderItems = orderItems.filter((item: any) => !excluded.has(item.id))
+        }
+        // When ?delivery=<id> is given, replace orderItems with the delivery's
+        // line items: filter to just those order_items present in the
+        // delivery, but override their displayed quantity with the delivery's
+        // qty (so a 270-qty order_item can show as just 100 on this slip).
+        if (deliveryOverrideItems) {
+            const qtyById = new Map(deliveryOverrideItems.map(d => [d.order_item_id, d.qty]))
+            orderItems = orderItems
+                .filter((item: any) => qtyById.has(item.id))
+                .map((item: any) => ({ ...item, quantity: qtyById.get(item.id) }))
+            if (deliveryCarrier) carrierLabel = deliveryCarrier
         }
 
         const parcels = calculateTigoParcels(orderItems.map((item: any) => ({

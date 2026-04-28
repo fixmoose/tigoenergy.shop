@@ -4,7 +4,7 @@ import { sendEmail, notifyAdmins } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id: orderId } = await params
-    const { email, type, comment } = await req.json()
+    const { email, type, comment, delivery_id } = await req.json()
     if (!email || !type) return NextResponse.json({ error: 'Missing email or type' }, { status: 400 })
 
     const supabase = await createAdminClient()
@@ -25,6 +25,55 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
+    // ── Delivery-completion path ──────────────────────────────────────────
+    // When delivery_id is set, this completion is for one part of a split
+    // shipment, not the whole order. Mark the delivery completed; the order
+    // only flips to delivered/shipped once every delivery is done.
+    let isLastDelivery = false
+    if (delivery_id) {
+        const { data: delivery } = await supabase
+            .from('order_deliveries')
+            .select('warehouse_actions, status, part_number')
+            .eq('id', delivery_id)
+            .eq('order_id', orderId)
+            .single()
+        if (!delivery) return NextResponse.json({ error: 'Delivery not found' }, { status: 404 })
+
+        const dActions = Array.isArray(delivery.warehouse_actions) ? delivery.warehouse_actions : []
+        const dAction = type === 'pickup' ? 'marked_picked_up' : 'marked_dpd_picked_up'
+        dActions.push({
+            action: dAction,
+            by_email: driver.email,
+            by_name: driver.name,
+            at: new Date().toISOString(),
+            ...(comment ? { comment } : {}),
+        })
+
+        const nowIso = new Date().toISOString()
+        const dStatusUpdate: Record<string, any> = {
+            status: 'completed',
+            warehouse_actions: dActions,
+        }
+        if (type === 'pickup') dStatusUpdate.delivered_at = nowIso
+        else dStatusUpdate.shipped_at = nowIso
+
+        await supabase.from('order_deliveries').update(dStatusUpdate).eq('id', delivery_id)
+
+        // Are all deliveries on this order now completed?
+        const { data: siblings } = await supabase
+            .from('order_deliveries')
+            .select('id, status')
+            .eq('order_id', orderId)
+        const allDone = (siblings || []).every((d: any) => d.status === 'completed')
+        isLastDelivery = allDone
+
+        if (!allDone) {
+            // Order stays in 'processing' until every delivery completes.
+            // Return early so we don't run the "order is now done" flow.
+            return NextResponse.json({ success: true, deliveryCompleted: true, remainingDeliveries: (siblings || []).filter((d: any) => d.status !== 'completed').length })
+        }
+    }
+
     const actions = Array.isArray(order.warehouse_actions) ? order.warehouse_actions : []
     const action = type === 'pickup' ? 'marked_picked_up' : 'marked_dpd_picked_up'
     actions.push({
@@ -33,6 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         by_name: driver.name,
         at: new Date().toISOString(),
         ...(comment ? { comment } : {}),
+        ...(isLastDelivery ? { final_delivery: true } : {}),
     })
 
     // Pickup = customer already has it → delivered. DPD = shipped (in transit).

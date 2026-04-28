@@ -40,6 +40,11 @@ interface WarehouseOrder {
     _split_part?: number
     _split_total?: number
     _split_carrier_param?: string
+    // Delivery (partial dobavnica) virtual fields
+    _delivery_id?: string
+    _delivery_part?: number
+    _delivery_total?: number
+    _delivery_status?: 'pending' | 'prepared' | 'completed'
 }
 
 export default function WarehousePortal() {
@@ -214,17 +219,18 @@ export default function WarehousePortal() {
         }
     }
 
-    const markComplete = async (orderId: string, type: 'pickup' | 'dpd', comment?: string) => {
-        setActionLoading(prev => ({ ...prev, [orderId + '_complete']: true }))
+    const markComplete = async (orderId: string, type: 'pickup' | 'dpd', comment?: string, deliveryId?: string) => {
+        const loadingKey = (deliveryId || orderId) + '_complete'
+        setActionLoading(prev => ({ ...prev, [loadingKey]: true }))
         try {
             await fetch(`/api/warehouse/orders/${orderId}/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, type, comment: comment || undefined }),
+                body: JSON.stringify({ email, type, comment: comment || undefined, delivery_id: deliveryId }),
             })
             await fetchOrders()
         } finally {
-            setActionLoading(prev => ({ ...prev, [orderId + '_complete']: false }))
+            setActionLoading(prev => ({ ...prev, [loadingKey]: false }))
         }
     }
 
@@ -569,7 +575,7 @@ function OrderCard({
     getUploadedDobavnica: (order: WarehouseOrder) => WarehouseAction | undefined
     onToggleAction: (id: string, actionType: string, currentlyChecked: boolean) => void
     onUpload: (id: string, file: File) => void
-    onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string) => void
+    onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string, deliveryId?: string) => void
 }) {
     const [comment, setComment] = useState('')
     const isPrepared = hasAction(order, 'marked_prepared')
@@ -613,7 +619,7 @@ function OrderCard({
                     <div>
                         <span className="text-orange-400 font-mono font-bold text-sm">
                             {order.order_number}
-                            {order._split_part ? ` (${order._split_part}/${order._split_total})` : ''}
+                            {order._delivery_part ? ` — Dobavnica ${order._delivery_part}/${order._delivery_total}` : (order._split_part ? ` (${order._split_part}/${order._split_total})` : '')}
                         </span>
                         <span className="text-slate-500 text-xs ml-2">
                             {new Date(order.created_at).toLocaleDateString('sl-SI')}
@@ -778,7 +784,7 @@ function OrderCard({
                     onClick={() => {
                         const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
                         if (confirm(`Zaključi naročilo #${order.order_number} kot ${label}?\n\nTo dejanje ni mogoče razveljaviti.`)) {
-                            onComplete(order.id, type, comment.trim() || undefined)
+                            onComplete(order.id, type, comment.trim() || undefined, order._delivery_id)
                         }
                     }}
                     className={`w-full py-3 rounded-lg font-bold text-sm transition ${

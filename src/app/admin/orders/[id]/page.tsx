@@ -10,6 +10,7 @@ import OrderEmailHistory from '@/components/admin/OrderEmailHistory'
 import EditableShippingAddress from '@/components/admin/EditableShippingAddress'
 import EditableShippingMethod from '@/components/admin/EditableShippingMethod'
 import EditableOrderItems from '@/components/admin/EditableOrderItems'
+import OrderDeliveriesPanel from '@/components/admin/OrderDeliveriesPanel'
 
 const TRANSACTION_TYPES: Record<string, { label: string; color: string }> = {
   domestic: { label: 'Domestic (SI)', color: 'bg-slate-100 text-slate-700' },
@@ -118,6 +119,10 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       )}
 
       <OrderAttachments orderId={order.id} warehouseActions={(order as any).warehouse_actions || []} />
+
+      <div className="mb-6">
+        <OrderDeliveriesPanel orderId={order.id} />
+      </div>
 
       <div className="mb-6">
         <AdminOrderActions

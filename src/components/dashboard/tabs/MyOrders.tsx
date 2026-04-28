@@ -54,6 +54,8 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
     const [archiveInvoices, setArchiveInvoices] = useState<ArchiveInvoice[]>([])
     const [archiveOpen, setArchiveOpen] = useState(false)
     const [mirrorSavedCarts, setMirrorSavedCarts] = useState<SavedCart[] | null>(null)
+    // Per-order delivery progress: { [orderId]: { completed, total } }
+    const [deliveryProgress, setDeliveryProgress] = useState<Record<string, { completed: number; total: number }>>({})
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const t = useTranslations('dashboard')
@@ -97,6 +99,25 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
             if (ordersRes.data) setOrders(ordersRes.data)
             if (quotesRes.data) setQuotes(quotesRes.data)
             setLoading(false)
+
+            // Fetch delivery progress for these orders so the order list can
+            // surface "X of Y dobavnic delivered" for orders that were split.
+            if (ordersRes.data && ordersRes.data.length > 0) {
+                try {
+                    const orderIds = ordersRes.data.map((o: any) => o.id)
+                    const { data: deliveries } = await supabase
+                        .from('order_deliveries')
+                        .select('order_id, status')
+                        .in('order_id', orderIds)
+                    const progress: Record<string, { completed: number; total: number }> = {}
+                    for (const d of deliveries || []) {
+                        if (!progress[d.order_id]) progress[d.order_id] = { completed: 0, total: 0 }
+                        progress[d.order_id].total++
+                        if (d.status === 'completed') progress[d.order_id].completed++
+                    }
+                    setDeliveryProgress(progress)
+                } catch { /* ignore */ }
+            }
 
             try {
                 const [unpaidRes, archiveRes] = await Promise.all([
@@ -371,6 +392,11 @@ export default function MyOrders({ user, customer, adminViewCustomerId }: Props)
                                             order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                                                 'bg-blue-100 text-blue-700'
                                             }`}>{order.status || 'Pending'}</span>
+                                        {deliveryProgress[order.id] && (
+                                            <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${deliveryProgress[order.id].completed === deliveryProgress[order.id].total ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
+                                                {deliveryProgress[order.id].completed}/{deliveryProgress[order.id].total} dobavnic
+                                            </span>
+                                        )}
                                         {(order as any).payment_terms === 'net30' && (order as any).payment_due_date && order.payment_status !== 'paid' && order.status !== 'cancelled' && (() => {
                                             const dueDate = new Date((order as any).payment_due_date)
                                             const diffDays = Math.ceil((dueDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
