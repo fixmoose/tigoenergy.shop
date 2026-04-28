@@ -170,6 +170,9 @@ export async function GET(
         const carrierFilter = req.nextUrl.searchParams.get('carrier')
         const partNumber = req.nextUrl.searchParams.get('part')     // e.g. "1"
         const totalParts = req.nextUrl.searchParams.get('totalParts') // e.g. "2"
+        // Exclude specific order_items by id — used for partial deliveries
+        // where part of the order has already been picked up. Comma-separated.
+        const excludeIds = req.nextUrl.searchParams.get('exclude')
         let carrierLabel = ''
         if (carrierFilter) {
             const carrierMap: Record<string, string> = {
@@ -183,6 +186,10 @@ export async function GET(
                 const itemCarrier = item.shipping_carrier || order.shipping_carrier
                 return itemCarrier === targetCarrier
             })
+        }
+        if (excludeIds) {
+            const excluded = new Set(excludeIds.split(',').map(s => s.trim()))
+            orderItems = orderItems.filter((item: any) => !excluded.has(item.id))
         }
 
         const parcels = calculateTigoParcels(orderItems.map((item: any) => ({
