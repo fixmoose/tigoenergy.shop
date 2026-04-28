@@ -628,23 +628,44 @@ function OrderCard({
                 )}
             </div>
 
-            {/* Items */}
+            {/* Items — honour any ?exclude= on the order's packing_slip_url so
+                already-delivered items in a partial-delivery scenario aren't
+                shown to the warehouse worker prepping the next pickup. */}
             <div className="px-4 py-2 border-b border-slate-700/30">
-                {order.order_items?.map(item => (
-                    <div key={item.id} className="flex justify-between text-xs py-0.5">
-                        <span className="text-slate-300">{item.product_name}</span>
-                        <span className="text-slate-400 font-mono">x{item.quantity}</span>
-                    </div>
-                ))}
+                {(() => {
+                    let visibleItems = order.order_items || []
+                    const excludedIds = new Set<string>()
+                    if (order.packing_slip_url) {
+                        try {
+                            const u = new URL(order.packing_slip_url, 'https://x')
+                            const exclude = u.searchParams.get('exclude')
+                            if (exclude) exclude.split(',').forEach(id => excludedIds.add(id.trim()))
+                        } catch { /* ignore malformed url */ }
+                    }
+                    if (excludedIds.size > 0) {
+                        visibleItems = visibleItems.filter(it => !excludedIds.has(it.id))
+                    }
+                    return visibleItems.map(item => (
+                        <div key={item.id} className="flex justify-between text-xs py-0.5">
+                            <span className="text-slate-300">{item.product_name}</span>
+                            <span className="text-slate-400 font-mono">x{item.quantity}</span>
+                        </div>
+                    ))
+                })()}
             </div>
 
             {/* Actions */}
             <div className="px-4 py-3 space-y-2.5">
-                {/* Download packing slip */}
+                {/* Download packing slip — prefer the order's packing_slip_url
+                    if set (carries any ?exclude= or ?part= overrides for
+                    partial deliveries), otherwise fall back to the default
+                    route. */}
                 {(() => {
-                    let slipUrl = `/api/orders/${order.id}/packing-slip`
-                    if (order._split_carrier_param && order._split_part && order._split_total) {
-                        slipUrl += `?carrier=${order._split_carrier_param}&part=${order._split_part}&totalParts=${order._split_total}`
+                    let slipUrl = order.packing_slip_url
+                        ? (order.packing_slip_url.startsWith('http') ? new URL(order.packing_slip_url).pathname + new URL(order.packing_slip_url).search : order.packing_slip_url)
+                        : `/api/orders/${order.id}/packing-slip`
+                    if (order._split_carrier_param && order._split_part && order._split_total && !slipUrl.includes('carrier=')) {
+                        slipUrl += `${slipUrl.includes('?') ? '&' : '?'}carrier=${order._split_carrier_param}&part=${order._split_part}&totalParts=${order._split_total}`
                     }
                     return (
                     <a
