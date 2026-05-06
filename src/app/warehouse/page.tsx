@@ -599,6 +599,7 @@ function OrderCard({
             const fd = new FormData()
             fd.append('email', email)
             fd.append('order_id', order.id)
+            if (order._delivery_id) fd.append('delivery_id', order._delivery_id)
             if (msgText.trim()) fd.append('message', msgText.trim())
             if (msgFile) fd.append('file', msgFile)
             const res = await fetch('/api/warehouse/message', { method: 'POST', body: fd })

@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
   const message = form.get('message') as string | null
   const file = form.get('file') as File | null
   const orderId = form.get('order_id') as string | null
+  const deliveryId = form.get('delivery_id') as string | null
 
   if (!email) return NextResponse.json({ error: 'email required' }, { status: 400 })
   if (!message && (!file || file.size === 0)) {
@@ -65,24 +66,45 @@ export async function POST(req: NextRequest) {
     ? `Sporočilo o naročilu #${orderNumber} od ${driver.name}`
     : `Sporočilo od ${driver.name}`
 
-  // Also append the message to the order's warehouse_actions log so it
-  // surfaces inline with prep / pickup history on the admin order page.
+  // Append the message to the order's warehouse_actions log so it surfaces
+  // inline with prep / pickup history on the admin order page. When a
+  // delivery_id is also provided (worker is on a split-delivery card),
+  // mirror it onto the delivery's audit log too — same JSON entry — so the
+  // worker sees the thread on their card. Admin's order-page view picks
+  // up everything via orders.warehouse_actions regardless.
   if (orderId && message) {
+    const newAction = {
+      action: 'warehouse_message',
+      by_email: driver.email,
+      by_name: driver.name,
+      at: new Date().toISOString(),
+      comment: message,
+      ...(deliveryId ? { delivery_id: deliveryId } : {}),
+      ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
+    }
+
     const { data: orderRow } = await supabase
       .from('orders')
       .select('warehouse_actions')
       .eq('id', orderId)
       .single()
     const actions = Array.isArray(orderRow?.warehouse_actions) ? [...orderRow!.warehouse_actions] : []
-    actions.push({
-      action: 'warehouse_message',
-      by_email: driver.email,
-      by_name: driver.name,
-      at: new Date().toISOString(),
-      comment: message,
-      ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
-    })
+    actions.push(newAction)
     await supabase.from('orders').update({ warehouse_actions: actions }).eq('id', orderId)
+
+    if (deliveryId) {
+      const { data: delivery } = await supabase
+        .from('order_deliveries')
+        .select('warehouse_actions')
+        .eq('id', deliveryId)
+        .eq('order_id', orderId)
+        .single()
+      if (delivery) {
+        const dActions = Array.isArray(delivery.warehouse_actions) ? [...delivery.warehouse_actions] : []
+        dActions.push(newAction)
+        await supabase.from('order_deliveries').update({ warehouse_actions: dActions }).eq('id', deliveryId)
+      }
+    }
   }
 
   // Create admin notification
@@ -95,6 +117,7 @@ export async function POST(req: NextRequest) {
     metadata: {
       ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
       ...(orderId ? { order_id: orderId, order_number: orderNumber } : {}),
+      ...(deliveryId ? { delivery_id: deliveryId } : {}),
       driver_email: driver.email,
     },
   })
