@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 export default function WarehouseUploadMobile() {
@@ -11,7 +11,9 @@ export default function WarehouseUploadMobile() {
 
     const [status, setStatus] = useState<'ready' | 'uploading' | 'done' | 'error'>('ready')
     const [errorMsg, setErrorMsg] = useState('')
+    const [uploadCount, setUploadCount] = useState(0)
     const inputRef = useRef<HTMLInputElement>(null)
+    const moreInputRef = useRef<HTMLInputElement>(null)
 
     const handleFile = async (file: File) => {
         if (!orderId || !warehouseEmail) {
@@ -32,6 +34,7 @@ export default function WarehouseUploadMobile() {
                 const data = await res.json().catch(() => ({}))
                 throw new Error(data.error || 'Nalaganje ni uspelo')
             }
+            setUploadCount(c => c + 1)
             setStatus('done')
         } catch (err: any) {
             setErrorMsg(err.message || 'Napaka pri nalaganju')
@@ -100,20 +103,45 @@ export default function WarehouseUploadMobile() {
                 )}
 
                 {status === 'done' && (
-                    <div className="text-center py-8">
-                        <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
+                    <div className="space-y-4">
+                        {/* Success indicator */}
+                        <div className="text-center py-4">
+                            <div className="w-14 h-14 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                            </div>
+                            <p className="text-amber-400 font-bold text-lg">
+                                {uploadCount === 1 ? 'Dobavnica naložena!' : `${uploadCount} datotek naloženih`}
+                            </p>
                         </div>
-                        <p className="text-amber-400 font-bold text-lg">Dobavnica naložena!</p>
-                        <p className="text-slate-400 text-sm mt-2">Lahko zaprete to stran.</p>
-                        <button
-                            onClick={() => { setStatus('ready'); setErrorMsg('') }}
-                            className="mt-6 px-6 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-medium"
-                        >
-                            Naloži novo
-                        </button>
+
+                        {/* Persistent upload area for additional documents */}
+                        <div className="border-t border-slate-700 pt-5">
+                            <p className="text-white font-semibold text-center mb-3">Naložite še druge dokumente?</p>
+                            <p className="text-slate-400 text-xs text-center mb-4">QR kode, dodatne fotografije, itd.</p>
+
+                            <button
+                                onClick={() => moreInputRef.current?.click()}
+                                className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl transition active:scale-95 mb-2"
+                            >
+                                📷 Slikaj dodatno
+                            </button>
+                            <input
+                                ref={moreInputRef}
+                                type="file"
+                                accept="image/*,application/pdf"
+                                capture="environment"
+                                className="hidden"
+                                onChange={e => {
+                                    const file = e.target.files?.[0]
+                                    if (file) handleFile(file)
+                                    if (e.target) e.target.value = ''
+                                }}
+                            />
+
+                            <p className="text-slate-500 text-xs text-center mt-4">Ko ste končali, lahko zaprete to stran.</p>
+                        </div>
                     </div>
                 )}
 
