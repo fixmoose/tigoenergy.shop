@@ -293,7 +293,8 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                 </div>
             )}
 
-            <table className="w-full">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px]">
                 <thead className="bg-slate-50 text-xs text-slate-500 uppercase">
                     <tr>
                         <th className="text-left px-6 py-3">Product</th>
@@ -302,7 +303,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                         <th className="text-right px-4 py-3">Total</th>
                         <th className="text-center px-4 py-3">Ship via</th>
                         <th className="text-center px-4 py-3">Compliance</th>
-                        {!invoiceIssued && <th className="text-center px-2 py-3 w-20">Edit</th>}
+                        {!invoiceIssued && <th className="text-center px-2 py-3 w-20 sticky right-0 bg-slate-50">Edit</th>}
                     </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -395,7 +396,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                                 </div>
                             </td>
                             {!invoiceIssued && (
-                                <td className="px-2 py-4 text-center">
+                                <td className="px-2 py-4 text-center sticky right-0 bg-white">
                                     {editingItem === item.id ? (
                                         <div className="flex items-center justify-center gap-1">
                                             <button
@@ -513,6 +514,7 @@ export default function EditableOrderItems({ orderId, items, subtotal, shippingC
                     </tr>
                 </tfoot>
             </table>
+            </div>
         </div>
     )
 }
