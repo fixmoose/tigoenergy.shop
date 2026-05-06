@@ -249,10 +249,12 @@ export async function adminAddOrderItem(
 
   const supabase = await createAdminClient()
 
-  // Fetch product details
+  // Compliance fields (applies_trod_fee, packaging_*, etc.) are auto-filled
+  // by the populate_order_item_compliance BEFORE INSERT trigger from
+  // product_id, so we only need the basic line-item data here.
   const { data: product, error: prodErr } = await supabase
     .from('products')
-    .select('id, name_en, sku, weight_kg, cn_code, applies_trod_fee, trod_category_code, applies_packaging_fee, packaging_weight_kg, packaging_type, packaging_data')
+    .select('id, name_en, sku, weight_kg, cn_code')
     .eq('id', productId)
     .single()
 
@@ -272,12 +274,6 @@ export async function adminAddOrderItem(
       total_price: totalPrice,
       weight_kg: product.weight_kg,
       cn_code: product.cn_code,
-      applies_trod_fee: product.applies_trod_fee,
-      trod_category_code: product.trod_category_code,
-      applies_packaging_fee: product.applies_packaging_fee,
-      packaging_weight_kg: product.packaging_weight_kg,
-      packaging_type: product.packaging_type,
-      packaging_data: product.packaging_data,
     })
 
   if (error) return { success: false, error: error.message }
