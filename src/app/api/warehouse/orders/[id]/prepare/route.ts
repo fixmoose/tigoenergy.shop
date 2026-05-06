@@ -4,7 +4,7 @@ import { sendEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id: orderId } = await params
-    const { email } = await req.json()
+    const { email, delivery_id: deliveryId } = await req.json()
     if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
 
     const supabase = await createAdminClient()
@@ -25,20 +25,39 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .single()
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-    const actions = Array.isArray(order.warehouse_actions) ? order.warehouse_actions : []
-    actions.push({
+    const newAction = {
         action: 'marked_prepared',
         by_email: driver.email,
         by_name: driver.name,
         at: new Date().toISOString(),
-    })
+    }
 
-    const { error } = await supabase
-        .from('orders')
-        .update({ warehouse_actions: actions })
-        .eq('id', orderId)
+    // Split-delivery card → mark this delivery prepared (status + audit log)
+    if (deliveryId) {
+        const { data: delivery } = await supabase
+            .from('order_deliveries')
+            .select('warehouse_actions')
+            .eq('id', deliveryId)
+            .eq('order_id', orderId)
+            .single()
+        if (!delivery) return NextResponse.json({ error: 'Delivery not found' }, { status: 404 })
+        const dActions = Array.isArray(delivery.warehouse_actions) ? delivery.warehouse_actions : []
+        dActions.push(newAction)
+        const { error: dErr } = await supabase
+            .from('order_deliveries')
+            .update({ warehouse_actions: dActions, status: 'prepared', prepared_at: new Date().toISOString() })
+            .eq('id', deliveryId)
+        if (dErr) return NextResponse.json({ error: 'Failed to update delivery' }, { status: 500 })
+    } else {
+        const actions = Array.isArray(order.warehouse_actions) ? order.warehouse_actions : []
+        actions.push(newAction)
+        const { error } = await supabase
+            .from('orders')
+            .update({ warehouse_actions: actions })
+            .eq('id', orderId)
 
-    if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+        if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+    }
 
     // Notify customer: order is ready for pickup
     const isPickup = order.shipping_carrier === 'Personal Pick-up'

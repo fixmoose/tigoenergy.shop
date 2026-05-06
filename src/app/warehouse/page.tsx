@@ -144,8 +144,8 @@ export default function WarehousePortal() {
         return () => clearInterval(interval)
     }, [emailConfirmed, authenticated, fetchOrders, email])
 
-    const toggleAction = async (orderId: string, actionType: string, currentlyChecked: boolean) => {
-        const key = orderId + '_' + actionType
+    const toggleAction = async (orderId: string, actionType: string, currentlyChecked: boolean, deliveryId?: string) => {
+        const key = (deliveryId || orderId) + '_' + actionType
         setActionLoading(prev => ({ ...prev, [key]: true }))
         try {
             if (currentlyChecked) {
@@ -153,7 +153,7 @@ export default function WarehousePortal() {
                 await fetch(`/api/warehouse/orders/${orderId}/undo`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, actionType }),
+                    body: JSON.stringify({ email, actionType, delivery_id: deliveryId }),
                 })
             } else {
                 // Do
@@ -166,7 +166,7 @@ export default function WarehousePortal() {
                     await fetch(`/api/warehouse/orders/${orderId}/${route}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email }),
+                        body: JSON.stringify({ email, delivery_id: deliveryId }),
                     })
                 }
             }
@@ -176,33 +176,30 @@ export default function WarehousePortal() {
         }
     }
 
-    const markPrepared = async (orderId: string) => {
-        setActionLoading(prev => ({ ...prev, [orderId + '_prep']: true }))
-        try {
-            await fetch(`/api/warehouse/orders/${orderId}/prepare`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            })
-            await fetchOrders()
-        } finally {
-            setActionLoading(prev => ({ ...prev, [orderId + '_prep']: false }))
-        }
-    }
-
-    const uploadDobavnica = async (orderId: string, file: File) => {
-        setActionLoading(prev => ({ ...prev, [orderId + '_upload']: true }))
+    const uploadDobavnica = async (orderId: string, file: File, deliveryId?: string) => {
+        const key = (deliveryId || orderId) + '_upload'
+        setActionLoading(prev => ({ ...prev, [key]: true }))
         try {
             const formData = new FormData()
             formData.append('email', email)
             formData.append('file', file)
-            await fetch(`/api/warehouse/orders/${orderId}/upload`, {
+            if (deliveryId) formData.append('delivery_id', deliveryId)
+            const res = await fetch(`/api/warehouse/orders/${orderId}/upload`, {
                 method: 'POST',
                 body: formData,
             })
+            if (!res.ok) {
+                let msg = 'Napaka pri nalaganju'
+                try { const j = await res.json(); if (j?.error) msg = j.error } catch { /* ignore */ }
+                alert(msg)
+                return
+            }
             await fetchOrders()
+        } catch (err) {
+            console.error('Upload failed:', err)
+            alert('Napaka pri nalaganju')
         } finally {
-            setActionLoading(prev => ({ ...prev, [orderId + '_upload']: false }))
+            setActionLoading(prev => ({ ...prev, [key]: false }))
         }
     }
 
@@ -328,7 +325,7 @@ export default function WarehousePortal() {
                         </div>
                     ) : pickupOrders.map(order => (
                         <OrderCard
-                            key={order.id}
+                            key={order._delivery_id || order.id}
                             order={order}
                             type="pickup"
                             email={email}
@@ -357,7 +354,7 @@ export default function WarehousePortal() {
                         </div>
                     ) : deliveryOrders.map(order => (
                         <OrderCard
-                            key={order.id}
+                            key={order._delivery_id || order.id}
                             order={order}
                             type="dpd"
                             email={email}
@@ -575,8 +572,8 @@ function OrderCard({
     actionLoading: Record<string, boolean>
     hasAction: (order: WarehouseOrder, action: string) => boolean
     getUploadedDobavnica: (order: WarehouseOrder) => WarehouseAction | undefined
-    onToggleAction: (id: string, actionType: string, currentlyChecked: boolean) => void
-    onUpload: (id: string, file: File) => void
+    onToggleAction: (id: string, actionType: string, currentlyChecked: boolean, deliveryId?: string) => void
+    onUpload: (id: string, file: File, deliveryId?: string) => void
     onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string, deliveryId?: string) => void
 }) {
     const [comment, setComment] = useState('')
@@ -745,12 +742,12 @@ function OrderCard({
                     <input
                         type="checkbox"
                         checked={isPrepared}
-                        disabled={actionLoading[order.id + '_marked_prepared']}
-                        onChange={() => onToggleAction(order.id, 'marked_prepared', isPrepared)}
+                        disabled={actionLoading[(order._delivery_id || order.id) + '_marked_prepared']}
+                        onChange={() => onToggleAction(order.id, 'marked_prepared', isPrepared, order._delivery_id)}
                         className="w-6 h-6 rounded border-2 border-slate-500 text-amber-500 focus:ring-amber-500 bg-slate-700 cursor-pointer"
                     />
                     <span className={`font-bold text-sm ${isPrepared ? 'text-amber-400' : 'text-slate-300'}`}>
-                        {actionLoading[order.id + '_marked_prepared'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
+                        {actionLoading[(order._delivery_id || order.id) + '_marked_prepared'] ? 'Shranjujem...' : isPrepared ? 'Pripravljeno' : 'Označi kot pripravljeno'}
                     </span>
                 </label>
 
@@ -779,8 +776,8 @@ function OrderCard({
                         orderId={order.id}
                         orderNumber={order.order_number}
                         email={email}
-                        loading={actionLoading[order.id + '_upload']}
-                        onFile={(file) => onUpload(order.id, file)}
+                        loading={actionLoading[(order._delivery_id || order.id) + '_upload']}
+                        onFile={(file) => onUpload(order.id, file, order._delivery_id)}
                     />
                 )}
 
@@ -794,12 +791,12 @@ function OrderCard({
                         <input
                             type="checkbox"
                             checked={isPaymentVerified}
-                            disabled={actionLoading[order.id + '_payment_verified']}
-                            onChange={() => onToggleAction(order.id, 'payment_verified', isPaymentVerified)}
+                            disabled={actionLoading[(order._delivery_id || order.id) + '_payment_verified']}
+                            onChange={() => onToggleAction(order.id, 'payment_verified', isPaymentVerified, order._delivery_id)}
                             className="w-6 h-6 rounded border-2 border-red-500 text-amber-500 focus:ring-amber-500 bg-slate-700 cursor-pointer"
                         />
                         <span className={`font-bold text-sm ${isPaymentVerified ? 'text-amber-400' : 'text-red-300'}`}>
-                            {actionLoading[order.id + '_payment_verified'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno' : 'Preveri dokazilo o plačilu'}
+                            {actionLoading[(order._delivery_id || order.id) + '_payment_verified'] ? 'Shranjujem...' : isPaymentVerified ? 'Plačilo preverjeno' : 'Preveri dokazilo o plačilu'}
                         </span>
                     </label>
                 )}
@@ -904,7 +901,7 @@ function OrderCard({
 
                 {/* Zaključi naročilo button */}
                 <button
-                    disabled={!canFinalize || actionLoading[order.id + '_complete']}
+                    disabled={!canFinalize || actionLoading[(order._delivery_id || order.id) + '_complete']}
                     onClick={() => {
                         const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
                         if (confirm(`Zaključi naročilo #${order.order_number} kot ${label}?\n\nTo dejanje ni mogoče razveljaviti.`)) {
@@ -917,7 +914,7 @@ function OrderCard({
                             : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                     }`}
                 >
-                    {actionLoading[order.id + '_complete']
+                    {actionLoading[(order._delivery_id || order.id) + '_complete']
                         ? 'Zaključujem...'
                         : type === 'pickup'
                             ? 'Zaključi naročilo'

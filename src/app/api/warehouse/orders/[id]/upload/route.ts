@@ -6,6 +6,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const formData = await req.formData()
     const email = formData.get('email') as string
     const file = formData.get('file') as File | null
+    const deliveryId = (formData.get('delivery_id') as string | null) || null
 
     if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
     if (!file) return NextResponse.json({ error: 'Missing file' }, { status: 400 })
@@ -40,7 +41,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const fileUrl = `/api/storage?bucket=invoices&path=${encodeURIComponent(filePath)}`
 
-    // Append to warehouse_actions
+    const newAction = {
+        action: 'uploaded_dobavnica',
+        by_email: driver.email,
+        by_name: driver.name,
+        at: new Date().toISOString(),
+        file_url: fileUrl,
+    }
+
+    // Split-delivery card → write to the delivery's audit log instead of the order's
+    if (deliveryId) {
+        const { data: delivery } = await supabase
+            .from('order_deliveries')
+            .select('warehouse_actions')
+            .eq('id', deliveryId)
+            .eq('order_id', orderId)
+            .single()
+        if (!delivery) return NextResponse.json({ error: 'Delivery not found' }, { status: 404 })
+        const dActions = Array.isArray(delivery.warehouse_actions) ? delivery.warehouse_actions : []
+        dActions.push(newAction)
+        const { error } = await supabase
+            .from('order_deliveries')
+            .update({ warehouse_actions: dActions })
+            .eq('id', deliveryId)
+        if (error) return NextResponse.json({ error: 'Failed to update delivery' }, { status: 500 })
+        return NextResponse.json({ success: true, file_url: fileUrl })
+    }
+
     const { data: order } = await supabase
         .from('orders')
         .select('warehouse_actions')
@@ -49,13 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
     const actions = Array.isArray(order.warehouse_actions) ? order.warehouse_actions : []
-    actions.push({
-        action: 'uploaded_dobavnica',
-        by_email: driver.email,
-        by_name: driver.name,
-        at: new Date().toISOString(),
-        file_url: fileUrl,
-    })
+    actions.push(newAction)
 
     const { error } = await supabase
         .from('orders')
