@@ -6,6 +6,7 @@ import * as pdfjsLib from 'pdfjs-dist'
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
 
 const CATEGORIES = [
+    'Zaloga',
     'Gorivo',
     'Telefon & internet',
     'Pisarniški material',
@@ -114,6 +115,42 @@ export default function AccountingPage() {
     const [dropHover, setDropHover] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [uploadingReceipt, setUploadingReceipt] = useState<string | null>(null)
+
+    // Notify accountant
+    const [notifyState, setNotifyState] = useState<{ pendingCount: number; log: any[] }>({ pendingCount: 0, log: [] })
+    const [notifyLoading, setNotifyLoading] = useState(false)
+    const [notifyError, setNotifyError] = useState<string | null>(null)
+    const [showLog, setShowLog] = useState(false)
+
+    const fetchNotifyState = useCallback(async () => {
+        try {
+            const res = await fetch('/api/admin/expenses/notify-accountant')
+            const data = await res.json()
+            if (data.success) setNotifyState({ pendingCount: data.pendingCount, log: data.log })
+        } catch { /* ignore */ }
+    }, [])
+
+    useEffect(() => { fetchNotifyState() }, [fetchNotifyState])
+
+    const sendNotifyAccountant = async () => {
+        if (notifyState.pendingCount === 0) return
+        if (!confirm(`Pošlji obvestilo Sonji za ${notifyState.pendingCount} ${notifyState.pendingCount === 1 ? 'račun' : 'računov'}?`)) return
+        setNotifyLoading(true)
+        setNotifyError(null)
+        try {
+            const res = await fetch('/api/admin/expenses/notify-accountant', { method: 'POST' })
+            const data = await res.json()
+            if (data.success) {
+                fetchNotifyState()
+            } else {
+                setNotifyError(data.error || 'Pošiljanje ni uspelo')
+            }
+        } catch (err: any) {
+            setNotifyError(err.message)
+        } finally {
+            setNotifyLoading(false)
+        }
+    }
 
     const monthsSI = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec']
     const monthsFullSI = ['Januar', 'Februar', 'Marec', 'April', 'Maj', 'Junij', 'Julij', 'Avgust', 'September', 'Oktober', 'November', 'December']
@@ -461,6 +498,71 @@ export default function AccountingPage() {
                     ))}
                 </div>
             )}
+
+            {/* Notify accountant */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <div className="text-sm font-bold text-slate-700">Sonja (računovodstvo)</div>
+                        <div className="text-xs text-slate-500 mt-0.5">
+                            {notifyState.pendingCount > 0
+                                ? <>Za pregled čaka <span className="font-bold text-orange-600">{notifyState.pendingCount}</span> {notifyState.pendingCount === 1 ? 'obdelan račun' : (notifyState.pendingCount <= 4 ? 'obdelani računi' : 'obdelanih računov')}</>
+                                : 'Vsi obdelani računi so že bili poslani v pregled'}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setShowLog(s => !s)}
+                            className="text-xs px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+                        >
+                            {showLog ? 'Skrij dnevnik' : 'Dnevnik obvestil'}
+                        </button>
+                        <button
+                            onClick={sendNotifyAccountant}
+                            disabled={notifyLoading || notifyState.pendingCount === 0}
+                            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 text-white text-sm font-bold rounded-lg transition whitespace-nowrap"
+                        >
+                            {notifyLoading ? 'Pošiljam...' : `Pošlji Sonji${notifyState.pendingCount > 0 ? ` (${notifyState.pendingCount})` : ''}`}
+                        </button>
+                    </div>
+                </div>
+                {notifyError && <div className="mt-2 text-xs text-red-600 font-medium">{notifyError}</div>}
+                {showLog && (
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                        {notifyState.log.length === 0 ? (
+                            <div className="text-xs text-slate-400 italic">Še ni poslanih obvestil.</div>
+                        ) : (
+                            <div className="space-y-1.5 max-h-80 overflow-y-auto">
+                                {notifyState.log.map(l => {
+                                    const dt = new Date(l.sent_at)
+                                    const isOk = l.status === 'sent'
+                                    return (
+                                        <div key={l.id} className={`text-xs px-3 py-2 rounded-lg border ${isOk ? 'border-slate-100 bg-slate-50' : 'border-red-200 bg-red-50'}`}>
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-mono text-slate-500">
+                                                    {dt.toLocaleDateString('sl-SI')} {dt.toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                                <span className={isOk ? 'text-emerald-600 font-bold' : 'text-red-600 font-bold'}>
+                                                    {isOk ? '✓ Poslano' : '✗ Napaka'}
+                                                </span>
+                                            </div>
+                                            <div className="text-slate-600 mt-0.5">
+                                                {l.recipient_email} · <span className="font-semibold">{l.expense_count}</span> računov · <span className="font-bold text-red-600">{formatEur(Number(l.total_amount_eur))}</span>
+                                            </div>
+                                            {Array.isArray(l.summary) && l.summary.length > 0 && (
+                                                <div className="text-[11px] text-slate-500 mt-1">
+                                                    {l.summary.map((s: any) => `${monthsFullSI[s.month - 1]} ${s.year}: ${s.count}`).join(' · ')}
+                                                </div>
+                                            )}
+                                            {l.error && <div className="text-[11px] text-red-700 mt-1 font-mono">{l.error}</div>}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* Search + Add button */}
             <div className="flex gap-3">
