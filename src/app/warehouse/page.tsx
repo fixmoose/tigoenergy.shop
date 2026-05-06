@@ -15,6 +15,8 @@ interface WarehouseAction {
     by_name: string
     at: string
     file_url?: string
+    file_name?: string
+    comment?: string
 }
 
 interface WarehouseOrder {
@@ -578,13 +580,46 @@ function OrderCard({
     onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string, deliveryId?: string) => void
 }) {
     const [comment, setComment] = useState('')
+    const [showMsgForm, setShowMsgForm] = useState(false)
+    const [msgText, setMsgText] = useState('')
+    const [msgFile, setMsgFile] = useState<File | null>(null)
+    const [msgSending, setMsgSending] = useState(false)
+    const [msgStatus, setMsgStatus] = useState<string | null>(null)
     const isPrepared = hasAction(order, 'marked_prepared')
     const isPaymentVerified = hasAction(order, 'payment_verified')
     const dobavnica = getUploadedDobavnica(order)
+    const priorMessages = (order.warehouse_actions || []).filter(a => a.action === 'warehouse_message')
     const addr = order.shipping_address
     const customerName = addr
         ? `${addr.first_name || ''} ${addr.last_name || ''}`.trim()
         : order.customer_email
+
+    const sendOrderMessage = async () => {
+        if (!msgText.trim() && !msgFile) return
+        setMsgSending(true)
+        setMsgStatus(null)
+        try {
+            const fd = new FormData()
+            fd.append('email', email)
+            fd.append('order_id', order.id)
+            if (msgText.trim()) fd.append('message', msgText.trim())
+            if (msgFile) fd.append('file', msgFile)
+            const res = await fetch('/api/warehouse/message', { method: 'POST', body: fd })
+            const data = await res.json()
+            if (data.success) {
+                setMsgText('')
+                setMsgFile(null)
+                setMsgStatus('✓ Poslano')
+                setTimeout(() => setMsgStatus(null), 4000)
+            } else {
+                setMsgStatus('✗ Napaka: ' + (data.error || ''))
+            }
+        } catch {
+            setMsgStatus('✗ Napaka pri pošiljanju')
+        } finally {
+            setMsgSending(false)
+        }
+    }
 
     // Can finalize? Prepared must be checked. Payment must be verified if required.
     const canFinalize = isPrepared && (!order.pickup_payment_proof_required || isPaymentVerified)
@@ -768,6 +803,95 @@ function OrderCard({
                         </span>
                     </label>
                 )}
+
+                {/* Per-order messages to admin — multiple sends over time */}
+                <div className="border-t border-slate-700/30 pt-2.5 space-y-2">
+                    {priorMessages.length > 0 && (
+                        <div className="space-y-1.5">
+                            {priorMessages.map((m, i) => (
+                                <div key={i} className="bg-slate-700/30 border border-slate-600/30 rounded-lg px-3 py-2 text-xs">
+                                    <div className="flex items-center justify-between text-slate-500 mb-0.5">
+                                        <span>{m.by_name}</span>
+                                        <span>{new Date(m.at).toLocaleString('sl-SI', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
+                                    {m.comment && <p className="text-slate-200 whitespace-pre-wrap break-words">{m.comment}</p>}
+                                    {m.file_url && (
+                                        <a
+                                            href={`${m.file_url}${m.file_url.includes('?') ? '&' : '?'}warehouse_email=${encodeURIComponent(email)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-blue-400 hover:underline text-[11px] mt-1"
+                                        >
+                                            📎 {m.file_name || 'priloga'}
+                                        </a>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {!showMsgForm ? (
+                        <button
+                            type="button"
+                            onClick={() => setShowMsgForm(true)}
+                            className="w-full flex items-center justify-center gap-2 py-2 bg-slate-700/40 hover:bg-slate-700/70 border border-slate-600/40 rounded-lg text-sm text-slate-300 transition"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            {priorMessages.length > 0 ? 'Pošlji novo sporočilo' : 'Pošlji sporočilo adminu'}
+                        </button>
+                    ) : (
+                        <div className="bg-slate-700/30 border border-slate-600/40 rounded-lg p-2.5 space-y-2">
+                            <textarea
+                                value={msgText}
+                                onChange={e => setMsgText(e.target.value)}
+                                placeholder="Sporočilo o tem naročilu..."
+                                rows={2}
+                                autoFocus
+                                className="w-full bg-slate-800/60 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500/50 resize-none"
+                            />
+                            <div className="flex items-center gap-2">
+                                <label className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 cursor-pointer transition">
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        onChange={e => setMsgFile(e.target.files?.[0] || null)}
+                                    />
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    {msgFile ? (
+                                        <span className="text-orange-400 truncate max-w-[140px]">{msgFile.name}</span>
+                                    ) : (
+                                        'Priloži'
+                                    )}
+                                </label>
+                                <div className="flex-1" />
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowMsgForm(false); setMsgText(''); setMsgFile(null); setMsgStatus(null) }}
+                                    className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 transition"
+                                >
+                                    Prekliči
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={sendOrderMessage}
+                                    disabled={msgSending || (!msgText.trim() && !msgFile)}
+                                    className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-lg transition disabled:opacity-50"
+                                >
+                                    {msgSending ? 'Pošiljam...' : 'Pošlji'}
+                                </button>
+                            </div>
+                            {msgStatus && (
+                                <p className={`text-xs font-medium ${msgStatus.startsWith('✓') ? 'text-green-400' : 'text-red-400'}`}>
+                                    {msgStatus}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {/* Comment for admin */}
                 <textarea
