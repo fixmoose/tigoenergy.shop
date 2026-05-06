@@ -576,7 +576,6 @@ function OrderCard({
     onUpload: (id: string, file: File, deliveryId?: string) => void
     onComplete: (id: string, type: 'pickup' | 'dpd', comment?: string, deliveryId?: string) => void
 }) {
-    const [comment, setComment] = useState('')
     const [showMsgForm, setShowMsgForm] = useState(false)
     const [msgText, setMsgText] = useState('')
     const [msgFile, setMsgFile] = useState<File | null>(null)
@@ -891,22 +890,13 @@ function OrderCard({
                     )}
                 </div>
 
-                {/* Comment for admin */}
-                <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Komentar za admina (neobvezno)"
-                    rows={2}
-                    className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500/50 resize-none"
-                />
-
                 {/* Zaključi naročilo button */}
                 <button
                     disabled={!canFinalize || actionLoading[(order._delivery_id || order.id) + '_complete']}
                     onClick={() => {
                         const label = type === 'pickup' ? 'prevzeto s strani stranke' : 'prevzeto s strani DPD'
                         if (confirm(`Zaključi naročilo #${order.order_number} kot ${label}?\n\nTo dejanje ni mogoče razveljaviti.`)) {
-                            onComplete(order.id, type, comment.trim() || undefined, order._delivery_id)
+                            onComplete(order.id, type, undefined, order._delivery_id)
                         }
                     }}
                     className={`w-full py-3 rounded-lg font-bold text-sm transition ${
