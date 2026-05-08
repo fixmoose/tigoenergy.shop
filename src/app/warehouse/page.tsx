@@ -67,6 +67,7 @@ export default function WarehousePortal() {
     const [msgSending, setMsgSending] = useState(false)
     const [msgStatus, setMsgStatus] = useState<string | null>(null)
     const [expandedCompletedId, setExpandedCompletedId] = useState<string | null>(null)
+    const [expandedCompletedMsgs, setExpandedCompletedMsgs] = useState<Record<string, boolean>>({})
     const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({})
     const COMPLETED_PAGE_SIZE = 20
 
@@ -456,34 +457,50 @@ export default function WarehousePortal() {
                                                         ))}
                                                     </div>
                                                 )}
-                                                {/* Sent messages — for worker's record */}
-                                                {messageActions.length > 0 && (
-                                                    <div className="mt-2 pt-2 border-t border-slate-700/30 space-y-1.5">
-                                                        <div className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Sporočila</div>
-                                                        {messageActions.map((m, i) => {
-                                                            const msg = m as any
-                                                            return (
-                                                                <div key={i} className="bg-slate-700/30 border border-slate-600/30 rounded px-2.5 py-1.5">
-                                                                    <div className="flex items-center justify-between text-[10px] text-slate-500 mb-0.5">
-                                                                        <span>{msg.by_name}</span>
-                                                                        <span>{new Date(msg.at).toLocaleString('sl-SI', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
-                                                                    </div>
-                                                                    {msg.comment && <p className="text-[11px] text-slate-200 whitespace-pre-wrap break-words">{msg.comment}</p>}
-                                                                    {msg.file_url && (
-                                                                        <a
-                                                                            href={withAuth(msg.file_url)}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="inline-flex items-center gap-1 text-blue-400 hover:underline text-[10px] mt-1"
-                                                                        >
-                                                                            📎 {msg.file_name || 'priloga'}
-                                                                        </a>
-                                                                    )}
+                                                {/* Sent messages — collapsed by default, click to expand */}
+                                                {messageActions.length > 0 && (() => {
+                                                    const isMsgsOpen = !!expandedCompletedMsgs[order.id]
+                                                    return (
+                                                        <div className="mt-2 pt-2 border-t border-slate-700/30">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setExpandedCompletedMsgs(prev => ({ ...prev, [order.id]: !isMsgsOpen }))}
+                                                                className="w-full flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500 tracking-wider hover:text-slate-300 transition"
+                                                            >
+                                                                <svg className={`w-3 h-3 transition-transform ${isMsgsOpen ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                                                </svg>
+                                                                <span>Sporočila ({messageActions.length})</span>
+                                                            </button>
+                                                            {isMsgsOpen && (
+                                                                <div className="mt-1.5 space-y-1.5">
+                                                                    {messageActions.map((m, i) => {
+                                                                        const msg = m as any
+                                                                        return (
+                                                                            <div key={i} className="bg-slate-700/30 border border-slate-600/30 rounded px-2.5 py-1.5">
+                                                                                <div className="flex items-center justify-between text-[10px] text-slate-500 mb-0.5">
+                                                                                    <span>{msg.by_name}</span>
+                                                                                    <span>{new Date(msg.at).toLocaleString('sl-SI', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                                                                                </div>
+                                                                                {msg.comment && <p className="text-[11px] text-slate-200 whitespace-pre-wrap break-words">{msg.comment}</p>}
+                                                                                {msg.file_url && (
+                                                                                    <a
+                                                                                        href={withAuth(msg.file_url)}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className="inline-flex items-center gap-1 text-blue-400 hover:underline text-[10px] mt-1"
+                                                                                    >
+                                                                                        📎 {msg.file_name || 'priloga'}
+                                                                                    </a>
+                                                                                )}
+                                                                            </div>
+                                                                        )
+                                                                    })}
                                                                 </div>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                )}
+                                                            )}
+                                                        </div>
+                                                    )
+                                                })()}
 
                                                 {/* Show order item summary */}
                                                 {order.order_items && order.order_items.length > 0 && (

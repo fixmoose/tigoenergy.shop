@@ -74,11 +74,16 @@ export async function GET(req: NextRequest) {
             .filter((it: any) => qtyById.has(it.id))
             .map((it: any) => ({ ...it, quantity: qtyById.get(it.id) }))
         const carrier = delivery.carrier || order.shipping_carrier
+        // Merge delivery's audit log with order-level warehouse_message rows so
+        // every delivery card on the same order surfaces all messages — workers
+        // see what every other worker (or other delivery) wrote about the order.
+        const orderMessages = (order.warehouse_actions || []).filter((a: any) => a.action === 'warehouse_message')
+        const mergedActions = [...(delivery.warehouse_actions || []), ...orderMessages]
         return {
             ...order,
             order_items: filteredItems,
             shipping_carrier: carrier,
-            warehouse_actions: delivery.warehouse_actions || [],
+            warehouse_actions: mergedActions,
             packing_slip_url: `/api/orders/${order.id}/packing-slip?delivery=${delivery.id}`,
             _delivery_id: delivery.id,
             _delivery_part: delivery.part_number,

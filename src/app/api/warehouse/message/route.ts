@@ -67,11 +67,10 @@ export async function POST(req: NextRequest) {
     : `Sporočilo od ${driver.name}`
 
   // Append the message to the order's warehouse_actions log so it surfaces
-  // inline with prep / pickup history on the admin order page. When a
-  // delivery_id is also provided (worker is on a split-delivery card),
-  // mirror it onto the delivery's audit log too — same JSON entry — so the
-  // worker sees the thread on their card. Admin's order-page view picks
-  // up everything via orders.warehouse_actions regardless.
+  // inline with prep / pickup history on the admin order page AND on every
+  // /warehouse delivery card of this order (the warehouse API merges these
+  // into each delivery's audit log so workers see all messages regardless
+  // of which delivery / who wrote them).
   if (orderId && message) {
     const newAction = {
       action: 'warehouse_message',
@@ -91,20 +90,6 @@ export async function POST(req: NextRequest) {
     const actions = Array.isArray(orderRow?.warehouse_actions) ? [...orderRow!.warehouse_actions] : []
     actions.push(newAction)
     await supabase.from('orders').update({ warehouse_actions: actions }).eq('id', orderId)
-
-    if (deliveryId) {
-      const { data: delivery } = await supabase
-        .from('order_deliveries')
-        .select('warehouse_actions')
-        .eq('id', deliveryId)
-        .eq('order_id', orderId)
-        .single()
-      if (delivery) {
-        const dActions = Array.isArray(delivery.warehouse_actions) ? [...delivery.warehouse_actions] : []
-        dActions.push(newAction)
-        await supabase.from('order_deliveries').update({ warehouse_actions: dActions }).eq('id', deliveryId)
-      }
-    }
   }
 
   // Create admin notification
