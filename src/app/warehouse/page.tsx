@@ -345,12 +345,20 @@ export default function WarehousePortal() {
 
                 {/* DPD column */}
                 <div>
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                         <div className="w-3 h-3 bg-red-500 rounded-full" />
                         <h2 className="text-white font-bold text-sm uppercase tracking-wide">
                             DPD Dostava
                         </h2>
                         <span className="text-slate-500 text-xs">({deliveryOrders.length})</span>
+                        {deliveryOrders.some(o => (o.warehouse_actions || []).some(a => a.action === 'dpd_carorder_email_sent')) && (
+                            <span
+                                title="Carorder za prevzem je naročen pri DPD"
+                                className="text-[10px] font-bold uppercase tracking-wider bg-emerald-900/50 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded"
+                            >
+                                ✓ carorder naročen
+                            </span>
+                        )}
                     </div>
                     {deliveryOrders.length === 0 ? (
                         <div className="text-slate-500 text-sm text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700/50">
