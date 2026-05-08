@@ -187,18 +187,24 @@ export function calculateTigoParcels(items: OrderItem[]): Parcel[] {
 
 /**
  * Calculate total DPD shipping cost by summing per-parcel rates.
- * Each parcel is priced individually based on its weight band.
+ * Each parcel is priced individually based on its weight band. A 10 EUR
+ * minimum is applied to the whole shipment — small / few-piece orders
+ * shouldn't ever bill less than that.
  */
+export const DPD_MIN_SHIPMENT_EUR = 10
 export function calculateDPDShippingCost(
     parcels: Parcel[],
     rates: { min_weight_kg: number; max_weight_kg: number; rate_eur: number }[],
     fallbackRate = 7.5
 ): number {
-    if (!rates || rates.length === 0) return parcels.length * fallbackRate
-    return parcels.reduce((total, parcel) => {
-        const rate = rates.find(r => parcel.weight >= r.min_weight_kg && parcel.weight <= r.max_weight_kg)
-        return total + (rate ? rate.rate_eur : fallbackRate)
-    }, 0)
+    if (parcels.length === 0) return 0
+    const raw = (!rates || rates.length === 0)
+        ? parcels.length * fallbackRate
+        : parcels.reduce((total, parcel) => {
+            const rate = rates.find(r => parcel.weight >= r.min_weight_kg && parcel.weight <= r.max_weight_kg)
+            return total + (rate ? rate.rate_eur : fallbackRate)
+        }, 0)
+    return Math.max(raw, DPD_MIN_SHIPMENT_EUR)
 }
 
 export class DPDService {
