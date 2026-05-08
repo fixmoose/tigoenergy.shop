@@ -16,6 +16,7 @@ interface EmailAttachment {
 interface SendEmailParams {
     from?: string
     to: string
+    cc?: string[]
     subject: string
     html?: string
     templateId?: string
@@ -29,6 +30,7 @@ interface SendEmailParams {
 export async function sendEmail({
     from = 'Tigo e-Shop Admin Team <support@tigoenergy.shop>',
     to,
+    cc,
     subject,
     html,
     templateId,
@@ -49,17 +51,26 @@ export async function sendEmail({
     const fromEmail = fromMatch ? fromMatch[2] : from
     const fromName = fromMatch ? fromMatch[1].trim() : undefined
 
-    const body = {
+    // CC handling: UniOne's recipients[] is the delivery list (every entry
+    // gets its own envelope). To present a real Cc:, we set headers.To and
+    // headers.Cc explicitly so every recipient sees the same RFC headers.
+    const ccList = (cc || []).map(e => e.trim()).filter(Boolean)
+    const allRecipients = [to, ...ccList]
+
+    const body: any = {
         message: {
-            recipients: [{
-                email: to,
+            recipients: allRecipients.map(email => ({
+                email,
                 ...(substitutions && { substitutions })
-            }],
+            })),
             ...(html && { body: { html } }),
             ...(templateId && { template_id: templateId }),
             subject,
             from_email: fromEmail,
             ...(fromName && { from_name: fromName }),
+            ...(ccList.length > 0 && {
+                headers: { 'To': to, 'Cc': ccList.join(', ') },
+            }),
             ...(attachments && attachments.length > 0 && {
                 attachments: attachments.map(a => ({
                     type: a.type,

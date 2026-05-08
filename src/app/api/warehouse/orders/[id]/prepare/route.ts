@@ -179,18 +179,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
                     `Priblizna teza: ${totalWeight.toFixed(2)} kg`,
                 ].join('\n')
                 const html = `<pre style="font-family:Arial,sans-serif;font-size:14px;color:#1e293b;white-space:pre-wrap;line-height:1.6">${bodyText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`
-                const recipients = [DPD_PICKUP_TO, ...DPD_PICKUP_CC]
-                await Promise.all(recipients.map(to =>
-                    sendEmail({
-                        from: 'Initra Energija <support@tigoenergy.shop>',
-                        to,
-                        subject,
-                        html,
-                        skipUnsubscribe: true,
-                        orderId,
-                        emailType: 'dpd_carorder',
-                    }).catch(err => console.error(`Failed dpd carorder email to ${to}:`, err))
-                ))
+                await sendEmail({
+                    from: 'Initra Energija <support@tigoenergy.shop>',
+                    to: DPD_PICKUP_TO,
+                    cc: DPD_PICKUP_CC,
+                    subject,
+                    html,
+                    skipUnsubscribe: true,
+                    orderId,
+                    emailType: 'dpd_carorder',
+                }).catch(err => console.error(`Failed dpd carorder email:`, err))
             } catch (carorderErr) {
                 console.error('Failed to send DPD carorder email (non-fatal):', carorderErr)
             }
