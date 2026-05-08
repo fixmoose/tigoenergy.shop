@@ -64,6 +64,37 @@ export async function GET(req: NextRequest) {
         deliveriesByOrder.get(d.order_id)!.push(d)
     }
 
+    // Read-state for warehouse messages: gather every notification_id
+    // referenced by warehouse_message rows on both active and completed
+    // orders, then ask admin_notifications which ones are read. Stamp
+    // each matching message with `read: true` + `read_at` so the
+    // warehouse UI can render a green check ("sporočilo prebrano").
+    const allOrders = [...(orders || []), ...(completedOrders || [])]
+    const notificationIds: string[] = []
+    for (const o of allOrders) {
+        for (const a of (o.warehouse_actions || []) as any[]) {
+            if (a.action === 'warehouse_message' && a.notification_id) notificationIds.push(a.notification_id)
+        }
+    }
+    const readMap = new Map<string, string>()
+    if (notificationIds.length > 0) {
+        const { data: notifs } = await supabase
+            .from('admin_notifications')
+            .select('id, read, read_at')
+            .in('id', notificationIds)
+            .eq('read', true)
+        for (const n of notifs || []) readMap.set(n.id, n.read_at)
+    }
+    const stampMessages = (actions: any[]) => {
+        for (const a of actions || []) {
+            if (a.action === 'warehouse_message' && a.notification_id && readMap.has(a.notification_id)) {
+                a.read = true
+                a.read_at = readMap.get(a.notification_id)
+            }
+        }
+    }
+    for (const o of allOrders) stampMessages(o.warehouse_actions || [])
+
     // Build a virtual entry for one delivery on an order. Replaces the
     // order's order_items with the delivery's filtered+overridden quantities
     // and points the dobavnica URL at /api/orders/X/packing-slip?delivery=…

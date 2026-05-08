@@ -17,6 +17,9 @@ interface WarehouseAction {
     file_url?: string
     file_name?: string
     comment?: string
+    notification_id?: string
+    read?: boolean
+    read_at?: string
 }
 
 interface WarehouseOrder {
@@ -479,7 +482,12 @@ export default function WarehousePortal() {
                                                                         return (
                                                                             <div key={i} className="bg-slate-700/30 border border-slate-600/30 rounded px-2.5 py-1.5">
                                                                                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-0.5">
-                                                                                    <span>{msg.by_name}</span>
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <span>{msg.by_name}</span>
+                                                                                        {msg.read && (
+                                                                                            <span title="Sporočilo prebrano" className="text-green-500 font-bold cursor-help">✓</span>
+                                                                                        )}
+                                                                                    </div>
                                                                                     <span>{new Date(msg.at).toLocaleString('sl-SI', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                                                                                 </div>
                                                                                 {msg.comment && <p className="text-[11px] text-slate-200 whitespace-pre-wrap break-words">{msg.comment}</p>}
@@ -858,7 +866,12 @@ function OrderCard({
                             {priorMessages.map((m, i) => (
                                 <div key={i} className="bg-slate-700/30 border border-slate-600/30 rounded-lg px-3 py-2 text-xs">
                                     <div className="flex items-center justify-between text-slate-500 mb-0.5">
-                                        <span>{m.by_name}</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <span>{m.by_name}</span>
+                                            {m.read && (
+                                                <span title="Sporočilo prebrano" className="text-green-500 font-bold cursor-help">✓</span>
+                                            )}
+                                        </div>
                                         <span>{new Date(m.at).toLocaleString('sl-SI', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     {m.comment && <p className="text-slate-200 whitespace-pre-wrap break-words">{m.comment}</p>}

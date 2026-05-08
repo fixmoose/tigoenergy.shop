@@ -66,11 +66,31 @@ export async function POST(req: NextRequest) {
     ? `Sporočilo o naročilu #${orderNumber} od ${driver.name}`
     : `Sporočilo od ${driver.name}`
 
+  // Create admin notification first so we can stash its id on the
+  // warehouse_action — that link is how /warehouse later finds out whether
+  // admin has read the message (read state lives on admin_notifications).
+  const { data: notif, error: notifErr } = await supabase.from('admin_notifications').insert({
+    type: 'warehouse_comment',
+    title,
+    message: message || (fileName ? `Priložen dokument: ${fileName}` : null),
+    source: 'warehouse',
+    source_name: driver.name,
+    metadata: {
+      ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
+      ...(orderId ? { order_id: orderId, order_number: orderNumber } : {}),
+      ...(deliveryId ? { delivery_id: deliveryId } : {}),
+      driver_email: driver.email,
+    },
+  }).select('id').single()
+
+  if (notifErr) {
+    return NextResponse.json({ error: notifErr.message }, { status: 500 })
+  }
+
   // Append the message to the order's warehouse_actions log so it surfaces
-  // inline with prep / pickup history on the admin order page AND on every
-  // /warehouse delivery card of this order (the warehouse API merges these
-  // into each delivery's audit log so workers see all messages regardless
-  // of which delivery / who wrote them).
+  // inline on admin order page AND on every /warehouse delivery card of
+  // this order. notification_id lets the warehouse view show a green check
+  // once admin reads it.
   if (orderId && message) {
     const newAction = {
       action: 'warehouse_message',
@@ -78,6 +98,7 @@ export async function POST(req: NextRequest) {
       by_name: driver.name,
       at: new Date().toISOString(),
       comment: message,
+      notification_id: notif?.id,
       ...(deliveryId ? { delivery_id: deliveryId } : {}),
       ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
     }
@@ -90,25 +111,6 @@ export async function POST(req: NextRequest) {
     const actions = Array.isArray(orderRow?.warehouse_actions) ? [...orderRow!.warehouse_actions] : []
     actions.push(newAction)
     await supabase.from('orders').update({ warehouse_actions: actions }).eq('id', orderId)
-  }
-
-  // Create admin notification
-  const { error: notifErr } = await supabase.from('admin_notifications').insert({
-    type: 'warehouse_comment',
-    title,
-    message: message || (fileName ? `Priložen dokument: ${fileName}` : null),
-    source: 'warehouse',
-    source_name: driver.name,
-    metadata: {
-      ...(fileUrl ? { file_url: fileUrl, file_name: fileName } : {}),
-      ...(orderId ? { order_id: orderId, order_number: orderNumber } : {}),
-      ...(deliveryId ? { delivery_id: deliveryId } : {}),
-      driver_email: driver.email,
-    },
-  })
-
-  if (notifErr) {
-    return NextResponse.json({ error: notifErr.message }, { status: 500 })
   }
 
   return NextResponse.json({ success: true })
