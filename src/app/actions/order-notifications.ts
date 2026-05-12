@@ -580,6 +580,18 @@ export async function confirmOrderAction(orderId: string) {
 
     if (error || !order) throw new Error('Order not found')
 
+    // 1b. Auto-split deliveries by carrier for mixed-shipping orders so
+    // /warehouse gets one card per carrier with its own dobavnica.
+    try {
+        const { autoSplitDeliveriesByCarrier } = await import('@/lib/order-deliveries')
+        const split = await autoSplitDeliveriesByCarrier(supabase, orderId)
+        if (split.created > 0) {
+            console.log(`Auto-split ${order.order_number} into ${split.created} deliveries`)
+        }
+    } catch (splitErr) {
+        console.error('Auto-split deliveries failed (non-fatal):', splitErr)
+    }
+
     // 2. Fetch order items for the email
     const { data: orderItems } = await supabase
         .from('order_items')
