@@ -40,13 +40,25 @@ export async function POST(
             const address = order.shipping_address || {}
             const { street, number } = splitStreetAndNumber(address.street || '')
 
-            // Fetch order items for packaging logic
+            // Fetch order items and filter to only DPD-carrier items —
+            // mixed orders (some items via InterEuropa or Pickup) must NOT
+            // produce DPD labels for non-DPD items. Items without a
+            // per-item override inherit the order's shipping_carrier.
             const { data: items } = await supabase
                 .from('order_items')
                 .select('*')
                 .eq('order_id', id)
 
-            const parcels = calculateTigoParcels(items || [])
+            const dpdItems = (items || []).filter((i: any) =>
+                i.shipping_carrier === 'DPD'
+                || (!i.shipping_carrier && order.shipping_carrier === 'DPD')
+            )
+
+            if (dpdItems.length === 0) {
+                return NextResponse.json({ error: 'No DPD items on this order — nothing to ship via DPD' }, { status: 400 })
+            }
+
+            const parcels = calculateTigoParcels(dpdItems)
             const weights = parcels.map(p => p.weight)
             const totalWeight = weights.reduce((a: number, b: number) => a + b, 0)
 
