@@ -430,14 +430,14 @@ export default function AccountingPage() {
                     </button>
                     <button
                         onClick={() => {
-                            if (month === 0) { alert('Izberite mesec za prenos celotnega arhiva.'); return }
+                            if (month === 0) { alert('Izberite mesec za prenos mesečnega skupka.'); return }
                             const url = `/api/admin/accounting/export?year=${year}&month=${month}`
                             window.open(url, '_blank')
                         }}
                         disabled={month === 0}
                         className="bg-slate-800 hover:bg-black disabled:bg-slate-200 disabled:text-slate-400 text-white px-3 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap"
                         title="Prenesi vse izdane in prejete račune za izbrani mesec v enem PDF-ju">
-                        Arhiv mesec
+                        Skupek mesečni
                     </button>
                 </div>
             </div>
