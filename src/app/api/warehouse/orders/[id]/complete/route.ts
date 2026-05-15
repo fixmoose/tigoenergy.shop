@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { sendEmail, notifyAdmins } from '@/lib/email'
+import { adjustStockForDelivery, adjustStockForOrder } from '@/lib/stock-adjustment'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id: orderId } = await params
@@ -59,6 +60,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
         await supabase.from('order_deliveries').update(dStatusUpdate).eq('id', delivery_id)
 
+        // Decrement stock for this delivery's items now that goods have
+        // physically left the warehouse. Idempotent via stock_adjusted
+        // marker on delivery.warehouse_actions.
+        try {
+            const stockRes = await adjustStockForDelivery(supabase, delivery_id)
+            if (stockRes.adjusted > 0) console.log(`Stock: adjusted ${stockRes.adjusted} item(s) for delivery ${delivery_id}`)
+        } catch (stockErr) {
+            console.error('Stock adjustment failed (non-fatal):', stockErr)
+        }
+
         // Are all deliveries on this order now completed?
         const { data: siblings } = await supabase
             .from('order_deliveries')
@@ -113,6 +124,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .eq('id', orderId)
 
     if (error) return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+
+    if (isLastDelivery) {
+        // Each delivery already deducted its own slice — just stamp the
+        // order flag so future calls can't double-deduct.
+        await supabase.from('orders').update({ stock_adjusted: true }).eq('id', orderId)
+    } else {
+        // Single-delivery / no-delivery path — adjust the entire order now.
+        try {
+            const stockRes = await adjustStockForOrder(supabase, orderId)
+            if (stockRes.adjusted > 0) console.log(`Stock: adjusted ${stockRes.adjusted} item(s) for order ${orderId}`)
+        } catch (stockErr) {
+            console.error('Order-level stock adjustment failed (non-fatal):', stockErr)
+        }
+    }
 
     // Auto-issue invoice for pickup orders when payment has been verified
     // (DPD orders wait for delivery confirmation — no auto-invoice)
