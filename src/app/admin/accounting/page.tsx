@@ -152,6 +152,26 @@ export default function AccountingPage() {
         }
     }
 
+    const sendReviewReminder = async () => {
+        if (!confirm('Pošlji Sonji opomnik za pregled?')) return
+        setNotifyLoading(true)
+        setNotifyError(null)
+        try {
+            const res = await fetch('/api/admin/expenses/notify-accountant/review-reminder', { method: 'POST' })
+            const data = await res.json()
+            if (data.success) {
+                fetchNotifyState()
+                alert('Opomnik poslan.')
+            } else {
+                setNotifyError(data.error || 'Pošiljanje ni uspelo')
+            }
+        } catch (err: any) {
+            setNotifyError(err.message)
+        } finally {
+            setNotifyLoading(false)
+        }
+    }
+
     const monthsSI = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec']
     const monthsFullSI = ['Januar', 'Februar', 'Marec', 'April', 'Maj', 'Junij', 'Julij', 'Avgust', 'September', 'Oktober', 'November', 'December']
 
@@ -513,20 +533,55 @@ export default function AccountingPage() {
             {/* Notify accountant */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <div>
+                    <div className="min-w-0">
                         <div className="text-sm font-bold text-slate-700">Sonja (računovodstvo)</div>
                         <div className="text-xs text-slate-500 mt-0.5">
                             {notifyState.pendingCount > 0
                                 ? <>Za pregled čaka <span className="font-bold text-orange-600">{notifyState.pendingCount}</span> {notifyState.pendingCount === 1 ? 'obdelan račun' : (notifyState.pendingCount <= 4 ? 'obdelani računi' : 'obdelanih računov')}</>
                                 : 'Vsi obdelani računi so že bili poslani v pregled'}
                         </div>
+                        <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                            <span>Sonjina prijava:</span>
+                            <a
+                                href="/racunovodstvo"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline font-mono break-all"
+                            >
+                                /racunovodstvo
+                            </a>
+                            <button
+                                onClick={() => navigator.clipboard.writeText(`${window.location.origin}/racunovodstvo`)}
+                                className="text-slate-400 hover:text-slate-700"
+                                title="Kopiraj povezavo"
+                            >
+                                ⧉
+                            </button>
+                            <a
+                                href="/racunovodstvo?key=123456"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-2 text-purple-600 hover:underline font-medium"
+                                title="Odpre /racunovodstvo prijavljen kot Sonja — za podporo, ko potrebuje pomoč"
+                            >
+                                👁 Pogled kot Sonja
+                            </a>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <button
                             onClick={() => setShowLog(s => !s)}
                             className="text-xs px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
                         >
                             {showLog ? 'Skrij dnevnik' : 'Dnevnik obvestil'}
+                        </button>
+                        <button
+                            onClick={sendReviewReminder}
+                            disabled={notifyLoading}
+                            className="px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50 text-slate-700 text-sm font-semibold rounded-lg transition whitespace-nowrap"
+                            title="Pošlji Sonji prošnjo za pregled (s povezavo)"
+                        >
+                            Pošlji opomnik
                         </button>
                         <button
                             onClick={sendNotifyAccountant}
