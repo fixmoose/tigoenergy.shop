@@ -425,8 +425,19 @@ export default function AccountingPage() {
                     </select>
                     <button onClick={downloadPDF}
                         className="border border-slate-200 bg-white text-slate-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition whitespace-nowrap"
-                        title="Prenesi PDF">
-                        PDF
+                        title="Prenesi povzetek stroškov v PDF">
+                        Povzetek
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (month === 0) { alert('Izberite mesec za prenos celotnega arhiva.'); return }
+                            const url = `/api/admin/accounting/export?year=${year}&month=${month}`
+                            window.open(url, '_blank')
+                        }}
+                        disabled={month === 0}
+                        className="bg-slate-800 hover:bg-black disabled:bg-slate-200 disabled:text-slate-400 text-white px-3 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap"
+                        title="Prenesi vse izdane in prejete račune za izbrani mesec v enem PDF-ju">
+                        Arhiv mesec
                     </button>
                 </div>
             </div>

@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createAdminClient } from '@/lib/supabase/server'
 import { buildMonthlyBundle } from '@/lib/monthly-bundle'
 
-const ACCOUNTANT_TOKEN = '123456'
-
-// Allow up to 5 minutes for large monthly bundles
+// Same monthly PDF bundle Sonja gets at /racunovodstvo, available to admin
+// via cookie auth. Bundle covers both directions (issued + received) for the
+// requested year+month.
 export const maxDuration = 300
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url)
-    const token = searchParams.get('key')
-    if (token !== ACCOUNTANT_TOKEN) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const cookieStore = await cookies()
+    if (cookieStore.get('tigo-admin')?.value !== '1') {
+        return NextResponse.json({ error: 'Not authorized' }, { status: 401 })
     }
 
+    const { searchParams } = new URL(req.url)
     const year = searchParams.get('year') || new Date().getFullYear().toString()
     const month = searchParams.get('month')
     if (!month) return NextResponse.json({ error: 'Month required' }, { status: 400 })
