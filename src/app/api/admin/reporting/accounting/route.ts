@@ -30,22 +30,73 @@ export async function GET(req: NextRequest) {
             : `${parseInt(year) + 1}-01-01T00:00:00Z`
 
         if (type === 'orders' || type === 'invoices') {
+            // Date semantics:
+            //   - orders → by created_at (when the order was placed)
+            //   - invoices → by invoice_created_at (when the invoice was
+            //     actually issued) so an order placed in March but invoiced
+            //     in April lands in the April report, not the March one.
             let query = supabase
                 .from('orders')
                 .select('*')
-                .order('created_at', { ascending: false })
 
             if (type === 'invoices') {
-                query = query.not('invoice_number', 'is', null)
+                query = query
+                    .not('invoice_number', 'is', null)
+                    .gte('invoice_created_at', start)
+                    .lt('invoice_created_at', endDate)
+                    .order('invoice_created_at', { ascending: false })
+            } else {
+                query = query
+                    .gte('created_at', start)
+                    .lt('created_at', endDate)
+                    .order('created_at', { ascending: false })
             }
-
-            query = query.gte('created_at', start).lt('created_at', endDate)
-            const { data: orders, error } = await query
+            const { data: shopOrders, error } = await query
             if (error) throw error
 
-            const totalRevenue = (orders || []).reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
-            const totalInvoices = (orders || []).filter((o: any) => o.invoice_number).length
-            const totalOutstanding = (orders || [])
+            // Imported external invoices (manual_invoices) ARE income too —
+            // include them in the invoices view, filtered by invoice_date.
+            let manualInvoices: any[] = []
+            if (type === 'invoices') {
+                const startDate = start.slice(0, 10)
+                const endDateOnly = endDate.slice(0, 10)
+                const { data: mi } = await supabase
+                    .from('manual_invoices')
+                    .select('id, invoice_number, invoice_date, customer_name, company_name, vat_id, net_amount, vat_amount, total, currency, paid, paid_at, pdf_url, category, region')
+                    .gte('invoice_date', startDate)
+                    .lt('invoice_date', endDateOnly)
+                    .order('invoice_date', { ascending: false })
+                manualInvoices = (mi || []).map((m: any) => ({
+                    id: m.id,
+                    order_number: null,
+                    invoice_number: m.invoice_number,
+                    invoice_created_at: m.invoice_date,
+                    created_at: m.invoice_date,
+                    customer_email: null,
+                    customer_name: m.customer_name,
+                    company_name: m.company_name,
+                    vat_id: m.vat_id,
+                    subtotal: m.net_amount,
+                    vat_amount: m.vat_amount,
+                    total: m.total,
+                    currency: m.currency || 'EUR',
+                    payment_status: m.paid ? 'paid' : 'unpaid',
+                    paid_at: m.paid_at,
+                    status: 'completed',
+                    invoice_url: m.pdf_url,
+                    _source: 'manual_invoice' as const,
+                    category: m.category,
+                    region: m.region,
+                }))
+            }
+
+            const orders = [...(shopOrders || []), ...manualInvoices].sort(
+                (a, b) => new Date(b.invoice_created_at || b.created_at).getTime() - new Date(a.invoice_created_at || a.created_at).getTime()
+            )
+
+            const totalRevenue = orders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
+            const totalInvoices = orders.filter((o: any) => o.invoice_number).length
+            const totalOutstanding = orders
                 .filter((o: any) => o.payment_status !== 'paid' && o.status !== 'cancelled')
                 .reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
 
@@ -83,15 +134,53 @@ export async function GET(req: NextRequest) {
             resultData = { records }
         } else if (type === 'ddv') {
             // DDV (VAT) report: VAT collected on invoiced orders — what you owe the government
+            // Filter by invoice_created_at — DDV is owed in the month the
+            // invoice is issued, not the month the order was placed.
             const { data: orders, error } = await supabase
                 .from('orders')
                 .select('id, order_number, customer_email, company_name, created_at, status, payment_status, invoice_number, invoice_created_at, total, subtotal, vat_amount, vat_rate, shipping_cost, shipping_address, amount_paid, payment_terms, payment_due_date')
                 .not('invoice_number', 'is', null)
-                .gte('created_at', start)
-                .lt('created_at', endDate)
-                .order('created_at', { ascending: false })
+                .gte('invoice_created_at', start)
+                .lt('invoice_created_at', endDate)
+                .order('invoice_created_at', { ascending: false })
 
             if (error) throw error
+
+            // Also include imported manual invoices — they carry VAT too.
+            const startDate = start.slice(0, 10)
+            const endDateOnly = endDate.slice(0, 10)
+            const { data: mi } = await supabase
+                .from('manual_invoices')
+                .select('id, invoice_number, invoice_date, customer_name, company_name, vat_id, net_amount, vat_amount, total, currency, paid, paid_at')
+                .gte('invoice_date', startDate)
+                .lt('invoice_date', endDateOnly)
+                .order('invoice_date', { ascending: false })
+
+            const manualAsOrders = (mi || []).map((m: any) => {
+                const net = Number(m.net_amount) || 0
+                const vat = Number(m.vat_amount) || 0
+                // Derive vat_rate from amounts (manual invoices don't carry a rate field)
+                const derivedRate = net > 0 ? Math.round((vat / net) * 100) : 0
+                return {
+                    id: m.id,
+                    order_number: null,
+                    invoice_number: m.invoice_number,
+                    invoice_created_at: m.invoice_date,
+                    created_at: m.invoice_date,
+                    customer_email: null,
+                    company_name: m.company_name || m.customer_name,
+                    subtotal: net,
+                    vat_amount: vat,
+                    total: Number(m.total) || (net + vat),
+                    vat_rate: derivedRate,
+                    payment_status: m.paid ? 'paid' : 'unpaid',
+                    amount_paid: m.paid ? (Number(m.total) || 0) : 0,
+                    status: 'completed',
+                    _source: 'manual_invoice' as const,
+                }
+            })
+
+            const combined = [...(orders || []), ...manualAsOrders]
 
             // Group by VAT rate
             const byRate: Record<number, { count: number; subtotal: number; vat: number; total: number }> = {}
@@ -101,7 +190,7 @@ export async function GET(req: NextRequest) {
             let totalPaid = 0
             let totalOutstanding = 0
 
-            for (const o of (orders || [])) {
+            for (const o of combined) {
                 const rawRate = Number(o.vat_rate) || 0
                 const rate = rawRate < 1 ? Math.round(rawRate * 100) : rawRate
                 if (!byRate[rate]) byRate[rate] = { count: 0, subtotal: 0, vat: 0, total: 0 }
@@ -119,14 +208,14 @@ export async function GET(req: NextRequest) {
             }
 
             resultData = {
-                orders: orders || [],
+                orders: combined,
                 summary: {
                     totalVat,
                     totalSubtotal,
                     totalGross,
                     totalPaid,
                     totalOutstanding,
-                    invoiceCount: (orders || []).length,
+                    invoiceCount: combined.length,
                     byRate: Object.entries(byRate)
                         .sort(([a], [b]) => Number(b) - Number(a))
                         .map(([rate, data]) => ({ rate: Number(rate), ...data })),
