@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { Product } from '@/types/database'
 import { PRODUCT_CATEGORIES } from '@/lib/constants/categories'
-import { updateProductStatus, updateProductFeatured, getOrderedQuantities } from '@/app/actions/products'
+import { updateProductStatus, updateProductFeatured, getOrderedQuantities, adminAdjustProductStock } from '@/app/actions/products'
+import { useRouter } from 'next/navigation'
 
 export default function ProductInventoryList({ products }: { products: Product[] }) {
     const [orderedQty, setOrderedQty] = useState<Record<string, number>>({})
@@ -130,19 +131,12 @@ function CollapsibleSubCategory({ subcategory, items, orderedQty }: { subcategor
                                 <div className="font-medium text-sm text-gray-800 truncate group-hover:text-blue-700">{p.name_en}</div>
                                 <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-0.5">
                                     <span className="font-mono bg-gray-100 px-1 rounded">{p.sku}</span>
-                                    {(() => {
-                                        const total = p.stock_quantity ?? 0
-                                        const ordered = orderedQty[p.id] || 0
-                                        const available = total - ordered
-                                        const isLow = available < (p.low_stock_threshold || 5)
-                                        return (
-                                            <span className={`font-medium ${isLow ? 'text-red-500' : 'text-gray-500'}`}>
-                                                {total} stk
-                                                {ordered > 0 && <span className="text-orange-500"> / {ordered} ord</span>}
-                                                {ordered > 0 && <span className={isLow ? 'text-red-600 font-bold' : 'text-green-600'}> / {available} avl</span>}
-                                            </span>
-                                        )
-                                    })()}
+                                    <StockEditor
+                                        productId={p.id}
+                                        stock={p.stock_quantity ?? 0}
+                                        ordered={orderedQty[p.id] || 0}
+                                        lowThreshold={p.low_stock_threshold || 5}
+                                    />
                                 </div>
                             </div>
 
@@ -161,6 +155,82 @@ function CollapsibleSubCategory({ subcategory, items, orderedQty }: { subcategor
     )
 }
 
+
+function StockEditor({ productId, stock, ordered, lowThreshold }: { productId: string, stock: number, ordered: number, lowThreshold: number }) {
+    const router = useRouter()
+    const [editing, setEditing] = useState(false)
+    const [value, setValue] = useState(String(stock))
+    const [saving, setSaving] = useState(false)
+
+    const available = stock - ordered
+    const isLow = available < lowThreshold
+
+    const startEdit = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setValue(String(stock))
+        setEditing(true)
+    }
+    const cancel = (e: React.MouseEvent | React.KeyboardEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setEditing(false)
+    }
+    const save = async (e: React.MouseEvent | React.KeyboardEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const n = parseInt(value, 10)
+        if (isNaN(n) || n < 0) { alert('Invalid stock value'); return }
+        if (n === stock) { setEditing(false); return }
+        setSaving(true)
+        try {
+            const res = await adminAdjustProductStock(productId, n, 'manual edit from /admin/products list')
+            if (res.success) {
+                setEditing(false)
+                router.refresh()
+            } else {
+                alert('Failed: ' + res.error)
+            }
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (editing) {
+        return (
+            <span
+                className="inline-flex items-center gap-1"
+                onClick={e => { e.preventDefault(); e.stopPropagation() }}
+            >
+                <input
+                    type="number"
+                    min={0}
+                    autoFocus
+                    value={value}
+                    onChange={e => setValue(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') save(e); if (e.key === 'Escape') cancel(e) }}
+                    onClick={e => { e.preventDefault(); e.stopPropagation() }}
+                    className="w-14 border border-blue-300 rounded px-1 py-0 text-[10px] font-mono"
+                    disabled={saving}
+                />
+                <button onClick={save} disabled={saving} className="text-[10px] font-bold text-emerald-600 hover:text-emerald-800">{saving ? '…' : '✓'}</button>
+                <button onClick={cancel} disabled={saving} className="text-[10px] text-gray-400 hover:text-gray-600">✕</button>
+            </span>
+        )
+    }
+
+    return (
+        <span
+            onClick={startEdit}
+            className={`font-medium cursor-pointer hover:underline ${isLow ? 'text-red-500' : 'text-gray-500'}`}
+            title="Klikni za ročno spremembo zaloge"
+        >
+            {stock} stk
+            {ordered > 0 && <span className="text-orange-500"> / {ordered} ord</span>}
+            {ordered > 0 && <span className={isLow ? 'text-red-600 font-bold' : 'text-green-600'}> / {available} avl</span>}
+        </span>
+    )
+}
 
 function ToggleStatus({ id, active, type }: { id: string, active: boolean, type: 'active' | 'featured' }) {
     const [loading, setLoading] = useState(false)
