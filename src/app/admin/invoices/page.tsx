@@ -39,6 +39,7 @@ export default function InvoicesPage() {
     const [dragOver, setDragOver] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editForm, setEditForm] = useState<Partial<ManualInvoice>>({})
+    const [filter, setFilter] = useState<'all' | 'pending' | 'open' | 'past_due' | 'paid'>('all')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const supabase = createClient()
 
@@ -139,6 +140,28 @@ export default function InvoicesPage() {
         fetchManualInvoices()
     }, [])
 
+    const todayStr = new Date().toISOString().slice(0, 10)
+    const isPastDue = (o: Order) =>
+        !!o.invoice_url && o.payment_status !== 'paid' && o.status !== 'cancelled'
+        && !!(o as any).payment_due_date && ((o as any).payment_due_date as string) < todayStr
+
+    const filteredOrders = orders.filter(o => {
+        if (filter === 'all') return true
+        if (filter === 'pending') return !o.invoice_url
+        if (filter === 'paid') return !!o.invoice_url && o.payment_status === 'paid'
+        if (filter === 'open') return !!o.invoice_url && o.payment_status !== 'paid'
+        if (filter === 'past_due') return isPastDue(o)
+        return true
+    })
+
+    const counts = {
+        all: orders.length,
+        pending: orders.filter(o => !o.invoice_url).length,
+        open: orders.filter(o => o.invoice_url && o.payment_status !== 'paid').length,
+        past_due: orders.filter(isPastDue).length,
+        paid: orders.filter(o => o.invoice_url && o.payment_status === 'paid').length,
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -151,6 +174,24 @@ export default function InvoicesPage() {
                         Intrastat Report
                     </Link>
                 </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+                {([
+                    { key: 'all', label: 'All', count: counts.all, color: 'bg-slate-800 text-white', inactive: 'bg-white text-slate-700 border border-slate-200' },
+                    { key: 'pending', label: 'Awaiting Invoice', count: counts.pending, color: 'bg-blue-600 text-white', inactive: 'bg-white text-blue-700 border border-blue-200' },
+                    { key: 'open', label: 'Open (Unpaid)', count: counts.open, color: 'bg-amber-500 text-white', inactive: 'bg-white text-amber-700 border border-amber-200' },
+                    { key: 'past_due', label: 'Past Due', count: counts.past_due, color: 'bg-red-600 text-white', inactive: 'bg-white text-red-700 border border-red-200' },
+                    { key: 'paid', label: 'Paid', count: counts.paid, color: 'bg-emerald-600 text-white', inactive: 'bg-white text-emerald-700 border border-emerald-200' },
+                ] as const).map(b => (
+                    <button
+                        key={b.key}
+                        onClick={() => setFilter(b.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${filter === b.key ? b.color : b.inactive} hover:opacity-90`}
+                    >
+                        {b.label} <span className={`ml-1 px-1.5 py-0.5 rounded ${filter === b.key ? 'bg-white/20' : 'bg-slate-100'} text-[10px]`}>{b.count}</span>
+                    </button>
+                ))}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -175,11 +216,11 @@ export default function InvoicesPage() {
                     </tbody>
                 </table>
 
-                {(!loading && orders.length === 0) && (
+                {(!loading && filteredOrders.length === 0) && (
                     <div className="py-20 text-center">
                         <div className="text-4xl mb-4">📑</div>
-                        <h3 className="text-lg font-bold text-slate-800">No invoices found</h3>
-                        <p className="text-slate-500 mt-1">Orders awaiting invoice will appear here.</p>
+                        <h3 className="text-lg font-bold text-slate-800">{orders.length === 0 ? 'No invoices found' : 'No invoices match this filter'}</h3>
+                        <p className="text-slate-500 mt-1">{orders.length === 0 ? 'Orders awaiting invoice will appear here.' : `Try a different filter — there are ${orders.length} total.`}</p>
                     </div>
                 )}
             </div>
@@ -350,7 +391,7 @@ export default function InvoicesPage() {
     )
 
     function projects_with_invoices() {
-        return orders.map((order) => (
+        return filteredOrders.map((order) => (
             <tr key={order.id} className="hover:bg-slate-50/50 transition">
                 <td className="px-6 py-4">
                     {order.invoice_number ? (
