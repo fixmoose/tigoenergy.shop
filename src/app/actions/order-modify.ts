@@ -138,6 +138,37 @@ export async function adminUpdateShippingCost(
 }
 
 /**
+ * Returns true if the order is still "holding" reserved stock — i.e. it was
+ * confirmed and its stock hasn't been fully adjusted yet. While true,
+ * adding/removing line items must mirror products.reserved_quantity so the
+ * counter doesn't drift on SKU swaps or qty edits.
+ */
+async function isOrderInReservationState(supabase: any, orderId: string): Promise<boolean> {
+  const { data: o } = await supabase
+    .from('orders')
+    .select('status, stock_adjusted')
+    .eq('id', orderId)
+    .single()
+  if (!o) return false
+  if (o.stock_adjusted) return false
+  return ['processing', 'shipped'].includes(o.status)
+}
+
+async function adjustProductReserved(supabase: any, productId: string, delta: number) {
+  const { data: p } = await supabase
+    .from('products')
+    .select('reserved_quantity')
+    .eq('id', productId)
+    .single()
+  if (!p) return
+  const next = Math.max(0, (p.reserved_quantity || 0) + delta)
+  await supabase
+    .from('products')
+    .update({ reserved_quantity: next })
+    .eq('id', productId)
+}
+
+/**
  * Recalculate order totals from items and update the order row.
  */
 async function recalcOrderTotals(supabase: any, orderId: string) {
@@ -203,12 +234,22 @@ export async function adminUpdateOrderItem(
 
   if (error) return { success: false, error: error.message }
 
+  // Mirror reservation by the qty delta when the order is still holding stock.
+  const qtyDelta = qty - item.quantity
+  if (qtyDelta !== 0 && item.product_id && await isOrderInReservationState(supabase, orderId)) {
+    await adjustProductReserved(supabase, item.product_id, qtyDelta)
+  }
+
   await recalcOrderTotals(supabase, orderId)
   return { success: true }
 }
 
 /**
  * Admin action: Remove an order item.
+ *
+ * If the order is still holding reserved stock (confirmed and not yet
+ * adjusted), decrement that product's reserved_quantity by the removed
+ * line's qty so swaps via remove-then-add don't leave phantom reservations.
  */
 export async function adminRemoveOrderItem(
   itemId: string,
@@ -221,6 +262,14 @@ export async function adminRemoveOrderItem(
 
   const supabase = await createAdminClient()
 
+  // Snapshot the row before delete so we can release the reservation
+  const { data: existing } = await supabase
+    .from('order_items')
+    .select('id, product_id, quantity')
+    .eq('id', itemId)
+    .eq('order_id', orderId)
+    .single()
+
   const { error } = await supabase
     .from('order_items')
     .delete()
@@ -228,6 +277,10 @@ export async function adminRemoveOrderItem(
     .eq('order_id', orderId)
 
   if (error) return { success: false, error: error.message }
+
+  if (existing?.product_id && existing.quantity > 0 && await isOrderInReservationState(supabase, orderId)) {
+    await adjustProductReserved(supabase, existing.product_id, -existing.quantity)
+  }
 
   await recalcOrderTotals(supabase, orderId)
   return { success: true }
@@ -277,6 +330,11 @@ export async function adminAddOrderItem(
     })
 
   if (error) return { success: false, error: error.message }
+
+  // Mirror the reservation if the order is still holding stock.
+  if (quantity > 0 && await isOrderInReservationState(supabase, orderId)) {
+    await adjustProductReserved(supabase, product.id, +quantity)
+  }
 
   await recalcOrderTotals(supabase, orderId)
   return { success: true }
