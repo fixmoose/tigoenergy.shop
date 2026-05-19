@@ -9,7 +9,7 @@ export const PRODUCT_CATEGORIES = {
     },
     'EI RESIDENTIAL SOLUTION': {
         slug: 'ei-residential-solution',
-        subcategories: ['EI Inverter', 'EI Battery', 'EI Link', 'GO EV Charger', 'GO Junction']
+        subcategories: ['EI Complete System', 'EI Inverter', 'EI Battery', 'EI Link', 'GO EV Charger', 'GO Junction']
     },
     'COMMUNICATIONS': {
         slug: 'communications',
