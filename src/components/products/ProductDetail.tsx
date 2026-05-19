@@ -109,26 +109,29 @@ export default function ProductDetail({ product, userId, reviews, pricing }: { p
           <div className="flex items-center gap-3 mt-2">
             <p className="text-sm text-gray-500 font-mono">{product.sku}</p>
 
-            {/* Stock Status Badges */}
+            {/* Stock Status Badges — color rules:
+                  green: in stock, available to order, low stock
+                  orange: coming soon, special order
+                  red: out of stock */}
             {product.stock_status === 'out_of_stock' && (
               <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded border border-red-200">{tc('outOfStock')}</span>
             )}
             {product.stock_status === 'coming_soon' && (
-              <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">{tc('comingSoon')}</span>
+              <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded border border-orange-200">{tc('comingSoon')}</span>
             )}
             {product.stock_status === 'special_order' && (
               <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded border border-orange-200">{tc('specialOrder')}</span>
             )}
             {product.stock_status === 'available_to_order' && (
-              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded border border-amber-200">{tc('availableToOrder')}</span>
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">{tc('availableToOrder')}</span>
             )}
             {/* Low Stock Badge */}
             {product.stock_status !== 'out_of_stock' && product.stock_status !== 'coming_soon' && product.stock_status !== 'special_order' && product.stock_status !== 'available_to_order' && (product.stock_quantity ?? 0) <= (product.low_stock_threshold ?? 10) && (product.stock_quantity ?? 0) > 0 && (
-              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded border border-yellow-200">{tc('lowStock')}</span>
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">{tc('lowStock')}</span>
             )}
             {/* In Stock Badge */}
             {product.stock_status !== 'out_of_stock' && product.stock_status !== 'coming_soon' && product.stock_status !== 'special_order' && product.stock_status !== 'available_to_order' && (product.stock_quantity ?? 0) > (product.low_stock_threshold ?? 10) && (
-              <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded border border-amber-200">{tc('inStock')}</span>
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded border border-green-200">{tc('inStock')}</span>
             )}
           </div>
 

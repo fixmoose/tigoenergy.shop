@@ -80,14 +80,17 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
               {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
             </span>
           )}
-          {/* Stock Badges */}
+          {/* Stock Badges — color rules:
+                  green: in stock / available to order / low stock
+                  orange: coming soon / special order
+                  red: out of stock */}
           {isOutOfStock && (
             <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('outOfStock')}
             </span>
           )}
           {!isOutOfStock && isComingSoon && (
-            <span className="absolute top-3 right-3 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('comingSoon')}
             </span>
           )}
@@ -97,17 +100,17 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
             </span>
           )}
           {!isOutOfStock && isAvailableToOrder && (
-            <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('availableToOrder')}
             </span>
           )}
           {!isAvailableToOrder && !isSpecialOrder && isLowStock && (
-            <span className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('lowStock')}
             </span>
           )}
           {!isAvailableToOrder && !isSpecialOrder && isNormalStock && (
-            <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
+            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
               {tc('inStock')}
             </span>
           )}
