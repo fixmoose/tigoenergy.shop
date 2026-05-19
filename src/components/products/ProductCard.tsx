@@ -74,46 +74,35 @@ export default function ProductCard({ product, pricing }: { product: Product; pr
               </svg>
             </div>
           )}
-          {/* Category Badge */}
-          {product.category && (
-            <span className="absolute top-3 left-3 bg-amber-600 text-white text-xs font-medium px-2 py-1 rounded">
-              {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
-            </span>
-          )}
-          {/* Stock Badges — color rules:
-                  green: in stock / available to order / low stock
-                  orange: coming soon / special order
-                  red: out of stock */}
-          {isOutOfStock && (
-            <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('outOfStock')}
-            </span>
-          )}
-          {!isOutOfStock && isComingSoon && (
-            <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('comingSoon')}
-            </span>
-          )}
-          {!isOutOfStock && isSpecialOrder && (
-            <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('specialOrder')}
-            </span>
-          )}
-          {!isOutOfStock && isAvailableToOrder && (
-            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('availableToOrder')}
-            </span>
-          )}
-          {!isAvailableToOrder && !isSpecialOrder && isLowStock && (
-            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('lowStock')}
-            </span>
-          )}
-          {!isAvailableToOrder && !isSpecialOrder && isNormalStock && (
-            <span className="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-              {tc('inStock')}
-            </span>
-          )}
+          {/* Top badge row — category (left, may truncate) + stock (right,
+              never wraps). justify-between keeps them apart; gap-2 ensures a
+              minimum visual separation; shrink-0 on the stock badge means
+              the category badge shortens itself, not the stock badge. */}
+          <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2 pointer-events-none">
+            {product.category ? (
+              <span className="bg-amber-600 text-white text-xs font-medium px-2 py-1 rounded min-w-0 truncate max-w-[60%]">
+                {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+              </span>
+            ) : <span />}
+            {isOutOfStock && (
+              <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('outOfStock')}</span>
+            )}
+            {!isOutOfStock && isComingSoon && (
+              <span className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('comingSoon')}</span>
+            )}
+            {!isOutOfStock && isSpecialOrder && (
+              <span className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('specialOrder')}</span>
+            )}
+            {!isOutOfStock && isAvailableToOrder && (
+              <span className="bg-green-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('availableToOrder')}</span>
+            )}
+            {!isOutOfStock && !isComingSoon && !isAvailableToOrder && !isSpecialOrder && isLowStock && (
+              <span className="bg-green-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('lowStock')}</span>
+            )}
+            {!isOutOfStock && !isComingSoon && !isAvailableToOrder && !isSpecialOrder && isNormalStock && (
+              <span className="bg-green-500 text-white text-xs font-medium px-2 py-1 rounded shrink-0 whitespace-nowrap">{tc('inStock')}</span>
+            )}
+          </div>
         </div>
 
         {/* Content */}
